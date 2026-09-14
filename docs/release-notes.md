@@ -1,4 +1,4 @@
-# Litespeed 0.1.13
+# Litespeed 0.1.14
 
 LiteFusion adds one persistent lead with task-specific specialist models and reasoning levels.
 
