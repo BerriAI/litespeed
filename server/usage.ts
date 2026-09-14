@@ -13,7 +13,7 @@ export class UsageLedger {
     store.db.exec('CREATE UNIQUE INDEX IF NOT EXISTS usage_request_id ON usage_log(request_id);');
   }
   start(input: Omit<RequestUsage,'id'|'usage'>): RequestUsage {
-    const record = { ...input, id: randomUUID() };
+    const record = { ...input, startedAt: Date.now(), id: randomUUID() };
     this.store.db.prepare('INSERT INTO request_usage(id,root_session_id,turn_id,data) VALUES(?,?,?,?)').run(record.id,record.rootSessionId,record.turnId,JSON.stringify(record));
     return record;
   }

@@ -22,6 +22,14 @@ describe('isolated worker publication', () => {
     await writeFile(join(batch.workspaces.get('two')!.workspace, 'b.txt'), 'worker two');
     return batch;
   }
+  it('settles a stopped worker before its independent sibling arrives, without publishing its edits',async()=>{
+    const workers=await batch();
+    const stopped=await workers.complete('one',false,'child-one','attempt-one');
+    expect(stopped.accepted).toBe(false);expect(stopped.note).toContain(workers.workspaces.get('one')!.workspace);
+    expect(await readFile(join(directory,'a.txt'),'utf8')).toBe('before');
+    const completed=await workers.complete('two',true,'child-two','attempt-two');expect(completed.accepted).toBe(true);
+    expect(await readFile(join(directory,'b.txt'),'utf8')).toBe('worker two');expect(await readFile(join(directory,'a.txt'),'utf8')).toBe('before');
+  });
   it('excludes state reached through a different filesystem alias from workspace copies', async () => {
     const alias = directory + '-alias'; await symlink(directory, alias, 'dir');
     const aliasStore = new Store(join(alias, 'state'));

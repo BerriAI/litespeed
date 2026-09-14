@@ -1,12 +1,15 @@
-# Litespeed 0.1.11
+# Litespeed 0.1.12
 
-Import existing skills and manage queued messages directly from the terminal.
+LiteFusion adds one persistent lead with task-specific specialist models and reasoning levels.
 
-- Import Claude Code and Codex skills from your machine into a project through `/skills` in the terminal or Settings → Project profiles in the web app. Preview the files before importing, then select the skill to activate it. Setup includes an optional import link.
-- Press Escape once to interrupt the current response and its workers, then start the oldest queued message after cleanup. Explicitly paused queues stay paused; `/stop` stops work and holds the queue.
-- Press Up on the first row of the terminal input to bring queued messages back into your draft for editing, including attachments. Individual messages can also be edited through `/queue`.
-- Steering notes use the normal user-message presentation in both interfaces, with their attachments and without internal steering labels.
+- Choose **LiteFusion** in Models or `/models`. It is recommended during new setup; existing architecture selections stay saved.
+- Inspect and customize all 63 task cards, their default and shared hard/escalation routes, handoff instructions, and gateway deployment bindings. Compatible serial workers keep their own context; the lead owns assistance, handoffs and final acceptance.
+- Parallel workers appear as compact progress rows in the terminal and web app. Open one worker history at a time, inspect earlier attempts, or stop one worker while the others continue. Closing the inspector restores your draft.
+- Export reviewed routing policies and per-session evaluation records for Devin. Worker completion, integration, reported costs and external success labels remain separate.
+- Mercury Edit 2 and Voyage Code 4 have explicit chat-model fallbacks for version-checked edit suggestions and repository search. Continuous autocomplete and vector indexing are unavailable.
 
-Update with `litespeed update`, then reopen the terminal UI. Saved sessions, settings, and keys are preserved.
+The bundled model roster is an initial research policy. Quality and cost improvements require independent evaluation; this release does not claim measured ROI gains.
+
+Run `litespeed update`, then reopen the terminal UI. Select **LiteFusion** in Models to use it in an existing session. Saved sessions, settings, and keys are preserved.
 
 Packages include Node, Bun, native terminal dependencies, and the web app for Apple silicon and Intel Macs.

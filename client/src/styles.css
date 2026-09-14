@@ -1081,3 +1081,33 @@ fieldset.model-picker { padding: 22px 24px; gap: 22px; overflow: visible; }
 .skill-importer-files li:nth-child(odd) { background: var(--surface); }
 .skill-importer-files span { color: var(--muted); flex: 0 0 auto; }
 .skill-importer-confirm { display: flex; gap: 10px; align-items: center; margin-top: 4px; }
+
+/* Concurrent work stays compact; only the selected inspector loads a transcript. */
+.worker-grid { grid-template-columns: minmax(0, 1fr); gap: 8px; }
+.worker-model, .worker-recent { margin: 5px 0 0; font-size: 11px; color: var(--muted); overflow-wrap: anywhere; }
+.worker-recent { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.worker-attention { margin: 7px 0 0; font-size: 12px; overflow-wrap: anywhere; }
+.workspace-retained { display: flex; min-height: 0; }
+.workspace-retained[hidden] { display: none; }
+.worker-inspector { width: min(46vw, 620px); min-width: 340px; min-height: 0; display: flex; flex-direction: column; gap: 10px; padding: 16px; border-left: 1px solid var(--border); background: var(--surface); overflow: auto; }
+.worker-inspector header { display: flex; align-items: center; justify-content: space-between; gap: 10px; }
+.worker-inspector > p { margin: 0; overflow-wrap: anywhere; }
+.worker-inspector label, .litefusion-settings label { display: flex; flex-direction: column; gap: 5px; font-size: 12px; }
+.worker-inspector select, .litefusion-settings select, .litefusion-settings input:not([type=checkbox]), .litefusion-settings textarea { min-width: 0; max-width: 100%; padding: 7px; border: 1px solid var(--border); border-radius: 6px; background: var(--surface); color: inherit; }
+.worker-inspector .research-transcript { min-height: 220px; flex: 1; display: flex; flex-direction: column; }
+.worker-inspector .task-transcript-content { overflow: auto; min-height: 0; flex: 1; }
+.worker-inspector .conversation-content { padding: 10px 0; }
+.litefusion-settings { display: flex; flex-direction: column; gap: 12px; border-top: 1px solid var(--border); padding-top: 14px; }
+.litefusion-settings details > :not(summary) { margin-top: 10px; }
+.litefusion-settings summary { cursor: pointer; font-size: 12px; }
+.litefusion-route, .litefusion-binding { display: grid; grid-template-columns: minmax(0, 1fr) minmax(100px, .45fr); gap: 8px; }
+.litefusion-route p { grid-column: 1 / -1; }
+.litefusion-actions { display: flex; flex-wrap: wrap; gap: 12px; }
+@media (max-width: 1000px) {
+  .worker-inspection-hidden { position: absolute; visibility: hidden; pointer-events: none; width: 100%; height: calc(100% - 66px); }
+  .worker-inspector { flex: 1; width: 100%; min-width: 0; border-left: 0; }
+}
+
+.work-log .worker-task .research-task-heading > strong { flex-basis: auto; flex: 1; min-width: 100px; }
+.work-log .worker-task .research-task-heading { align-items: center; }
+.work-log .worker-task p { margin-top: 5px; margin-bottom: 0; }

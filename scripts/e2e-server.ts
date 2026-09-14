@@ -14,7 +14,7 @@ await mkdir(join(root,'src'));await writeFile(join(root,'src','hello.ts'),'expor
 let providerRequests=0;
 const profileRequests:{model:string;messages:any[];tools:any[]}[]=[];
 const pendingSummaries=new Set<()=>void>();
-const delegationRequests:{model:string;messages:any[];tools:any[]}[]=[];
+const delegationRequests:{model:string;messages:any[];tools:any[];reasoningEffort?:string}[]=[];
 const pendingDelegations=new Set<()=>void>();
 const mock=createServer(async(req,res)=>{
   if(req.url?.startsWith('/setup-auth/')&&req.headers.authorization!=='Bearer fixture-key'){res.writeHead(401,{'Content-Type':'application/json'});res.end(JSON.stringify({error:{message:'Invalid API key'}}));return;}
@@ -25,7 +25,7 @@ const mock=createServer(async(req,res)=>{
   const lastUser=data.messages.filter((m:any)=>m.role==='user').at(-1)?.content||'';
   const prompt=typeof lastUser==='string'?lastUser:JSON.stringify(lastUser);
   if(prompt.includes('PROFILE_BROWSER')){profileRequests.push({model:data.model,messages:data.messages,tools:data.tools||[]});if(profileRequests.length>30)profileRequests.shift();}
-  if(prompt.includes('DELEGATE_BROWSER')||prompt.includes('DELEGATE_CHILD')||prompt.includes('SIDEKICK_BROWSER')||prompt.includes('SIDEKICK_CHILD')||prompt.includes('FUSION_BROWSER')||prompt.includes('FUSION_CHILD')){delegationRequests.push({model:data.model,messages:data.messages,tools:data.tools||[]});if(delegationRequests.length>100)delegationRequests.shift();}
+  if(prompt.includes('DELEGATE_BROWSER')||prompt.includes('DELEGATE_CHILD')||prompt.includes('SIDEKICK_BROWSER')||prompt.includes('SIDEKICK_CHILD')||prompt.includes('FUSION_BROWSER')||prompt.includes('FUSION_CHILD')){delegationRequests.push({model:data.model,messages:data.messages,tools:data.tools||[],reasoningEffort:data.reasoning_effort});if(delegationRequests.length>100)delegationRequests.shift();}
   if(prompt.includes('provider failure')||(prompt.includes('DELEGATE_CHILD')&&prompt.includes('CHILD_FAILURE'))){res.writeHead(401,{'Content-Type':'application/json'});res.end(JSON.stringify({error:{message:'Fixture provider rejected the request.'}}));return;}
   res.writeHead(200,{'Content-Type':'text/event-stream'});
   const emit=(delta:any,finish_reason?:string)=>res.write(`data: ${JSON.stringify({choices:[{index:0,delta,finish_reason}]})}\n\n`);
@@ -35,6 +35,15 @@ const mock=createServer(async(req,res)=>{
     emit({content:'The fixture exports a greeting. Shunt kept the source out of the caller context.'});
     if(prompt.includes('LIVE_SHUNT'))await new Promise<void>(resolve=>{const release=()=>{pendingDelegations.delete(release);res.off('close',release);resolve();};pendingDelegations.add(release);res.once('close',release);});
     if(res.destroyed)return;
+  }else if(prompt.includes('LITEFUSION_BROWSER')) {
+    const child=data.messages.some((m:any)=>m.role==='system'&&typeof m.content==='string'&&m.content.includes('You are a LiteFusion worker.'));
+    if(child) {
+      const name=prompt.includes('alpha.txt')?'alpha':'beta';
+      if(data.messages.at(-1)?.role!=='tool') {toolCall=true;emit({tool_calls:[{index:0,id:`lf-write-${name}`,type:'function',function:{name:'write_file',arguments:JSON.stringify({path:`${name}.txt`,content:`${name} written`})}}]});}
+      else {emit({content:`${name} worker report`});await new Promise<void>(resolve=>{const release=()=>{pendingDelegations.delete(release);res.off('close',release);resolve();};pendingDelegations.add(release);res.once('close',release);});if(res.destroyed)return;}
+    } else if(data.messages.at(-1)?.role!=='tool') {
+      toolCall=true;emit({tool_calls:['alpha','beta'].map((name,index)=>({index,id:`lf-${name}`,type:'function',function:{name:'delegate',arguments:JSON.stringify({roleId:'bounded_patch',workstream:name,description:`Write ${name}`,prompt:`Write ${name}.txt`,files:[`${name}.txt`],reason:'Independent bounded files',acceptance:[`${name}.txt contains ${name} written`]})}}))});
+    } else emit({content:'LiteFusion fixture finished. Review the integrated files.'});
   }else if(prompt.includes('SHUNT_WORKERS')&&data.messages.at(-1)?.role!=='tool') {
     toolCall=true;emit({tool_calls:['alpha','beta'].map((name,index)=>({index,id:`shunt-worker-${name}`,type:'function',function:{name:'delegate',arguments:JSON.stringify({description:`Read ${name}`,prompt:`SHUNT_CHILD ${name}`})}}))});
   }else if((prompt.includes('SHUNT_BROWSER')||prompt.includes('SHUNT_CHILD'))&&data.messages.at(-1)?.role!=='tool') {

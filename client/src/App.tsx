@@ -1,3 +1,5 @@
+import { WorkerInspector } from './WorkerInspector';
+import { workerProjection } from '../../shared/worker-presentation';
 import { goalTurnLabel } from '../../shared/goals.js';
 import { Updates } from './Updates';
 import { useCopyOnSelection } from './clipboard';
@@ -101,6 +103,10 @@ export default function App() {
     update(); media.addEventListener('change', update);
     return () => media.removeEventListener('change', update);
   }, []);
+  const [inspectedWorker,setInspectedWorker]=useState<string|null>(null);
+  const inspectorTrigger=useRef<HTMLElement|null>(null);
+  const closeWorker=()=>{setInspectedWorker(null);requestAnimationFrame(()=>inspectorTrigger.current?.focus());};
+  useEffect(()=>{setInspectedWorker(null);},[activeId]);
   const [terminalOpen, setTerminalOpen] = useState(false);
   useEffect(() => setTerminalOpen(false), [activeId]);
   const [sessionMenu, setSessionMenu] = useState(false);
@@ -127,6 +133,8 @@ export default function App() {
   const detailRef = useRef(detail); detailRef.current = detail;
   const running = detail?.session.status === 'running' || detail?.session.status === 'waiting';
   const delegations = detail ? visibleDelegations(detail) : [];
+  const workerRows=detail?workerProjection(detail):new Map();
+  const inspected=inspectedWorker?delegations.find(task=>task.id===inspectedWorker):undefined;
   const actors = detail ? workerLabels(detail) : new Map<string, string>();
   const history = detail?.history;
   const historyDisabled = running || busy || queueBusy || submissionBusy || historyBusy || configBusy || sessionLoading;
@@ -686,12 +694,14 @@ export default function App() {
         {detail && <button className={`icon-button ${terminalOpen ? 'selected' : ''}`} aria-label={terminalOpen ? 'Hide terminal pane' : 'Open terminal'} aria-expanded={terminalOpen} title="Open a local shell (not sandboxed)" onClick={() => setTerminalOpen(v => !v)}><Terminal size={18} /></button>}
         <button className={`icon-button workspace-toggle ${workspaceOpen ? 'selected' : ''}`} aria-label={workspaceOpen ? 'Hide workspace panel' : 'Show workspace panel'} title="Files, changes, and plan" aria-expanded={workspaceOpen} onClick={() => setWorkspaceOpen(v => !v)}><PanelRight size={18} /></button></div></header>
       {error && <div className="global-alert" role="alert"><span>{error}</span>{!settings ? <button onClick={() => void load()}>Retry connection</button> : activeId && !detail ? <button onClick={() => { setError(''); setSessionReload(v => v + 1); }}>Retry</button> : null}<button className="icon-button" aria-label="Dismiss error" onClick={() => setError('')}><X size={15} /></button></div>}
-      <div className="main-panels"><div className={`main-stage ${!activeId ? 'welcome-stage' : ''}`}>
+      <div className="main-panels"><div className={`main-stage ${inspected && compactWorkspace ? 'worker-inspection-hidden' : ''} ${!activeId ? 'welcome-stage' : ''}`}>
         {loading ? <div className="app-loading"><Logo /><LiteSpeed active /><p>Opening your workspace…</p></div> : !settings ? <EmptyState icon={<Terminal size={30} />} title="Let’s get connected.">The local server is not available. Check that Litespeed is running, then retry the connection.<button className="button primary" onClick={() => void load()}>Try again</button></EmptyState> : activeId ? <>
           {goalVisible && detail && <div className={`goal-banner ${goal.status}`} role="status"><Target size={14} /><div className="goal-banner-body"><strong>{goal.status === 'blocked' ? 'Goal paused' : 'Session goal'}</strong><span title={goal.text}>{goal.text}</span></div><span className="goal-banner-turns">{goalTurnLabel(goal.turns, goal.maxTurns)}</span><button className="button secondary" disabled={busy || running} onClick={() => void clearSessionGoal()}>Clear goal</button></div>}
           {sessionLoading ? <div className="app-loading"><LiteSpeed active /><p>Opening this conversation…</p></div> : detail ? <Conversation detail={detail} connection={connection} busy={busy} onAllowAll={() => void changePermissionMode('auto')} renderTask={(tool, message, expanded) => {
-            const task = delegations.find(item => item.id === tool.delegationId && item.toolCallId === tool.id && item.parentMessageId === message.id);
-            return task || actors.has(`${message.id}:${tool.id}`) ? <TaskCard task={task} tool={tool} label={actors.get(`${message.id}:${tool.id}`)} awaitingApproval={detail.permissions.some(request => request.toolCallId === tool.id)} expanded={expanded} onCancel={() => { if (task) void cancelTask(task); }} cancelling={Boolean(task && cancellingTasks.has(task.id))} error={task && taskErrors.get(task.id)} /> : null;
+            const row=workerRows.get(`${message.id}:${tool.id}`);
+            if(row?.hidden)return <></>;
+            const task = row?.task ?? delegations.find(item => item.id === tool.delegationId && item.toolCallId === tool.id && item.parentMessageId === message.id);
+            return task || actors.has(`${message.id}:${tool.id}`) ? <TaskCard onInspect={()=>{if(task){inspectorTrigger.current=document.activeElement as HTMLElement;setInspectedWorker(task.id);}}} task={task} tool={tool} label={actors.get(`${message.id}:${tool.id}`)} awaitingApproval={detail.permissions.some(request => Boolean(task && request.invocationId===task.id) || request.toolCallId === tool.id)} expanded={expanded} onCancel={() => { if (task) void cancelTask(task); }} cancelling={Boolean(task && cancellingTasks.has(task.id))} error={task && taskErrors.get(task.id)} /> : null;
           }} onDecide={(id, decision) => void act(async () => { await post(`/sessions/${activeId}/permissions/${id}`, { decision }); await refreshDetail(activeId); })} onFork={messageId => void fork(messageId)} renderQuestion={request => <QuestionCard key={request.id} request={request} draft={questionDrafts.get(request.id) ?? emptyQuestionDraft()} onChange={value => changeQuestionDraft(request.id, value)} onAnswer={answer => answerQuestion(request, answer)} onStop={() => void stopResponse(request.sessionId)} busy={answering.has(request.id)} disabled={busy || historyBusy || Boolean(history?.pendingRecovery)} error={questionErrors.get(request.id)} />} /> : <EmptyState title="This session couldn’t be opened">Choose another session, or start a fresh one.<button className="button secondary" onClick={newSession}><Plus size={15} />New session</button></EmptyState>}
           {detail && <div className="chat-composer">{history?.pendingRecovery && <TurnHistory history={history} disabled={historyDisabled} busy={historyBusy} running={running} preparing={submissionBusy || queueBusy} onAction={askHistory} />}<CommandArea key={activeId} commands={composerCommands} text={text} setText={setText}><Composer onCommand={runCommand} key={activeId} onPermissionMode={mode => void changePermissionMode(mode)} settings={settings} selection={selection} onSelection={v => void changeSelection(v)} selectionDisabled={selectionDisabled} onSend={(content, files) => send(expandSlashCommand(content, commands), files)} onQueue={(content, files) => queueMessage(expandSlashCommand(content, commands), files)} onSteer={content => steerMessage(content)} queue={detail.queue} queueBusy={queueBusy} onQueueAction={(action, queueId) => void queueAction(action, queueId)} onCancel={() => void stopResponse(activeId)} running={running} disabled={composerDisabled} workspace={workspace} text={text} setText={setText} attachments={attachments} setAttachments={setAttachments} draftNotice={draftNotice} onSettings={() => setSettingsOpen(true)} /></CommandArea></div>}
           {terminalOpen && detail && <div className="terminal-dock"><Suspense fallback={<div className="app-loading"><LiteSpeed compact active /><p>Opening terminal…</p></div>}><SessionTerminal key={activeId} sessionId={activeId} onClose={() => setTerminalOpen(false)} /></Suspense></div>}
@@ -700,7 +710,7 @@ export default function App() {
           <div className="suggestions">{suggestions.map(({ Icon, label, description, prompt }) => <button key={label} onClick={() => { setText(prompt); document.getElementById('message-input')?.focus(); }}><span className="suggestion-icon"><Icon size={17} /></span><span><strong>{label}</strong><small>{description}</small></span><ArrowRight className="suggestion-arrow" size={14} /></button>)}</div>
           {(!provider?.configured && provider?.baseUrl && !/localhost|127\.0\.0\.1/.test(provider.baseUrl)) && <button className="setup-hint" onClick={() => setSettingsOpen(true)}><Shield size={13} />Connect your provider to get started<ArrowRight size={13} /></button>}
         </div>}
-      </div>{workspaceOpen && settings && <Workspace workspace={workspace} sessionId={activeId ?? undefined} todos={detail?.todos ?? []} refreshKey={refreshKey} onClose={() => setWorkspaceOpen(false)} onUndo={legacyUndo ? () => askHistory('legacy') : undefined} running={historyDisabled} />}</div>
+      </div>{inspected && detail && <WorkerInspector task={inspected} detail={detail} onSelect={setInspectedWorker} onClose={closeWorker} onCancel={()=>void cancelTask(inspected)} cancelling={cancellingTasks.has(inspected.id)} error={taskErrors.get(inspected.id)} />}<div className="workspace-retained" hidden={Boolean(inspected)}>{workspaceOpen && settings && <Workspace workspace={workspace} sessionId={activeId ?? undefined} todos={detail?.todos ?? []} refreshKey={refreshKey} onClose={() => setWorkspaceOpen(false)} onUndo={legacyUndo ? () => askHistory('legacy') : undefined} running={historyDisabled} />}</div></div>
     </main>
     <input type="file" accept="application/json,.json" hidden tabIndex={-1} ref={importInput} aria-label="Import session JSON" onChange={e => { const f = e.target.files?.[0]; if (f) void importSession(f); e.target.value = ''; }} />
     {!settingsOpen && profileDialog && profileDialog.id === activeId && <ProfilePicker skillsOnly={profileDialog.skillsOnly} key={`${profileDialog.id ?? 'new'}-${profileDialog.view}`} workspace={profileDialog.workspace} sessionId={profileDialog.id} initialChoice={profileDialog.choice} selection={profileDialog.selection} disabled={selectionDisabled} onClose={closeProfiles} onApply={applyProfile} />}

@@ -35,7 +35,7 @@ test('Advanced settings keeps onboarding simple and saves an independently chose
   } finally {await request.post('/api/workspace-preferences',{data:{...original,workspace:settings.workspace,shunt:original.shunt??null,architecture:original.architecture??null,setupComplete:true}});}
 });
 
-for(const workers of [false,true])test(`Shunt streams inline in ${workers?'each worker':'the originating tool'} without Inspect`,async({page,request},testInfo)=>{
+for(const workers of [false,true])test(`Shunt streams in ${workers?'one selected worker inspector':'the originating tool'}`,async({page,request},testInfo)=>{
   const settings=await(await request.get('/api/settings')).json();
   const original=await(await request.get(`/api/workspace-preferences?workspace=${encodeURIComponent(settings.workspace)}`)).json();
   const session=await(await request.post('/api/sessions',{data:{providerId:'fixture',model:'test-model',permissionMode:'auto',architecture:workers?{kind:'team-fusion',worker:{providerId:'fixture',model:'test-fast'}}:null,shunt:{enabled:true,model:{providerId:'fixture',model:'budget-model'}}}})).json();
@@ -43,14 +43,24 @@ for(const workers of [false,true])test(`Shunt streams inline in ${workers?'each 
     await page.goto(`/#session/${session.id}`);
     await page.getByRole('textbox',{name:'Message Litespeed',exact:true}).fill(workers?'SHUNT_WORKERS':'SHUNT_BROWSER');await page.getByRole('button',{name:'Send message',exact:true}).click();
     const readers=page.getByRole('region',{name:'Shunt reader',exact:true});
-    await expect(readers).toHaveCount(workers?2:1);
-    for(const reader of await readers.all()){await expect(reader).toContainText('The fixture exports a greeting.');await expect(reader).toContainText('budget-model');}
-    if(workers)for(const name of ['Worker 1 task','Worker 2 task'])await expect(page.getByRole('region',{name,exact:true}).getByRole('region',{name:'Shunt reader',exact:true})).toBeVisible();
+    if(workers){
+      const cards=page.locator('.worker-task');await expect(cards).toHaveCount(2);
+      await expect(readers).toHaveCount(0);
+      for(const card of await cards.all()){
+        await card.getByRole('button',{name:'Inspect worker',exact:true}).click();
+        await expect(readers).toHaveCount(1);
+        await expect(readers).toContainText('The fixture exports a greeting.');await expect(readers).toContainText('budget-model');
+        await page.getByRole('button',{name:'Back to conversation',exact:false}).click();
+      }
+    }else{
+      await expect(readers).toHaveCount(1);await expect(readers).toContainText('The fixture exports a greeting.');await expect(readers).toContainText('budget-model');
+    }
     await page.screenshot({path:testInfo.outputPath(workers?'shunt-workers.png':'shunt-inline.png')});
     await request.post('/fixture/delegations/release');
     await expect.poll(async()=>(await(await request.get(`/api/sessions/${session.id}`)).json()).session.status).toBe('idle');
     await page.reload();
     await page.locator('.work-log > summary').first().click();
-    await expect(readers).toHaveCount(workers?2:1);
+    if(workers){await expect(readers).toHaveCount(0);await page.locator('.worker-task').first().getByRole('button',{name:'Inspect worker',exact:true}).click();}
+    await expect(readers).toHaveCount(1);await expect(readers).toContainText('The fixture exports a greeting.');
   } finally {await request.post('/fixture/delegations/release');await request.post(`/api/sessions/${session.id}/cancel`,{data:{}});await request.post('/api/workspace-preferences',{data:{...original,workspace:settings.workspace,shunt:original.shunt??null,architecture:original.architecture??null,permissionMode:original.permissionMode??'ask',setupComplete:true}});}
 });

@@ -12,7 +12,7 @@ import type { ModelRoute } from './architectures.js';
 
 export type SetupStep = 'architecture' | 'gateway' | 'driver' | 'worker' | 'review';
 
-type SetupKind = 'single' | 'sidekick-fusion' | 'team-fusion' | 'expert-fusion';
+type SetupKind = 'single' | import('./architectures.js').ArchitectureKind;
 
 export function isFusion(kind: SetupKind): boolean {
   return kind !== 'single';
@@ -20,9 +20,10 @@ export function isFusion(kind: SetupKind): boolean {
 
 /** The model-role steps required after the architecture choice, in order.
  * - Single: only the base/driver model; never a supporting model.
+ * - LiteFusion: the driver, with specialists configured in its task catalog.
  * - Fusion (sidekick/team/expert): a driver plus one supporting model. */
 export function modelRoles(kind: SetupKind): Array<'driver' | 'worker'> {
-  return isFusion(kind) ? ['driver', 'worker'] : ['driver'];
+  return isFusion(kind) && kind !== 'litefusion' ? ['driver', 'worker'] : ['driver'];
 }
 
 /** Advance after the architecture choice: connect a provider only when needed,
@@ -34,7 +35,7 @@ export function nextAfterArchitecture(providerConnected: boolean): SetupStep {
 /** Advance after picking a role's model during the walkthrough.
  * Review edits return directly to review instead. */
 export function nextAfterRole(kind: SetupKind, role: 'driver' | 'worker'): SetupStep {
-  if (role === 'worker' || !isFusion(kind)) return 'review';
+  if (role === 'worker' || !isFusion(kind) || kind === 'litefusion') return 'review';
   return 'worker';
 }
 
@@ -45,7 +46,7 @@ export function backFromRole(role: 'driver' | 'worker'): SetupStep {
 
 /** Back from the review screen to the last model role, sequentially. */
 export function backFromReview(kind: SetupKind): SetupStep {
-  return isFusion(kind) ? 'worker' : 'driver';
+  return isFusion(kind) && kind !== 'litefusion' ? 'worker' : 'driver';
 }
 
 /** Whether a selected route points at a configured provider on the settings. */
@@ -66,6 +67,6 @@ export function saveEnabled(args: {
   const { step, kind, driver, worker, shuntOk, providerConfigured } = args;
   if (step !== 'review') return false;
   if (!routeConfigured(driver, providerConfigured)) return false;
-  if (isFusion(kind) && !routeConfigured(worker, providerConfigured)) return false;
+  if (isFusion(kind) && kind !== 'litefusion' && !routeConfigured(worker, providerConfigured)) return false;
   return shuntOk;
 }

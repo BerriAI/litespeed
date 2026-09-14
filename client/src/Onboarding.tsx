@@ -1,3 +1,5 @@
+import { LiteFusionSettings } from './LiteFusionSettings';
+import { bindExactModels, type LiteFusionSelection } from '../../shared/litefusion';
 import { useState, type ReactNode } from 'react';
 import { shuntConfigured } from '../../shared/shunt';
 import { Check } from 'lucide-react';
@@ -15,18 +17,20 @@ export function Onboarding({ settings, selection, workspace, onSave, onClose, re
   const [providers, setProviders] = useState(false);
   const [skills, setSkills] = useState(false);
   const [simple, setSimple] = useState(quick);
-  const [step, setStep] = useState(quick && settings.providers.some(p => p.id === selection.providerId && p.baseUrl) ? 2 : 0), [kind, setKind] = useState<'single' | ArchitectureKind>(selection.architecture?.kind ?? (quick || !selection.model ? 'sidekick-fusion' : 'single'));
+  const [step, setStep] = useState(quick && settings.providers.some(p => p.id === selection.providerId && p.baseUrl) ? 2 : 0), [kind, setKind] = useState<'single' | ArchitectureKind>(selection.architecture?.kind ?? (quick || !selection.model ? 'litefusion' : 'single'));
   const [draft, setDraft] = useState(selection), [worker, setWorker] = useState(selection.architecture ? architectureWorker(selection.architecture) : null);
+  const [fusion,setFusion]=useState<LiteFusionSelection>(selection.architecture?.kind==='litefusion'?selection.architecture:{kind:'litefusion',gatewayProviderId:selection.providerId||settings.providers.find(p=>p.kind!=='codex')?.id||''});
   const [open, setOpen] = useState<string | null>(null), [saving, setSaving] = useState(false), [error, setError] = useState('');
   const [gateway, setGateway] = useState(() => setupGateway(settings, selection.providerId));
   const [baseUrl, setBaseUrl] = useState(gateway.baseUrl), [apiKey, setApiKey] = useState('');
   const [connection, setConnection] = useState('');
   const label = kind === 'expert-fusion' ? 'Expert' : kind === 'team-fusion' ? 'Worker' : 'Sidekick';
-  const valid = !shuntPending && shuntConfigured(draft.shunt,settings.providers) && Boolean(draft.model && settings.providers.some(provider => provider.id === draft.providerId) && (kind === 'single' || worker?.model && settings.providers.some(provider => provider.id === worker.providerId)));
+  const valid = !shuntPending && shuntConfigured(draft.shunt,settings.providers) && Boolean(draft.model && settings.providers.some(provider => provider.id === draft.providerId) && (kind === 'single' || kind === 'litefusion' || worker?.model && settings.providers.some(provider => provider.id === worker.providerId)));
   async function connect() {
     setSaving(true); setError('');
     try {
       const result = await post<GatewayConnection>('/providers/connect', { providerId: gateway.providerId, baseUrl: gatewayBaseUrl(baseUrl), ...(apiKey.trim() ? {apiKey: apiKey.trim()} : {}) });
+      setFusion(current=>bindExactModels({...current,gatewayProviderId:result.providerId},result.models));
       onSettings(result.settings); setGateway({providerId: result.providerId, baseUrl: baseUrl.trim(), existing: true}); setApiKey('');
       setDraft(current => ({...current, ...(current.shunt?.enabled&&current.shunt.model.providerId===result.providerId&&!result.models.some(model=>model.id===current.shunt!.model!.model)?{shunt:{...current.shunt,model:{providerId:result.providerId,model:''}}}:{}), providerId: result.providerId, model: current.providerId === result.providerId && result.models.some(model => model.id === current.model) ? current.model : ''}));
       setWorker(current => current?.providerId === result.providerId && result.models.some(model => model.id === current.model) ? current : null);
@@ -35,7 +39,7 @@ export function Onboarding({ settings, selection, workspace, onSave, onClose, re
   }
   async function save() {
     setSaving(true); setError('');
-    try { await onSave({ ...draft, architecture: kind === 'single' ? null : selectArchitecture(kind, worker!) }); onClose(); }
+    try { await onSave({ ...draft, architecture: kind === 'single' ? null : kind==='litefusion'?fusion:selectArchitecture(kind, worker!) }); onClose(); }
     catch (error) { setError(errorMessage(error)); } finally { setSaving(false); }
   }
   if (skills) return <Modal title="Import a Claude/Codex skill" onClose={() => setSkills(false)}><SkillImporter workspace={workspace} onClose={() => setSkills(false)} onImported={() => setSkills(false)} /></Modal>;
@@ -53,9 +57,10 @@ export function Onboarding({ settings, selection, workspace, onSave, onClose, re
         {simple && <label className="setup-architecture">Setup<select aria-label="Setup architecture" value={kind} onChange={event => { setKind(event.target.value as typeof kind); setOpen(null); }}>{SETUP_ARCHITECTURES.map(item => <option key={item.kind} value={item.kind}>{item.name}{item.recommended ? ' · Recommended' : ''}</option>)}</select></label>}
         <p className="field-hint">{SETUP_ARCHITECTURES.find(item => item.kind === kind)?.description}</p>
         {!settings.providers.length ? <p className="field-hint">Connect a provider to see its models.</p> : <div className="setup-models">
-          <ModelField simple hint={modelGuidance(kind, 'driver')} label={kind === 'single' ? 'Model' : 'Driver'} settings={settings} selection={draft} value={draft.model ? draft : null} onChange={route => setDraft({ ...draft, ...route })} onReasoning={() => {}} open={open === 'driver'} onOpen={value => setOpen(value ? 'driver' : null)} />
-          {kind !== 'single' && <ModelField simple hint={modelGuidance(kind, 'worker')} label={label} settings={settings} selection={draft} value={worker} onChange={setWorker} onReasoning={() => {}} open={open === 'worker'} onOpen={value => setOpen(value ? 'worker' : null)} />}
+          <ModelField simple hint={modelGuidance(kind, 'driver')} label={kind === 'single' ? 'Model' : 'Driver'} settings={settings} selection={draft} value={draft.model ? draft : null} onChange={route => {setDraft({ ...draft, ...route });if(!fusion.gatewayProviderId)setFusion({...fusion,gatewayProviderId:route.providerId});}} onReasoning={() => {}} open={open === 'driver'} onOpen={value => setOpen(value ? 'driver' : null)} />
+          {kind !== 'single' && kind !== 'litefusion' && <ModelField simple hint={modelGuidance(kind, 'worker')} label={label} settings={settings} selection={draft} value={worker} onChange={setWorker} onReasoning={() => {}} open={open === 'worker'} onOpen={value => setOpen(value ? 'worker' : null)} />}
         </div>}
+        {kind==='litefusion' && <details><summary>Review specialist routes · 63 tasks</summary><LiteFusionSettings value={fusion} settings={settings} onChange={setFusion}/></details>}
         <ShuntSettings settings={settings} selection={draft} onChange={shunt=>setDraft({...draft,shunt})} onPending={setShuntPending}/>
         <div className="setup-links"><button className="text-button" onClick={() => simple ? setStep(0) : setProviders(true)}>{simple ? 'Change gateway' : 'Manage providers'}</button>
         {simple && <button className="text-button" onClick={() => { setSimple(false); setStep(1); setOpen(null); }}>Customize setup</button>}</div>
