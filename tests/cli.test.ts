@@ -71,9 +71,9 @@ describe('spawned litespeed executable against a real local provider', () => {
     await until(() => {
       if (fixture.child.exitCode !== null) throw new Error(`CLI fixture exited: ${fixture.stderr()}`);
       return fixture.stdout().includes('\n');
-    });
+    }, 15_000); // Cold TypeScript fixture startup can exceed five seconds on shared Intel runners.
     base = JSON.parse(fixture.stdout().split('\n')[0]).base;
-  });
+  }, 20_000);
   afterEach(async () => {
     for (const proc of children) {
       if (proc.child.exitCode === null && proc.child.signalCode === null) proc.child.kill('SIGKILL');
