@@ -98,6 +98,15 @@ describe('stableStreamingMarkdown', () => {
     // A closed fence leaves the trailing paragraph eligible again.
     expect(stableStreamingMarkdown('```ts\nconst a = 1;\n```\n\nNow **bo')).toBe('```ts\nconst a = 1;\n```\n\nNow **bo**');
   });
+  it('keeps shorter and mismatched fences inside the code block literal', () => {
+    for (const source of ['````md\n```\n**literal', '~~~md\n```\n**literal', '```md\n```not-a-closer\n**literal']) {
+      expect(stableStreamingMarkdown(source)).toBe(source);
+    }
+  });
+  it('starts inline completion after a closed fence even without a blank line', () => {
+    expect(stableStreamingMarkdown('```ts\nconst n = 2 ** 3;\n```\nNow **bo')).toBe('```ts\nconst n = 2 ** 3;\n```\nNow **bo**');
+    expect(stableStreamingMarkdown('```ts\nconst n = 2 ** 3;\n```')).toBe('```ts\nconst n = 2 ** 3;\n```');
+  });
   it('only completes the trailing paragraph', () => {
     expect(stableStreamingMarkdown('An **unclosed earlier line\n\nNow **bo'))
       .toBe('An **unclosed earlier line\n\nNow **bo**');

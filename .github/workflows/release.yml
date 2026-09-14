@@ -32,6 +32,7 @@ jobs:
       - run: npm ci
       - run: npm run check
       - run: npm run test:tui:startup
+      - run: npm run test:tui:stream
       - run: npm run test:tui:flow
       - run: npm run test:tui:litefusion
       - run: node scripts/release/package.mjs
