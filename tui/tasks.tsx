@@ -1,6 +1,6 @@
 /** @jsxImportSource @opentui/react */
 import type { DelegationSummary, SessionDetail, Todo } from '../shared/types.js';
-import { useState } from 'react';
+import { useContext, useState } from 'react';
 import type { TerminalController } from './controller.js';
 import { useTheme } from './context.js';
 import { useInvocation } from './useInvocation.js';
@@ -9,6 +9,7 @@ import { terminalText } from './protocol.js';
 import { workerLabels } from '../shared/worker-presentation.js';
 import { TODO_MARKERS } from './transcriptModel.js';
 import { taskInvocations } from './conversation.js';
+import { WorkerInspectionContext } from './workerCard.js';
 
 function TaskItems({ todos, actor, compact }: { todos: Todo[]; actor: string; compact?: boolean }) {
   const theme = useTheme(), [expanded, setExpanded] = useState(false);
@@ -29,7 +30,13 @@ function WorkerTasks({ task, label, controller, compact }: { task: DelegationSum
 }
 
 export function TaskProgress({ detail, controller, compact = false }: { detail: SessionDetail; controller: TerminalController; compact?: boolean }) {
-  const theme = useTheme(), tasks = taskInvocations(detail), labels = workerLabels(detail);
+  const theme = useTheme(), tasks = taskInvocations(detail), labels = workerLabels(detail),inspect=useContext(WorkerInspectionContext);
+  if(detail.session.architecture?.kind==='litefusion'){
+    const last=detail.messages.findLast(message=>message.role==='user')?.id;
+    const scheduled=(detail.tasks??[]).filter(task=>task.turnId===last||['queued','running','blocked'].includes(task.status));
+    const shown=compact?scheduled.filter(task=>task.status==='running'||task.status==='blocked').slice(0,1):scheduled;
+    return <box flexDirection="column" paddingLeft={1} paddingRight={1} flexShrink={0}>{!compact&&<text fg={toHex(theme.text)}>Tasks</text>}<TaskItems todos={detail.todos} actor="Lead" compact={compact}/>{shown.map(task=>{const attempt=detail.delegations?.findLast(item=>item.asyncTaskId===task.id);return <box key={task.id} flexDirection="column" marginBottom={compact?0:1} onMouseDown={()=>inspect?.(attempt??task)}><text fg={toHex(theme.text)}>{terminalText(task.description)}</text><text fg={toHex(task.error?theme.warning:theme.textMuted)}>{terminalText(task.error??attempt?.activity??task.status)}</text></box>;})}{compact&&scheduled.length>shown.length&&<text fg={toHex(theme.textMuted)}>{`${scheduled.length-shown.length} more tasks · /workers to inspect`}</text>}</box>;
+  }
   const active = tasks.filter(task => task.status === 'running');
   const shown = compact ? active.slice(0, 1) : tasks;
   return <box flexDirection="column" flexShrink={0} paddingLeft={1} paddingRight={1}>

@@ -28,7 +28,7 @@ try{
   terminal.onData(data=>emulator.write(data));await waitFor(()=>screen().includes('Commands [Ctrl+P]')&&screen().includes('Ask Litespeed'),'composer ready');await delay(200);
   assert(screen().includes('+ specialists'));
   terminal.write('/models\r');await waitFor(()=>screen().includes('Architecture: LiteFusion'),'LiteFusion saved in TUI');terminal.write('\x1b[H'+'\x1b[B'.repeat(3)+'\r');
-  await waitFor(()=>screen().includes('All 63 task routes and handoffs'),'routing editor');terminal.write('\r');await waitFor(()=>screen().includes('all 63 tasks'),'searchable task catalog');terminal.write('technical documentation');await delay(150);terminal.write('\r');await waitFor(()=>screen().includes('Hard / escalation:')&&screen().includes('Luna'),'task route pair');await save('01-task-routing');
+  await waitFor(()=>screen().includes('All 63 task routes and handoffs'),'routing editor');terminal.write('\x1b[H'+'\x1b[B'+'\r');await waitFor(()=>screen().includes('all 63 tasks'),'searchable task catalog');terminal.write('technical documentation');await delay(150);terminal.write('\r');await waitFor(()=>screen().includes('Hard / escalation:')&&screen().includes('Luna'),'task route pair');await save('01-task-routing');
   for(let i=0;i<4;i++){terminal.write('\x1b');await delay(100);}
   await waitFor(()=>!screen().includes('↑↓ choose')&&screen().includes('Ask Litespeed'),'return to conversation');
   terminal.write('LITEFUSION_BROWSER implement both files\r');await waitFor(async()=>{const d=await detail();return d.delegations?.length===2&&d.delegations.every(t=>t.recentActivity?.length);},'both workers executed tools');

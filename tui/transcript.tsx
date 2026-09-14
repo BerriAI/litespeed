@@ -337,7 +337,7 @@ function DriverActivity({ entries, detail, live, heading, syntax, width, embedde
   const calls = entries.flatMap(entry => entry.call ? [entry.call] : []);
   const open = live || expanded || settings.toolDetails || settings.showThinking;
   return <box flexDirection="column" flexShrink={0}>
-    {heading && <text paddingLeft={3} fg={toHex(theme.textMuted)}>Driver</text>}
+    {heading && <text paddingLeft={3} fg={toHex(theme.textMuted)}>{detail.session.architecture?.kind==='litefusion'?'Lead':'Driver'}</text>}
     {!live && calls.length > 0 && <Button tone="muted" onPress={() => setExpanded(!expanded)}>{`${open ? '▾' : '▸'} ${calls.length} ${calls.length === 1 ? 'step' : 'steps'}`}</Button>}
     {(open || !calls.length) && entries.map(({ message, call }) => call
       ? <ToolActivity key={call.id} syntax={syntax.normal} width={width} call={call} showDetails={settings.toolDetails} awaitingPermission={detail.permissions.some(item => item.toolCallId === call.id && !item.invocationId)} embedded={embedded} />
@@ -350,7 +350,7 @@ function WorkLog({ steps, detail, actors, live, syntax, width, controller, embed
   const sections = activitySections(steps, actors);
   if (!sections.length) return null;
   return <box flexDirection="column" flexShrink={0} gap={1} marginTop={hasText ? 1 : 0}>{sections.map((section, index) => section.kind === 'worker' && controller
-    ? <WorkerCard key={section.id} task={section.task} call={section.call} label={section.label} controller={controller} width={width - 6} defaultOpen={live || settings.toolDetails || settings.showThinking} needsApproval={detail.permissions.some(item => item.toolCallId === section.call.id)} renderTranscript={(child, childWidth) => <Transcript detail={child} width={childWidth} active={false} embedded />} />
+    ? <WorkerCard key={section.id} scheduled={section.scheduled} task={section.task} call={section.call} label={section.label} controller={controller} width={width - 6} defaultOpen={live || settings.toolDetails || settings.showThinking} needsApproval={detail.permissions.some(item => item.toolCallId === section.call.id)} renderTranscript={(child, childWidth) => <Transcript detail={child} width={childWidth} active={false} embedded />} />
     : <DriverActivity key={section.id} entries={section.kind === 'driver' ? section.entries : [{ message: section.message, call: section.call }]} detail={detail} live={live && index === sections.length - 1} heading={!embedded && Boolean(detail.session.architecture) && (index ? sections[index - 1].kind : precedingActor) !== 'driver'} syntax={syntax} width={width} embedded={embedded} />)}</box>;
 }
 
@@ -394,7 +394,7 @@ export const Transcript = memo(function Transcript({ detail, width, height, acti
       const precedingActor = hasText ? 'driver' : previousActor;
       previousActor = activitySections(steps, actors).at(-1)?.kind ?? precedingActor;
       return <box key={message.id} marginTop={index === 0 && embedded ? 0 : 1} flexDirection="column" flexShrink={0}>
-        {showDriver && detail.session.architecture && controller && <text paddingLeft={3} fg={toHex(theme.textMuted)}>Driver</text>}
+        {showDriver && detail.session.architecture && controller && <text paddingLeft={3} fg={toHex(theme.textMuted)}>{detail.session.architecture?.kind==='litefusion'?'Lead':'Driver'}</text>}
         {message.reasoning && <ReasoningRow subtle={syntax.subtle} row={{ running: live && !message.content && !message.toolCalls?.length, ...reasoningSummary(message.reasoning) }} />}
         {content.trim() && <TextRow compact text={terminalText(content, true)} syntax={syntax.normal} />}
         <WorkLog steps={steps} detail={detail} actors={actors} live={live} syntax={syntax} width={width} controller={controller} embedded={embedded} precedingActor={precedingActor} hasText={hasText} />

@@ -57,6 +57,8 @@ export interface Settings { mcpConfigRevision?: string; providers: Provider[]; d
  * (docs/design-capability-proxy.md, Option 3). */
 export interface McpServerConfig { command?: string; args?: string[]; env?: Record<string,string>; url?: string; enabled?: boolean; advertise?: boolean; }
 export interface Session { modelReasoning?: ModelReasoning; profile?: ActiveProfile; configRevision?: number; historyRevision?: number; id: string; title: string; workspace: string; model: string; providerId: string; mode: Mode; permissionMode: PermissionMode; createdAt: number; updatedAt: number; status: RunStatus; archived: boolean; parentId?: string;
+  architectureConfigurations?: import('./architecture-config.js').ArchitectureConfigurations;
+  pendingArchitecture?: import('./architecture-config.js').PendingArchitectureConfiguration;
   shunt?: import('./shunt.js').ShuntSelection;
   /** Session goal (goal mode): persists on the session; see shared/goals.ts. */
   goal?: SessionGoal;
@@ -76,7 +78,7 @@ export interface Session { modelReasoning?: ModelReasoning; profile?: ActiveProf
    * tail so it stays in the cached prefix. Changing it is an idle-only config
    * change with a revision bump, exactly like changing the model. */
   outputStyle?: string; }
-export interface ToolCall { waitingForWorkspace?: string; changes?: FileChange[]; delegationId?: string; ruleMatch?: RuleMatch; id: string; name: string; args: Record<string,unknown>; status: 'pending' | 'running' | 'completed' | 'error' | 'denied'; output?: string; startedAt?: number; endedAt?: number;
+export interface ToolCall { taskId?:string; waitingForWorkspace?: string; changes?: FileChange[]; delegationId?: string; ruleMatch?: RuleMatch; id: string; name: string; args: Record<string,unknown>; status: 'pending' | 'running' | 'completed' | 'error' | 'denied'; output?: string; startedAt?: number; endedAt?: number;
   execution?: import('./receipts.js').CommandExecution;
   shunt?: import('./shunt.js').ShuntOperation;
   routing?: { kind: 'shunt'; paths: string[] };
@@ -97,8 +99,8 @@ export interface FileChange { path: string; before: string | null; after: string
 export interface QueuedMessage { clientSurface?: ClientSurface; id: string; sessionId: string; content: string; attachments: Attachment[]; createdAt: number; }
 export interface QueueState { items: QueuedMessage[]; paused: boolean; reason?: string; manualPause?: boolean; }
 export interface BackgroundJob { id: string; command: string; status: 'running' | 'exited' | 'killed' | 'failed'; pid?: number; startedAt: number; endedAt?: number; exitCode?: number; signal?: string; timedOut: boolean; truncated: boolean; }
-export interface SessionDetail { delegations?: DelegationSummary[]; lastEventId?: number; session: Session; messages: Message[]; todos: Todo[]; permissions: PermissionRequest[]; questions?: QuestionRequest[]; queue?: QueueState; history?: HistoryState; jobs?: BackgroundJob[]; }
-export interface RunEvent { id?: number; type: 'session' | 'delegation' | 'message' | 'delta' | 'reasoning' | 'tool' | 'permission' | 'permission_resolved' | 'question' | 'question_resolved' | 'todos' | 'reset' | 'queue' | 'history' | 'done' | 'error'; sessionId: string; data: any; }
+export interface SessionDetail { tasks?:import('./litefusion-tasks.js').LiteFusionTask[]; delegations?: DelegationSummary[]; lastEventId?: number; session: Session; messages: Message[]; todos: Todo[]; permissions: PermissionRequest[]; questions?: QuestionRequest[]; queue?: QueueState; history?: HistoryState; jobs?: BackgroundJob[]; }
+export interface RunEvent { id?: number; type: 'session' | 'task' | 'delegation' | 'message' | 'delta' | 'reasoning' | 'tool' | 'permission' | 'permission_resolved' | 'question' | 'question_resolved' | 'todos' | 'reset' | 'queue' | 'history' | 'done' | 'error'; sessionId: string; data: any; }
 export interface ToolDefinition { type: 'function'; function: { name: string; description: string; parameters: Record<string,unknown> }; }
 export interface StreamChunk { type: 'text' | 'reasoning' | 'tool' | 'usage' | 'metadata'; metadata?: Record<string,unknown>; text?: string; tool?: { index: number; id?: string; name?: string; arguments?: string }; usage?: Usage; }
 /** One provider-reported usage record (5.1). Token counts are whatever the

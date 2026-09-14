@@ -1,4 +1,5 @@
 import { LEGACY_NAMES } from '../bin/legacy.mjs';
+import { architectureConfiguration, architectureKey, liteFusionConfiguration } from '../shared/architecture-config.js';
 import type { ClientSurface } from '../shared/client.js';
 import { DatabaseSync } from 'node:sqlite';
 import { mkdirSync, chmodSync, existsSync } from 'node:fs';
@@ -47,7 +48,7 @@ export class Store {
       -- riding the cascade) must never erase its usage record.
       CREATE TABLE IF NOT EXISTS usage_log (id INTEGER PRIMARY KEY AUTOINCREMENT, session_id TEXT NOT NULL, provider_id TEXT NOT NULL, model TEXT NOT NULL, day TEXT NOT NULL, input_tokens INTEGER NOT NULL, output_tokens INTEGER NOT NULL, cached_tokens INTEGER, created_at INTEGER NOT NULL);
       CREATE INDEX IF NOT EXISTS usage_log_day ON usage_log(day);`);
-    try { this.migrateDelegations(); this.migrateToolGrants(); } catch (error) { this.db.close(); throw error; }
+    try { this.migrateDelegations(); this.migrateTaskAttempts(); this.migrateToolGrants(); } catch (error) { this.db.close(); throw error; }
     // An interrupted process must never leave a session stuck running.
     for (const session of this.sessions('', true).concat(this.sessions())) {
       if (session.status === 'running' || session.status === 'waiting') this.updateSession(session.id, { status: 'idle' });
@@ -85,6 +86,27 @@ export class Store {
         CREATE UNIQUE INDEX IF NOT EXISTS delegations_active_context ON delegations(child_session_id) WHERE status='running';
         INSERT INTO schema_migrations(version) VALUES(1);`);
     });
+  }
+  /** A queued task receipt may own sequential attempts. Legacy tool calls still
+   * own exactly one delegation, and no origin/context may run twice at once. */
+  private migrateTaskAttempts():void {
+    if(this.db.prepare('SELECT 1 FROM schema_migrations WHERE version=2').get())return;
+    this.atomic(()=>this.db.exec(`
+      CREATE TABLE delegations_v3 (
+        id TEXT PRIMARY KEY, parent_session_id TEXT NOT NULL REFERENCES sessions(id) ON DELETE CASCADE,
+        parent_turn_id TEXT NOT NULL, parent_message_id TEXT NOT NULL, tool_call_id TEXT NOT NULL,
+        child_session_id TEXT NOT NULL REFERENCES sessions(id) ON DELETE CASCADE,
+        status TEXT NOT NULL, data TEXT NOT NULL);
+      INSERT INTO delegations_v3 SELECT * FROM delegations ORDER BY rowid;
+      DROP TABLE delegations;
+      ALTER TABLE delegations_v3 RENAME TO delegations;
+      CREATE INDEX delegations_parent ON delegations(parent_session_id);
+      CREATE INDEX delegations_child ON delegations(child_session_id);
+      CREATE UNIQUE INDEX delegations_active_context ON delegations(child_session_id) WHERE status='running';
+      CREATE UNIQUE INDEX delegations_active_origin ON delegations(parent_session_id,parent_turn_id,parent_message_id,tool_call_id) WHERE status='running';
+      CREATE UNIQUE INDEX delegations_legacy_origin ON delegations(parent_session_id,parent_turn_id,parent_message_id,tool_call_id) WHERE json_extract(data,'$.summary.asyncTaskId') IS NULL;
+      INSERT INTO schema_migrations(version) VALUES(2);
+    `));
   }
   /** Keep each approved target; a later path must not replace an earlier grant. */
   private migrateToolGrants(): void {
@@ -136,7 +158,7 @@ export class Store {
     return this.normalizedSession(JSON.parse(row.data));
   }
   private detachedMessage(message: Message): Message {
-    return { ...message, ...(message.toolCalls ? { toolCalls: message.toolCalls.map(({ delegationId: _delegation, ...call }) => call) } : {}) };
+    return { ...message, ...(message.toolCalls ? { toolCalls: message.toolCalls.map(({ delegationId: _delegation, taskId: _task, ...call }) => call) } : {}) };
   }
   private normalizedSession(session: Session): Session {
     return { ...session, configRevision: Number.isSafeInteger(session.configRevision) && session.configRevision! >= 0 ? session.configRevision : 0 };
@@ -179,6 +201,9 @@ export class Store {
     return this.atomic(() => {
       const settings = this.settings(), now = Date.now();
       const session: Session = { id: randomUUID(), title: 'New session', workspace: settings.workspace, model: settings.defaultModel, providerId: settings.defaultProvider, mode: 'build', permissionMode: settings.permissionMode, createdAt: now, updatedAt: now, archived: false, ...input, status: 'idle', configRevision: 0 };
+      delete session.pendingArchitecture;
+      this.projectArchitecture(session);
+      session.architectureConfigurations={...session.architectureConfigurations,[architectureKey(session)]:architectureConfiguration(session)};
       // Imported/public summaries can never manufacture a private activation.
       delete session.profile;
       const snapshot = resolved ? this.resolvedSnapshot(session.workspace, resolved) : null;
@@ -211,10 +236,25 @@ export class Store {
       if (planner !== undefined) { if (planner === null) delete session.planner; else session.planner = planner; }
       if (outputStyle !== undefined) { if (outputStyle === null) delete session.outputStyle; else session.outputStyle = outputStyle; }
       if (architecture !== undefined) { if (architecture === null) delete session.architecture; else session.architecture = architecture; }
+      if(architecture===undefined&&session.architecture?.kind==='litefusion'&&(safe.model!==undefined||safe.providerId!==undefined||safe.modelReasoning!==undefined))session.architecture={...session.architecture,lead:{providerId:session.providerId,model:session.model,effort:session.modelReasoning?.[JSON.stringify([session.providerId,session.model])]}};
+      this.projectArchitecture(session);
+      const modelChanged=JSON.stringify(architectureConfiguration(previous))!==JSON.stringify(architectureConfiguration(session));
+      if(modelChanged) {
+        session.architectureConfigurations={...previous.architectureConfigurations,[architectureKey(previous)]:architectureConfiguration(previous),[architectureKey(session)]:architectureConfiguration(session)};
+        if(!changed)session.configRevision++;
+      }
       this.db.prepare('UPDATE sessions SET data=? WHERE id=?').run(JSON.stringify(session), id);
-      if (changed) this.pauseConfigurationQueue(id);
+      if (changed||modelChanged) this.pauseConfigurationQueue(id);
       return session;
     });
+  }
+  private projectArchitecture(session:Session) {
+    if(session.architecture?.kind!=='litefusion')return;
+    // Preserve the actual lead of pre-policy sessions as a custom policy.
+    const selection=liteFusionConfiguration(session.architecture,session);
+    session.providerId=selection.providerId;session.model=selection.model;
+    session.architecture=selection.architecture!;session.modelReasoning=selection.modelReasoning;
+    delete session.planner;delete session.shunt;
   }
   applyProfile(id: string, expectedConfigRevision: number, resolved: ResolvedProfile, selection: ApplyProfileRequest['selection'] = {}): Session {
     return this.atomic(() => {
@@ -222,6 +262,9 @@ export class Store {
       const previous = this.session(id); this.assertConfigRevision(previous, expectedConfigRevision);
       const snapshot = this.resolvedSnapshot(previous.workspace, resolved);
       const session: Session = { ...previous, ...(selection.providerId !== undefined ? { providerId: selection.providerId } : {}), ...(selection.model !== undefined ? { model: selection.model } : {}), ...(selection.mode !== undefined ? { mode: selection.mode } : {}), updatedAt: Date.now(), configRevision: previous.configRevision! + 1 };
+      if(session.architecture?.kind==='litefusion'&&(selection.model!==undefined||selection.providerId!==undefined))session.architecture={...session.architecture,lead:{providerId:session.providerId,model:session.model,effort:session.modelReasoning?.[JSON.stringify([session.providerId,session.model])]}};
+      this.projectArchitecture(session);
+      session.architectureConfigurations={...previous.architectureConfigurations,[architectureKey(previous)]:architectureConfiguration(previous),[architectureKey(session)]:architectureConfiguration(session)};
       delete session.profile; if (snapshot) session.profile = snapshot.active;
       this.db.prepare('UPDATE sessions SET data=? WHERE id=?').run(JSON.stringify(session), id);
       this.writeProfile(id, snapshot); this.pauseConfigurationQueue(id);

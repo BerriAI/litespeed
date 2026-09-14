@@ -3,7 +3,7 @@ import { act, createElement } from 'react';
 import { createRoot, type Root } from 'react-dom/client';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import App from '../client/src/App';
-import { TaskTranscript } from '../client/src/TaskCard';
+import { TaskCard, TaskTranscript } from '../client/src/TaskCard';
 import { applyEvent, visibleDelegations } from '../client/src/api';
 import type { DelegationDetail, DelegationSummary } from '../shared/delegation';
 import type { Message, RunEvent, Session, SessionDetail, Settings } from '../shared/types';
@@ -60,6 +60,19 @@ beforeEach(() => {
   vi.useFakeTimers({ toFake: ['setTimeout', 'clearTimeout'] });
 });
 afterEach(async () => { await act(async () => roots.splice(0).forEach(root => root.unmount())); vi.clearAllTimers(); vi.useRealTimers(); vi.restoreAllMocks(); vi.unstubAllGlobals(); });
+
+it('shows a lead-resolved task as resolved without hiding access to the failed attempt',async()=>{
+  const onInspect=vi.fn();
+  await act(async()=>root().render(createElement(TaskCard,{
+    task:task({role:'worker',status:'failed',error:'Previous worker failed'}),
+    scheduled:{id:'logical',parentSessionId:'a',turnId:'turn-a',workstream:'fix',roleId:'bounded_patch',description:'Fix the issue',status:'completed',dependencies:[],attemptIds:['task-a'],createdAt:1,updatedAt:2,revision:2,policyHash:'policy',resolution:{kind:'lead',evidence:'Lead fixed and checked the issue',at:2}},
+    label:'Task 1',expanded:false,onCancel:()=>{},cancelling:false,onInspect,
+  })));
+  expect(el('.worker-current').textContent).toBe('Resolved by lead');
+  expect(el('.worker-task').textContent).not.toContain('Previous worker failed');
+  await click('button[aria-label="Inspect worker"]');expect(onInspect).toHaveBeenCalledOnce();
+  expect(document.querySelector('button[aria-label="Cancel task"]')).toBeNull();
+});
 
 describe('bound research task cards', () => {
   it('shows live transcripts automatically without launching anything', async () => {

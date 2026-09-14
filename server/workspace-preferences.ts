@@ -2,7 +2,7 @@ import type { Session } from '../shared/types.js';
 import { architectureProviders } from '../shared/architectures.js';
 import type { Store } from './store.js';
 
-export type WorkspaceSelection = Pick<Session,'providerId'|'model'|'shunt'|'architecture'|'planner'|'modelReasoning'|'outputStyle'> & { permissionMode?: Session['permissionMode']; setupComplete?: boolean };
+export type WorkspaceSelection = Pick<Session,'providerId'|'model'|'shunt'|'architecture'|'planner'|'modelReasoning'|'outputStyle'|'architectureConfigurations'> & { permissionMode?: Session['permissionMode']; setupComplete?: boolean };
 export class WorkspacePreferences {
   constructor(private store: Store) {store.db.exec('CREATE TABLE IF NOT EXISTS workspace_preferences (workspace TEXT PRIMARY KEY, data TEXT NOT NULL); CREATE TABLE IF NOT EXISTS model_defaults (id INTEGER PRIMARY KEY CHECK(id=1), data TEXT NOT NULL);');}
   get(workspace: string): Partial<WorkspaceSelection> {
@@ -19,11 +19,12 @@ export class WorkspacePreferences {
   }
   save(workspace: string, selection: WorkspaceSelection, rememberModels = false) {
     const {providerId,model,shunt,architecture,planner,modelReasoning,outputStyle}=selection;
+    const architectureConfigurations=selection.architectureConfigurations??this.get(workspace).architectureConfigurations;
     const permissionMode=selection.permissionMode ?? this.get(workspace).permissionMode;
     const setupComplete=selection.setupComplete ?? this.get(workspace).setupComplete;
-    this.store.db.prepare('INSERT INTO workspace_preferences(workspace,data) VALUES(?,?) ON CONFLICT(workspace) DO UPDATE SET data=excluded.data').run(workspace,JSON.stringify({providerId,model,shunt,architecture,planner,modelReasoning,outputStyle,permissionMode,setupComplete}));
+    this.store.db.prepare('INSERT INTO workspace_preferences(workspace,data) VALUES(?,?) ON CONFLICT(workspace) DO UPDATE SET data=excluded.data').run(workspace,JSON.stringify({providerId,model,shunt,architecture,planner,modelReasoning,outputStyle,permissionMode,setupComplete,architectureConfigurations}));
     if(rememberModels&&model.trim()){
-      this.store.db.prepare('INSERT INTO model_defaults(id,data) VALUES(1,?) ON CONFLICT(id) DO UPDATE SET data=excluded.data').run(JSON.stringify({providerId,model,shunt:shunt??null,architecture:architecture??null,planner:planner??null,modelReasoning:modelReasoning??null,outputStyle:outputStyle??null}));
+      this.store.db.prepare('INSERT INTO model_defaults(id,data) VALUES(1,?) ON CONFLICT(id) DO UPDATE SET data=excluded.data').run(JSON.stringify({providerId,model,shunt:shunt??null,architecture:architecture??null,planner:planner??null,modelReasoning:modelReasoning??null,outputStyle:outputStyle??null,architectureConfigurations}));
       this.store.saveSettings({defaultProvider:providerId,defaultModel:model});
     }
   }

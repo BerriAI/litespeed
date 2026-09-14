@@ -25,7 +25,7 @@ import { EditorKeys } from './editor.js';
 import { Sessions } from './sessions.js';
 import { FilePicker } from './files.js';
 import { attachmentFromFile, editDraft, openShell, suspendTerminal } from './terminalIO.js';
-import { WorkerChooser, Changes, WorkInspector, WorkerInspector } from './inspectors.js';
+import { PendingTaskInspector, WorkerChooser, Changes, WorkInspector, WorkerInspector } from './inspectors.js';
 import { conversationGroups, usageDetails } from './conversation.js';
 import { TaskProgress } from './tasks.js';
 import { UpdateNotice } from './updates.js';
@@ -162,7 +162,7 @@ function SessionApp({ controller, router, onQuit, chooseTheme, themeName, themeM
   const openSettings = () => setPanel(<SettingsPanel controller={controller} onClose={close} />);
   const openModels = () => {
     if (!controller.detail || !controller.getState().settings) return;
-    controller.configurationReady();
+    controller.configurationReady(true);
     setPanel(<ModelSettings controller={controller} initial={controller.detail.session} settings={controller.getState().settings!} onClose={close} onProviders={() => setPanel(<Providers controller={controller} onClose={close} />)} />);
   };
   const openSetup = (quick = false) => { controller.configurationReady(); if (controller.detail) setPanel(<Onboarding quick={quick} controller={controller} initial={controller.detail.session} onClose={close} />); };
@@ -207,15 +207,15 @@ function SessionApp({ controller, router, onQuit, chooseTheme, themeName, themeM
     { id: 'todos', label: 'Task list', description: 'Follow the agent’s plan and progress', action: () => setPanel(<PlanPanel controller={controller} onClose={close} />) },
     { id: 'changes', label: 'Review changed files', description: 'Recorded file edits and diffs', action: () => setPanel(<Changes controller={controller} onClose={close} />) },
     { id: 'work', label: 'Inspect response steps', description: 'Thinking, commands, outputs, and worker assignments', action: () => menu('Response turns', conversationGroups(controller.detail!).filter(group => group.steps.some(message => message.reasoning || message.toolCalls?.length)).reverse().map((group, index) => ({ id: group.message.id, label: group.steps.find(message => message.content)?.content.slice(0, 100) || `Response ${index + 1}`, description: `${group.steps.flatMap(message => message.toolCalls ?? []).length} steps`, action: () => inspect(group.steps) }))) },
-    { id: 'workers', label: 'Inspect worker', description: 'Brief, report, evidence, and invocation transcript', action: () => setPanel(<WorkerChooser controller={controller} onClose={close} onSelect={task=>setPanel(<WorkerInspector controller={controller} invocation={task} onClose={close} />)}/>) },
+    { id: 'workers', label: 'Inspect worker', description: 'Brief, report, evidence, and invocation transcript', action: () => setPanel(<WorkerChooser controller={controller} onClose={close} onSelect={task=>setPanel('childSessionId' in task?<WorkerInspector controller={controller} invocation={task} onClose={close}/>:<PendingTaskInspector controller={controller} task={task} onClose={close}/>)}/>) },
     { id: 'fork', label: 'Fork session', description: 'Continue from a copy of this conversation', disabled: busy, action: () => { close(); run(() => controller.fork()); } },
     { id: 'compact', label: 'Compact context', description: 'Summarize earlier context for the next response', disabled: busy, action: () => { close(); run(() => controller.action('Compacting context', () => controller.client.api(controller.path('/compact'), {}))); } },
     { id: 'setup', label: 'Set up Litespeed', description: 'A quick guide to architecture, models, and permissions', disabled: busy, action: () => run(() => openSetup()) },
-    { id: 'models', label: 'Choose models', description: 'Architecture, driver, worker, planner, and output style', disabled: busy, action: () => run(openModels) },
+    { id: 'models', label: 'Choose models', description: 'Architecture and its saved model configuration', disabled: Boolean(state.pending||detail?.history?.pendingRecovery), action: () => run(openModels) },
     { id: 'permissions', label: 'Permissions', description: 'Ask first or allow all tools, including workers', action: permissions },
     { id: 'settings', label: 'Settings', description: 'Providers, project profiles, permissions, integrations, and usage', action: openSettings },
     { id: 'sessions', label: 'Sessions', description: 'Switch sessions or start a new one', action: () => run(sessions) },
-    ...['new', 'clear', 'reset'].map(id => ({ id, label: 'New session', description: 'Start with empty context; keep this session and its draft', action: () => { close(); run(() => controller.create(detail?.session.workspace ?? process.cwd())); } })),
+    { id: 'new', label: 'New session', description: 'Start with empty context; keep this session and its draft', action: () => { close(); run(() => controller.create(detail?.session.workspace ?? process.cwd())); } },
     { id: 'rename', label: 'Rename session', action: () => prompt('Rename session', detail?.session.title ?? '', title => controller.configure({ title })) },
     { id: 'mode', label: detail?.session.mode === 'plan' ? 'Switch to Build' : 'Switch to Plan', description: 'Plan investigates without changing project files', disabled: busy, action: () => { close(); run(() => controller.configure({ mode: detail?.session.mode === 'plan' ? 'build' : 'plan' })); } },
     { id: 'queue', label: 'Queued messages', description: 'Pause, resume, or remove follow-ups', action: queue },
@@ -230,7 +230,7 @@ function SessionApp({ controller, router, onQuit, chooseTheme, themeName, themeM
     { id: 'quit', label: 'Quit Litespeed TUI', description: 'The server and running tasks keep working', action: onQuit },
   ];
   commands.sort((a, b) => COMMAND_ORDER.indexOf(a.id) - COMMAND_ORDER.indexOf(b.id));
-  const reserved = [...commands.map(item => item.id), 'help', 'exit', 'skill', ...projectCommands.map(item => item.name)];
+  const reserved = [...commands.map(item => item.id), 'help', 'exit', 'skill', 'clear', 'reset', ...projectCommands.map(item => item.name)];
   const palette = () => menu('Commands', [...commands.map(item => ({ ...item, label: `${item.label}   /${item.id}` })), ...projectCommands.map(item => ({ id: `project:${item.name}`, label: `/${item.name}`, description: item.description, action: () => { controller.setDraft({ ...controller.getState().draft, text: `/${item.name} ` }); close(); } }))]);
   const send = (kind: 'message' | 'queue' | 'steer' = 'message', content?: string) => controller.send(kind, content, skillInvocation(content ?? controller.getState().draft.text, skillCatalog, reserved));
   const submit = () => {
@@ -241,7 +241,7 @@ function SessionApp({ controller, router, onQuit, chooseTheme, themeName, themeM
     if (slash?.name === 'attach' && slash.args) { controller.setDraft({ ...controller.getState().draft, text: '' }); run(() => attach(slash.args)); return; }
     if (slash) {
       if (slash.name === 'help') { controller.setDraft({ ...controller.getState().draft, text: '' }); palette(); return; }
-      const command = commands.find(item => item.id === (slash.name === 'exit' ? 'quit' : slash.name === 'skill' ? 'skills' : slash.name));
+      const command = commands.find(item => item.id === (['clear','reset'].includes(slash.name) ? 'new' : slash.name === 'exit' ? 'quit' : slash.name === 'skill' ? 'skills' : slash.name));
       if (command) {
         if (command.disabled) { controller.notice('That action is unavailable while the current task is running or history is incomplete.'); return; }
         controller.setDraft({ ...controller.getState().draft, text: '' }); command.action(); return;
@@ -290,15 +290,16 @@ function SessionApp({ controller, router, onQuit, chooseTheme, themeName, themeM
   const modelSpace = Math.max(1, modelWidth - modelSuffix.length);
   const modelLabel = (modelName.length > modelSpace ? `${modelName.slice(0, modelSpace - 1)}…` : modelName) + modelSuffix;
   const taskWidth = width >= 112 ? Math.min(44, Math.max(32, Math.floor(width / 4))) : 0;
-  return <WorkerInspectionContext.Provider value={task=>setPanel(<WorkerInspector controller={controller} invocation={task} onClose={close}/>)}><TranscriptSettingsProvider value={settings}><box width="100%" height="100%" flexDirection="column" backgroundColor={toHex(theme.background)}>
+  return <WorkerInspectionContext.Provider value={task=>setPanel('childSessionId' in task?<WorkerInspector controller={controller} invocation={task} onClose={close}/>:<PendingTaskInspector controller={controller} task={task} onClose={close}/>)}><TranscriptSettingsProvider value={settings}><box width="100%" height="100%" flexDirection="column" backgroundColor={toHex(theme.background)}>
     {detail ? <>
-      <box height={1} flexDirection="row" flexShrink={0}><Button onPress={() => run(sessions)}>{terminalText(detail.session.title || 'New session').slice(0, Math.max(10, Math.floor((width - (busy ? 36 : 12)) / 2) - 4))}</Button><Button disabled={busy} onPress={() => run(openModels)}>{modelLabel}</Button><Button disabled={busy} onPress={() => run(() => controller.configure({ mode: detail.session.mode === 'plan' ? 'build' : 'plan' }))}>{detail.session.mode}</Button><box flexGrow={1} />{busy ? permission || question ? <text fg={toHex(theme.warning)}>waiting for you </text> : <><WorkingScanner color={toHex(theme.primary)} /><text fg={toHex(theme.textMuted)}>{` ${actor} `}</text><InterruptHint /></> : <text fg={toHex(theme.textMuted)}>idle </text>}</box>
+      <box height={1} flexDirection="row" flexShrink={0}><Button onPress={() => run(sessions)}>{terminalText(detail.session.title || 'New session').slice(0, Math.max(10, Math.floor((width - (busy ? 36 : 12)) / 2) - 4))}</Button><Button disabled={Boolean(state.pending||detail?.history?.pendingRecovery)} onPress={() => run(openModels)}>{modelLabel}</Button><Button disabled={busy} onPress={() => run(() => controller.configure({ mode: detail.session.mode === 'plan' ? 'build' : 'plan' }))}>{detail.session.mode}</Button><box flexGrow={1} />{busy ? permission || question ? <text fg={toHex(theme.warning)}>waiting for you </text> : <><WorkingScanner color={toHex(theme.primary)} /><text fg={toHex(theme.textMuted)}>{` ${actor} `}</text><InterruptHint /></> : <text fg={toHex(theme.textMuted)}>idle </text>}</box>
       {!taskWidth && <TaskProgress detail={detail} controller={controller} compact />}
       <box flexDirection="row" flexGrow={1} minHeight={1}>
         <Transcript controller={controller} detail={detail} width={width - taskWidth} active={!panel} onInspect={inspect} onUsage={showUsage} />
         {taskWidth > 0 && <scrollbox width={taskWidth} flexShrink={0} border={['left']} borderColor={toHex(theme.border)}><TaskProgress detail={detail} controller={controller} /></scrollbox>}
       </box>
       {detail.history?.pendingRecovery && <box border borderColor={toHex(theme.warning)}><text fg={toHex(theme.warning)}>History needs recovery. Your draft is saved. </text><Button onPress={() => run(() => controller.history('recover'))}>Recover history</Button></box>}
+      {detail.session.pendingArchitecture&&<box height={1}><Button onPress={()=>run(openModels)}>{detail.session.pendingArchitecture.expectedRevision===(detail.session.configRevision??0)?`Architecture queued: ${detail.session.pendingArchitecture.configuration.architecture?.kind??'single model'} · after active work finishes`:'Pending architecture needs review · open Models'}</Button></box>}
       {detail.session.goal && ['active', 'blocked'].includes(detail.session.goal.status) && <box height={1} flexShrink={0}><Button onPress={() => setPanel(<GoalPanel controller={controller} onClose={close} />)}>{`Goal ${detail.session.goal.status} · ${goalTurnLabel(detail.session.goal.turns, detail.session.goal.maxTurns)} · ${terminalText(detail.session.goal.text).slice(0, Math.max(10, width - 36))}`}</Button></box>}
       {detail.queue?.items.length ? <box flexDirection="column" flexShrink={0} paddingLeft={1} paddingRight={1}>
         <box flexDirection="row" height={1}>

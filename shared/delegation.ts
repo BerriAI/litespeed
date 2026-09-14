@@ -31,6 +31,9 @@ export interface DelegationSummary {
   model?: string;
   reasoningEffort?: string;
   litefusion?: LiteFusionAssignment;
+  /** Host-owned task identity. Its submission receipt is already settled;
+   * terminal reports are delivered as later task events, never a second result. */
+  asyncTaskId?: string;
   /** Older stores retained only the latest origin of a reused Sidekick. */
   legacyContext?: boolean;
 }

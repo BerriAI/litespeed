@@ -1,4 +1,5 @@
 import { createHash } from 'node:crypto';
+import { availableParallelism } from 'node:os';
 import { z } from 'zod';
 import { REASONING_EFFORTS, type Provider, type ReasoningEffort } from '../shared/types.js';
 import { LITEFUSION_CAPABILITIES, LITEFUSION_MODELS, LITEFUSION_ROLES, LITEFUSION_VERSION, effectiveSpecialist, configuredRole, liteFusionRole, specialistRoute, validateLiteFusion, type LiteFusionSelection, type LiteFusionRouteStatus, type LiteFusionTier } from '../shared/litefusion.js';
@@ -8,14 +9,17 @@ const modelKey=z.string().refine(key=>Object.hasOwn(LITEFUSION_MODELS,key),'Unkn
 const roleId=z.string().refine(id=>LITEFUSION_ROLES.some(role=>role.id===id),'Unknown LiteFusion task.');
 const routeSchema=z.object({modelKey,effort:z.string().min(1).max(30)}).strict();
 const bindingSchema=z.object({providerId:z.string().min(1).max(64),model:z.string().min(1).max(250)}).strict();
+export const liteFusionCapacity=(selection:LiteFusionSelection)=>({slots:selection.concurrency??Math.max(1,availableParallelism()),source:selection.concurrency?'explicit override':'host available parallelism'});
 export const liteFusionSchema=z.object({
   kind:z.literal('litefusion'),gatewayProviderId:z.string().min(1).max(64),
+  presetVersion:z.string().min(1).max(100).optional(),
+  lead:bindingSchema.extend({effort:z.enum(REASONING_EFFORTS).optional()}).strict().optional(),
   bindings:z.record(modelKey,bindingSchema).optional(),
   routes:z.record(roleId,z.object({default:routeSchema.optional(),escalation:routeSchema.optional()}).strict()).optional(),
   spend:z.object({limitUsd:z.number().positive().finite(),rescueReserveUsd:z.number().nonnegative().finite(),requestCeilings:z.array(bindingSchema.extend({usd:z.number().positive().finite()})).min(1).max(100)}).strict().refine(value=>value.rescueReserveUsd<value.limitUsd,'Rescue reserve must be below the total budget.').refine(value=>new Set(value.requestCeilings.map(route=>JSON.stringify([route.providerId,route.model]))).size===value.requestCeilings.length,'Duplicate request reservation route.').optional(),
   handoffs:z.record(roleId,z.object({instructions:z.string().min(1).max(8000),acceptance:z.string().min(1).max(4000)}).strict()).optional(),
-  concurrency:z.union([z.literal(1),z.literal(2),z.literal(3),z.literal(4)]).optional(),
-  maxAssignments:z.number().int().min(1).max(32).optional(),
+  concurrency:z.number().int().min(1).max(256).optional(),
+  maxAssignments:z.number().int().min(1).max(10000).optional(),
   capabilities:z.array(z.enum(LITEFUSION_CAPABILITIES)).max(5).optional(),
 }).strict();
 
@@ -70,7 +74,6 @@ export function resolveLiteFusion(snapshot:LiteFusionSnapshot,id:string,hard:boo
     tier='escalation';route=snapshot.routes[id].escalation;reason='availability_fallback';
   }
   if(!route.route||!route.effort||route.status==='unavailable')throw new Error(`LiteFusion ${id}: ${route.reason??'no eligible route'}`);
-  for(const capability of role.requirements)if(!snapshot.selection.capabilities?.includes(capability))throw new Error(`LiteFusion ${id} requires configured ${capability} capability. Routing does not install tools or hardware.`);
   const provider=snapshot.providers.find(p=>p.id===route.route!.providerId)!;
   return {role,route,provider,tier,reason};
 }

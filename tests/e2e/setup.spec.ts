@@ -76,8 +76,8 @@ test('gateway setup asks for the URL and key, handles failure inline, and then s
     await expect(dialog.getByRole('combobox',{name:'Setup architecture'})).toHaveValue('litefusion');
     await expect(dialog.getByText(/Your persistent lead/)).toBeVisible();
     await expect(dialog.getByText('Review specialist routes · 63 tasks')).toBeVisible();
-    await expect(dialog.getByRole('button',{name:'Start chatting'})).toBeDisabled();
-    await dialog.getByRole('button',{name:'Driver model',exact:true}).click();
+    await expect(dialog.getByRole('button',{name:'Lead model',exact:true})).toContainText('opus');
+    await dialog.getByRole('button',{name:'Lead model',exact:true}).click();
     await dialog.getByRole('option',{name:'test-model',exact:true}).click();
     await page.screenshot({path:testInfo.outputPath('recommended-setup-mobile.png')});
     await expect(dialog.getByRole('button',{name:'Start chatting'})).toBeInViewport();

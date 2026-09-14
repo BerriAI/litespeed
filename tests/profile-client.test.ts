@@ -226,9 +226,9 @@ describe('session profile integration', () => {
     expect(api.calls.filter(call => call.path === '/sessions/new/messages')).toHaveLength(2);
     expect(api.calls.filter(call => call.method === 'PATCH')).toHaveLength(0);
   });
-  it.each(['running', 'waiting'] as const)('disables profile and selection controls while %s without touching drafts', async status => {
+  it.each(['running', 'waiting'] as const)('keeps profiles locked but permits queued model configuration while %s without touching drafts', async status => {
     server([detail('a', { status })]); await mount(); await fill('Next thought');
-    expect(document.querySelector('.composer [aria-label="Project profiles"]')).toBeNull(); expect(el<HTMLButtonElement>('.model-trigger').disabled).toBe(true);
+    expect(document.querySelector('.composer [aria-label="Project profiles"]')).toBeNull(); expect(el<HTMLButtonElement>('.model-trigger').disabled).toBe(false);
     expect(el<HTMLTextAreaElement>('#message-input').value).toBe('Next thought');
   });
   it('preserves a pending question answer and composer attachments when a profile dialog is blocked by a live run', async () => {

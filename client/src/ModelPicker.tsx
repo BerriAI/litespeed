@@ -1,4 +1,6 @@
 import { LiteFusionSettings } from './LiteFusionSettings';
+import { liteFusionConfiguration, rememberArchitecture, specialistGateway, withLiteFusionLead } from '../../shared/architecture-config';
+import type { LiteFusionSelection } from '../../shared/litefusion';
 import { SHUNT_DESCRIPTION, SHUNT_MODEL_HINT, SHUNT_BENEFIT, shuntConfigured, type ShuntSelection } from '../../shared/shunt';
 import { useEffect, useId, useRef, useState, type KeyboardEvent } from 'react';
 import { Check, ChevronDown, Search } from 'lucide-react';
@@ -70,6 +72,7 @@ export function ModelField({ simple = false, hint, label, value, settings, selec
       </select>}
     </div>
     {hint && <p className="field-hint model-role-hint">{hint}</p>}
+    {value && !loading && catalog[value.providerId]?.length > 0 && !catalog[value.providerId].some(model => model.id === value.model) && <p className="field-hint">This model wasn’t in the provider’s list. Verify its ID or choose a listed model.</p>}
     {open && <div id={`${id}-menu`} className="model-select-menu" onKeyDown={event => moveOption(event)}>
       {settings.providers.length > 1 && <label className="model-provider">Provider<select aria-label={`${label} provider`} value={providerId} onChange={event => { setProviderId(event.target.value); setSearch(''); }}>{settings.providers.map(provider => <option key={provider.id} value={provider.id}>{provider.name}</option>)}</select></label>}
       <div className="model-search"><Search size={15} /><input autoFocus aria-label={`Search ${label.toLowerCase()} models`} placeholder="Search models or enter an ID…" value={search} onChange={event => setSearch(event.target.value)} onKeyDown={event => { if (event.key === 'Enter' && search.trim()) { event.preventDefault(); choose(filtered.length === 1 ? filtered[0].id : search.trim()); } }} /></div>
@@ -86,6 +89,8 @@ export function ModelField({ simple = false, hint, label, value, settings, selec
 
 export function ModelPicker({ disabled, settings, selection, onChange, onClose, onSettings, workspace }: { disabled?: boolean; settings: Settings; selection: Selection; onChange: (selection: Selection) => void; onClose: () => void; onSettings: () => void; workspace: string }) {
   const [shuntPending,setShuntPending]=useState(false);
+  const currentSelection=useRef(selection);currentSelection.current=selection;
+  const [switching,setSwitching]=useState(false),[switchError,setSwitchError]=useState('');
   const [view, setView] = useState<View>(selection.architecture?.kind ?? 'single');
   const [open, setOpen] = useState<Role | 'architecture' | null>(null);
   const [workspaceStyles, setWorkspaceStyles] = useState<string[]>([]);
@@ -97,26 +102,37 @@ export function ModelPicker({ disabled, settings, selection, onChange, onClose, 
   const worker = selection.architecture ? architectureWorker(selection.architecture) : null;
   const workerLabel = view === 'team-fusion' ? 'Worker' : view === 'expert-fusion' ? 'Expert' : 'Sidekick';
   const pending = view !== 'single' && selection.architecture?.kind !== view;
-  function chooseArchitecture(kind: View) {
-    setView(kind); setOpen(null); architectureTrigger.current?.focus();
-    if (kind === 'single') onChange({ ...selection, architecture: null });
-    else if (kind === 'litefusion') onChange({ ...selection, architecture: {kind, gatewayProviderId: settings.providers.find(p=>p.id===selection.providerId&&p.kind!=='codex')?.id??settings.providers.find(p=>p.kind!=='codex')?.id??selection.providerId} });
-    else if (worker) onChange({ ...selection, architecture: selectArchitecture(kind, worker) });
+  async function chooseArchitecture(kind: View) {
+    if(kind===view)return;
+    const architectureConfigurations=rememberArchitecture(selection),saved=architectureConfigurations[kind];
+    setSwitchError('');setOpen(null);architectureTrigger.current?.focus();
+    if(saved){setView(kind);onChange({...selection,...saved,architectureConfigurations});return;}
+    if(kind==='litefusion') {
+      setSwitching(true);
+      try {const captured=selection;const result=await api<{selection:LiteFusionSelection;discoveryError?:string}>(`/litefusion/preset?${query({providerId:specialistGateway(settings.providers,selection.providerId)})}`);if(currentSelection.current!==captured)throw new Error('Settings changed while loading the preset. Select it again.');setView(kind);onChange({...selection,...liteFusionConfiguration(result.selection),architectureConfigurations});if(result.discoveryError)setSwitchError(`Preset loaded; gateway discovery failed: ${result.discoveryError}`);}
+      catch(error){setSwitchError(errorMessage(error));}finally{setSwitching(false);}return;
+    }
+    setView(kind);
+    if(kind==='single')onChange({...selection,architecture:null,planner:null,shunt:null,architectureConfigurations});
+    else if(worker)onChange({...selection,architecture:selectArchitecture(kind,worker),architectureConfigurations});
   }
   function reasoning(value: ModelRoute, effort: string) {
     const modelReasoning = { ...selection.modelReasoning }, key = JSON.stringify([value.providerId, value.model]);
     if (effort) modelReasoning[key] = effort as ReasoningEffort; else delete modelReasoning[key];
-    onChange({ ...selection, modelReasoning });
+    if(selection.architecture?.kind==='litefusion')onChange({...selection,...liteFusionConfiguration(withLiteFusionLead(selection.architecture,value,effort as ReasoningEffort||undefined),selection)});
+    else onChange({ ...selection, modelReasoning });
   }
   function field(role: Role, label: string, value: ModelRoute | null) {
     return <ModelField hint={modelGuidance(view, role === 'model' ? 'driver' : role)} label={label} value={value} settings={settings} selection={selection} onReasoning={reasoning} open={open === role} onOpen={next => setOpen(next ? role : null)} onChange={value => {
       if (role === 'planner') onChange({ ...selection, planner: value });
       else if (role === 'worker' && view !== 'single') onChange({ ...selection, architecture: selectArchitecture(view, value) });
+      else if(selection.architecture?.kind==='litefusion')onChange({...selection,...liteFusionConfiguration(withLiteFusionLead(selection.architecture,value,selection.architecture.lead?.effort),selection)});
       else onChange({ ...selection, ...value });
     }} />;
   }
   return <Modal title="Choose a model" onClose={onClose}>
-    <div className="model-picker-scroll"><fieldset className="model-picker" disabled={disabled}>
+    <div className="model-picker-scroll"><fieldset className="model-picker" disabled={disabled||switching}>
+      {switchError&&<p role="alert" className="error-text">{switchError}</p>}
       <div className="architecture-field" onKeyDown={event => { if (event.key === 'Escape' && open === 'architecture') { event.stopPropagation(); setOpen(null); architectureTrigger.current?.focus(); } }}>
         <label id={`${architectureId}-label`}>Architecture</label>
         <button ref={architectureTrigger} className="architecture-select" aria-label="Architecture" aria-haspopup="listbox" aria-controls={architectureId} aria-expanded={open === 'architecture'} onClick={() => setOpen(open === 'architecture' ? null : 'architecture')}><span><strong>{arrangement.name}</strong><small>{arrangement.description}</small></span><ChevronDown size={16} /></button>
@@ -124,17 +140,17 @@ export function ModelPicker({ disabled, settings, selection, onChange, onClose, 
       </div>
       <section className="model-roles" aria-label="Models">
         <div className="model-column-head"><span>Model</span><span>Reasoning</span></div>
-        {field('model', view === 'single' ? 'Model' : 'Driver', route)}
+        {field('model', view === 'single' ? 'Model' : view==='litefusion'?'Lead':'Driver', route)}
         {view !== 'single' && view !== 'litefusion' && field('worker', workerLabel, worker)}
         {pending && <p className="field-hint">Choose a {workerLabel.toLowerCase()} to enable {arrangement.name}.</p>}
         {(view === 'team-fusion' || view === 'expert-fusion') && <label className="model-setting-row">Workers at once<select aria-label="Workers at once" disabled={pending} value={selection.architecture && selection.architecture.kind !== 'sidekick-fusion' ? selection.architecture.concurrency ?? 'auto' : 'auto'} onChange={event => { if (selection.architecture && selection.architecture.kind !== 'sidekick-fusion') { const { concurrency: _, ...architecture } = selection.architecture; onChange({ ...selection, architecture: event.target.value === 'auto' ? architecture : { ...architecture, concurrency: Number(event.target.value) as 1 | 2 | 3 | 4 } }); } }}><option value="auto">All requested · default</option>{[1, 2, 3, 4].map(count => <option key={count} value={count}>{count === 1 ? '1 · sequential' : `${count} · parallel`}</option>)}</select></label>}
       </section>
-      {selection.architecture?.kind==='litefusion' && <LiteFusionSettings value={selection.architecture} settings={settings} onChange={architecture=>onChange({...selection,architecture})} />}
-      <ShuntSettings settings={settings} selection={selection} onChange={value=>onChange({...selection,shunt:value})} onPending={setShuntPending} onReasoning={reasoning} />
-      <section className="planner-section" aria-label="Planning">
+      {selection.architecture?.kind==='litefusion' && <LiteFusionSettings value={selection.architecture} settings={settings} onChange={architecture=>onChange({...selection,...liteFusionConfiguration(architecture,selection)})} />}
+      {view!=='litefusion'&&<ShuntSettings settings={settings} selection={selection} onChange={value=>onChange({...selection,shunt:value})} onPending={setShuntPending} onReasoning={reasoning} />}
+      {view!=='litefusion'&&<section className="planner-section" aria-label="Planning">
         <div className="planner-heading"><div><strong>Planner model</strong><p>Use a different model in Plan mode.</p></div><button type="button" role="switch" className="setting-switch" aria-label="Use a planner model" aria-checked={Boolean(selection.planner)} disabled={!route} onClick={() => { onChange({ ...selection, planner: selection.planner ? null : route }); setOpen(null); }}><span /></button></div>
         {selection.planner && field('planner', 'Planner', selection.planner)}
-      </section>
+      </section>}
       <label className="model-setting-row output-style-setting">Output style<select aria-label="Output style" value={selection.outputStyle ?? ''} onChange={event => onChange({ ...selection, outputStyle: event.target.value || null })}><option value="">Default</option>{styles.map(style => <option key={style} value={style}>{style[0].toUpperCase() + style.slice(1)}</option>)}</select></label>
     </fieldset></div>
     <div className="model-picker-footer"><button className="text-button" onClick={() => { onClose(); onSettings(); }}>Manage providers</button><button className="button primary" disabled={disabled || pending || shuntPending || !shuntConfigured(selection.shunt,settings.providers)} onClick={onClose}>Done</button></div>

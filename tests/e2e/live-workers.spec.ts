@@ -17,8 +17,8 @@ for (const [kind, role, concurrency, width] of [
       await expect.poll(pending).toBe(concurrency === 1 ? 1 : 2);
       const cards = page.locator('.worker-task');
       await expect(cards).toHaveCount(2);
-      await expect(cards.nth(0).locator('.task-actor')).toHaveText(`${role} 1`);
-      await expect(cards.nth(1).locator('.task-actor')).toHaveText(`${role} 2`);
+      await expect(cards.nth(0).locator('.worker-number')).toHaveText(`${role} 1`);
+      await expect(cards.nth(1).locator('.worker-number')).toHaveText(`${role} 2`);
       await expect(page.locator('.driver-identity').first()).toHaveText('Driver');
       await expect(cards.locator('.research-transcript')).toHaveCount(0);
       await expect(cards.first()).toContainText('test-fast');
@@ -36,7 +36,8 @@ for (const [kind, role, concurrency, width] of [
       await request.post('/fixture/delegations/release');
       if (concurrency === 1) {
         await expect(cards.nth(1).getByRole('button',{name:'Inspect worker',exact:true})).toBeVisible();
-        await expect(cards.nth(1).locator('.task-actor')).toHaveText('Worker 2');
+        await expect(cards.nth(1).locator('.worker-number')).toHaveText('Worker 2');
+        await expect.poll(pending).toBe(1);
         await request.post('/fixture/delegations/release');
       }
       await expect(page.getByRole('article', { name: 'Assistant message' }).last()).toContainText('Driver report: both assignments are complete.');
@@ -81,22 +82,26 @@ test('tool rounds remain visible and compact until prose collapses their combine
   } finally { await request.post(`/api/sessions/${session.id}/cancel`); await request.post('/fixture/delegations/release'); }
 });
 
-test('workspace panel can close during a visit and reopens when entering the session again', async ({ page, request }) => {
+test('workspace panel stays closed across reloads after the user closes it', async ({ page, request }) => {
   const session = await (await request.post('/api/sessions', { data: {} })).json();
   await page.goto(`/#session/${session.id}`);
   const panel = page.locator('.workspace-panel');
+  await expect(panel).toHaveCount(0);
+  await page.getByRole('button', { name: 'Show workspace panel', exact: true }).click();
   await expect(panel).toBeVisible();
   await page.getByRole('button', { name: 'Hide workspace panel', exact: true }).click();
   await expect(panel).toHaveCount(0);
   await page.reload();
-  await expect(page.getByRole('button', { name: 'Hide workspace panel', exact: true })).toBeVisible();
-  await expect(panel).toBeVisible();
+  await expect(page.getByRole('button', { name: 'Show workspace panel', exact: true })).toBeVisible();
+  await expect(panel).toHaveCount(0);
 });
 
 test('narrowing the window closes the workspace overlay without changing the desktop preference', async ({ page, request }) => {
   const session = await (await request.post('/api/sessions', { data: {} })).json();
   await page.goto(`/#session/${session.id}`);
   const panel = page.locator('.workspace-panel');
+  await expect(panel).toHaveCount(0);
+  await page.getByRole('button', { name: 'Show workspace panel', exact: true }).click();
   await expect(panel).toBeVisible();
   await page.setViewportSize({ width: 390, height: 844 });
   await expect(panel).toHaveCount(0);

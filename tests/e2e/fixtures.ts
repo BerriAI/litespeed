@@ -8,7 +8,7 @@ export const test=base.extend<{savedModelDefaults:void}>({
     try{await use();}finally{
       const response=await request.post('/api/workspace-preferences',{data:{
         workspace:settings.workspace,providerId:original.providerId??settings.defaultProvider,model:original.model??settings.defaultModel,
-        architecture:original.architecture??null,planner:original.planner??null,shunt:original.shunt??null,modelReasoning:original.modelReasoning??{},outputStyle:original.outputStyle??null,
+        architectureConfigurations:original.architectureConfigurations??{},architecture:original.architecture??null,planner:original.planner??null,shunt:original.shunt??null,modelReasoning:original.modelReasoning??{},outputStyle:original.outputStyle??null,
         permissionMode:original.permissionMode??settings.permissionMode,setupComplete:original.setupComplete??false,
       }});
       expect(response.ok(),await response.text()).toBe(true);

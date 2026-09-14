@@ -1,3 +1,4 @@
+import { liteFusionEnvironment } from './litefusion-environment.js';
 import { LiteFusionEvaluations, evaluationSchema } from './litefusion-evaluations.js';
 import { VERSION } from '../shared/version.js';
 import type { UpdateStatus } from '../shared/updates.js';
@@ -7,6 +8,7 @@ import { gatewayBaseUrl } from '../shared/setup.js';
 import { clientSurface } from '../shared/client.js';
 import { REASONING_EFFORTS } from '../shared/types.js';
 import { WorkspacePreferences } from './workspace-preferences.js';
+import { architectureConfiguration, liteFusionPreset } from '../shared/architecture-config.js';
 import { architectureProviders } from '../shared/architectures.js';
 import { liteFusionSchema, captureLiteFusion } from './litefusion-routing.js';
 import { LITEFUSION_ROLES, LITEFUSION_MODELS, LITEFUSION_VERSION, validateLiteFusion } from '../shared/litefusion.js';
@@ -48,6 +50,8 @@ const architectureSchema = z.discriminatedUnion('kind', [
   z.object({kind:z.literal('expert-fusion'),expert:modelRouteSchema,concurrency:z.union([z.literal(1),z.literal(2),z.literal(3),z.literal(4)]).optional()}).strict(),
 ]);
 const sessionSchema = z.object({shunt:shuntSchema.nullable().optional(),modelReasoning:z.record(z.string().max(400),z.enum(REASONING_EFFORTS)).refine(value=>Object.keys(value).length<=100,'At most 100 model reasoning preferences may be configured.').optional(),title:z.string().trim().min(1).max(200).optional(),workspace:z.string().max(4096).optional(),providerId:z.string().max(64).optional(),model:z.string().max(250).optional(),mode:z.enum(['build','plan']).optional(),permissionMode:z.enum(['ask','auto']).optional(),planner:z.object({providerId:z.string().min(1).max(64),model:z.string().min(1).max(250)}).nullable().optional(),architecture:architectureSchema.nullable().optional(),outputStyle:z.string().regex(/^[a-zA-Z0-9_-]{1,64}$/).nullable().optional()});
+const architectureConfigurationSchema=sessionSchema.pick({providerId:true,model:true,architecture:true,planner:true,shunt:true,modelReasoning:true,outputStyle:true}).required();
+const architectureConfigurationsSchema=z.object({single:architectureConfigurationSchema.optional(),'sidekick-fusion':architectureConfigurationSchema.optional(),'team-fusion':architectureConfigurationSchema.optional(),'expert-fusion':architectureConfigurationSchema.optional(),litefusion:architectureConfigurationSchema.optional()}).strict().refine(value=>Object.entries(value).every(([key,configuration])=>!configuration||(configuration.architecture?.kind??'single')===key),'Saved architecture must match its key.');
 const profileChoiceSchema=z.object({profileId:z.string().min(1).max(64).nullable(),skillIds:z.array(z.string().min(1).max(64)).max(100),catalogRevision:z.string().min(1).max(128).optional()}).strict().refine(choice=>new Set(choice.skillIds).size===choice.skillIds.length,'Skill IDs must be unique.').refine(choice=>(choice.profileId===null&&choice.skillIds.length===0)||Boolean(choice.catalogRevision),'Refresh the profile catalog before choosing profiles or skills.');
 const configRevisionSchema=z.number().int().min(0).max(Number.MAX_SAFE_INTEGER);
 const profileSelectionSchema=z.object({providerId:z.string().min(1).max(64).optional(),model:z.string().min(1).max(250).optional(),mode:z.enum(['build','plan']).optional()}).strict();
@@ -212,28 +216,37 @@ export function createApp(options:AppOptions = {}) {
   app.post('/api/sessions/:id/litefusion/evaluations',(req,res)=>{
     const session=store.session(req.params.id);
     if(store.isChild(session.id))throw httpError(404,'Session not found.');
-    if(session.architecture?.kind!=='litefusion')throw httpError(400,'This session does not use LiteFusion.');
+    if(session.architecture?.kind!=='litefusion'&&!runner.tasks.list(session.id).length&&!runner.delegations.list(session.id).some(task=>task.litefusion))throw httpError(400,'This session has no LiteFusion history.');
     res.status(201).json(fusionEvaluations.record(session.id,evaluationSchema.parse(req.body)));
   });
   app.get('/api/litefusion/catalog',(_req,res)=>res.json({version:LITEFUSION_VERSION,roles:LITEFUSION_ROLES,models:LITEFUSION_MODELS}));
+  app.get('/api/litefusion/preset',async(req,res)=>{
+    const provider=store.settings().providers.find(p=>p.id===queryString(req.query.providerId));
+    if(!provider||provider.kind==='codex')throw httpError(400,'Choose an API gateway for the LiteFusion preset.');
+    let models=modelCatalog.snapshot(provider),discoveryError:string|undefined;
+    try {const listed=await listModels(provider,AbortSignal.timeout(15000));modelCatalog.remember(provider,listed);models=listed;}
+    catch(error){discoveryError=safeError(error,store);}
+    const selection=liteFusionPreset(provider.id,models);
+    res.json({selection,discoveryError,executionVerified:false});
+  });
   app.post('/api/litefusion/routes',(req,res)=>{
     const selection=liteFusionSchema.parse(req.body);checkArchitecture(selection);
     const {version,hash,routes}=captureLiteFusion(selection,store.settings().providers);
-    res.json({version,hash,routes,executionVerified:false});
+    const lease=options.external?.capture(new AbortController().signal);try{res.json({version,hash,routes,environment:liteFusionEnvironment(lease?.definitions??[]),executionVerified:false});}finally{lease?.release();}
   });
   app.get('/api/sessions/:id/litefusion/export',(req,res)=>{
     const session=store.session(req.params.id);
     if(store.isChild(session.id))throw httpError(404,'Session not found.');
-    if(session.architecture?.kind!=='litefusion')throw httpError(400,'This session does not use LiteFusion.');
+    if(session.architecture?.kind!=='litefusion'&&!runner.tasks.list(session.id).length&&!runner.delegations.list(session.id).some(task=>task.litefusion))throw httpError(400,'This session has no LiteFusion history.');
     const assignments=runner.delegations.list(session.id);
     const turns=[...new Set(assignments.map(item=>item.parentTurnId))];
     for(const message of store.messages(session.id))if(message.role==='user'&&!turns.includes(message.id))turns.push(message.id);
-    res.json({schemaVersion:1,sessionId:session.id,policyVersion:LITEFUSION_VERSION,selection:session.architecture,assignments,turns:turns.map(id=>{const evaluations=fusionEvaluations.list(session.id,id);return {id,usage:runner.usage.turn(session.id,id),checks:store.messages(session.id).filter(message=>message.turnId===id).flatMap(message=>(message.toolCalls??[]).filter(call=>['verify','bash'].includes(call.name)).map(call=>({id:call.id,command:call.args.command,status:call.status,execution:call.execution}))),evaluation:evaluations.at(-1)??{success:null,source:null},evaluations};}),limitations:['Unreported costs remain unknown.','Worker completion is not an external success label.']});
+    res.json({schemaVersion:1,sessionId:session.id,policyVersion:LITEFUSION_VERSION,selection:session.architecture,tasks:runner.tasks.list(session.id),assignments,turns:turns.map(id=>{const evaluations=fusionEvaluations.list(session.id,id);return {id,scheduling:runner.tasks.metrics(session.id,id),usage:runner.usage.turn(session.id,id),checks:store.messages(session.id).filter(message=>message.turnId===id).flatMap(message=>(message.toolCalls??[]).filter(call=>['verify','bash'].includes(call.name)).map(call=>({id:call.id,command:call.args.command,status:call.status,execution:call.execution}))),evaluation:evaluations.at(-1)??{success:null,source:null},evaluations};}),limitations:['Unreported costs remain unknown.','Worker completion is not an external success label.']});
   });
   const preferences=new WorkspacePreferences(store);
   app.get('/api/workspace-preferences',async(req,res)=>res.json(preferences.get(await workspace(req.query.workspace))));
   app.post('/api/workspace-preferences',async(req,res)=>{
-    const input=sessionSchema.required({providerId:true,model:true}).extend({setupComplete:z.boolean().optional()}).parse(req.body), root=await workspace(input.workspace);
+    const input=sessionSchema.required({providerId:true,model:true}).extend({setupComplete:z.boolean().optional(),architectureConfigurations:architectureConfigurationsSchema.optional()}).parse(req.body), root=await workspace(input.workspace);
     checkProvider(input.providerId);if(input.architecture)checkArchitecture(input.architecture);if(input.planner)checkProvider(input.planner.providerId);if(!shuntConfigured(input.shunt,store.settings().providers))throw httpError(400,'Choose an API-key Shunt model or turn Shunt off.');
     if(input.setupComplete&&!input.model.trim())throw httpError(400,'Choose a model to finish setup.');
     preferences.save(root,{...input,shunt:input.shunt??undefined,architecture:input.architecture??undefined,planner:input.planner??undefined,outputStyle:input.outputStyle??undefined},true);
@@ -273,8 +286,10 @@ export function createApp(options:AppOptions = {}) {
     for(const message of imported.messages)store.saveMessage({...message,attachments:message.attachments?.map(({path: _path,...attachment})=>attachment),id:randomUUID(),sessionId:session.id} as Message);
     res.status(201).json(session);
   });
-  app.get('/api/sessions/:id',(req,res)=>res.json({session:store.session(req.params.id),messages:runner.messages(req.params.id),todos:store.todos(req.params.id),permissions:runner.permissions(req.params.id),questions:runner.questions.pending(req.params.id),queue:store.queue(req.params.id),history:runner.history.state(req.params.id),delegations:runner.delegations.list(req.params.id),jobs:runner.jobs.list(req.params.id),lastEventId:store.latestEventId(req.params.id)}));
+  app.get('/api/sessions/:id',(req,res)=>res.json({session:store.session(req.params.id),messages:runner.messages(req.params.id),todos:store.todos(req.params.id),permissions:runner.permissions(req.params.id),questions:runner.questions.pending(req.params.id),queue:store.queue(req.params.id),history:runner.history.state(req.params.id),tasks:runner.tasks.list(req.params.id),delegations:runner.delegations.list(req.params.id),jobs:runner.jobs.list(req.params.id),lastEventId:store.latestEventId(req.params.id)}));
   app.get('/api/sessions/:id/delegations',(req,res)=>res.json({delegations:runner.delegations.list(req.params.id)}));
+  app.get('/api/sessions/:id/tasks/:taskId',(req,res)=>res.json(runner.tasks.get(req.params.id,req.params.taskId)));
+  app.post('/api/sessions/:id/tasks/:taskId/cancel',async(req,res)=>res.json({task:await runner.cancelTask(req.params.id,req.params.taskId)}));
   app.get('/api/sessions/:id/delegations/:delegationId',(req,res)=>{
     const detail=runner.delegations.transcript(req.params.id,req.params.delegationId);
     res.json({...detail,todos:store.todos(detail.session.id),permissions:[],questions:[],queue:{items:[],paused:true},history:{hasCheckpoints:true,canUndo:false,canRedo:false}});
@@ -316,6 +331,23 @@ export function createApp(options:AppOptions = {}) {
     const session=store.updateSession(req.params.id,patch,expectedConfigRevision);
     const modelChange=patch.shunt!==undefined||patch.modelReasoning!==undefined||patch.model!==undefined||patch.providerId!==undefined||patch.planner!==undefined||patch.architecture!==undefined||patch.outputStyle!==undefined;
     if(configChange){preferences.save(session.workspace,session,modelChange);publishConfiguration(req.params.id);}res.json(session);
+  });
+  // A complete architecture configuration can be staged while work runs.
+  // Permissions/mode/workspace remain outside this endpoint and idle-only.
+  app.put('/api/sessions/:id/architecture',(req,res)=>{
+    const input=sessionSchema.pick({providerId:true,model:true,architecture:true,planner:true,shunt:true,modelReasoning:true,outputStyle:true}).required({providerId:true,model:true,architecture:true}).extend({expectedConfigRevision:configRevisionSchema,expectedPendingId:z.string().nullable().optional()}).strict().parse(req.body);
+    const {expectedConfigRevision,expectedPendingId,...value}=input;
+    if((store.session(req.params.id).pendingArchitecture?.id??null)!==(expectedPendingId??null))throw httpError(409,'The pending architecture changed. Refresh and review it before saving.');
+    checkProvider(value.providerId);if(value.architecture)checkArchitecture(value.architecture);if(value.planner)checkProvider(value.planner.providerId);
+    if(!shuntConfigured(value.shunt,store.settings().providers))throw httpError(400,'Choose an API-key Shunt model or turn Shunt off.');
+    const configuration=architectureConfiguration({...value,architecture:value.architecture??undefined,planner:value.planner??undefined,shunt:value.shunt??undefined,outputStyle:value.outputStyle??undefined});
+    if(runner.active(req.params.id)) {
+      const session=store.updateSession(req.params.id,{pendingArchitecture:{id:randomUUID(),requestedAt:Date.now(),expectedRevision:expectedConfigRevision,configuration}},expectedConfigRevision);
+      publishConfiguration(session.id);res.status(202).json(session);return;
+    }
+    runner.assertIdle(req.params.id);runner.history.assertReady(req.params.id);
+    const session=store.updateSession(req.params.id,{...configuration,pendingArchitecture:undefined},expectedConfigRevision);
+    preferences.save(session.workspace,session,true);publishConfiguration(session.id);res.json(session);
   });
   app.delete('/api/sessions/:id',(req,res)=>{runner.assertIdle(req.params.id);runner.deleteSessionJobs(req.params.id);store.deleteSession(req.params.id);runner.removeFromSearchIndex(req.params.id);res.json({ok:true});});
   const memory=new Memory(store);

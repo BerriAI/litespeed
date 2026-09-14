@@ -13,10 +13,19 @@ import { toHex } from './theme.js';
 import { useConfig, useTheme } from './context.js';
 
 /** Keep the chooser live when opened before queued workers acquire identities. */
-export function WorkerChooser({controller,onSelect,onClose}:{controller:TerminalController;onSelect:(task:DelegationSummary)=>void;onClose:()=>void}) {
+export function WorkerChooser({controller,onSelect,onClose}:{controller:TerminalController;onSelect:(task:DelegationSummary|import('../shared/litefusion-tasks.js').LiteFusionTask)=>void;onClose:()=>void}) {
   const {sync}=useSyncExternalStore(controller.subscribe,controller.getState);
   const detail=sync.detail,labels=detail?workerLabels(detail):new Map<string,string>();
-  return <Menu title="Worker assignments" onClose={onClose} items={(detail?logicalWorkers(detail):[]).map(task=>({id:task.id,label:`${labels.get(`${task.parentMessageId}:${task.toolCallId}`)||'Research'} · ${task.description}`,description:`${task.role??'research'} · ${task.status}`,action:()=>onSelect(task)}))}/>;
+  return <Menu title="Worker assignments" onClose={onClose} items={[...(detail?.tasks??[]).filter(task=>!detail?.delegations?.some(attempt=>attempt.asyncTaskId===task.id)).map(task=>({id:task.id,label:task.description,description:task.status,action:()=>onSelect(task)})),...(detail?logicalWorkers(detail):[]).map(task=>({id:task.id,label:`${labels.get(`${task.parentMessageId}:${task.toolCallId}`)||'Research'} · ${task.description}`,description:`${task.role??'research'} · ${task.status}`,action:()=>onSelect(task)}))]}/>;
+}
+
+export function PendingTaskInspector({controller,task:initial,onClose}:{controller:TerminalController;task:import('../shared/litefusion-tasks.js').LiteFusionTask;onClose:()=>void}) {
+  const state=useSyncExternalStore(controller.subscribe,controller.getState),detail=state.sync.detail;
+  const task=detail?.tasks?.find(task=>task.id===initial.id)??initial;
+  const attempt=detail?.delegations?.findLast(item=>item.asyncTaskId===task.id);
+  if(attempt)return <WorkerInspector controller={controller} invocation={attempt} onClose={onClose}/>;
+  const call=detail?.messages.flatMap(message=>message.toolCalls??[]).findLast(call=>call.taskId===task.id);
+  return <Dialog title={`${task.description} · ${task.status}`} onClose={onClose} footer="Esc returns to your draft"><box flexDirection="column"><Button onPress={()=>{void controller.action('Stopping task',()=>controller.client.api(`/sessions/${task.parentSessionId}/tasks/${task.id}/cancel`,{}));}}>Stop task</Button><scrollbox height={18}><text>{terminalText([String(call?.args.prompt??''),`Dependencies: ${task.dependencies.map(id=>detail?.tasks?.find(task=>task.id===id)?.description??id).join(', ')||'None'}`,`Acceptance: ${JSON.stringify(call?.args.acceptance??[])}`,task.error??'Worker history appears when execution starts.'].join('\n\n'))}</text></scrollbox></box></Dialog>;
 }
 
 export function WorkerInspector({ controller, invocation, onClose }: { controller: TerminalController; invocation: DelegationSummary; onClose: () => void }) {
