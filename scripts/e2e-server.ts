@@ -192,6 +192,17 @@ const mock=createServer(async(req,res)=>{
     toolCall=true;emit({tool_calls:[{index:0,id:'fixture-question',type:'function',function:{name:'ask_user',arguments:JSON.stringify({question:'Which storage should this project use?',options:[{id:'sqlite',label:'SQLite',description:'A local database with no extra service.'},{id:'postgres',label:'PostgreSQL',description:'A separate database server.'}]})}}]});
   }else if(prompt.includes('ask fixture question')&&prompt.includes('then write')&&data.messages.at(-1)?.tool_call_id==='fixture-question'){
     toolCall=true;emit({tool_calls:[{index:0,id:'fixture-after-answer',type:'function',function:{name:'write_file',arguments:JSON.stringify({path:'answered.txt',content:'The answer did not grant tool permission.\n'})}}]});
+  }else if(prompt.includes('TUI_MARKDOWN_STREAM')){
+    // Streams prose with inline markdown two characters at a time so a test can
+    // observe every intermediate frame, then calls one tool so the same run has
+    // live activity rows and, once settled, a collapsed step summary.
+    if(data.messages.at(-1)?.role==='tool'){emit({content:'Done. The **transcript** is stable.'});}
+    else{
+      emit({reasoning_content:'Planning the streamed transcript check.'});
+      const text='Reviewing the **streaming transcript** for `conceal` markers and ~~stale~~ current layout.';
+      for(const part of text.match(/.{1,2}|\n/g)||[]){if(res.destroyed)return;emit({content:part});await new Promise(r=>setTimeout(r,40));}
+      toolCall=true;emit({tool_calls:[{index:0,id:'stream-read',type:'function',function:{name:'bash',arguments:JSON.stringify({command:'sleep 2'})}}]});
+    }
   }else if(prompt==='TUI_QUEUE_HOLD'){
     emit({content:'Waiting for an interrupt.'});
     await new Promise<void>(resolve=>res.once('close',resolve));

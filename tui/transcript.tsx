@@ -18,7 +18,7 @@ import { activityActors, activitySections, conversationGroups, usageLabel, type 
 import { steeringContent } from '../shared/steering-presentation.js';
 import { Button } from './ui.js';
 import { terminalText } from './protocol.js';
-import { toolRow, reasoningSummary } from './transcriptModel.js';
+import { toolRow, reasoningSummary, stableStreamingMarkdown } from './transcriptModel.js';
 import { useConfig, useTheme } from './context.js';
 import type { TerminalController } from './controller.js';
 import { Brand } from './brand.js';
@@ -30,6 +30,14 @@ export const RAIL_BORDER = {
   topLeft: '┃', topRight: '┃', bottomLeft: '┃', bottomRight: '┃',
   horizontal: ' ', vertical: '┃', topT: '┃', bottomT: '┃', leftT: '┃', rightT: '┃', cross: '┃',
 };
+
+/** One indentation grid for everything under a response. Prose and every
+ * activity label share the text edge; an expandable row puts its chevron in the
+ * two-column gutter before it, so a live tool row, a collapsed step summary and
+ * the text they belong to all line up. `Button` already pads itself by one, so
+ * a row built from one needs no wrapper padding. */
+const ACTIVITY_TEXT = 3;
+const ACTIVITY_CHEVRON = 1;
 
 export interface TranscriptSettings {
   showThinking: boolean;
@@ -116,22 +124,22 @@ function ReasoningRow({ row }: { row: { running: boolean; title: string | null; 
   const theme = useTheme(), settings = useTranscriptSettings(), [expanded, setExpanded] = useState<boolean | null>(null);
   const text = terminalText([row.title, row.body].filter(Boolean).join('\n'), true);
   const open = expanded ?? settings.showThinking;
-  if (row.running) return <box paddingLeft={3} flexShrink={0}><text fg={toHex(theme.textMuted)}><em>Thinking…</em></text></box>;
-  return <box paddingLeft={2} flexShrink={0} flexDirection="column">
+  if (row.running) return <box paddingLeft={ACTIVITY_TEXT} flexShrink={0}><text fg={toHex(theme.textMuted)}><em>Thinking…</em></text></box>;
+  return <box flexShrink={0} flexDirection="column">
     <Button tone="muted" onPress={() => setExpanded(!open)}>{`${open ? '▾' : '▸'} Thought`}</Button>
-    {open && <text paddingLeft={1} fg={toHex(theme.textMuted)} wrapMode="word"><em>{text}</em></text>}
+    {open && <text paddingLeft={ACTIVITY_TEXT} fg={toHex(theme.textMuted)} wrapMode="word"><em>{text}</em></text>}
   </box>;
 }
 
-const TextRow = memo(function TextRow({ text, syntax, compact = false }: { text: string; syntax: SyntaxStyle; compact?: boolean }) {
+const TextRow = memo(function TextRow({ text, syntax, compact = false, streaming = false }: { text: string; syntax: SyntaxStyle; compact?: boolean; streaming?: boolean }) {
   const theme = useTheme();
   return (
-    <box paddingLeft={3} marginTop={compact ? 0 : 1} flexShrink={0}>
+    <box paddingLeft={ACTIVITY_TEXT} marginTop={compact ? 0 : 1} flexShrink={0}>
       <markdown
         syntaxStyle={syntax}
-        streaming
+        streaming={streaming}
         conceal
-        content={text}
+        content={streaming ? stableStreamingMarkdown(text) : text}
         fg={toHex(theme.markdownText)}
         bg={toHex(theme.background)}
       />
@@ -141,10 +149,12 @@ const TextRow = memo(function TextRow({ text, syntax, compact = false }: { text:
 
 const DENIED_MARK = '⊘ ';
 
-function InlineToolRow({ row, awaitingPermission, margin }: {
+function InlineToolRow({ row, awaitingPermission, margin, indent = ACTIVITY_TEXT }: {
   row: ToolRowModel;
   awaitingPermission: boolean;
   margin: 0 | 1;
+  /** Columns before the icon. A chevron row supplies the rest of the gutter. */
+  indent?: number;
 }) {
   const theme = useTheme();
   const [showError, setShowError] = useState(false);
@@ -154,14 +164,14 @@ function InlineToolRow({ row, awaitingPermission, margin }: {
         : theme.text;
   if (row.running && !row.text) {
     return (
-      <box paddingLeft={3} marginTop={margin} flexShrink={0}>
+      <box paddingLeft={indent} marginTop={margin} flexShrink={0}>
         <text fg={toHex(theme.textMuted)}>{`~ ${row.pending}`}</text>
       </box>
     );
   }
   const prefix = row.denied ? DENIED_MARK : `${row.icon} `;
   return (
-    <box paddingLeft={3} marginTop={margin} flexShrink={0} flexDirection="column">
+    <box paddingLeft={indent} marginTop={margin} flexShrink={0} flexDirection="column">
       {row.running
         ? <Spinner color={toHex(theme.text)}>{row.text}</Spinner>
         : (
@@ -312,20 +322,20 @@ function ToolActivity({ call, showDetails, awaitingPermission, syntax, width, em
   if (call.name === 'todo_write') {
     const todos = parseTodos(call.args.todos);
     const title = row.failed ? 'Task update failed' : row.denied ? 'Task update declined' : row.completed ? 'Tasks updated' : 'Update tasks';
-    return <box paddingLeft={2} flexDirection="column" flexShrink={0}>
+    return <box flexDirection="column" flexShrink={0}>
       <Button tone={row.failed ? 'error' : 'muted'} onPress={() => setExpanded(!expanded)}>{`${open ? '▾' : '▸'} ${title} · ${todos.filter(todo => todo.status === 'completed').length}/${todos.length} done`}</Button>
-      {open && todos.map(todo => <text paddingLeft={1} key={todo.id ?? todo.content} fg={toHex(todo.status === 'in_progress' ? theme.text : theme.textMuted)} wrapMode="word">{`${TODO_MARKERS[todo.status] ?? '○'} ${terminalText(todo.content)}`}</text>)}
+      {open && todos.map(todo => <text paddingLeft={ACTIVITY_TEXT} key={todo.id ?? todo.content} fg={toHex(todo.status === 'in_progress' ? theme.text : theme.textMuted)} wrapMode="word">{`${TODO_MARKERS[todo.status] ?? '○'} ${terminalText(todo.content)}`}</text>)}
       {row.error && <text fg={toHex(theme.error)} wrapMode="word">{terminalText(row.error, true)}</text>}
     </box>;
   }
   if(call.shunt||call.routing||call.name==='bulk_read'||call.name==='code_write')return <box flexDirection="column" flexShrink={0}>
     <InlineToolRow row={row} awaitingPermission={awaitingPermission} margin={0}/>
-    {call.output && <box paddingLeft={4} flexShrink={0}>{result}</box>}
+    {call.output && <box paddingLeft={ACTIVITY_TEXT} flexShrink={0}>{result}</box>}
   </box>;
   return <box flexDirection="column" flexShrink={0}>
-    <box onMouseDown={() => setExpanded(!expanded)} flexDirection="row"><text fg={toHex(theme.textMuted)}>{open ? '▾' : '▸'}</text><InlineToolRow row={row} awaitingPermission={awaitingPermission} margin={0} /></box>
-    {call.waitingForWorkspace && <text fg={toHex(theme.textMuted)} wrapMode="word"><em>{terminalText(call.waitingForWorkspace)}</em></text>}
-    {open && <box paddingLeft={4} flexDirection="column" flexShrink={0}>
+    <box paddingLeft={ACTIVITY_CHEVRON} onMouseDown={() => setExpanded(!expanded)} flexDirection="row"><text fg={toHex(theme.textMuted)}>{open ? '▾' : '▸'}</text><InlineToolRow row={row} awaitingPermission={awaitingPermission} margin={0} indent={ACTIVITY_TEXT - ACTIVITY_CHEVRON - 1} /></box>
+    {call.waitingForWorkspace && <text paddingLeft={ACTIVITY_TEXT} fg={toHex(theme.textMuted)} wrapMode="word"><em>{terminalText(call.waitingForWorkspace)}</em></text>}
+    {open && <box paddingLeft={ACTIVITY_TEXT} flexDirection="column" flexShrink={0}>
       {call.intercepted && <text fg={toHex(theme.warning)}>{`Modified by ${terminalText(call.intercepted.by)}: ${terminalText(call.intercepted.reason)}`}</text>}
       {row.shape === 'block' ? <BlockToolRow row={row} syntax={syntax} width={width - 8} /> : result}
     </box>}
@@ -337,7 +347,7 @@ function DriverActivity({ entries, detail, live, heading, syntax, width, embedde
   const calls = entries.flatMap(entry => entry.call ? [entry.call] : []);
   const open = live || expanded || settings.toolDetails || settings.showThinking;
   return <box flexDirection="column" flexShrink={0}>
-    {heading && <text paddingLeft={3} fg={toHex(theme.textMuted)}>{detail.session.architecture?.kind==='litefusion'?'Lead':'Driver'}</text>}
+    {heading && <text paddingLeft={ACTIVITY_TEXT} fg={toHex(theme.textMuted)}>{detail.session.architecture?.kind==='litefusion'?'Lead':'Driver'}</text>}
     {!live && calls.length > 0 && <Button tone="muted" onPress={() => setExpanded(!expanded)}>{`${open ? '▾' : '▸'} ${calls.length} ${calls.length === 1 ? 'step' : 'steps'}`}</Button>}
     {(open || !calls.length) && entries.map(({ message, call }) => call
       ? <ToolActivity key={call.id} syntax={syntax.normal} width={width} call={call} showDetails={settings.toolDetails} awaitingPermission={detail.permissions.some(item => item.toolCallId === call.id && !item.invocationId)} embedded={embedded} />
@@ -385,7 +395,7 @@ export const Transcript = memo(function Transcript({ detail, width, height, acti
       if (message.role === 'user') { previousActor = undefined; return embedded ? null : <UserRow key={message.id} message={message} first={index === 0} />; }
       if (message.role === 'system') {
         previousActor = undefined;
-        return <box key={message.id} marginTop={1} paddingLeft={3} flexShrink={0}><text fg={toHex(theme.textMuted)} wrapMode="word">{terminalText(message.content, true)}</text></box>;
+        return <box key={message.id} marginTop={1} paddingLeft={ACTIVITY_TEXT} flexShrink={0}><text fg={toHex(theme.textMuted)} wrapMode="word">{terminalText(message.content, true)}</text></box>;
       }
       const usageMessage = steps.findLast(step => step.turnUsage) ?? steps.at(-1) ?? message;
       const content = withoutVerificationNotice(message.content, message.receipts);
@@ -394,9 +404,11 @@ export const Transcript = memo(function Transcript({ detail, width, height, acti
       const precedingActor = hasText ? 'driver' : previousActor;
       previousActor = activitySections(steps, actors).at(-1)?.kind ?? precedingActor;
       return <box key={message.id} marginTop={index === 0 && embedded ? 0 : 1} flexDirection="column" flexShrink={0}>
-        {showDriver && detail.session.architecture && controller && <text paddingLeft={3} fg={toHex(theme.textMuted)}>{detail.session.architecture?.kind==='litefusion'?'Lead':'Driver'}</text>}
+        {showDriver && detail.session.architecture && controller && <text paddingLeft={ACTIVITY_TEXT} fg={toHex(theme.textMuted)}>{detail.session.architecture?.kind==='litefusion'?'Lead':'Driver'}</text>}
         {message.reasoning && <ReasoningRow subtle={syntax.subtle} row={{ running: live && !message.content && !message.toolCalls?.length, ...reasoningSummary(message.reasoning) }} />}
-        {content.trim() && <TextRow compact text={terminalText(content, true)} syntax={syntax.normal} />}
+        {/* Text is still arriving only while the run is live and no tool call has
+            followed it in this message; a settled response renders its real source. */}
+        {content.trim() && <TextRow compact streaming={live && !message.toolCalls?.length} text={terminalText(content, true)} syntax={syntax.normal} />}
         <WorkLog steps={steps} detail={detail} actors={actors} live={live} syntax={syntax} width={width} controller={controller} embedded={embedded} precedingActor={precedingActor} hasText={hasText} />
         {message.error && <ErrorRow error={terminalText(message.error, true)} />}
         {footer && (runUsage || message.context) && <box marginTop={1} paddingLeft={2} flexShrink={0}><Button tone="muted" onPress={() => onUsage?.(usageMessage, runUsage)}>{usageLabel(usageMessage, runUsage)}</Button></box>}
