@@ -2,7 +2,7 @@ import { createHash } from 'node:crypto';
 import { availableParallelism } from 'node:os';
 import { z } from 'zod';
 import { REASONING_EFFORTS, type Provider, type ReasoningEffort } from '../shared/types.js';
-import { LITEFUSION_CAPABILITIES, LITEFUSION_MODELS, LITEFUSION_ROLES, LITEFUSION_VERSION, effectiveSpecialist, configuredRole, liteFusionRole, specialistRoute, validateLiteFusion, type LiteFusionSelection, type LiteFusionRouteStatus, type LiteFusionTier } from '../shared/litefusion.js';
+import { bindExactModels, LITEFUSION_CAPABILITIES, LITEFUSION_MODELS, LITEFUSION_ROLES, LITEFUSION_VERSION, effectiveSpecialist, configuredRole, liteFusionRole, specialistRoute, validateLiteFusion, type LiteFusionSelection, type LiteFusionRouteStatus, type LiteFusionTier } from '../shared/litefusion.js';
 import { modelCatalog, type ModelCatalogCache } from './budget.js';
 
 const modelKey=z.string().refine(key=>Object.hasOwn(LITEFUSION_MODELS,key),'Unknown specialist model.');
@@ -32,6 +32,11 @@ export interface LiteFusionSnapshot {
 }
 export function captureLiteFusion(selection: LiteFusionSelection, providers: readonly Provider[], cache: ModelCatalogCache = modelCatalog): LiteFusionSnapshot {
   validateLiteFusion(selection);
+  // Saved preferences are not the executable roster. Fill missing connections
+  // from observed identities at every capture, including legacy sessions and
+  // queued/goal turns. Explicit bindings and task/lead choices win unchanged.
+  const gateway=providers.find(provider=>provider.id===selection.gatewayProviderId);
+  if(gateway)selection=bindExactModels(selection,[...cache.snapshot(gateway),...(gateway.models??[]).map(id=>({id}))]);
   const routes: LiteFusionSnapshot['routes']={};
   for(const role of LITEFUSION_ROLES) {
     const resolve=(tier:LiteFusionTier):LiteFusionRouteStatus=>{

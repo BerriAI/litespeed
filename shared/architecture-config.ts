@@ -1,5 +1,5 @@
 import type { ArchitectureKind, ArchitectureSelection, ModelRoute } from './architectures.js';
-import type { ModelReasoning, Provider, ReasoningEffort, Session } from './types.js';
+import type { Model, ModelReasoning, Provider, ReasoningEffort, Session } from './types.js';
 import { bindExactModels, LITEFUSION_MODELS, LITEFUSION_VERSION, type LiteFusionSelection } from './litefusion.js';
 
 export type ArchitectureKey = 'single' | ArchitectureKind;
@@ -28,9 +28,13 @@ export function architectureConfiguration(value: {providerId:string;model:string
 export function rememberArchitecture(value: Parameters<typeof architectureConfiguration>[0] & {architectureConfigurations?:ArchitectureConfigurations}):ArchitectureConfigurations {
   return {...value.architectureConfigurations,[architectureKey(value)]:architectureConfiguration(value)};
 }
-export function liteFusionPreset(gatewayProviderId: string, models: readonly {id:string}[] = []): LiteFusionSelection {
+export function liteFusionPreset(gatewayProviderId: string, models: readonly Pick<Model,'id'|'canonicalId'|'reasoningEfforts'>[] = []): LiteFusionSelection {
   const selection=bindExactModels({kind:'litefusion',gatewayProviderId,presetVersion:LITEFUSION_VERSION},models);
-  const route=selection.bindings?.opus??{providerId:gatewayProviderId,model:LITEFUSION_MODELS.opus.apiId};
+  const route=[selection.bindings?.opus,selection.bindings?.astra].find(route=>{
+    if(!route)return false;
+    const efforts=models.find(model=>model.id===route.model)?.reasoningEfforts;
+    return !efforts||efforts.includes('high');
+  })??{providerId:gatewayProviderId,model:''};
   return {...selection,lead:{...route,effort:'high'}};
 }
 export function liteFusionConfiguration(selection: LiteFusionSelection, fallback?: Pick<Session,'providerId'|'model'|'modelReasoning'> & {outputStyle?:string|null}): ArchitectureConfiguration {
@@ -44,6 +48,16 @@ export function specialistGateway(providers: readonly Provider[], preferred?: st
   return providers.find(p=>p.id===preferred&&p.kind!=='codex')?.id??providers.find(p=>p.kind!=='codex')?.id??preferred??'';
 }
 export function liteFusionCustomized(selection:LiteFusionSelection):boolean {
-  const expected=selection.bindings?.opus??{providerId:selection.gatewayProviderId,model:LITEFUSION_MODELS.opus.apiId};
+  const expected=selection.bindings?.opus??selection.bindings?.astra??{providerId:selection.gatewayProviderId,model:''};
   return selection.presetVersion!==LITEFUSION_VERSION||!selection.lead||selection.lead.providerId!==expected.providerId||selection.lead.model!==expected.model||selection.lead.effort!=='high'||selection.concurrency!==undefined||selection.maxAssignments!==undefined||Boolean(selection.spend)||Object.keys(selection.routes??{}).length>0||Object.keys(selection.handoffs??{}).length>0;
+}
+
+/** Automatic connection refresh never needs a queued architecture change. */
+export function pendingArchitectureLabel(session: Pick<Session,'architecture'|'pendingArchitecture'|'configRevision'>): string | undefined {
+  const pending=session.pendingArchitecture;
+  if(!pending)return;
+  if(pending.expectedRevision!==(session.configRevision??0))return 'Pending configuration needs review · open Models';
+  const next=pending.configuration.architecture;
+  if(session.architecture?.kind===next?.kind)return 'Model settings updated · available after this turn';
+  return `Architecture queued: ${next?.kind??'single model'} · after active work finishes`;
 }

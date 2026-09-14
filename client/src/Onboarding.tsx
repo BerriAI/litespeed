@@ -54,7 +54,7 @@ export function Onboarding({ settings, selection, workspace, onSave, onClose, re
   if (skills) return <Modal title="Import a Claude/Codex skill" onClose={() => setSkills(false)}><SkillImporter workspace={workspace} onClose={() => setSkills(false)} onImported={() => setSkills(false)} /></Modal>;
   if (providers) return renderProviders(() => { const next = setupGateway(settings, settings.defaultProvider); setGateway(next); setBaseUrl(next.baseUrl); setApiKey(''); setProviders(false); });
   return <Modal title="Set up Litespeed" onClose={() => { if (!saving) onClose(); }}>
-    <div className="setup-intro"><Logo /><div><p>{step === 0 ? 'Connect your LiteLLM gateway' : step === 1 ? 'How would you like to work?' : 'Choose your models'}</p><small>{simple ? step === 0 ? 'Enter your connection to get started.' : 'Choose a setup, then a model for each role.' : `${step + 1} of 3 · You can change this later.`}</small></div></div>
+    <div className="setup-intro"><Logo /><div><p>{step === 0 ? 'Connect your LiteLLM gateway' : step === 1 ? 'How would you like to work?' : kind==='litefusion'?'Your LiteFusion setup':'Choose your models'}</p><small>{simple ? step === 0 ? 'Enter your connection to get started.' : kind==='litefusion'?'Specialists connect automatically to your gateway.':'Choose a setup, then a model for each role.' : `${step + 1} of 3 · You can change this later.`}</small></div></div>
     <div className="setup-content">
       {step === 0 ? <form id="gateway-setup" className="setup-gateway" onSubmit={event => { event.preventDefault(); if (!saving) void connect(); }}>
         <label>Gateway base URL<input type="url" autoFocus required placeholder="https://your-gateway.example.com" value={baseUrl} disabled={saving} onChange={event => setBaseUrl(event.target.value)} spellCheck={false} /><span className="field-hint">{GATEWAY_URL_HINT}</span></label>
@@ -69,7 +69,7 @@ export function Onboarding({ settings, selection, workspace, onSave, onClose, re
           <ModelField simple hint={modelGuidance(kind, 'driver')} label={kind === 'single' ? 'Model' : kind==='litefusion'?'Lead':'Driver'} settings={settings} selection={draft} value={draft.model ? draft : null} onChange={route => {if(kind==='litefusion')changeFusion(withLiteFusionLead(fusion,route,fusion.lead?.effort));else setDraft({...draft,...route});}} onReasoning={() => {}} open={open === 'driver'} onOpen={value => setOpen(value ? 'driver' : null)} />
           {kind !== 'single' && kind !== 'litefusion' && <ModelField simple hint={modelGuidance(kind, 'worker')} label={label} settings={settings} selection={draft} value={worker} onChange={setWorker} onReasoning={() => {}} open={open === 'worker'} onOpen={value => setOpen(value ? 'worker' : null)} />}
         </div>}
-        {kind==='litefusion' && <details><summary>Review specialist routes · 63 tasks</summary><LiteFusionSettings value={fusion} settings={settings} onChange={changeFusion}/></details>}
+        {kind==='litefusion' && <LiteFusionSettings compact value={fusion} settings={settings} onChange={changeFusion}/>}
         {kind!=='litefusion'&&<ShuntSettings settings={settings} selection={draft} onChange={shunt=>setDraft({...draft,shunt})} onPending={setShuntPending}/>}
         <div className="setup-links"><button className="text-button" onClick={() => simple ? setStep(0) : setProviders(true)}>{simple ? 'Change gateway' : 'Manage providers'}</button>
         {simple && <button className="text-button" onClick={() => { setSimple(false); setStep(1); setOpen(null); }}>Customize setup</button>}</div>

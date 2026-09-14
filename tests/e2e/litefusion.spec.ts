@@ -60,3 +60,29 @@ test('LiteFusion settings expose all 63 cards, alias binding, and one shared esc
     const saved=await(await request.get(`/api/sessions/${session.id}`)).json();expect(saved.session.architecture).toMatchObject({kind:'litefusion',bindings:{glm:{model:'test-fast'}}});
   }finally{await request.delete(`/api/sessions/${session.id}`);}
 });
+
+test('legacy LiteFusion sessions connect specialists automatically and show readiness in chat',async({page,request})=>{
+  const session=await(await request.post('/api/sessions',{data:{providerId:'fixture',model:'test-model',architecture:{kind:'litefusion',gatewayProviderId:'fixture'}}})).json();
+  try{
+    await page.goto(`/#session/${session.id}`);
+    await expect(page.locator('.chat-composer').getByRole('button',{name:/specialist task routes/})).toBeVisible();
+    const detail=await(await request.get(`/api/sessions/${session.id}`)).json();
+    expect(detail.litefusion.primary).toBeGreaterThan(0);expect(detail.session.architecture.bindings).toBeUndefined();expect(detail.session.pendingArchitecture).toBeUndefined();
+    await page.locator('.chat-composer').getByRole('button',{name:/specialist task routes/}).click();
+    await expect(page.getByRole('region',{name:'LiteFusion task routing'}).getByRole('status')).toContainText('specialist task routes');
+    await expect(page.getByText('Architecture queued',{exact:false})).toHaveCount(0);
+  }finally{await request.delete(`/api/sessions/${session.id}`);}
+});
+
+test('a gateway without matching specialists visibly reports lead-only operation',async({page,request})=>{
+  const settings=await(await request.get('/api/settings')).json();
+  const missing={id:'no-specialists',name:'No specialists',kind:'openai',baseUrl:settings.providers[0].baseUrl+'/no-specialists'};
+  await request.patch('/api/settings',{data:{providers:[...settings.providers,missing]}});
+  const session=await(await request.post('/api/sessions',{data:{providerId:missing.id,model:'unknown-lead',architecture:{kind:'litefusion',gatewayProviderId:missing.id}}})).json();
+  try{
+    await page.goto(`/#session/${session.id}`);
+    await expect(page.locator('.chat-composer').getByRole('button',{name:'No specialists connected · tasks will run on the lead'})).toBeVisible();
+    await page.setViewportSize({width:390,height:844});
+    expect(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth)).toBe(true);
+  }finally{await request.delete(`/api/sessions/${session.id}`);await request.patch('/api/settings',{data:{providers:settings.providers}});}
+});

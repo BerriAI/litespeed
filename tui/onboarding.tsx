@@ -2,7 +2,8 @@
 import { LiteFusionSettings } from './litefusion.js';
 import { liteFusionPreset, liteFusionConfiguration, specialistGateway, withLiteFusionLead } from '../shared/architecture-config.js';
 import { bindExactModels, type LiteFusionSelection } from '../shared/litefusion.js';
-import { useState, useSyncExternalStore } from 'react';
+import { liteFusionReadinessLabel, type LiteFusionReadiness } from '../shared/litefusion-readiness.js';
+import { useEffect, useState, useSyncExternalStore } from 'react';
 import { architectureWorker, selectArchitecture, type ArchitectureKind, type ModelRoute } from '../shared/architectures.js';
 import { SETUP_ARCHITECTURES, modelGuidance, providerIsConfigured, roleGuidance, roleStepTitle } from '../shared/setup.js';
 import { SHUNT_DESCRIPTION, SHUNT_MODEL_HINT, shuntConfigured, type ShuntSelection } from '../shared/shunt.js';
@@ -30,6 +31,9 @@ export function Onboarding({ controller, initial, onClose, quick = false }: { co
   const [permissionMode, setPermissionMode] = useState(initial.permissionMode), [view, setView] = useState<'main' | 'providers' | 'advanced' | 'skills' | 'litefusion'>('main');
   const [loading,setLoading]=useState(false);
   const [revision, setRevision] = useState(initial.configRevision ?? 0);
+
+  const [readiness,setReadiness]=useState<LiteFusionReadiness|null>(null);
+  useEffect(()=>{let live=true;setReadiness(null);if(kind==='litefusion'&&fusion.gatewayProviderId)void controller.client.api<{readiness:LiteFusionReadiness}>('/litefusion/routes',fusion).then(result=>{if(live)setReadiness(result.readiness);}).catch(()=>{});return()=>{live=false;};},[kind,fusion]);
 
   if (!state.settings) return null;
   const back = () => setView('main');
@@ -88,7 +92,7 @@ export function Onboarding({ controller, initial, onClose, quick = false }: { co
     { id: 'architecture', label: `Architecture: ${SETUP_ARCHITECTURES.find(item => item.kind === kind)!.name}`, description: SETUP_ARCHITECTURES.find(item => item.kind === kind)!.description, action: () => { setFrom('walkthrough'); setStep('architecture'); } },
     { id: 'driver', label: `${kind === 'single' ? 'Model' : kind==='litefusion'?'Lead':'Driver'}: ${driver.model || 'Choose a model'}`, description: modelGuidance(kind, 'driver'), action: () => openRole('driver', true) },
     ...(roles.includes('worker') ? [{ id: 'worker', label: `${workerLabel(kind)}: ${worker?.model || 'Choose a model'}`, description: modelGuidance(kind, 'worker'), action: () => openRole('worker', true) }] : []),
-    ...(kind==='litefusion'?[{id:'litefusion',label:'63 task routes and handoffs',action:()=>setView('litefusion')}]:[]),
+    ...(kind==='litefusion'?[{id:'litefusion',label:readiness?liteFusionReadinessLabel(readiness):'Connecting specialists…',description:readiness?.discoveryError??'View all 63 task assignments and handoffs',action:()=>setView('litefusion')}]:[]),
     ...(kind!=='litefusion'?[{ id: 'advanced', label: `Advanced settings · Shunt ${shunt.enabled ? 'On' : 'Off'}`, description: `${SHUNT_DESCRIPTION} ${shunt.enabled && !shuntConfigured(shunt, state.settings.providers) ? 'Choose a Shunt model to enable it.' : SHUNT_MODEL_HINT}`, action: () => setView('advanced') }]:[]),
     ...(!quick ? [{ id: 'providers', label: 'Manage providers', description: 'Connect an API or sign in to ChatGPT', action: () => setView('providers') },
     { id: 'permissions', label: `Permissions: ${permissionMode === 'auto' ? 'Allow all tools' : 'Ask first'}`, description: permissionMode === 'ask' ? 'Review actions and remember tools you trust' : 'No routine prompts; explicit project rules still apply', action: () => setPermissionMode(permissionMode === 'auto' ? 'ask' : 'auto') }] : []),

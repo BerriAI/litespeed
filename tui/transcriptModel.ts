@@ -43,12 +43,26 @@ export function outputBudget(maxLines: number, width: number): number {
 /** Inline markers that arrive in halves while a response streams. */
 const STREAM_MARKERS = ['**', '~~', '`'] as const;
 
-/** A fence is open when an odd number of fence lines has arrived. Everything
- * after it is code: its markers are literal and must never be completed. */
-function insideOpenFence(content: string): boolean {
-  let open = false;
-  for (const line of content.split('\n')) if (/^\s{0,3}(?:```|~~~)/.test(line)) open = !open;
-  return open;
+/** Only a matching fence of at least the opening length closes a code block.
+ * Return the last prose boundary so completed code blocks are not scanned as
+ * inline markdown when the next paragraph arrives without a blank line. */
+function trailingProseStart(content: string): number | null {
+  let fence: { marker: string; length: number } | undefined;
+  let offset = 0, start = 0;
+  for (const line of content.split('\n')) {
+    const delimiter = line.match(/^ {0,3}(`{3,}|~{3,})(.*)$/);
+    if (delimiter) {
+      const [_, markers, suffix] = delimiter;
+      if (!fence) {
+        if (markers[0] !== '`' || !suffix.includes('`')) fence = { marker: markers[0], length: markers.length };
+      } else if (markers[0] === fence.marker && markers.length >= fence.length && /^[ \t]*$/.test(suffix)) {
+        fence = undefined;
+        start = Math.min(content.length, offset + line.length + 1);
+      }
+    }
+    offset += line.length + 1;
+  }
+  return fence ? null : start;
 }
 
 /** Start of the last paragraph: inline emphasis never crosses a blank line. */
@@ -73,8 +87,10 @@ function lastParagraphStart(content: string): number {
  * rather than closed, because `****` is literal text. Balanced content, code
  * fences and every settled response are returned unchanged. */
 export function stableStreamingMarkdown(content: string): string {
-  if (!content || insideOpenFence(content)) return content;
-  const start = lastParagraphStart(content);
+  if (!content) return content;
+  const proseStart = trailingProseStart(content);
+  if (proseStart === null) return content;
+  const start = Math.max(proseStart, lastParagraphStart(content));
   const region = content.slice(start);
   const open: string[] = [];
   for (let index = 0; index < region.length;) {

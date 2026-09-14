@@ -23,11 +23,13 @@ export function applyEvent(detail: SessionDetail, event: RunEvent): SessionDetai
 function reduceEvent(detail: SessionDetail, event: RunEvent): SessionDetail {
   const data = event.data;
   switch (event.type) {
+    case 'litefusion': return {...detail,litefusion:data};
     case 'session': {
       const session = data.session ?? data;
       // Revision-bearing events are full persisted sessions; an omitted profile means explicitly cleared.
       const incoming = { ...detail.session, ...session, ...(session.configRevision !== undefined ? { profile: session.profile,architecture:session.architecture,planner:session.planner,shunt:session.shunt,pendingArchitecture:session.pendingArchitecture } : {}) };
-      return { ...detail, session: reconcileSession(detail.session, incoming) };
+      const sessionState=reconcileSession(detail.session, incoming);
+      return { ...detail, session: sessionState, ...(sessionState.architecture?.kind!=='litefusion'?{litefusion:undefined}:{}) };
     }
     case 'task': {
       const task=data.task??data;const old=detail.tasks?.find(item=>item.id===task.id);if(old&&old.revision>=task.revision)return detail;

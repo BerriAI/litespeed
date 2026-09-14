@@ -1,4 +1,6 @@
 /** @jsxImportSource @opentui/react */
+import { liteFusionReadinessLabel } from '../shared/litefusion-readiness.js';
+import { pendingArchitectureLabel } from '../shared/architecture-config.js';
 import { Footer, shortcutLabel } from './footer.js';
 import { goalTurnLabel } from '../shared/goals.js';
 import { useCallback, useEffect, useMemo, useRef, useState, useSyncExternalStore, type ReactNode, type RefObject } from 'react';
@@ -299,7 +301,8 @@ function SessionApp({ controller, router, onQuit, chooseTheme, themeName, themeM
         {taskWidth > 0 && <scrollbox width={taskWidth} flexShrink={0} border={['left']} borderColor={toHex(theme.border)}><TaskProgress detail={detail} controller={controller} /></scrollbox>}
       </box>
       {detail.history?.pendingRecovery && <box border borderColor={toHex(theme.warning)}><text fg={toHex(theme.warning)}>History needs recovery. Your draft is saved. </text><Button onPress={() => run(() => controller.history('recover'))}>Recover history</Button></box>}
-      {detail.session.pendingArchitecture&&<box height={1}><Button onPress={()=>run(openModels)}>{detail.session.pendingArchitecture.expectedRevision===(detail.session.configRevision??0)?`Architecture queued: ${detail.session.pendingArchitecture.configuration.architecture?.kind??'single model'} · after active work finishes`:'Pending architecture needs review · open Models'}</Button></box>}
+      {detail.litefusion&&<box height={1}><Button tone="muted" onPress={()=>run(openModels)}>{liteFusionReadinessLabel(detail.litefusion)}</Button></box>}
+      {detail.session.pendingArchitecture&&<box height={1}><Button onPress={()=>run(openModels)}>{pendingArchitectureLabel(detail.session)}</Button></box>}
       {detail.session.goal && ['active', 'blocked'].includes(detail.session.goal.status) && <box height={1} flexShrink={0}><Button onPress={() => setPanel(<GoalPanel controller={controller} onClose={close} />)}>{`Goal ${detail.session.goal.status} · ${goalTurnLabel(detail.session.goal.turns, detail.session.goal.maxTurns)} · ${terminalText(detail.session.goal.text).slice(0, Math.max(10, width - 36))}`}</Button></box>}
       {detail.queue?.items.length ? <box flexDirection="column" flexShrink={0} paddingLeft={1} paddingRight={1}>
         <box flexDirection="row" height={1}>

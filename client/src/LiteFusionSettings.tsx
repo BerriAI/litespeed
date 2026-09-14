@@ -1,11 +1,13 @@
+import { liteFusionReadinessLabel, type LiteFusionReadiness } from '../../shared/litefusion-readiness';
 import { useEffect, useRef, useState } from 'react';
 import type { Model, Settings } from '../../shared/types';
 import { LITEFUSION_CAPABILITIES, LITEFUSION_MODELS, LITEFUSION_ROLES, LITEFUSION_VERSION, bindExactModels, configuredRole, liteFusionPolicy, parseLiteFusionPolicy, specialistRoute, type LiteFusionSelection, type LiteFusionRouteStatus, type LiteFusionTier } from '../../shared/litefusion';
 import { api, post, errorMessage } from './api';
 import { liteFusionCustomized } from '../../shared/architecture-config';
 
-type Preview = { routes: Record<string, Record<LiteFusionTier, LiteFusionRouteStatus>> };
-export function LiteFusionSettings({ value, settings, onChange }: { value: LiteFusionSelection; settings: Settings; onChange: (value: LiteFusionSelection) => void }) {
+type Preview = { readiness:LiteFusionReadiness; routes: Record<string, Record<LiteFusionTier, LiteFusionRouteStatus>> };
+export function LiteFusionSettings({ value, settings, onChange, compact=false }: { value: LiteFusionSelection; settings: Settings; onChange: (value: LiteFusionSelection) => void; compact?:boolean }) {
+  const [expanded,setExpanded]=useState(false);
   const [search, setSearch] = useState(''), [selected, setSelected] = useState(LITEFUSION_ROLES[0].id);
   const [preview, setPreview] = useState<Preview | null>(null), [error, setError] = useState(''), [loading, setLoading] = useState(false);
   const file = useRef<HTMLInputElement>(null), revision = useRef(value); revision.current = value;
@@ -25,10 +27,17 @@ export function LiteFusionSettings({ value, settings, onChange }: { value: LiteF
     const url = URL.createObjectURL(new Blob([JSON.stringify(liteFusionPolicy(value), null, 2)], {type:'application/json'}));
     const link = document.createElement('a'); link.href = url; link.download = 'litefusion-policy.json'; link.click(); setTimeout(() => URL.revokeObjectURL(url), 1000);
   }
+  if(compact)return <section className="litefusion-settings" aria-label="LiteFusion task routing">
+    <p role="status">{preview?liteFusionReadinessLabel(preview.readiness):'Connecting specialists…'}</p>
+    {preview?.readiness.discoveryError&&<p className="field-hint">{preview.readiness.discoveryError}</p>}
+    <details onToggle={event=>setExpanded(event.currentTarget.open)}><summary>View model assignments</summary>{expanded&&<LiteFusionSettings value={value} settings={settings} onChange={onChange}/>}</details>
+  </section>;
   return <section className="litefusion-settings" aria-label="LiteFusion task routing">
     <strong>{liteFusionCustomized(value)?'Custom LiteFusion policy':'Research preset'} · {LITEFUSION_VERSION}</strong>
     <p className="field-hint">Your lead plans, chooses task specialists, and checks their results. 63 task types share one queue; workers start when work and capacity are ready.</p>
-    <p className="field-hint">{preview?`${Object.values(preview.routes).filter(r=>r.default.status!=='unavailable'||r.escalation.status!=='unavailable').length} / 63 task routes configured`:'Checking gateway readiness…'} · Live model performance is not yet evaluated.</p>
+    <p className="field-hint" role="status">{preview?liteFusionReadinessLabel(preview.readiness):'Connecting specialists…'}</p>
+    {preview?.readiness.discoveryError&&<p className="field-hint">{preview.readiness.discoveryError}</p>}
+    <p className="field-hint">Connections are discovered automatically. Gateway listings do not verify credits or model performance.</p>
     <div className="litefusion-actions"><button type="button" className="text-button" disabled={loading} onClick={()=>{const captured=value;setLoading(true);void api<{selection:LiteFusionSelection;discoveryError?:string}>(`/litefusion/preset?providerId=${encodeURIComponent(value.gatewayProviderId)}`).then(result=>{if(revision.current!==captured)throw new Error('Settings changed while loading. Restore again to review the current policy.');onChange(result.selection);setError(result.discoveryError??'');}).catch(e=>setError(errorMessage(e))).finally(()=>setLoading(false));}}>Restore preset</button><button type="button" className="text-button" disabled={loading} onClick={() => void discover()}>{loading?'Refreshing…':'Refresh and pin exact models'}</button></div>
     <input ref={file} type="file" accept="application/json,.json" hidden aria-label="Import LiteFusion policy" onChange={event => { if(event.target.files?.[0]) void importPolicy(event.target.files[0]); event.target.value=''; }} />
     {error && <p role="alert" className="error-text">{error}</p>}
