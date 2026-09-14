@@ -1,3 +1,4 @@
+import { liteFusionReadiness } from '../shared/litefusion-readiness.js';
 import { liteFusionEnvironment } from './litefusion-environment.js';
 import { LiteFusionEvaluations, evaluationSchema } from './litefusion-evaluations.js';
 import { VERSION } from '../shared/version.js';
@@ -229,10 +230,13 @@ export function createApp(options:AppOptions = {}) {
     const selection=liteFusionPreset(provider.id,models);
     res.json({selection,discoveryError,executionVerified:false});
   });
-  app.post('/api/litefusion/routes',(req,res)=>{
-    const selection=liteFusionSchema.parse(req.body);checkArchitecture(selection);
+  app.post('/api/litefusion/routes',async(req,res)=>{
+    // Setup may have discovered specialists before the user chooses a lead.
+    const draft=req.body?.lead?.model===''?{...req.body,lead:undefined}:req.body;
+    const selection=liteFusionSchema.parse(draft);checkArchitecture(selection);
+    const discoveryError=await runner.liteFusionDiscovery.ensure(selection,store.settings().providers);
     const {version,hash,routes}=captureLiteFusion(selection,store.settings().providers);
-    const lease=options.external?.capture(new AbortController().signal);try{res.json({version,hash,routes,environment:liteFusionEnvironment(lease?.definitions??[]),executionVerified:false});}finally{lease?.release();}
+    const lease=options.external?.capture(new AbortController().signal);try{res.json({version,hash,routes,readiness:{...liteFusionReadiness(routes,selection.lead),discoveryError},environment:liteFusionEnvironment(lease?.definitions??[]),executionVerified:false});}finally{lease?.release();}
   });
   app.get('/api/sessions/:id/litefusion/export',(req,res)=>{
     const session=store.session(req.params.id);
@@ -286,7 +290,10 @@ export function createApp(options:AppOptions = {}) {
     for(const message of imported.messages)store.saveMessage({...message,attachments:message.attachments?.map(({path: _path,...attachment})=>attachment),id:randomUUID(),sessionId:session.id} as Message);
     res.status(201).json(session);
   });
-  app.get('/api/sessions/:id',(req,res)=>res.json({session:store.session(req.params.id),messages:runner.messages(req.params.id),todos:store.todos(req.params.id),permissions:runner.permissions(req.params.id),questions:runner.questions.pending(req.params.id),queue:store.queue(req.params.id),history:runner.history.state(req.params.id),tasks:runner.tasks.list(req.params.id),delegations:runner.delegations.list(req.params.id),jobs:runner.jobs.list(req.params.id),lastEventId:store.latestEventId(req.params.id)}));
+  app.get('/api/sessions/:id',async(req,res)=>{
+    const discoveryError=await runner.refreshLiteFusion(req.params.id),readiness=runner.liteFusionStatus(req.params.id);
+    res.json({litefusion:readiness?{...readiness,...(discoveryError?{discoveryError}:{})}:undefined,session:store.session(req.params.id),messages:runner.messages(req.params.id),todos:store.todos(req.params.id),permissions:runner.permissions(req.params.id),questions:runner.questions.pending(req.params.id),queue:store.queue(req.params.id),history:runner.history.state(req.params.id),tasks:runner.tasks.list(req.params.id),delegations:runner.delegations.list(req.params.id),jobs:runner.jobs.list(req.params.id),lastEventId:store.latestEventId(req.params.id) });
+  });
   app.get('/api/sessions/:id/delegations',(req,res)=>res.json({delegations:runner.delegations.list(req.params.id)}));
   app.get('/api/sessions/:id/tasks/:taskId',(req,res)=>res.json(runner.tasks.get(req.params.id,req.params.taskId)));
   app.post('/api/sessions/:id/tasks/:taskId/cancel',async(req,res)=>res.json({task:await runner.cancelTask(req.params.id,req.params.taskId)}));

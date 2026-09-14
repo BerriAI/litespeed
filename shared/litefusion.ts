@@ -101,11 +101,11 @@ export function liteFusionLeadPrompt(selection: LiteFusionSelection): string {
     const limitation = effectiveSpecialist(role,'default',specialistRoute(selection,role,'default'),specialistRoute(selection,role,'escalation')).limitation;
     return `${role.id}: ${role.task}\nDefault: ${route('default')}. Hard/escalation: ${route('escalation')}. Mode: ${role.execution}. Stakes: ${role.stakes}. Prerequisites: ${role.requirements.join(', ') || 'ordinary workspace tools'}.\nHandoff: ${role.handoff}\nAcceptance: ${role.acceptance}${limitation ? `\nLimitation: ${limitation}` : ''}`;
   });
-  return `LiteFusion policy ${LITEFUSION_VERSION}. You are the persistent user-facing lead. Own intent, scope, user communication, integration and acceptance. Work directly when delegation would add unnecessary briefing or repair. Choose coherent units, not a model switch for every operation. Classify mixed work before delegating. The catalog is an initial research policy, not measured success probabilities.
+  return `LiteFusion policy ${LITEFUSION_VERSION}. You are the persistent user-facing lead. Own intent, scope, user communication, integration and acceptance. For substantial work, briefly scope the request, then delegate coherent specialist tasks by default: repository investigation, implementation, tests and independent review. Read only enough to give a useful handoff; do not complete the investigation yourself before assigning it. Continue independent lead work while workers run. Handle quick questions, tiny edits, tightly coupled integration and acceptance yourself when delegation would cost more than it saves. If you take substantial specialist work on yourself, state a short concrete reason in your progress update (for example: no eligible route, failed handoff, or already-local evidence); 'I can do it' is not a reason. There is no worker quota and no need to split every tool operation. Classify mixed work before delegating. The catalog is an initial research policy, not measured success probabilities.
 Call delegate with roleId, workstream, objective, constraints, acceptance criteria, relevant files/evidence and a short routing reason. Code selects the deployment and native reasoning; never invent them. hard=true starts on the role's escalation route. repairOf selects that SAME escalation route and carries previous artifacts and failure evidence. Do not confuse high stakes with difficulty. Do not reassign user-cancelled work.
 Use continueFrom to continue compatible completed or yielded work; include new evidence and avoid repeating exploration. A same-route repair uses continueFrom with repair=true and actionable evidence; it is not repairOf. When a worker reports needs_help, create a sibling with helperFor; after it returns, continue the original worker with the findings. needs_handoff returns ownership to you; decide an explicit transfer. Workers cannot create workers or ask users. Independent review is a separate role with original requirements, raw checks and the patch, before the author's explanation.
 delegate registers work and returns a task ID immediately. The scheduler starts ready tasks within host capacity. Submit prerequisites first, then dependents using dependsOn task IDs or workstream names. Dependency reports and integrated source are included when dependents start. Continue useful independent lead work; otherwise call wait_tasks to wait without model polling. You receive results as task events without waiting for unrelated siblings. Workers use private source copies and version-checked integration at your execution boundaries. A completed task still needs your acceptance. If you independently resolve blocked or failed work, record its task ID and concrete evidence with resolve_task; this records your judgment, not externally verified success. Compatible worker contexts may continue across attempts. Declare relevant files, integrate and run combined checks. A completed worker is not proof of success. Keep observed facts separate from diagnoses; acceptance remains yours. Allow one actionable same-route repair, then escalate or take over when no progress is made. Do not repeatedly escalate an already-escalated task. An explicit provider rejection can trigger one host-managed availability fallback to the configured escalation route; do not duplicate a queued recovery. This is separate from a hard-task classification.
-Provider availability failures are distinct from quality failures. A routing error does not authorize arbitrary substitution; continue directly if capable, otherwise explain the missing prerequisite. Native autocomplete and vector indexing are unavailable. Memory extraction only proposes updates through your existing memory policy. Do not run hidden classifiers or online benchmark refresh inside dispatch.
+When the runtime lists a task in leadOnlyTasks, both configured specialist routes are unavailable: handle it directly only if capable and state that fallback briefly. Missing specialists never authorize pretending that a worker ran. Provider availability failures are distinct from quality failures. A routing error does not authorize arbitrary substitution; continue directly if capable, otherwise explain the missing prerequisite. Native autocomplete and vector indexing are unavailable. Memory extraction only proposes updates through your existing memory policy. Do not run hidden classifiers or online benchmark refresh inside dispatch.
 
 ${cards.join('\n\n')}
 
@@ -117,18 +117,21 @@ export function configuredRole(selection: LiteFusionSelection, id: string): Lite
   return guide ? { ...role, handoff: guide.instructions, acceptance: guide.acceptance } : role;
 }
 /** Pin only exact identities discovered on the configured gateway. No fuzzy aliases. */
-export function bindExactModels(selection: LiteFusionSelection, models: readonly Pick<Model,'id'>[]): LiteFusionSelection {
+export function bindExactModels(selection: LiteFusionSelection, models: readonly Pick<Model,'id' | 'canonicalId'>[]): LiteFusionSelection {
   const bindings = { ...selection.bindings };
   for (const [key, card] of Object.entries(LITEFUSION_MODELS)) {
-    // Provider namespaces are identities, not arbitrary deployment aliases.
-    // Never strip version suffixes or choose a regional/dated alternative.
-    const namespace=card.apiId.startsWith('gpt-')?'openai':card.apiId.startsWith('claude-')?'anthropic':card.apiId.startsWith('gemini-')?'gemini':card.apiId.startsWith('grok-')?'xai':undefined;
-    const exact=[card.apiId,...(namespace?[`${namespace}/${card.apiId}`]:[])].find(id=>models.some(model=>model.id===id));
-    if (!bindings[key] && !['mercury_edit','voyage_code'].includes(key) && exact)
-      bindings[key] = { providerId: selection.gatewayProviderId, model: exact };
+    if (bindings[key] || ['mercury_edit','voyage_code'].includes(key)) continue;
+    const namespace=card.apiId.startsWith('gpt-')?'openai':card.apiId.startsWith('claude-')?'anthropic':card.apiId.startsWith('gemini-')?'gemini':card.apiId.startsWith('grok-')?'xai':card.apiId.startsWith('kimi-')?'moonshot':card.apiId.startsWith('glm-')?'zai':undefined;
+    const identities=[card.apiId,...(namespace?[`${namespace}/${card.apiId}`]:[])];
+    // Never infer identity from display names, prefixes or version similarity.
+    const exact=identities.find(id=>models.some(model=>model.id===id));
+    const aliases=models.filter(model=>model.canonicalId && identities.includes(model.canonicalId));
+    const model=exact??(aliases.length===1?aliases[0].id:undefined);
+    if(model)bindings[key]={providerId:selection.gatewayProviderId,model};
   }
   return { ...selection, bindings };
 }
+
 export function liteFusionPolicy(selection: LiteFusionSelection) {
   return { schemaVersion: 1, catalogVersion: LITEFUSION_VERSION, selection };
 }

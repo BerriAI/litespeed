@@ -29,7 +29,7 @@ export interface ContextBudget {
 }
 
 /** The key is a digest only: never retain credentials in cache keys or snapshots. */
-function providerIdentity(provider: Provider): string {
+export function providerIdentity(provider: Provider): string {
   return createHash('sha256').update(JSON.stringify({
     id: provider.id, name: provider.name, kind: provider.kind, baseUrl: provider.baseUrl,
     apiKey: provider.apiKey, models: provider.models,
@@ -40,9 +40,9 @@ function providerIdentity(provider: Provider): string {
 export function contextIdentity(request: BudgetRequest): string {
   return createHash('sha256').update(JSON.stringify([providerIdentity(request.provider), request.model, request.system, request.tools])).digest('hex');
 }
-/** A bounded in-memory observation cache. Only successful explicit model discovery
+/** A bounded in-memory observation cache. Only successful model discovery
  * populates it; get never fetches, falls back by model name, or refreshes its TTL. */
-export interface CatalogLimit { reasoningEfforts?: Model['reasoningEfforts']; contextWindow?: number; maxInputTokens?: number; }
+export interface CatalogLimit { canonicalId?: string; reasoningEfforts?: Model['reasoningEfforts']; contextWindow?: number; maxInputTokens?: number; }
 export class ModelCatalogCache {
   private entries = new Map<string, { identity: string; createdAt: number; limits: Map<string, CatalogLimit> }>();
   constructor(private now: () => number = () => Date.now()) {}
@@ -55,6 +55,7 @@ export class ModelCatalogCache {
       if (seen.has(model.id)) { limits.delete(model.id); continue; }
       seen.add(model.id);
       const limit: CatalogLimit = {
+        ...(model.canonicalId ? {canonicalId:model.canonicalId} : {}),
         ...(model.reasoningEfforts ? {reasoningEfforts:[...model.reasoningEfforts]} : {}),
         ...(validContextWindow(model.contextWindow) ? { contextWindow: model.contextWindow } : {}),
         ...(validContextWindow(model.maxInputTokens) ? { maxInputTokens: model.maxInputTokens } : {}),

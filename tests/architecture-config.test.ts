@@ -28,7 +28,7 @@ describe('complete architecture configurations',()=>{
   });
   it('preserves customized arrangements separately, including reasoning, planner and Shunt',()=>{
     const original=store.createSession({architecture:{kind:'sidekick-fusion',sidekick:{providerId:'fixture',model:'executor'}},planner:{providerId:'fixture',model:'planner'},shunt:{enabled:true,model:{providerId:'fixture',model:'reader'}},modelReasoning:{'["fixture","old-lead"]':'medium'},outputStyle:'learning',permissionMode:'ask'});
-    const fusion=store.updateSession(original.id,liteFusionConfiguration(liteFusionPreset('fixture')));
+    const fusion=store.updateSession(original.id,liteFusionConfiguration(liteFusionPreset('fixture',[{id:'claude-opus-5'}])));
     const restored=store.updateSession(original.id,fusion.architectureConfigurations!['sidekick-fusion']!);
     expect(architectureConfiguration(restored)).toEqual(architectureConfiguration(original));expect(restored.permissionMode).toBe('ask');expect(restored.workspace).toBe(directory);
     new WorkspacePreferences(store).save(directory,restored,true);expect(new WorkspacePreferences(store).get(directory).architectureConfigurations?.litefusion?.model).toBe('claude-opus-5');
@@ -38,7 +38,7 @@ describe('complete architecture configurations',()=>{
     expect(session.model).toBe('astra-custom');expect(session.architecture).toMatchObject({lead:{model:'astra-custom',effort:'low'}});expect((session.architecture as any).presetVersion).toBeUndefined();
   });
   it('keeps direct model edits synchronized with the LiteFusion policy lead',()=>{
-    const session=store.createSession(liteFusionConfiguration(liteFusionPreset('fixture')) as Partial<Session>);
+    const session=store.createSession(liteFusionConfiguration(liteFusionPreset('fixture',[{id:'claude-opus-5'}])) as Partial<Session>);
     const next=store.updateSession(session.id,{model:'new-lead',modelReasoning:{'["fixture","new-lead"]':'medium'}});
     expect(liteFusionConfiguration(next.architecture as any,{...next,outputStyle:'learning'}).outputStyle).toBe('learning');
     expect(next.model).toBe('new-lead');expect(next.architecture).toMatchObject({lead:{providerId:'fixture',model:'new-lead',effort:'medium'}});
@@ -46,14 +46,14 @@ describe('complete architecture configurations',()=>{
   it('queues a switch until work settles, rejects stale pending editors, and applies once',async()=>{
     const session=store.createSession();runner.start(session.id,'Hold this response.');
     const deadline=Date.now()+3000;while(!held){if(Date.now()>deadline)throw new Error('Fixture did not receive the lead request');await new Promise(resolve=>setTimeout(resolve,5));}
-    const config=liteFusionConfiguration(liteFusionPreset('fixture'));
+    const config=liteFusionConfiguration(liteFusionPreset('fixture',[{id:'claude-opus-5'}]));
     const queued=await request(`/sessions/${session.id}/architecture`,{...config,expectedConfigRevision:0,expectedPendingId:null},'PUT');expect(queued.status).toBe(202);expect(queued.body.model).toBe('old-lead');expect(queued.body.pendingArchitecture.configuration.model).toBe('claude-opus-5');
     const stale=await request(`/sessions/${session.id}/architecture`,{...config,expectedConfigRevision:0,expectedPendingId:null},'PUT');expect(stale.status).toBe(409);
     held!.writeHead(200,{'Content-Type':'text/event-stream'});held!.end('data: '+JSON.stringify({choices:[{delta:{content:'Finished.'},finish_reason:'stop'}]})+'\n\ndata: [DONE]\n\n');await runner.whenIdle();
     const current=store.session(session.id);expect(current.model).toBe('claude-opus-5');expect(current.pendingArchitecture).toBeUndefined();expect(current.configRevision).toBe(1);expect(current.architectureConfigurations?.single?.model).toBe('old-lead');expect(store.messages(session.id).filter(message=>message.role==='user')).toHaveLength(1);
   });
   it('round-trips saved architecture defaults and rejects mismatched arrangement keys',async()=>{
-    const configuration=liteFusionConfiguration(liteFusionPreset('fixture'));
+    const configuration=liteFusionConfiguration(liteFusionPreset('fixture',[{id:'claude-opus-5'}]));
     const input={workspace:directory,providerId:'fixture',model:'old-lead',architectureConfigurations:{litefusion:configuration}};
     expect((await request('/workspace-preferences',input)).status).toBe(200);
     expect((await request('/workspace-preferences?workspace='+encodeURIComponent(directory))).body.architectureConfigurations).toEqual(input.architectureConfigurations);

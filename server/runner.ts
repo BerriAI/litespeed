@@ -1,3 +1,5 @@
+import { LiteFusionDiscovery } from './litefusion-discovery.js';
+import { liteFusionReadiness, type LiteFusionReadiness } from '../shared/litefusion-readiness.js';
 import { unavailableRoute } from './litefusion-availability.js';
 import { liteFusionConfiguration } from '../shared/architecture-config.js';
 import { liteFusionEnvironment } from './litefusion-environment.js';
@@ -63,7 +65,7 @@ type CapturedRules = { project: PermissionRule[]; app: PermissionRule[]; hidden:
 type CapturedStyle = { text: string; advisory?: string };
 type RunPolicy = { litefusion?: LiteFusionSnapshot; sidecars: unknown; reviewer?: {provider:Provider;model:string}; session: Session; provider: Provider; workerProvider?: Provider; shuntProvider?: Provider; guidance: string; style: CapturedStyle; rules: CapturedRules; hooks: CapturedHooks; tools: readonly string[]; memory: boolean };
 type ResearchBudget = { launches: number; steps: number; elapsedMs: number };
-type ActiveRun = { unavailableRoutes?:Map<string,string>; availabilityFailure?:string; scheduler?:LiteFusionScheduler; taskEvents?:string[]; cancelledWorkstreams?: Set<string>; invocationEffort?: import('../shared/types.js').ReasoningEffort; workerRequest?: import('zod').infer<typeof workerRequestSchema>; litefusionRole?: LiteFusionRole; clientSurface?: ClientSurface; turnId?: string; profile?: ProfileSnapshot | null; policy?: RunPolicy; budget?: ResearchBudget; sidekickBudget?: ResearchBudget; external?: ExternalToolLease; controller: AbortController; approvals: Map<string, PendingPermission>; completed?: boolean; blocked?: boolean; compacting?: boolean; progressMessage?: Message; child?: { delegation: DelegationSummary; parent: ActiveRun; timedOut: boolean; isolated?: WorkerWorkspace; role?: DelegationSummary['role'] }; done?: Promise<void>; resolveDone?: () => void; failureKind?: 'provider' | 'execution'; failure?: string; jobsNotice?: string;
+type ActiveRun = { discoveryError?:string; unavailableRoutes?:Map<string,string>; availabilityFailure?:string; scheduler?:LiteFusionScheduler; taskEvents?:string[]; cancelledWorkstreams?: Set<string>; invocationEffort?: import('../shared/types.js').ReasoningEffort; workerRequest?: import('zod').infer<typeof workerRequestSchema>; litefusionRole?: LiteFusionRole; clientSurface?: ClientSurface; turnId?: string; profile?: ProfileSnapshot | null; policy?: RunPolicy; budget?: ResearchBudget; sidekickBudget?: ResearchBudget; external?: ExternalToolLease; controller: AbortController; approvals: Map<string, PendingPermission>; completed?: boolean; blocked?: boolean; compacting?: boolean; progressMessage?: Message; child?: { delegation: DelegationSummary; parent: ActiveRun; timedOut: boolean; isolated?: WorkerWorkspace; role?: DelegationSummary['role'] }; done?: Promise<void>; resolveDone?: () => void; failureKind?: 'provider' | 'execution'; failure?: string; jobsNotice?: string;
   /** Mid-turn steering notes accepted for THIS response (max 5 per run). Notes
    * land between steps, never inside a tool execution; steeringDelivered marks
    * how many were already drained. In-memory only: cancellation or any run end
@@ -159,6 +161,18 @@ export class Runner {
   // intercepted calls instead of changing policy or respawning an old command.
   readonly sidecars = new Sidecars();
   constructor(readonly store: Store, readonly bus: EventBus, private external?: ExternalTools) { this.usage=new UsageLedger(store);this.history=new History(store);this.delegations=new Delegations(store,this.history);this.tasks=new LiteFusionTasks(store);this.questions=new Questions(store,bus); }
+  readonly liteFusionDiscovery=new LiteFusionDiscovery();
+  liteFusionStatus(id:string):LiteFusionReadiness|undefined {
+    const run=this.runs.get(id),session=this.store.session(id);
+    if(session.architecture?.kind!=='litefusion')return;
+    const snapshot=run?.policy?.litefusion??captureLiteFusion(session.architecture,this.store.settings().providers);
+    return {...liteFusionReadiness(snapshot.routes,{providerId:session.providerId,model:session.model}),activeTurn:Boolean(run),...(run?.policy?.rules?.hidden.includes('delegate')?{delegationDisabled:true}:{}),...(run?.discoveryError?{discoveryError:run.discoveryError}:{})};
+  }
+  async refreshLiteFusion(id:string) {
+    const session=this.store.session(id);
+    if(session.architecture?.kind==='litefusion'&&!this.active(id))
+      return this.liteFusionDiscovery.ensure(session.architecture,this.store.settings().providers);
+  }
   private assertRoot(id:string) { if(this.delegations.isChild(id))throw conflict('Research transcripts are read-only. Use their parent task controls.'); }
   active(id: string) { return this.runs.has(id); }
   // Detail-only projection: never include transient progress in provider input,
@@ -918,7 +932,7 @@ export class Runner {
     const goalBlock = liveGoal?.status === 'active' && run.goalTurn
       ? `${liveGoal.text}\n${goalTurnLabel(run.goalTurn!, liveGoal.maxTurns)}. Report progress with update_goal before finishing.` : '';
     const fusion=run.child?undefined:run.policy?.litefusion;
-    const availability=fusion?'\nLiteFusion availability captured for this turn (configuration, not execution-tested): '+JSON.stringify({unavailableDefault:Object.entries(fusion.routes).filter(([,routes])=>routes.default.status==='unavailable').map(([id])=>id),unavailableEscalation:Object.entries(fusion.routes).filter(([,routes])=>routes.escalation.status==='unavailable').map(([id])=>id),tasks:this.tasks.list(session.id).map(task=>({id:task.id,workstream:task.workstream,status:task.status,attemptId:task.attemptIds.at(-1),error:task.error})),environment:liteFusionEnvironment(run.external?.definitions??[]),capacity:liteFusionCapacity(fusion.selection),maxAssignments:fusion.selection.maxAssignments??null}):'';
+    const availability=fusion?'\nLiteFusion availability captured for this turn (configuration, not execution-tested): '+JSON.stringify({unavailableDefault:Object.entries(fusion.routes).filter(([,routes])=>routes.default.status==='unavailable').map(([id])=>id),unavailableEscalation:Object.entries(fusion.routes).filter(([,routes])=>routes.escalation.status==='unavailable').map(([id])=>id),leadOnlyTasks:liteFusionReadiness(fusion.routes).leadOnlyTasks,discoveryError:run.discoveryError,tasks:this.tasks.list(session.id).map(task=>({id:task.id,workstream:task.workstream,status:task.status,attemptId:task.attemptIds.at(-1),error:task.error})),environment:liteFusionEnvironment(run.external?.definitions??[]),capacity:liteFusionCapacity(fusion.selection),maxAssignments:fusion.selection.maxAssignments??null}):'';
     const envelope = renderEnvelope({ posture: this.posture(session), runtime: `Today: ${new Date().toISOString().slice(0,10)}.${nudge}\n${clientContext(parseClientSurface(run.child?.parent.clientSurface??run.clientSurface), session.workspace, this.store.settings().workspace)}${availability}`, goal: goalBlock, memory: memoryBlock, jobs: run.jobsNotice });
     if (!envelope) return history;
     const at = history.map(message => message.role).lastIndexOf('user');
@@ -1374,6 +1388,14 @@ export class Runner {
     const provider = policy.provider;
     const signal = run.controller.signal;
     const profile=run.profile;
+    if(policy.litefusion&&!run.child) {
+      // Resolve once, before the first paid request. The accepted provider/config
+      // snapshot is immutable even if another client edits settings meanwhile.
+      run.discoveryError=await this.liteFusionDiscovery.ensure(policy.litefusion.selection,policy.litefusion.providers);
+      signal.throwIfAborted();
+      policy.litefusion=captureLiteFusion(policy.litefusion.selection,policy.litefusion.providers);
+      this.bus.emit(id,'litefusion',this.liteFusionStatus(id));
+    }
     if(policy.litefusion&&!run.child)run.scheduler=new LiteFusionScheduler(this.tasks,id,run.turnId!,liteFusionCapacity(policy.litefusion.selection).slots,signal,task=>this.prepareLiteFusionTask(id,run,task),task=>this.bus.emit(id,'task',task));
     let system = await this.systemPrompt(session,policy.guidance,policy.style);
     if (policy.shuntProvider) system += "\n\n" + shuntInstructions(session.shunt?.minLines ?? SHUNT_LIMITS.minLines);

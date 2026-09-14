@@ -555,13 +555,17 @@ export async function listModels(provider: Provider, signal?: AbortSignal): Prom
     if (seen.has(id)) {
       // Ambiguous duplicate metadata is not authoritative for budgeting.
       const previous = models.find(model => model.id === id);
-      if (previous) { delete previous.contextWindow; delete previous.maxInputTokens; delete previous.reasoningEfforts; }
+      if (previous) { delete previous.contextWindow; delete previous.maxInputTokens; delete previous.reasoningEfforts; delete previous.canonicalId; }
       continue;
     }
     seen.add(id);
     const levels=value.supported_reasoning_efforts??value.supported_reasoning_levels;
     const efforts=Array.isArray(levels)?levels.map((item:unknown)=>typeof item==='string'?item:(item as {effort?:string})?.effort).filter((effort:unknown):effort is ReasoningEffort=>REASONING_EFFORTS.includes(effort as ReasoningEffort)):undefined;
-    models.push({ ...(efforts?{reasoningEfforts:efforts}:{}), id, name: validName(value.display_name) ? value.display_name : validName(value.name) ? value.name : id, providerId: provider.id,
+    // Model catalogs sometimes include an explicit underlying identity. Conflicting
+    // metadata is ambiguous; display names and arbitrary aliases are never evidence.
+    const identities=[value.model_info?.base_model,value.litellm_params?.model].filter(validName);
+    const canonicalId=identities.length && new Set(identities).size===1 ? identities[0] : undefined;
+    models.push({ ...(canonicalId?{canonicalId}:{}), ...(efforts?{reasoningEfforts:efforts}:{}), id, name: validName(value.display_name) ? value.display_name : validName(value.name) ? value.name : id, providerId: provider.id,
       ...(validContextWindow(value.context_window) ? { contextWindow: value.context_window } : {}),
       // LiteLLM gateways publish max_input_tokens rather than context_window.
       // Kept as a separate field: an input cap is not a total context window.

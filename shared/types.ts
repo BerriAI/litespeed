@@ -32,7 +32,7 @@ export type PermissionMode = 'ask' | 'auto';
 export type RunStatus = 'idle' | 'running' | 'waiting' | 'error';
 export type ProviderKind = 'openai' | 'anthropic' | 'codex';
 export interface Provider { id: string; name: string; kind: ProviderKind; baseUrl: string; apiKey?: string; configured?: boolean; models?: string[]; anthropicCacheModels?: string[]; contextWindows?: Record<string, number>; }
-export interface Model { reasoningEfforts?: ReasoningEffort[]; id: string; name: string; providerId: string; contextWindow?: number; maxInputTokens?: number; }
+export interface Model { canonicalId?: string; reasoningEfforts?: ReasoningEffort[]; id: string; name: string; providerId: string; contextWindow?: number; maxInputTokens?: number; }
 export interface Settings { mcpConfigRevision?: string; providers: Provider[]; defaultProvider: string; defaultModel: string; workspace: string; permissionMode: PermissionMode; maxSteps?: number; theme: 'system' | 'light' | 'dark'; mcpServers: Record<string, McpServerConfig>; permissionRules?: PermissionRuleSet; memoryEnabled?: boolean;
   /** Lifecycle hooks configured at the app level (design note 4.3). */
   hooks?: HookConfig[];
@@ -99,8 +99,8 @@ export interface FileChange { path: string; before: string | null; after: string
 export interface QueuedMessage { clientSurface?: ClientSurface; id: string; sessionId: string; content: string; attachments: Attachment[]; createdAt: number; }
 export interface QueueState { items: QueuedMessage[]; paused: boolean; reason?: string; manualPause?: boolean; }
 export interface BackgroundJob { id: string; command: string; status: 'running' | 'exited' | 'killed' | 'failed'; pid?: number; startedAt: number; endedAt?: number; exitCode?: number; signal?: string; timedOut: boolean; truncated: boolean; }
-export interface SessionDetail { tasks?:import('./litefusion-tasks.js').LiteFusionTask[]; delegations?: DelegationSummary[]; lastEventId?: number; session: Session; messages: Message[]; todos: Todo[]; permissions: PermissionRequest[]; questions?: QuestionRequest[]; queue?: QueueState; history?: HistoryState; jobs?: BackgroundJob[]; }
-export interface RunEvent { id?: number; type: 'session' | 'task' | 'delegation' | 'message' | 'delta' | 'reasoning' | 'tool' | 'permission' | 'permission_resolved' | 'question' | 'question_resolved' | 'todos' | 'reset' | 'queue' | 'history' | 'done' | 'error'; sessionId: string; data: any; }
+export interface SessionDetail { litefusion?:import('./litefusion-readiness.js').LiteFusionReadiness; tasks?:import('./litefusion-tasks.js').LiteFusionTask[]; delegations?: DelegationSummary[]; lastEventId?: number; session: Session; messages: Message[]; todos: Todo[]; permissions: PermissionRequest[]; questions?: QuestionRequest[]; queue?: QueueState; history?: HistoryState; jobs?: BackgroundJob[]; }
+export interface RunEvent { id?: number; type: 'session' | 'litefusion' | 'task' | 'delegation' | 'message' | 'delta' | 'reasoning' | 'tool' | 'permission' | 'permission_resolved' | 'question' | 'question_resolved' | 'todos' | 'reset' | 'queue' | 'history' | 'done' | 'error'; sessionId: string; data: any; }
 export interface ToolDefinition { type: 'function'; function: { name: string; description: string; parameters: Record<string,unknown> }; }
 export interface StreamChunk { type: 'text' | 'reasoning' | 'tool' | 'usage' | 'metadata'; metadata?: Record<string,unknown>; text?: string; tool?: { index: number; id?: string; name?: string; arguments?: string }; usage?: Usage; }
 /** One provider-reported usage record (5.1). Token counts are whatever the

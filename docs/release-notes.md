@@ -1,17 +1,15 @@
-# Litespeed 0.1.15
+# Litespeed 0.1.16
 
-LiteFusion is now a complete architecture with an Opus/high lead, asynchronous specialists, and a quieter web workspace.
+LiteFusion now connects its specialists automatically, including in existing sessions that were missing saved model connections.
 
-- Switch between LiteFusion, Single Model, Sidekick, Team, and Expert. Each architecture remembers its own model arrangement. LiteFusion has one Lead setting; unrelated Driver, Planner, and Shunt controls are removed from its setup.
-- The lead can continue useful work while specialists run. The host schedules dependencies and waits for events without model polling. Task identities, attempts, and private workspaces survive continuation and escalation; interrupted work is never replayed automatically.
-- Explicit provider failures can switch a worker once to its configured escalation route, preserving partial work and recording the availability reason. Lead failures remain visible and require recovery; there is no silent lead replacement.
-- Web chat has larger text, neutral light/dark themes, a simpler composer, compact worker activity, and one history inspector. Task details and attempt history expand on demand. The file panel remembers your choice across conversations and reloads.
-- Both clients keep all 63 task cards and per-task handoffs available for customization. Concurrency defaults to host capacity; there is no default assignment-count cutoff. Advanced experiment overrides remain available.
-- Changes requested during a response apply after active work settles. Worker cancellation, version-checked integration, stale settings protection, retained reports, and export accounting remain explicit.
-- `/new` is the visible new-session command. `/clear` and `/reset` remain compatible aliases without duplicate menu entries.
+- Connect your gateway and start chatting. The backend discovers matching model identities, keeps explicit choices, and resolves each task to its default model or configured escalation route. If neither is connected, the lead handles the task with a visible explanation.
+- Both the terminal and web UI show specialist task coverage, backup usage, and work left to the lead. A gateway with no specialist connections or only the lead model is labeled clearly. First-time setup keeps the detailed roster behind “View model assignments.”
+- New setups prefer Opus/high, then Astra/high when supported and listed. If neither is listed, choose your lead once. Existing leads and custom task assignments are preserved.
+- Substantial research, implementation, testing and review now default to coherent delegation after brief scoping. Small tasks can stay with the lead. There is no forced worker quota or extra classifier call.
+- Discovery is cached and does not run paid probes. Automatic connection repair does not queue an architecture change. Active turns keep their model assignments; explicit model edits show “Model settings updated” and apply after the turn.
 
-Run `litespeed update`, then reopen Litespeed. In Models, select **LiteFusion**. Existing custom LiteFusion sessions preserve their lead: choose **Restore preset** to load the recommended Opus/high setup. Check the model IDs available on your gateway.
+Run `litespeed update`, then reopen Litespeed. Existing LiteFusion sessions discover missing connections automatically; no reset or manual session repair is needed.
 
-The model roster remains a research policy awaiting independent evaluation. No measured cost or quality improvement is claimed. Devin exports include task attempts, reported costs, lead wait time, and external evaluation labels separately.
+Gateway listings do not verify credits, tool support or performance. The routing roster remains a research policy awaiting independent evaluation. Local checks use fake gateways and do not benchmark commercial models.
 
 Packages include the terminal runtime and web app for Apple silicon and Intel Macs.
