@@ -79,6 +79,11 @@ describe('Hooks unit: capture, matcher filtering, and run()', () => {
     expect(warn.code).toBe(1);
   });
 
+  it('drains output after exit while reaping descendants that inherited its pipes', async () => {
+    const result = await new Hooks(2000).run(payload(), hook('sleep 30 & echo "complete reason" >&2; exit 2'), directory);
+    expect(result).toMatchObject({ code: 2, timedOut: false, stderr: 'complete reason\n' });
+  });
+
   it('run() delivers the JSON payload on stdin', async () => {
     const result = await new Hooks().run(payload({ tool: 'bash', args: { command: 'ls' } }), hook('cat'), directory);
     expect(result.code).toBe(0);

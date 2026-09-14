@@ -1,9 +1,10 @@
-# Litespeed 0.1.12
+# Litespeed 0.1.13
 
 LiteFusion adds one persistent lead with task-specific specialist models and reasoning levels.
 
 - Choose **LiteFusion** in Models or `/models`. It is recommended during new setup; existing architecture selections stay saved.
 - Inspect and customize all 63 task cards, their default and shared hard/escalation routes, handoff instructions, and gateway deployment bindings. Compatible serial workers keep their own context; the lead owns assistance, handoffs and final acceptance.
+- The terminal footer groups message actions and session controls, consistently labeled `Action [Shortcut]`. F3 opens Permissions, F4 opens Settings, and Ctrl+P opens Commands. Clickable Send/New line actions preserve normal input behavior, and hints reflect configured bindings.
 - Parallel workers appear as compact progress rows in the terminal and web app. Open one worker history at a time, inspect earlier attempts, or stop one worker while the others continue. Closing the inspector restores your draft.
 - Export reviewed routing policies and per-session evaluation records for Devin. Worker completion, integration, reported costs and external success labels remain separate.
 - Mercury Edit 2 and Voyage Code 4 have explicit chat-model fallbacks for version-checked edit suggestions and repository search. Continuous autocomplete and vector indexing are unavailable.

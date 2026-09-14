@@ -63,7 +63,7 @@ try {
   console.log('Bundled backend and provider call passed; starting TUI.');
   terminal = pty.spawn('/bin/zsh', ['-lic','exec litespeed "$@"','litespeed','--url', base, '--session', session.id], { cwd: workspace, env, cols: 110, rows: 34, name: 'xterm-256color' });
   const tuiExited = new Promise(done => terminal.onExit(done)); terminal.onData(data => emulator.write(data));
-  await waitFor(() => screen().includes('Ctrl+P Commands') && screen().includes('Package smoke answer'), 'Bundled TUI did not render');
+  await waitFor(() => screen().includes('Commands [Ctrl+P]') && screen().includes('Package smoke answer'), 'Bundled TUI did not render');
   terminal.write('\x03'); await delay(120); terminal.write('\x03');
   assert.equal((await Promise.race([tuiExited, delay(5000).then(() => { throw new Error('TUI did not exit'); })])).exitCode, 0);
   terminal = undefined;

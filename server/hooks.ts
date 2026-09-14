@@ -123,7 +123,10 @@ export class Hooks {
       child.stdout?.on('data', chunk => { if (Buffer.byteLength(stdout) <= HOOK_LIMITS.stdioBytes) stdout += chunk.toString('utf8'); });
       child.stderr?.on('data', chunk => { if (Buffer.byteLength(stderr) <= HOOK_LIMITS.stdioBytes) stderr += chunk.toString('utf8'); });
       child.once('error', error => { stderr += `\nHook process error: ${error instanceof Error ? error.message : String(error)}`; finish(null); });
-      child.once('exit', code => finish(code));
+      // Exit can precede the final stdout/stderr data events. Reap descendants
+      // at exit, then publish the result only after the pipes have drained.
+      child.once('exit', () => kill('SIGKILL'));
+      child.once('close', code => finish(code));
       // A hook that never reads stdin closes the pipe: EPIPE here is normal.
       child.stdin?.on('error', () => { /* hook does not read stdin */ });
       try { child.stdin?.end(JSON.stringify(payload)); } catch { /* stdin already closed */ }
