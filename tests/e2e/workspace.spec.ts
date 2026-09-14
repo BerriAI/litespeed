@@ -47,7 +47,7 @@ test('surfaces provider errors and remains navigable',async({page})=>{
 
 test('discovers models and attaches workspace context',async({page})=>{
   await fresh(page);await page.getByRole('button',{name:'test-model'}).click();await expect(page.getByRole('dialog',{name:'Choose a model'})).toBeVisible();await page.getByRole('button',{name:'Architecture',exact:true}).click();await page.getByRole('option',{name:/^Single model/}).click();await page.getByRole('button',{name:'Model',exact:true}).click();await page.getByRole('option',{name:'test-fast',exact:true}).click();await page.getByRole('button',{name:'Done',exact:true}).click();
-  await page.getByRole('button',{name:'Add workspace file context'}).click();await page.getByRole('textbox',{name:'Search workspace files'}).fill('hello.ts');await page.getByRole('button',{name:'src/hello.ts'}).click();
+  await page.getByRole('button',{name:'Add workspace file context'}).click();await page.getByRole('textbox',{name:'Search workspace files'}).fill('hello.ts');await page.getByRole('button',{name:'src/hello.ts',exact:true}).click();
   await expect(page.getByRole('button',{name:'Remove hello.ts'})).toBeVisible();await send(page,'Read this attached source');await expect(page.getByRole('article',{name:'Your message'})).toContainText('src/hello.ts');await expect(page.getByRole('button',{name:'Stop generation'})).toHaveCount(0);
 });
 

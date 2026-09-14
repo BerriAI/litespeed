@@ -1,4 +1,6 @@
 /** @jsxImportSource @opentui/react */
+import { LiteFusionSettings } from './litefusion.js';
+import { bindExactModels, type LiteFusionSelection } from '../shared/litefusion.js';
 import { useEffect, useState, useSyncExternalStore } from 'react';
 import type { Model, ModelReasoning, Session, Settings } from '../shared/types.js';
 import { SHUNT_DESCRIPTION, SHUNT_BENEFIT, SHUNT_MODEL_HINT, shuntCanEnable, shuntConfigured, shuntToggle, type ShuntSelection } from '../shared/shunt.js';
@@ -34,6 +36,7 @@ export function ModelSettings({ controller, initial, settings, onClose, onProvid
   const state = useSyncExternalStore(controller.subscribe, controller.getState);
   const [kind, setKind] = useState<'single' | ArchitectureKind>(initial.architecture?.kind ?? 'single');
   const [driver, setDriver] = useState<ModelRoute>({ providerId: initial.providerId, model: initial.model });
+  const [fusion,setFusion]=useState<LiteFusionSelection>(initial.architecture?.kind==='litefusion'?initial.architecture:{kind:'litefusion',gatewayProviderId:initial.providerId});
   const [worker, setWorker] = useState<ModelRoute | null>(initial.architecture ? architectureWorker(initial.architecture) : null);
   const [shunt,setShunt]=useState<ShuntSelection>(initial.shunt??{enabled:false});
   const [planner, setPlanner] = useState<ModelRoute | null>(initial.planner ?? null);
@@ -52,6 +55,7 @@ export function ModelSettings({ controller, initial, settings, onClose, onProvid
   const back = () => setView('main');
   const name = kind === 'single' ? 'Single model' : ARCHITECTURES.find(item => item.kind === kind)!.name;
   const workerLabel = kind === 'team-fusion' ? 'Worker' : kind === 'expert-fusion' ? 'Expert' : 'Sidekick';
+  if(view==='litefusion')return <LiteFusionSettings controller={controller} settings={settings} value={fusion} onChange={setFusion} onClose={back}/>;
   if (view === 'advanced') return <ShuntSettings controller={controller} settings={settings} value={shunt} onChange={setShunt} onClose={back} reasoning={shunt.model?reasoning[JSON.stringify([shunt.model.providerId,shunt.model.model])]:undefined} onReasoning={()=>setView('reasoning:shunt')}/>;
   if (view === 'architecture') return <Menu title="Architecture" search={false} onClose={back} items={[
     ...SETUP_ARCHITECTURES.map(item => ({ id: item.kind, label: `${item.name}${item.recommended ? ' · Recommended' : ''}`, description: item.description, action: () => { setKind(item.kind); back(); } })),
@@ -73,7 +77,7 @@ export function ModelSettings({ controller, initial, settings, onClose, onProvid
   ];
   const save = async () => {
     try {
-      const architecture = kind !== 'single' && worker ? selectArchitecture(kind, worker) : null;
+      const architecture = kind==='litefusion'?fusion:kind !== 'single' && worker ? selectArchitecture(kind, worker) : null;
       if (architecture?.kind === 'team-fusion' || architecture?.kind === 'expert-fusion') architecture.concurrency = concurrency;
       if (await controller.configure({ ...driver, architecture, planner, shunt, modelReasoning: reasoning, outputStyle: style || null }, initial.configRevision ?? 0)) onClose();
     } catch (error) { controller.notice(String((error as Error).message)); }
@@ -81,13 +85,14 @@ export function ModelSettings({ controller, initial, settings, onClose, onProvid
   return <Menu title="Models" search={false} onClose={onClose} footer={state.notice || '↑↓ choose · Enter edit · Save applies changes · Esc cancel'} items={[
     { id: 'architecture', label: `Architecture: ${name}`, action: () => setView('architecture') },
     ...fields('driver', kind === 'single' ? 'Model' : 'Driver', driver),
-    ...(kind !== 'single' ? fields('worker', workerLabel, worker) : []),
+    ...(kind !== 'single' && kind !== 'litefusion' ? fields('worker', workerLabel, worker) : []),
     ...(kind === 'team-fusion' || kind === 'expert-fusion' ? [{ id: 'workers', label: `Workers at once: ${concurrency ?? 'Automatic'}`, action: () => setView('concurrency') }] : []),
+    ...(kind==='litefusion'?[{id:'litefusion',label:'63 task routes and handoffs',action:()=>setView('litefusion')}]:[]),
     { id:'advanced',label:`Advanced settings · Shunt ${shunt.enabled?'On':'Off'}`,description:SHUNT_DESCRIPTION,action:()=>setView('advanced')},
     { id: 'planner', separatorBefore: true, label: `Planner model: ${planner ? 'On' : 'Off'}`, description: 'Use a different model in Plan mode.', action: () => { if (planner) setPlanner(null); else setView('model:planner'); } },
     ...(planner ? fields('planner', 'Planner', planner) : []),
     { id: 'style', separatorBefore: true, label: `Output style: ${style || 'Default'}`, action: () => setView('style') },
-    { id: 'save', separatorBefore: true, label: state.pending ? 'Saving…' : 'Save', disabled: Boolean(state.pending) || !shuntConfigured(shunt,settings.providers) || !driver.model.trim() || !driver.providerId || (kind !== 'single' && !worker), action: () => { void save(); } },
+    { id: 'save', separatorBefore: true, label: state.pending ? 'Saving…' : 'Save', disabled: Boolean(state.pending) || !shuntConfigured(shunt,settings.providers) || !driver.model.trim() || !driver.providerId || (kind !== 'single' && kind !== 'litefusion' && !worker), action: () => { void save(); } },
     { id: 'providers', label: 'Manage providers', action: onProviders },
   ]} />;
 }

@@ -1,0 +1,1882 @@
+{
+  "version": "2026-09-13.1",
+  "asOf": "2026-09-13",
+  "models": {
+    "astra": {
+      "name": "GPT-6 Astra",
+      "apiId": "gpt-6-astra",
+      "efforts": [
+        "low",
+        "medium",
+        "high",
+        "xhigh",
+        "max"
+      ],
+      "historyRule": "Keep this worker session native and persistent. Preserve response/tool item IDs and provider continuation state; send portable evidence briefs to other providers.",
+      "sources": [
+        "https://developers.openai.com/api/docs/models/gpt-6-astra",
+        "https://developers.openai.com/api/docs/pricing"
+      ],
+      "executionVerified": false,
+      "handoffStyle": "Give outcomes, constraints and source evidence; avoid a mandatory step-by-step itinerary. Grant ownership of diagnosis and implementation inside the assigned boundary. Ask for decisive tests and concise decision rationale."
+    },
+    "sol": {
+      "name": "GPT-5.6 Sol",
+      "apiId": "gpt-5.6-sol",
+      "efforts": [
+        "none",
+        "low",
+        "medium",
+        "high",
+        "xhigh",
+        "max"
+      ],
+      "historyRule": "Keep this worker session native and persistent. Preserve response/tool item IDs and provider continuation state; send portable evidence briefs to other providers.",
+      "sources": [
+        "https://developers.openai.com/api/docs/models/gpt-5.6-sol",
+        "https://developers.openai.com/api/docs/pricing"
+      ],
+      "executionVerified": false,
+      "handoffStyle": "For incident work, provide topology, time-aligned telemetry and changes. Require competing causal hypotheses and the observation that distinguishes them; keep root-cause diagnosis separate from executing a remediation."
+    },
+    "terra": {
+      "name": "GPT-5.6 Terra",
+      "apiId": "gpt-5.6-terra",
+      "efforts": [
+        "none",
+        "low",
+        "medium",
+        "high",
+        "xhigh",
+        "max"
+      ],
+      "historyRule": "Keep this worker session native and persistent. Preserve response/tool item IDs and provider continuation state; send portable evidence briefs to other providers.",
+      "sources": [
+        "https://developers.openai.com/api/docs/models/gpt-5.6-terra",
+        "https://developers.openai.com/api/docs/pricing"
+      ],
+      "executionVerified": false,
+      "handoffStyle": "Use explicit interfaces, constraints and tests. Validate at the selected effort on this workload; do not transfer Sol or Luna results to this model."
+    },
+    "luna": {
+      "name": "GPT-5.6 Luna",
+      "apiId": "gpt-5.6-luna",
+      "efforts": [
+        "none",
+        "low",
+        "medium",
+        "high",
+        "xhigh",
+        "max"
+      ],
+      "historyRule": "Keep this worker session native and persistent. Preserve response/tool item IDs and provider continuation state; send portable evidence briefs to other providers.",
+      "sources": [
+        "https://developers.openai.com/api/docs/models/gpt-5.6-luna",
+        "https://developers.openai.com/api/docs/pricing"
+      ],
+      "executionVerified": false,
+      "handoffStyle": "Use a narrow transformation or evidence-reading assignment. Supply exact inputs, examples and output fields. Do not ask it to invent project architecture or interpret missing requirements. On a contradiction, return the observation and escalate."
+    },
+    "opus": {
+      "name": "Claude Opus 5",
+      "apiId": "claude-opus-5",
+      "efforts": [
+        "low",
+        "medium",
+        "high",
+        "xhigh",
+        "max"
+      ],
+      "historyRule": "Keep signed thinking/tool blocks intact inside the same worker conversation. Exchange concise facts and artifacts between workers. Do not reconstruct another provider transcript.",
+      "sources": [
+        "https://platform.claude.com/docs/en/models/overview",
+        "https://platform.claude.com/docs/en/build-with-claude/effort",
+        "https://platform.claude.com/docs/en/about-claude/pricing"
+      ],
+      "executionVerified": false,
+      "handoffStyle": "Give outcomes, task boundaries, dependencies and acceptance criteria. Maintain a short plan and evidence ledger. Return separable assistance requests to the lead when briefing and review are justified."
+    },
+    "fable": {
+      "name": "Claude Fable 5.1",
+      "apiId": "claude-fable-5-1",
+      "efforts": [
+        "low",
+        "medium",
+        "high",
+        "xhigh",
+        "max"
+      ],
+      "historyRule": "Keep signed thinking/tool blocks intact inside the same worker conversation. Exchange concise facts and artifacts between workers. Do not reconstruct another provider transcript.",
+      "sources": [
+        "https://platform.claude.com/docs/en/models/overview",
+        "https://platform.claude.com/docs/en/build-with-claude/effort",
+        "https://platform.claude.com/docs/en/about-claude/pricing"
+      ],
+      "executionVerified": false,
+      "handoffStyle": "Use for difficult or consequential work. Supply invariants, adversarial requirements and the actual acceptance boundary, then allow independent planning. Do not force delegation merely to raise its delegation rate."
+    },
+    "sonnet": {
+      "name": "Claude Sonnet 5",
+      "apiId": "claude-sonnet-5",
+      "efforts": [
+        "low",
+        "medium",
+        "high",
+        "xhigh",
+        "max"
+      ],
+      "historyRule": "Keep signed thinking/tool blocks intact inside the same worker conversation. Exchange concise facts and artifacts between workers. Do not reconstruct another provider transcript.",
+      "sources": [
+        "https://platform.claude.com/docs/en/models/overview",
+        "https://platform.claude.com/docs/en/build-with-claude/effort",
+        "https://platform.claude.com/docs/en/about-claude/pricing"
+      ],
+      "executionVerified": false,
+      "handoffStyle": "Provide concrete task boundaries and expected output, with room for independent reasoning. Treat the role and effort as an evaluation candidate rather than inheriting old Sonnet settings."
+    },
+    "haiku": {
+      "name": "Claude Haiku 4.5",
+      "apiId": "claude-haiku-4-5-20251001",
+      "efforts": [
+        "off",
+        "budget_tokens"
+      ],
+      "historyRule": "Use explicit state and a bounded communication task. Never assign a native high/xhigh/max setting: Haiku uses thinking off or an explicit supported token budget.",
+      "sources": [
+        "https://platform.claude.com/docs/en/models/overview",
+        "https://platform.claude.com/docs/en/build-with-claude/effort",
+        "https://platform.claude.com/docs/en/about-claude/pricing"
+      ],
+      "executionVerified": false,
+      "handoffStyle": "Supply verified state, audience and a concise communication objective. Keep reasoning off for this role. Tone may be flexible, but facts and completion claims must come from the supplied record."
+    },
+    "gemini": {
+      "name": "Gemini 3.8 Flash",
+      "apiId": "gemini-3.8-flash",
+      "efforts": [
+        "low",
+        "medium",
+        "high"
+      ],
+      "historyRule": "Preserve thought signatures and their associated function calls/results within this worker. Do not strip signatures when storing/replaying messages.",
+      "sources": [
+        "https://ai.google.dev/gemini-api/docs/models/gemini-3.8-flash",
+        "https://ai.google.dev/gemini-api/docs/thinking",
+        "https://ai.google.dev/gemini-api/docs/pricing"
+      ],
+      "executionVerified": false,
+      "handoffStyle": "Give the objective, completion boundary and constraints, with room to choose the implementation. Preserve thought signatures across its own tool turns. A new failure should trigger a revised hypothesis, not a repeated identical action."
+    },
+    "glm": {
+      "name": "GLM-5.3-Flash",
+      "apiId": "glm-5.3-flash",
+      "efforts": [
+        "low",
+        "high",
+        "max"
+      ],
+      "historyRule": "Preserve reasoning_content in its dedicated field and tool-call IDs within the worker. Provide explicit scope, invariants and evidence when escalating.",
+      "sources": [
+        "https://docs.z.ai/guides/llm/glm-5.3-flash",
+        "https://docs.z.ai/guides/overview/pricing"
+      ],
+      "executionVerified": false,
+      "handoffStyle": "Define a bounded deliverable, important invariants and concrete checks. Let it inspect locally, but avoid asking for an unlimited search. The lead should inspect raw evidence before adopting a confident diagnosis."
+    },
+    "deepseek": {
+      "name": "DeepSeek V4.1 Flash",
+      "apiId": "deepseek-flash",
+      "efforts": [
+        "off",
+        "low",
+        "high",
+        "max"
+      ],
+      "historyRule": "Preserve reasoning_content on assistant tool-call turns; omitting required reasoning state can cause 400 errors. Cross-provider handoffs contain task facts, not native reasoning traces.",
+      "sources": [
+        "https://huggingface.co/deepseek-ai/DeepSeek-V4.1-Flash",
+        "https://api-docs.deepseek.com/guides/thinking_mode",
+        "https://api-docs.deepseek.com/quick_start/pricing"
+      ],
+      "executionVerified": false,
+      "handoffStyle": "For security work, keep reproduction/discovery separate from remediation. Specify vulnerable and fixed environments and require differential proof. Preserve native reasoning_content for tool continuation; do not give discovered claims automatic acceptance."
+    },
+    "kimi": {
+      "name": "Kimi K3",
+      "apiId": "kimi-k3",
+      "efforts": [
+        "low",
+        "high",
+        "max"
+      ],
+      "historyRule": "Keep full reasoning_content and tool history within the persistent worker. Distinguish a 256K preview checkpoint from the current 1M API release.",
+      "sources": [
+        "https://platform.kimi.ai/docs/guide/kimi-k3-quickstart",
+        "https://platform.kimi.ai/docs/pricing/chat"
+      ],
+      "executionVerified": false,
+      "handoffStyle": "Provide the precise question and access to full relevant source context. Encourage multi-hop exploration, file/line citations and explicit contradictions. Return a compact evidence map rather than an unsupported summary."
+    },
+    "qwen_next": {
+      "name": "Qwen3.8-Flash-Next",
+      "apiId": "alibaba/qwen3.8-flash-next",
+      "efforts": [
+        "off",
+        "low",
+        "medium",
+        "xhigh"
+      ],
+      "historyRule": "Preserve historical reasoning_content and tool history. Native xhigh is the default; low/medium also supported. Pin the inference provider; do not silently substitute qwen3.8-flash.",
+      "sources": [
+        "https://vercel.com/ai-gateway/models/qwen3.8-flash-next",
+        "https://huggingface.co/Qwen/Qwen3.8-Flash-Next"
+      ],
+      "executionVerified": false,
+      "handoffStyle": "Provide a working-flow specification and visual references, then require inspection of the rendered result. Keep recent code and edit history current. Use native xhigh with preserved thinking; pin the served Next model and provider."
+    },
+    "muse": {
+      "name": "Muse Spark 1.3",
+      "apiId": "meta/muse-spark-1.3",
+      "efforts": [
+        "xhigh"
+      ],
+      "historyRule": "Use documented gateway xhigh; exact provider-native equivalence to the benchmark setting is unresolved. Keep a persistent native worker session.",
+      "sources": [
+        "https://vercel.com/ai-gateway/models/muse-spark-1.3"
+      ],
+      "executionVerified": false,
+      "handoffStyle": "Provide equations, units, conditioning assumptions and independent correctness criteria. Separate mathematical derivation from coding and performance claims. Validate the gateway effort mapping before promoting a measured policy."
+    },
+    "grok": {
+      "name": "Grok 4.6",
+      "apiId": "grok-4.6",
+      "efforts": [
+        "low",
+        "medium",
+        "high",
+        "xhigh"
+      ],
+      "historyRule": "Keep this worker conversation and tool results intact. Supply desired final state and check it independently; do not infer secure-code competence from a generic cyber reputation.",
+      "sources": [
+        "https://docs.x.ai/developers/models/grok-4.6",
+        "https://docs.x.ai/developers/model-capabilities/text/reasoning"
+      ],
+      "executionVerified": false,
+      "handoffStyle": "State the intended final tool state and permitted actions. Require object IDs, exact tool results and confirmation of final predicates. Do not treat tool-call plausibility as successful completion."
+    },
+    "mercury_edit": {
+      "name": "Mercury Edit 2",
+      "apiId": "mercury-edit-2",
+      "efforts": [
+        "not_applicable"
+      ],
+      "historyRule": "Supply current file/cursor, a bounded editable region, 3–5 recent code snippets and 3–5 edits in chronological order. API returns a replacement region; reject stale base hashes.",
+      "sources": [
+        "https://docs.inceptionlabs.ai/capabilities/next-edit",
+        "https://docs.inceptionlabs.ai/capabilities/fim",
+        "https://www.inceptionlabs.ai/blog/introducing-mercury-edit-2"
+      ],
+      "executionVerified": false,
+      "handoffStyle": "Use the dedicated FIM or edit schema, current code, cursor and a bounded replacement region. Do not route an open-ended agent conversation to this endpoint. Reject a suggestion if the base document version changed."
+    },
+    "mercury25": {
+      "name": "Mercury 2.5",
+      "apiId": "mercury-2.5",
+      "efforts": [
+        "instant",
+        "low",
+        "medium",
+        "high"
+      ],
+      "historyRule": "Use explicit output structure and important task constraints near the end; this is provider guidance requiring validation.",
+      "sources": [
+        "https://www.inceptionlabs.ai/blog/introducing-mercury-2-5",
+        "https://docs.inceptionlabs.ai/capabilities/reasoning-efforts"
+      ],
+      "executionVerified": false,
+      "handoffStyle": "For the latency challenger, give explicit inputs and a short output schema. Use the native instant/low/medium/high scale. Keep current independent quality validation separate from provider throughput claims."
+    },
+    "voyage_code": {
+      "name": "Voyage Code 4",
+      "apiId": "voyage-code-4",
+      "efforts": [
+        "not_applicable"
+      ],
+      "historyRule": "Embed versioned code chunks with path, symbol and commit metadata. Set input_type separately for queries and documents. Combine with lexical/symbol retrieval; return provenance with results.",
+      "sources": [
+        "https://blog.voyageai.com/2026/08/13/voyage-code-4/",
+        "https://docs.voyageai.com/docs/embeddings"
+      ],
+      "executionVerified": false,
+      "handoffStyle": "Index versioned source chunks and return provenance. Embedding similarity supplies candidates; the reader must verify relevance and current code. Use deterministic exact/symbol search for exact identifiers."
+    }
+  },
+  "roles": [
+    {
+      "id": "controller",
+      "task": "Single controller: decomposition, dispatch and integration",
+      "default": {
+        "modelKey": "opus",
+        "effort": "high"
+      },
+      "escalation": {
+        "modelKey": "fable",
+        "effort": "xhigh"
+      },
+      "execution": "lead",
+      "external": false,
+      "requirements": [],
+      "stakes": "high",
+      "handoff": "Own the dependency graph and acceptance decisions. Assign independent, reviewable units; keep integration authority. Delegate only when expected saved work exceeds briefing and review. Revise the plan when evidence contradicts it.",
+      "acceptance": "Every completed task links to a pinned artifact, observed checks and integration status. Reconcile conflicting worker evidence before acceptance.",
+      "confidence": "moderate",
+      "evidence": "Most direct current evidence is Agent Arena code orchestration. Opus high has similar point net improvement to Astra max at lower median task cost. No public test establishes this exact org or best controller at matched effort.",
+      "equationProfile": null,
+      "sources": [
+        "https://arena.ai/leaderboard/agent/code",
+        "https://cognition.com/blog/local-fusion"
+      ]
+    },
+    {
+      "id": "agent_harness_construction",
+      "task": "Build and tune a multi-model agent harness",
+      "default": {
+        "modelKey": "opus",
+        "effort": "max"
+      },
+      "escalation": {
+        "modelKey": "sol",
+        "effort": "xhigh"
+      },
+      "execution": "worker",
+      "external": false,
+      "requirements": [],
+      "stakes": "high",
+      "handoff": "Supply the workload, permitted API menu, serving budget, acceptance contract and existing harness. Measure the baseline before rewriting it. Inventory requirements and unresolved facts; compare model and architecture alternatives using calibration evidence. Retain useful existing routing. Explicitly test pagination, ambiguous writes, retry/idempotency behavior and complete billing. Give Opus max the actual serving-model menu, workload, lifetime volume and operating budget. Require a measured starting baseline before rewriting it, compare plausible routing designs, recover source requirements, and test the complete agent on held-out behavior. Model familiarity is not evidence for choosing a provider; preserve useful existing architecture unless measured results justify replacing it.",
+      "acceptance": "Hold-out end-to-end behavior, full serving spend, independent tests and observed failure recovery. Developer-written tests must not weaken to match behavior. Preserve client/source evidence and expose unresolved requirements; the builder may not read hidden evaluator data.",
+      "confidence": "moderate",
+      "evidence": "Hyper-tau August/September native-harness results favor Opus5max/ClaudeCode23.9 budget-adjusted score versus Solxhigh/Codex22.0. Mean developer build bills are$42 and$18.2 respectively; these exclude a complete deployed-service bill. Choose Opus for a consequential reusable harness and keep Sol as the lower-build-cost alternative. Lifetime workload and actual serving economics could reverse the choice; newest Astra/Fable/Gemini3.8 were absent.",
+      "equationProfile": null,
+      "sources": [
+        "https://sierra-research.github.io/hyper-tau-bench/",
+        "https://github.com/sierra-research/hyper-tau-bench",
+        "https://arxiv.org/html/2609.04611v1"
+      ]
+    },
+    {
+      "id": "task_classification",
+      "task": "Ticket classification and initial routing",
+      "default": {
+        "modelKey": "luna",
+        "effort": "none"
+      },
+      "escalation": {
+        "modelKey": "opus",
+        "effort": "high"
+      },
+      "execution": "lead",
+      "external": false,
+      "requirements": [],
+      "stakes": "low",
+      "handoff": "Provide the allowed role IDs, concise definitions, repository metadata and examples. Return role_id, stakes, ambiguity and missing inputs. Use unknown instead of inventing a category.",
+      "acceptance": "Schema validation, deterministic high-risk overrides and held-out label/confusion review.",
+      "confidence": "low",
+      "evidence": "Cost/latency-oriented prior; no direct measured routing accuracy for Luna none. The code classifier must be calibrated on local labels.",
+      "equationProfile": null,
+      "sources": [
+        "https://artificialanalysis.ai/models/gpt-5-6-luna",
+        "https://cognition.com/blog/local-fusion"
+      ]
+    },
+    {
+      "id": "developer_chat",
+      "task": "Natural developer conversation and clarification wording",
+      "default": {
+        "modelKey": "luna",
+        "effort": "none"
+      },
+      "escalation": {
+        "modelKey": "gemini",
+        "effort": "high"
+      },
+      "execution": "lead",
+      "external": false,
+      "requirements": [],
+      "stakes": "low",
+      "handoff": "Supply the actual question, audience, known facts and desired response length. Write naturally; ask the smallest useful clarification. Do not make technical decisions beyond supplied evidence.",
+      "acceptance": "Faithfulness to supplied state, user preference and latency; no invented progress or commitments.",
+      "confidence": "low",
+      "evidence": "Low-cost default for grounded short replies: AA reports about5.62s for a500-token answer versus6.95s for Haiku off, although Haiku has a faster first token(.71s versus.93s). Luna has much lower input/output prices. This is a proposed price/latency choice; no matched human preference experiment establishes Luna none as the quality winner. Keep Haiku off as a style/first-token-latency challenger.",
+      "equationProfile": null,
+      "sources": [
+        "https://arena.ai/leaderboard/text",
+        "https://artificialanalysis.ai/models/gpt-5-6-luna"
+      ]
+    },
+    {
+      "id": "progress_messages",
+      "task": "Progress messages, changelog summaries and status formatting",
+      "default": {
+        "modelKey": "luna",
+        "effort": "none"
+      },
+      "escalation": {
+        "modelKey": "haiku",
+        "effort": "off"
+      },
+      "execution": "lead",
+      "external": false,
+      "requirements": [],
+      "stakes": "low",
+      "handoff": "Use only the provided event log. Distinguish started, changed, checked and completed. Include the next concrete step in at most three sentences.",
+      "acceptance": "Compare claims to source event IDs and actual test/artifact status.",
+      "confidence": "low",
+      "evidence": "Mechanical transformation of verified state is a low-cost prior; Luna none has no direct coding-quality guarantee.",
+      "equationProfile": null,
+      "sources": [
+        "https://artificialanalysis.ai/models/gpt-5-6-luna"
+      ]
+    },
+    {
+      "id": "requirements",
+      "task": "Ambiguous requirement analysis and acceptance criteria",
+      "default": {
+        "modelKey": "opus",
+        "effort": "high"
+      },
+      "escalation": {
+        "modelKey": "fable",
+        "effort": "xhigh"
+      },
+      "execution": "lead",
+      "external": false,
+      "requirements": [],
+      "stakes": "high",
+      "handoff": "Supply user intent, stakeholder constraints and existing behavior. Identify decisions that affect implementation; propose observable acceptance criteria and label assumptions.",
+      "acceptance": "Trace every criterion to a stated requirement or an explicit proposed assumption; challenge omissions and incompatible goals.",
+      "confidence": "low",
+      "evidence": "Controller evidence transfers plausibly; requirements/design benchmarks do not prove current-model leadership.",
+      "equationProfile": null,
+      "sources": [
+        "https://arena.ai/leaderboard/agent/code",
+        "https://arxiv.org/html/2604.06683v1"
+      ]
+    },
+    {
+      "id": "architecture",
+      "task": "System architecture, boundaries and consequential trade-offs",
+      "default": {
+        "modelKey": "astra",
+        "effort": "xhigh"
+      },
+      "escalation": {
+        "modelKey": "fable",
+        "effort": "xhigh"
+      },
+      "execution": "worker",
+      "external": false,
+      "requirements": [],
+      "stakes": "high",
+      "handoff": "Specify workloads, SLOs, trust boundaries, data ownership and migration constraints. Ask for alternatives, failure modes, reversibility and a decision record; allow independent exploration.",
+      "acceptance": "Executable feasibility spikes where possible, explicit data-flow review, capacity assumptions and independent architectural challenge.",
+      "confidence": "moderate",
+      "evidence": "Strong current refactoring/system evidence; open-ended architecture transfer remains unmeasured. SAKE accuracy and diagram similarity are insufficient.",
+      "equationProfile": null,
+      "sources": [
+        "https://labs.scale.com/leaderboard/sweatlas-refactoring",
+        "https://www.tbench.ai/leaderboard/terminal-bench/4.0",
+        "https://arxiv.org/html/2604.06683v1",
+        "https://arxiv.org/html/2606.29520v1"
+      ]
+    },
+    {
+      "id": "api_contract",
+      "task": "API/interface design and backward compatibility",
+      "default": {
+        "modelKey": "astra",
+        "effort": "xhigh"
+      },
+      "escalation": {
+        "modelKey": "fable",
+        "effort": "xhigh"
+      },
+      "execution": "worker",
+      "external": false,
+      "requirements": [],
+      "stakes": "high",
+      "handoff": "Provide existing schemas, clients, error semantics, versioning and compatibility constraints. Require a consumer map and migration path before changing contracts.",
+      "acceptance": "Contract tests, old-client compatibility, serialization and failure-mode cases.",
+      "confidence": "moderate",
+      "evidence": "SWE-Atlas refactoring provides relevant consumer/interface evidence, not a direct API design leaderboard.",
+      "equationProfile": null,
+      "sources": [
+        "https://labs.scale.com/leaderboard/sweatlas-refactoring"
+      ]
+    },
+    {
+      "id": "semantic_code_index",
+      "task": "Semantic code search and repository indexing",
+      "default": {
+        "modelKey": "voyage_code",
+        "effort": "not_applicable"
+      },
+      "escalation": {
+        "modelKey": "kimi",
+        "effort": "max"
+      },
+      "execution": "read",
+      "external": false,
+      "requirements": [],
+      "stakes": "low",
+      "handoff": "Version chunks by repository commit and symbol. Separate query/document embedding input types. Return path, range and source hash; combine semantic with lexical and symbol search.",
+      "acceptance": "Recall/NDCG on held-out real navigation queries, freshness checks and end-to-end task success.",
+      "confidence": "moderate",
+      "evidence": "Voyage provider retrieval suite favors Code4, including over Codestral Embed; private-heavy NDCG evidence does not prove downstream coding success.",
+      "equationProfile": null,
+      "sources": [
+        "https://blog.voyageai.com/2026/08/13/voyage-code-4/"
+      ]
+    },
+    {
+      "id": "repository_qa",
+      "task": "Codebase onboarding, call paths and difficult repository Q&A",
+      "default": {
+        "modelKey": "kimi",
+        "effort": "max"
+      },
+      "escalation": {
+        "modelKey": "fable",
+        "effort": "xhigh"
+      },
+      "execution": "read",
+      "external": false,
+      "requirements": [],
+      "stakes": "medium",
+      "handoff": "Provide the concrete question and repository boundary, not a guessed answer. Permit exploration and require actual call paths, file references and distinctions between static inference and observed runtime.",
+      "acceptance": "Verify cited code and answer requirements; run a minimal probe for claims that depend on runtime.",
+      "confidence": "moderate",
+      "evidence": "Kimi K3 max leads the reviewed independent SWE-Atlas-QnA coding-agent table. Its cost advantage for this exact role is not fully measured.",
+      "equationProfile": null,
+      "sources": [
+        "https://artificialanalysis.ai/agents/coding-agents"
+      ]
+    },
+    {
+      "id": "doc_lookup",
+      "task": "Interactive lookup in technical documentation",
+      "default": {
+        "modelKey": "luna",
+        "effort": "high"
+      },
+      "escalation": {
+        "modelKey": "luna",
+        "effort": "max"
+      },
+      "execution": "read",
+      "external": false,
+      "requirements": [],
+      "stakes": "low",
+      "handoff": "Give the exact question and a small set of current primary docs. Find the supporting passage first and quote only the relevant line or API field.",
+      "acceptance": "Every factual claim has a matching current source; abstain on absent documentation.",
+      "confidence": "low",
+      "evidence": "A latency-saving step below the measured Luna-max long-context result; interactive high-effort quality is a proposed transfer.",
+      "equationProfile": null,
+      "sources": [
+        "https://artificialanalysis.ai/evaluations/artificial-analysis-long-context-reasoning",
+        "https://artificialanalysis.ai/models/gpt-5-6-luna"
+      ]
+    },
+    {
+      "id": "long_document_extraction",
+      "task": "Precise extraction from long technical documents",
+      "default": {
+        "modelKey": "luna",
+        "effort": "max"
+      },
+      "escalation": {
+        "modelKey": "kimi",
+        "effort": "max"
+      },
+      "execution": "read",
+      "external": false,
+      "requirements": [],
+      "stakes": "medium",
+      "handoff": "Supply the full relevant context, exact fields and citation format. Separate explicit statements, deductions and missing facts; preserve contradictory passages.",
+      "acceptance": "Source-grounding checks and independently reviewed sampled extractions.",
+      "confidence": "moderate",
+      "evidence": "AA-LCR: Luna max 83.67%, approximately $.0209 per question; Kimi max 88.67% at $.3086. The default uses a proposed five-point quality tolerance; freeze this before a new held-out comparison.",
+      "equationProfile": "long_document_extraction",
+      "sources": [
+        "https://artificialanalysis.ai/evaluations/artificial-analysis-long-context-reasoning",
+        "https://artificialanalysis.ai/models/gpt-5-6-luna"
+      ]
+    },
+    {
+      "id": "pdf_extraction",
+      "task": "Read tables and extract data from engineering PDFs",
+      "default": {
+        "modelKey": "luna",
+        "effort": "high"
+      },
+      "escalation": {
+        "modelKey": "astra",
+        "effort": "xhigh"
+      },
+      "execution": "read",
+      "external": false,
+      "requirements": [
+        "pdf"
+      ],
+      "stakes": "medium",
+      "handoff": "Provide original pages and expected fields/units. Distinguish headers, footnotes and table cells. Report unreadable regions and check extracted totals.",
+      "acceptance": "Page-level citations, arithmetic reconciliation and visual inspection of uncertain cells.",
+      "confidence": "low",
+      "evidence": "GDP.pdf measures free-form answers grounded in PDF packages with criterion-level judging. Luna high is an inexpensive first attempt; this does not directly measure exact engineering-table extraction.",
+      "equationProfile": "professional_pdf_first_attempt",
+      "sources": [
+        "https://artificialanalysis.ai/models/gpt-5-6-luna"
+      ]
+    },
+    {
+      "id": "handoff_compression",
+      "task": "Compress worker history into an evidence brief",
+      "default": {
+        "modelKey": "glm",
+        "effort": "max"
+      },
+      "escalation": {
+        "modelKey": "fable",
+        "effort": "high"
+      },
+      "execution": "bounded",
+      "external": false,
+      "requirements": [],
+      "stakes": "high",
+      "handoff": "Preserve objective, constraints, decisions, unresolved contradictions, exact paths, commands, errors and artifact hashes. Separate observed facts from hypotheses. Do not compress away failures.",
+      "acceptance": "Schema validation plus lead checks of requirements, contradictions and artifact references; replay on a holdout before relying on it.",
+      "confidence": "low",
+      "evidence": "Low-cost long-context performance is suggestive; no benchmark directly proves lossless coding handoff compression.",
+      "equationProfile": null,
+      "sources": [
+        "https://artificialanalysis.ai/models/glm-5-3-flash",
+        "https://cognition.com/blog/local-fusion",
+        "https://xiaowu0162.github.io/longmemeval-v2/"
+      ]
+    },
+    {
+      "id": "memory_update",
+      "task": "Extract and update durable project memory",
+      "default": {
+        "modelKey": "glm",
+        "effort": "max"
+      },
+      "escalation": {
+        "modelKey": "opus",
+        "effort": "high"
+      },
+      "execution": "bounded",
+      "external": false,
+      "requirements": [],
+      "stakes": "medium",
+      "handoff": "Write only stable decisions and useful corrections with source, scope and date. Preserve superseded facts as history; do not treat past authorization as current permission.",
+      "acceptance": "Conflict/duplication checks, cited provenance and downstream memory-use evaluation.",
+      "confidence": "low",
+      "evidence": "Long-context and memory benchmarks favor task-specific memory design; current model assignment is a cost-oriented prior.",
+      "equationProfile": null,
+      "sources": [
+        "https://xiaowu0162.github.io/longmemeval-v2/",
+        "https://artificialanalysis.ai/models/glm-5-3-flash"
+      ]
+    },
+    {
+      "id": "bounded_patch",
+      "task": "Small implementation patch with explicit tests and interface",
+      "default": {
+        "modelKey": "glm",
+        "effort": "max"
+      },
+      "escalation": {
+        "modelKey": "gemini",
+        "effort": "high"
+      },
+      "execution": "worker",
+      "external": false,
+      "requirements": [],
+      "stakes": "medium",
+      "handoff": "Give the exact behavior, editable scope, interfaces, invariants and acceptance commands. Permit local investigation; escalate a scope mismatch or repeated unchanged failure.",
+      "acceptance": "Targeted behavioral and regression checks outside the patch; validate diff scope and actual exit codes.",
+      "confidence": "moderate",
+      "evidence": "DeepSWE equal-task result .635 at about $.484 per attempt. Low-cost first-stage candidate; small-patch specialization and final cascade quality remain unmeasured.",
+      "equationProfile": "bounded_patch_first_attempt",
+      "sources": [
+        "https://deepswe.datacurve.ai/"
+      ]
+    },
+    {
+      "id": "repository_implementation",
+      "task": "Substantial repository feature or bug fix",
+      "default": {
+        "modelKey": "gemini",
+        "effort": "high"
+      },
+      "escalation": {
+        "modelKey": "astra",
+        "effort": "xhigh"
+      },
+      "execution": "worker",
+      "external": false,
+      "requirements": [],
+      "stakes": "medium",
+      "handoff": "Provide outcome, invariants and completion boundary. Allow targeted exploration and a revised implementation plan. Preserve native thought signatures across tool turns.",
+      "acceptance": "New behavior plus regression tests, type/build checks and independent acceptance review.",
+      "confidence": "moderate",
+      "evidence": "DeepSWE fixed-harness equal-task quality .7397 near Astra xhigh .7412, at about $2.35 per attempt. Harness and local workload may change the ordering.",
+      "equationProfile": "repository_implementation",
+      "sources": [
+        "https://deepswe.datacurve.ai/"
+      ]
+    },
+    {
+      "id": "mechanical_edits",
+      "task": "Mechanical edits, repetitive codemods and syntax repairs",
+      "default": {
+        "modelKey": "luna",
+        "effort": "high"
+      },
+      "escalation": {
+        "modelKey": "luna",
+        "effort": "max"
+      },
+      "execution": "worker",
+      "external": false,
+      "requirements": [],
+      "stakes": "low",
+      "handoff": "Provide the precise rewrite rule, positive and negative examples, affected symbols and files. Prefer deterministic AST tools when available; change only verified matches.",
+      "acceptance": "AST/diff inspection, parse/type checks and idempotence of the transformation.",
+      "confidence": "low",
+      "evidence": "Bounded transformation prior; open-ended DeepSWE performance is much weaker at high than max, so scope must remain mechanical.",
+      "equationProfile": null,
+      "sources": [
+        "https://deepswe.datacurve.ai/"
+      ]
+    },
+    {
+      "id": "large_refactor",
+      "task": "Large refactor across modules and call sites",
+      "default": {
+        "modelKey": "astra",
+        "effort": "xhigh"
+      },
+      "escalation": {
+        "modelKey": "fable",
+        "effort": "xhigh"
+      },
+      "execution": "worker",
+      "external": false,
+      "requirements": [],
+      "stakes": "high",
+      "handoff": "Map all callers and compatibility obligations, identify obsolete paths and prove intended behavior preservation. Do not make tests easier to fit the patch.",
+      "acceptance": "Unchanged acceptance tests, complete consumer updates and independent diff review.",
+      "confidence": "moderate",
+      "evidence": "Current SWE-Atlas refactoring leader at 59.05%; no comparable task-cost column. Chosen for quality under behavior-preservation stakes.",
+      "equationProfile": null,
+      "sources": [
+        "https://labs.scale.com/leaderboard/sweatlas-refactoring"
+      ]
+    },
+    {
+      "id": "dependency_migration",
+      "task": "Dependency/framework upgrades and API migrations",
+      "default": {
+        "modelKey": "astra",
+        "effort": "xhigh"
+      },
+      "escalation": {
+        "modelKey": "fable",
+        "effort": "xhigh"
+      },
+      "execution": "worker",
+      "external": false,
+      "requirements": [],
+      "stakes": "high",
+      "handoff": "Provide current/target versions, official migration docs, removed APIs and compatibility policy. Inventory consumers and stage reversible changes.",
+      "acceptance": "Clean install, build, representative end-to-end flows and rollback/compatibility tests.",
+      "confidence": "moderate",
+      "evidence": "Relevant refactoring evidence and Fusion migration study; exact newest-version upgrade success/ROI not established.",
+      "equationProfile": null,
+      "sources": [
+        "https://labs.scale.com/leaderboard/sweatlas-refactoring",
+        "https://cognition.com/blog/local-fusion"
+      ]
+    },
+    {
+      "id": "language_migration",
+      "task": "Module-level C/C++ to Rust or cross-language translation",
+      "default": {
+        "modelKey": "astra",
+        "effort": "xhigh"
+      },
+      "escalation": {
+        "modelKey": "fable",
+        "effort": "xhigh"
+      },
+      "execution": "worker",
+      "external": false,
+      "requirements": [],
+      "stakes": "high",
+      "handoff": "Specify ABI, ownership, threading, serialization and unsafe-code policy. Preserve semantics before optimizing; isolate unavoidable unsafe boundaries with invariants.",
+      "acceptance": "Differential/property tests, sanitizer runs, ABI checks and explicit unsafe review.",
+      "confidence": "low",
+      "evidence": "Current strong refactoring prior for a bounded component; CRUST/Multi-SWE evidence does not establish this model as the migration winner. Use the separate whole-repository stack migration role for a complete language or framework replacement.",
+      "equationProfile": null,
+      "sources": [
+        "https://labs.scale.com/leaderboard/sweatlas-refactoring",
+        "https://github.com/anirudhkhatry/CRUST-bench"
+      ]
+    },
+    {
+      "id": "inline_completion",
+      "task": "Editor fill-in-the-middle autocomplete",
+      "default": {
+        "modelKey": "mercury_edit",
+        "effort": "not_applicable"
+      },
+      "escalation": {
+        "modelKey": "luna",
+        "effort": "high"
+      },
+      "execution": "bounded",
+      "external": false,
+      "requirements": [],
+      "stakes": "low",
+      "handoff": "Send prefix, suffix, language and current file version through the FIM endpoint. Keep output bounded to the insertion; reject stale suggestions.",
+      "acceptance": "Accepted-edit rate, syntactic validity, suggestion latency and subsequent revert rate.",
+      "confidence": "moderate",
+      "evidence": "Dedicated FIM endpoint and provider comparison of edit/completion tasks; independent current quality/cost validation is limited.",
+      "equationProfile": null,
+      "sources": [
+        "https://www.inceptionlabs.ai/blog/introducing-mercury-edit-2"
+      ]
+    },
+    {
+      "id": "next_edit",
+      "task": "Predict the next small editor change",
+      "default": {
+        "modelKey": "mercury_edit",
+        "effort": "not_applicable"
+      },
+      "escalation": {
+        "modelKey": "luna",
+        "effort": "high"
+      },
+      "execution": "bounded",
+      "external": false,
+      "requirements": [],
+      "stakes": "low",
+      "handoff": "Send 3–5 current snippets, 3–5 chronological edits, cursor and a 10–15-line editable region. Use the documented edit endpoint and replacement-region parser.",
+      "acceptance": "Source-version match, bounded diff, user acceptance and persistent correctness after later edits.",
+      "confidence": "moderate",
+      "evidence": "Dedicated next-edit model uses recent edit history. Provider benchmark combines heterogeneous scores; no universal rank claim.",
+      "equationProfile": null,
+      "sources": [
+        "https://www.inceptionlabs.ai/blog/introducing-mercury-edit-2"
+      ]
+    },
+    {
+      "id": "regression_tests",
+      "task": "Routine unit and regression test implementation",
+      "default": {
+        "modelKey": "gemini",
+        "effort": "high"
+      },
+      "escalation": {
+        "modelKey": "fable",
+        "effort": "xhigh"
+      },
+      "execution": "worker",
+      "external": false,
+      "requirements": [],
+      "stakes": "medium",
+      "handoff": "Provide intended behavior, existing test conventions and bug reproduction. Demand assertions that fail on the broken behavior, including relevant edge cases.",
+      "acceptance": "Run tests against both broken and fixed variants where available; use mutants for assertion discrimination.",
+      "confidence": "moderate",
+      "evidence": "SWE-Atlas test-writing gives Gemini a useful quality signal; the table does not expose an exact effort/cost for that row, so high is proposed.",
+      "equationProfile": null,
+      "sources": [
+        "https://labs.scale.com/leaderboard/sweatlas-tw"
+      ]
+    },
+    {
+      "id": "acceptance_tests",
+      "task": "High-stakes test design and independent acceptance coverage",
+      "default": {
+        "modelKey": "fable",
+        "effort": "xhigh"
+      },
+      "escalation": {
+        "modelKey": "opus",
+        "effort": "xhigh"
+      },
+      "execution": "worker",
+      "external": false,
+      "requirements": [],
+      "stakes": "high",
+      "handoff": "Design tests from requirements before seeing the worker rationale. Cover invariants, error paths, state transitions and adversarial cases; identify what remains untested.",
+      "acceptance": "Demonstrated failure on meaningful mutants/regressions and pass on correct implementation; independently inspect security-sensitive assertions.",
+      "confidence": "moderate",
+      "evidence": "Fable5.1 xhigh leads SWE-Atlas test writing at 67.04%; framework includes test correctness and mutant discrimination.",
+      "equationProfile": null,
+      "sources": [
+        "https://labs.scale.com/leaderboard/sweatlas-tw"
+      ]
+    },
+    {
+      "id": "flaky_tests",
+      "task": "Diagnose flaky tests and nondeterministic failures",
+      "default": {
+        "modelKey": "astra",
+        "effort": "high"
+      },
+      "escalation": {
+        "modelKey": "astra",
+        "effort": "xhigh"
+      },
+      "execution": "worker",
+      "external": false,
+      "requirements": [],
+      "stakes": "medium",
+      "handoff": "Supply repeat logs, seeds, timing, environment diffs and isolation boundaries. Separate race, dependency, clock and infrastructure hypotheses; change one factor at a time.",
+      "acceptance": "Repeated reproduction and disappearance under controlled conditions; report confidence and remaining nondeterminism.",
+      "confidence": "low",
+      "evidence": "Terminal/system strength is relevant; no direct current-model flaky-test ROI comparison found.",
+      "equationProfile": null,
+      "sources": [
+        "https://www.tbench.ai/leaderboard/terminal-bench/4.0"
+      ]
+    },
+    {
+      "id": "error_triage",
+      "task": "Initial stack-trace and CI failure triage",
+      "default": {
+        "modelKey": "glm",
+        "effort": "max"
+      },
+      "escalation": {
+        "modelKey": "astra",
+        "effort": "high"
+      },
+      "execution": "read",
+      "external": false,
+      "requirements": [],
+      "stakes": "medium",
+      "handoff": "Return the first causal error with exact raw evidence, affected component and two testable hypotheses. Keep logs accessible; label speculation and stop after a bounded investigation.",
+      "acceptance": "Controller checks the cited error and confirms the proposed discriminating command before broader work.",
+      "confidence": "low",
+      "evidence": "Cheap bounded diagnosis prior. Do not let a weak scout’s confident hypothesis anchor the stronger investigator.",
+      "equationProfile": null,
+      "sources": [
+        "https://deepswe.datacurve.ai/",
+        "https://cognition.com/blog/local-fusion"
+      ]
+    },
+    {
+      "id": "terminal_systems",
+      "task": "Difficult build, terminal and environment repair",
+      "default": {
+        "modelKey": "astra",
+        "effort": "high"
+      },
+      "escalation": {
+        "modelKey": "astra",
+        "effort": "xhigh"
+      },
+      "execution": "worker",
+      "external": false,
+      "requirements": [],
+      "stakes": "high",
+      "handoff": "Give exact environment, artifact target, commands/errors already observed and resource limits. Allow autonomous diagnosis, but require a working artifact and reproducible instructions.",
+      "acceptance": "Actual clean build/run and behavioral checks; classify provider/environment failure separately while retaining its cost.",
+      "confidence": "moderate",
+      "evidence": "Official TB4 native-agent high 57.88% versus max 58.18%, with about 30.5% lower published cost. Fixed AA harness instead favors xhigh.",
+      "equationProfile": "terminal_systems_native",
+      "sources": [
+        "https://www.tbench.ai/leaderboard/terminal-bench/4.0",
+        "https://artificialanalysis.ai/agents/coding-agents"
+      ]
+    },
+    {
+      "id": "kubernetes_incident",
+      "task": "Kubernetes incident/root-cause investigation",
+      "default": {
+        "modelKey": "sol",
+        "effort": "max"
+      },
+      "escalation": {
+        "modelKey": "astra",
+        "effort": "high"
+      },
+      "execution": "read",
+      "external": false,
+      "requirements": [],
+      "stakes": "high",
+      "handoff": "Provide topology, time range, deployment changes, traces/metrics/logs and read-only tools. Seek the minimal causal set and evidence that distinguishes competing causes.",
+      "acceptance": "Correct affected component and causal explanation; remediation is a separate task with its own change authorization.",
+      "confidence": "moderate",
+      "evidence": "Sol max leads the reviewed ITBench-AA table at 56.21%; newest Astra/Fable are absent from that comparison.",
+      "equationProfile": null,
+      "sources": [
+        "https://artificialanalysis.ai/models/gpt-5-6-sol",
+        "https://github.com/IBM/ITBench"
+      ]
+    },
+    {
+      "id": "infrastructure_code",
+      "task": "Infrastructure as code, deployment config and CI repair",
+      "default": {
+        "modelKey": "gemini",
+        "effort": "high"
+      },
+      "escalation": {
+        "modelKey": "astra",
+        "effort": "high"
+      },
+      "execution": "worker",
+      "external": false,
+      "requirements": [],
+      "stakes": "high",
+      "handoff": "Specify environment, desired resources, state ownership, secrets references and rollback constraints. Work against a disposable plan/state snapshot and surface destructive actions.",
+      "acceptance": "Provider plan/schema checks, least-change diff and staging behavior; the controller separately owns deployment acceptance.",
+      "confidence": "low",
+      "evidence": "Repository implementation transfer; current task-specific deployment correctness/ROI is not measured.",
+      "equationProfile": null,
+      "sources": [
+        "https://deepswe.datacurve.ai/",
+        "https://github.com/ucsb-mlsec/DevOps-Gym"
+      ]
+    },
+    {
+      "id": "release_engineering",
+      "task": "Release checks, compatibility and rollback planning",
+      "default": {
+        "modelKey": "astra",
+        "effort": "high"
+      },
+      "escalation": {
+        "modelKey": "fable",
+        "effort": "xhigh"
+      },
+      "execution": "worker",
+      "external": false,
+      "requirements": [],
+      "stakes": "high",
+      "handoff": "Supply release scope, dependency graph, deployment order, compatibility window and rollback triggers. Produce executable checks and explicit stop conditions.",
+      "acceptance": "Fresh build, migration/rollback rehearsal, version/asset consistency and observed post-release criteria.",
+      "confidence": "low",
+      "evidence": "Strong systems prior; release safety is not established by generic coding score.",
+      "equationProfile": null,
+      "sources": [
+        "https://www.tbench.ai/leaderboard/terminal-bench/4.0"
+      ]
+    },
+    {
+      "id": "simple_sql",
+      "task": "Bounded read-only SQL and query repair",
+      "default": {
+        "modelKey": "glm",
+        "effort": "max"
+      },
+      "escalation": {
+        "modelKey": "gemini",
+        "effort": "high"
+      },
+      "execution": "worker",
+      "external": false,
+      "requirements": [],
+      "stakes": "medium",
+      "handoff": "Provide dialect, schema, keys, business definitions and representative rows. Resolve joins, null handling, time zones and aggregation grain before drafting SQL.",
+      "acceptance": "Execute against known-answer fixtures, adversarial null/duplicate cases and a read-only database copy.",
+      "confidence": "low",
+      "evidence": "Low-cost code-generation prior. BIRD/LiveSQL current tables do not contain a matched September pool for this choice.",
+      "equationProfile": null,
+      "sources": [
+        "https://livesqlbench.ai/",
+        "https://deepswe.datacurve.ai/"
+      ]
+    },
+    {
+      "id": "complex_sql",
+      "task": "Complex SQL, large schemas and analytical business rules",
+      "default": {
+        "modelKey": "gemini",
+        "effort": "high"
+      },
+      "escalation": {
+        "modelKey": "astra",
+        "effort": "xhigh"
+      },
+      "execution": "worker",
+      "external": false,
+      "requirements": [],
+      "stakes": "high",
+      "handoff": "Supply authoritative business rules with version dates, schema and intended result grain. Inspect data in a sandbox; make intermediate checks and reconcile totals.",
+      "acceptance": "Known-answer and perturbation tests, business-rule review, row-level reconciliation and query-plan resource bounds.",
+      "confidence": "low",
+      "evidence": "New-model transfer from strong repository reasoning; LiveSQL evidence is mostly older models and differing harnesses, so no validated current ROI winner.",
+      "equationProfile": null,
+      "sources": [
+        "https://livesqlbench.ai/",
+        "https://deepswe.datacurve.ai/"
+      ]
+    },
+    {
+      "id": "dbt_analytics",
+      "task": "dbt/analytics engineering and data pipeline repair",
+      "default": {
+        "modelKey": "gemini",
+        "effort": "high"
+      },
+      "escalation": {
+        "modelKey": "astra",
+        "effort": "xhigh"
+      },
+      "execution": "worker",
+      "external": false,
+      "requirements": [],
+      "stakes": "high",
+      "handoff": "Provide source/target models, lineage, freshness, materialization and contract requirements. Identify where records are lost, duplicated or mis-keyed.",
+      "acceptance": "dbt tests, source-target reconciliation, null/uniqueness checks and representative incremental reruns.",
+      "confidence": "low",
+      "evidence": "Repository repair transfer; ADE-bench is a useful evaluation target but does not rank the complete latest model pool.",
+      "equationProfile": null,
+      "sources": [
+        "https://deepswe.datacurve.ai/",
+        "https://github.com/dbt-labs/ade-bench"
+      ]
+    },
+    {
+      "id": "database_migration",
+      "task": "Database schema migration and data preservation",
+      "default": {
+        "modelKey": "astra",
+        "effort": "xhigh"
+      },
+      "escalation": {
+        "modelKey": "fable",
+        "effort": "xhigh"
+      },
+      "execution": "worker",
+      "external": false,
+      "requirements": [],
+      "stakes": "high",
+      "handoff": "Specify table scale, locks, online constraints, old/new application versions and rollback needs. Include backfill, dual-read/write and invariant checks where needed.",
+      "acceptance": "Disposable database rehearsal, conservation/reconciliation checks and compatibility during each migration phase.",
+      "confidence": "low",
+      "evidence": "Consequential systems/refactoring prior; SQL benchmark query success cannot prove safe migrations.",
+      "equationProfile": null,
+      "sources": [
+        "https://labs.scale.com/leaderboard/sweatlas-refactoring",
+        "https://livesqlbench.ai/"
+      ]
+    },
+    {
+      "id": "data_notebooks",
+      "task": "Data cleaning, analysis notebooks and exploratory plots",
+      "default": {
+        "modelKey": "luna",
+        "effort": "max"
+      },
+      "escalation": {
+        "modelKey": "gemini",
+        "effort": "high"
+      },
+      "execution": "worker",
+      "external": false,
+      "requirements": [],
+      "stakes": "medium",
+      "handoff": "Provide data schema, analytical question, units and valid ranges. Inspect missingness and leakage, then produce reproducible code and explicit data assumptions.",
+      "acceptance": "Recomputed totals, held-out checks, clean-kernel execution and consistency between chart and source data.",
+      "confidence": "low",
+      "evidence": "Cheap numerical/code first-attempt prior; SciCode is not an end-to-end data-analysis productivity benchmark.",
+      "equationProfile": null,
+      "sources": [
+        "https://artificialanalysis.ai/models/gpt-5-6-luna"
+      ]
+    },
+    {
+      "id": "frontend_prototype",
+      "task": "Frontend layout and interactive prototypes",
+      "default": {
+        "modelKey": "qwen_next",
+        "effort": "xhigh"
+      },
+      "escalation": {
+        "modelKey": "astra",
+        "effort": "max"
+      },
+      "execution": "worker",
+      "external": false,
+      "requirements": [],
+      "stakes": "medium",
+      "handoff": "Supply complete user flows, design references, target viewports and real data states. Let it implement, then inspect the running UI and fix actual visual/interaction defects.",
+      "acceptance": "Rendered viewport inspection plus working navigation/forms, accessibility basics and functional tests.",
+      "confidence": "moderate",
+      "evidence": "Arena WebDev Qwen3.8-Flash-Next scores 1635 preliminary at low token price; exact Next API is commercially offered. Native default xhigh is verified; Arena effort itself is unstated.",
+      "equationProfile": null,
+      "sources": [
+        "https://arena.ai/leaderboard/code/webdev",
+        "https://vercel.com/ai-gateway/models/qwen3.8-flash-next"
+      ]
+    },
+    {
+      "id": "frontend_polish",
+      "task": "Consequential visual design and final UI polish",
+      "default": {
+        "modelKey": "astra",
+        "effort": "max"
+      },
+      "escalation": {
+        "modelKey": "fable",
+        "effort": "max"
+      },
+      "execution": "worker",
+      "external": false,
+      "requirements": [],
+      "stakes": "high",
+      "handoff": "Provide screenshots, working app, design intent and specific usability defects. Preserve working flows; inspect results at target sizes before declaring completion.",
+      "acceptance": "Side-by-side visual QA, keyboard/accessibility checks and unchanged functional acceptance flows.",
+      "confidence": "moderate",
+      "evidence": "Astra max leads current WebDev preference at 1800 versus Fable5.1 max 1758. This is preference evidence, not measured functional success or task ROI.",
+      "equationProfile": null,
+      "sources": [
+        "https://arena.ai/leaderboard/code/webdev"
+      ]
+    },
+    {
+      "id": "frontend_bug",
+      "task": "Frontend state, forms and interaction bug fixes",
+      "default": {
+        "modelKey": "gemini",
+        "effort": "high"
+      },
+      "escalation": {
+        "modelKey": "astra",
+        "effort": "xhigh"
+      },
+      "execution": "worker",
+      "external": false,
+      "requirements": [],
+      "stakes": "medium",
+      "handoff": "Provide exact reproduction, expected state transitions, network behavior and viewport. Fix the causal state/interaction issue and demonstrate the flow.",
+      "acceptance": "Browser reproduction before/after, console/network checks and targeted interaction tests.",
+      "confidence": "moderate",
+      "evidence": "Repository feature/repair evidence is more relevant than style preference alone; frontend transfer needs local validation.",
+      "equationProfile": null,
+      "sources": [
+        "https://deepswe.datacurve.ai/"
+      ]
+    },
+    {
+      "id": "accessibility",
+      "task": "Accessibility remediation and keyboard interaction",
+      "default": {
+        "modelKey": "gemini",
+        "effort": "high"
+      },
+      "escalation": {
+        "modelKey": "astra",
+        "effort": "xhigh"
+      },
+      "execution": "worker",
+      "external": false,
+      "requirements": [],
+      "stakes": "high",
+      "handoff": "Provide failing audits and the affected interaction. Fix semantics, focus order, labels and contrast using current standards; verify with actual keyboard and accessibility tooling.",
+      "acceptance": "Automated rules plus keyboard/screen-reader-relevant manual checks; do not equate a zero automated-error count with complete accessibility.",
+      "confidence": "low",
+      "evidence": "Proposed implementation specialist; visual preference scores do not establish accessibility compliance.",
+      "equationProfile": null,
+      "sources": [
+        "https://deepswe.datacurve.ai/",
+        "https://arena.ai/leaderboard/code/webdev"
+      ]
+    },
+    {
+      "id": "browser_tests",
+      "task": "Playwright/browser end-to-end test implementation",
+      "default": {
+        "modelKey": "gemini",
+        "effort": "high"
+      },
+      "escalation": {
+        "modelKey": "fable",
+        "effort": "xhigh"
+      },
+      "execution": "worker",
+      "external": false,
+      "requirements": [],
+      "stakes": "medium",
+      "handoff": "Specify user-visible outcomes, stable selectors, test data and environment lifecycle. Avoid brittle sleeps; make failure evidence observable.",
+      "acceptance": "Run against actual app, prove relevant failure detection and check rerun stability.",
+      "confidence": "low",
+      "evidence": "General test-writing and implementation transfer; no matched current browser-test ROI table.",
+      "equationProfile": null,
+      "sources": [
+        "https://labs.scale.com/leaderboard/sweatlas-tw",
+        "https://deepswe.datacurve.ai/"
+      ]
+    },
+    {
+      "id": "scientific_first",
+      "task": "Scientific/numerical code with a strong verifier: first attempt",
+      "default": {
+        "modelKey": "luna",
+        "effort": "max"
+      },
+      "escalation": {
+        "modelKey": "muse",
+        "effort": "xhigh"
+      },
+      "execution": "worker",
+      "external": false,
+      "requirements": [],
+      "stakes": "medium",
+      "handoff": "Supply equations, definitions, units, boundary conditions and tolerances. Require independent numerical checks, not merely reproduction of one output.",
+      "acceptance": "Analytical cases, conservation identities, randomized differential checks and declared precision.",
+      "confidence": "moderate",
+      "evidence": "AA SciCode subproblems: Luna max 53.59%, modeled $.0093 each. This is subproblem ROI, not completed research-project ROI.",
+      "equationProfile": "scientific_code_first_attempt",
+      "sources": [
+        "https://artificialanalysis.ai/models/gpt-5-6-luna"
+      ]
+    },
+    {
+      "id": "scientific_specialist",
+      "task": "Hard numerical subproblems and mathematical function implementation",
+      "default": {
+        "modelKey": "muse",
+        "effort": "xhigh"
+      },
+      "escalation": {
+        "modelKey": "fable",
+        "effort": "xhigh"
+      },
+      "execution": "worker",
+      "external": false,
+      "requirements": [],
+      "stakes": "high",
+      "handoff": "Give the scientific specification and allowed approximations. Permit independent derivation; request assumptions, conditioning and correctness evidence before optimization.",
+      "acceptance": "Independent reference calculations and stress cases; inspect numerical stability and scientific interpretation.",
+      "confidence": "moderate",
+      "evidence": "AA SciCode Muse1.3 xhigh 59.72% at $.0372 per subproblem lies on the reviewed quality/cost frontier. Gateway effort equivalence needs Devin validation.",
+      "equationProfile": "scientific_code_stronger_attempt",
+      "sources": [
+        "https://artificialanalysis.ai/models/muse-spark-1-3-xhigh",
+        "https://vercel.com/ai-gateway/models/muse-spark-1.3"
+      ]
+    },
+    {
+      "id": "scientific_repository_repair",
+      "task": "Scientific repository repair and cross-module scientific integration",
+      "default": {
+        "modelKey": "astra",
+        "effort": "max"
+      },
+      "escalation": {
+        "modelKey": "opus",
+        "effort": "max"
+      },
+      "execution": "worker",
+      "external": false,
+      "requirements": [],
+      "stakes": "high",
+      "handoff": "Supply the scientific contract, units, invariant, repository snapshot and reproducible discrepancy. Separate necessary scientific definitions from a suggested diagnosis. Permit independent hypothesis testing and follow the invariant through every affected module; do not prescribe a patch location. Give Astra max the scientific contract and observed discrepancy, with room to discover the cause. Label supporting domain material separately from a proposed diagnosis: poorly grounded guidance can anchor a repair. Require independent numerical and cross-module validation before accepting it.",
+      "acceptance": "Rebuild the submitted patch on a clean baseline. Check alternative numerical regimes, equivalent representations, boundary cases and regression behavior with verifier data outside the worker context. The public96-task default cannot reproduce the119-task leaderboard.",
+      "confidence": "moderate",
+      "evidence": "SWE-bench Science September11 results: Astra max/Codex50.42% exact private-test success versus Opus5max/ClaudeCode47.90% on119tasks. This supports a quality reference, not demonstrated ROI or a statistically separated model-only winner. Token totals lack a complete bill. Opus max is a useful independent escalation, especially for scientific root-cause exploration.",
+      "equationProfile": "scientific_repository_quality_reference",
+      "sources": [
+        "https://swescience.github.io/",
+        "https://github.com/OpenMOSS/SWE-bench-Science",
+        "https://arxiv.org/abs/2608.19799v2"
+      ]
+    },
+    {
+      "id": "cpu_performance",
+      "task": "CPU algorithm and application performance optimization",
+      "default": {
+        "modelKey": "astra",
+        "effort": "xhigh"
+      },
+      "escalation": {
+        "modelKey": "fable",
+        "effort": "xhigh"
+      },
+      "execution": "worker",
+      "external": false,
+      "requirements": [],
+      "stakes": "medium",
+      "handoff": "Supply profile, workload distribution, baseline, allowed memory budget and correctness invariants. Optimize measured bottlenecks; keep benchmark and test code outside editable scope.",
+      "acceptance": "Distribution-wide correctness, randomized differential tests and repeated wall-clock measurements on matched hardware.",
+      "confidence": "low",
+      "evidence": "Strong difficult-code prior; AlgoTune/GSO establish useful correctness-plus-speed evaluation but not a matched latest API ROI winner.",
+      "equationProfile": null,
+      "sources": [
+        "https://labs.scale.com/leaderboard/sweatlas-refactoring",
+        "https://github.com/ScalingIntelligence/AlgoTune"
+      ]
+    },
+    {
+      "id": "gpu_prototype",
+      "task": "GPU/Triton/CUDA kernel prototype",
+      "default": {
+        "modelKey": "deepseek",
+        "effort": "max"
+      },
+      "escalation": {
+        "modelKey": "fable",
+        "effort": "max"
+      },
+      "execution": "worker",
+      "external": false,
+      "requirements": [
+        "gpu"
+      ],
+      "stakes": "medium",
+      "handoff": "Specify shapes, dtypes, precision, device and permitted operations. Keep reference and checks inaccessible for editing. Treat correctness as a prerequisite to any speed claim.",
+      "acceptance": "Mutated inputs, multiple seeds/shapes/dtypes, strict numerical bounds, state-reset tests and anti-cheating checks before timing.",
+      "confidence": "moderate",
+      "evidence": "V4.1 Flash has strong custom-deck gate results; one accepted Mega cell has a documented semantic error within tolerance. Prototype-only assignment until strict verification.",
+      "equationProfile": null,
+      "sources": [
+        "https://kernelbench.com/models/deepseek-flash"
+      ]
+    },
+    {
+      "id": "gpu_final",
+      "task": "High-value GPU kernel optimization and final implementation",
+      "default": {
+        "modelKey": "fable",
+        "effort": "max"
+      },
+      "escalation": {
+        "modelKey": "astra",
+        "effort": "xhigh"
+      },
+      "execution": "worker",
+      "external": false,
+      "requirements": [
+        "gpu"
+      ],
+      "stakes": "high",
+      "handoff": "Provide a trusted performance harness, target GPU, strict numerical contract and end-to-end workload. Require reasoning about persistent state, memory safety and timing methodology.",
+      "acceptance": "Independent regrade on new inputs, sanitizer/race checks where supported, stable timing and application-level equivalence.",
+      "confidence": "moderate",
+      "evidence": "Fable5.1 max has strong audited speed on five custom cells with substantial model cost; incomplete coverage and GPU bills prevent universal ROI claims.",
+      "equationProfile": null,
+      "sources": [
+        "https://kernelbench.com/models/claude-fable-5-1"
+      ]
+    },
+    {
+      "id": "security_reproduction",
+      "task": "Authorized vulnerability reproduction and exploit regression",
+      "default": {
+        "modelKey": "deepseek",
+        "effort": "max"
+      },
+      "escalation": {
+        "modelKey": "kimi",
+        "effort": "max"
+      },
+      "execution": "worker",
+      "external": false,
+      "requirements": [],
+      "stakes": "high",
+      "handoff": "Provide permitted sandbox, vulnerable/fixed builds, threat preconditions and success condition. Return the smallest reproducible proof with exact environment and differential behavior.",
+      "acceptance": "Independent vulnerable/fixed differential replay; distinguish actual exploit from crash, false alarm and environment failure.",
+      "confidence": "moderate",
+      "evidence": "Provider reports V4.1 Flash CyberGym 88.1 and SEC-bench-Pro 62.8 at max; current independent replication is missing. These test reproduction, not safe patch writing.",
+      "equationProfile": null,
+      "sources": [
+        "https://huggingface.co/deepseek-ai/DeepSeek-V4.1-Flash"
+      ]
+    },
+    {
+      "id": "secure_implementation",
+      "task": "Secure code generation and vulnerability remediation",
+      "default": {
+        "modelKey": "fable",
+        "effort": "high"
+      },
+      "escalation": {
+        "modelKey": "astra",
+        "effort": "high"
+      },
+      "execution": "worker",
+      "external": false,
+      "requirements": [],
+      "stakes": "high",
+      "handoff": "Give threat model, trust boundaries, invariants and adversarial requirements. Fix the cause while preserving functionality; inspect alternate entry points and related patterns.",
+      "acceptance": "Functional tests plus exploit regression, independent security review and relevant static/dynamic analysis; no self-certification.",
+      "confidence": "moderate",
+      "evidence": "Endor current secure-code result favors Fable5.1; exact source effort is unstated, so high is a proposed economical starting setting. Absolute secure success remains low.",
+      "equationProfile": null,
+      "sources": [
+        "https://www.endorlabs.com/research/ai-code-security-benchmark"
+      ]
+    },
+    {
+      "id": "security_review",
+      "task": "Independent security patch review and authorization logic audit",
+      "default": {
+        "modelKey": "astra",
+        "effort": "high"
+      },
+      "escalation": {
+        "modelKey": "fable",
+        "effort": "xhigh"
+      },
+      "execution": "review",
+      "external": false,
+      "requirements": [],
+      "stakes": "high",
+      "handoff": "Inspect requirements, threat model and diff independently before reading the author rationale. For each finding provide reachable path, violated invariant and concrete evidence; report coverage gaps.",
+      "acceptance": "Reproduce feasible findings or prove the invariant violation; reject unsupported severity claims and recheck fixed behavior.",
+      "confidence": "moderate",
+      "evidence": "Complementary current secure-code evidence. Cross-model review benefit and high-effort optimality are proposed, not measured.",
+      "equationProfile": null,
+      "sources": [
+        "https://www.endorlabs.com/research/ai-code-security-benchmark"
+      ]
+    },
+    {
+      "id": "dependency_exploitability",
+      "task": "Dependency-alert reachability and exploitability assessment",
+      "default": {
+        "modelKey": "opus",
+        "effort": "high"
+      },
+      "escalation": {
+        "modelKey": "astra",
+        "effort": "xhigh"
+      },
+      "execution": "read",
+      "external": false,
+      "requirements": [],
+      "stakes": "high",
+      "handoff": "Provide resolved dependency versions, the advisory, relevant deployment configuration and trust boundaries. Trace upstream vulnerable behavior into downstream reachable call paths; separate code absence, unreachable paths and configuration/environment assumptions. Return evidence and unresolved uncertainty, not a blanket safe label. Give Opus high resolved dependency versions, downstream call sites and real deployment assumptions. Require an affected/not-affected argument tied to observable reachability and configuration. Preserve uncertainty; a concise confident label cannot close an alert.",
+      "acceptance": "Independently verify relevant call paths and deployment assumptions. A not-affected recommendation cannot automatically close an alert without its evidence and applicable configuration being reviewed.",
+      "confidence": "low",
+      "evidence": "VEX-Bench shows that affected-class recall, exact justification and overall accuracy differ. Its older Opus4.6 high has strong recall; no current Opus5 result exists. Opus5 high is a proposed careful triage lead, not a measured VEX winner. Old V4Flash weakness must not be transferred numerically to4.1.",
+      "equationProfile": null,
+      "sources": [
+        "https://arxiv.org/html/2609.08040v1"
+      ]
+    },
+    {
+      "id": "cheap_code_review",
+      "task": "Inexpensive first-pass review finding generation",
+      "default": {
+        "modelKey": "glm",
+        "effort": "max"
+      },
+      "escalation": {
+        "modelKey": "astra",
+        "effort": "high"
+      },
+      "execution": "review",
+      "external": false,
+      "requirements": [],
+      "stakes": "medium",
+      "handoff": "Review the actual diff with relevant surrounding code. Return only actionable findings with triggering input, file/line and consequence; keep uncertainty explicit.",
+      "acceptance": "Independent reviewer reproduces/corroborates findings; track precision, recall and review minutes, not number of comments.",
+      "confidence": "moderate",
+      "evidence": "Kodus CodeReviewBench reports GLMFlash roughly $.08/PR, precision41/recall39/F1 40 on 30 PRs. Effort is not disclosed; max is proposed. F1 is not success probability.",
+      "equationProfile": null,
+      "sources": [
+        "https://codereviewbench.com/leaderboard"
+      ]
+    },
+    {
+      "id": "final_code_review",
+      "task": "Consequential correctness and integration review",
+      "default": {
+        "modelKey": "astra",
+        "effort": "high"
+      },
+      "escalation": {
+        "modelKey": "fable",
+        "effort": "xhigh"
+      },
+      "execution": "review",
+      "external": false,
+      "requirements": [],
+      "stakes": "high",
+      "handoff": "Read requirements and diff before author narrative. Trace changed consumers and edge cases. Return only substantiated defects, missing checks and unresolved release risks.",
+      "acceptance": "Tests/reproductions attached to findings, no duplicate comments, and independent acceptance checks.",
+      "confidence": "moderate",
+      "evidence": "CodeRabbit current labelled-bug coverage and broad system evidence support the shortlist; precision/cost/effort gaps prevent a validated ROI winner.",
+      "equationProfile": null,
+      "sources": [
+        "https://www.coderabbit.ai/blog/gpt-6-astra-code-review-evaluation",
+        "https://labs.scale.com/leaderboard/sweatlas-refactoring",
+        "https://www.endorlabs.com/research/ai-code-security-benchmark"
+      ]
+    },
+    {
+      "id": "technical_documentation",
+      "task": "README, API documentation and developer guides",
+      "default": {
+        "modelKey": "luna",
+        "effort": "high"
+      },
+      "escalation": {
+        "modelKey": "kimi",
+        "effort": "max"
+      },
+      "execution": "worker",
+      "external": false,
+      "requirements": [],
+      "stakes": "low",
+      "handoff": "Provide code-derived facts, runnable commands and audience. Explain the actual workflow with one minimal example, requirements and known limitations; do not invent API flags.",
+      "acceptance": "Execute documentation examples in a clean environment and check every API name against source/current docs.",
+      "confidence": "low",
+      "evidence": "Cheap bounded writing prior using verified source material; no current documentation-quality/cost winner established.",
+      "equationProfile": null,
+      "sources": [
+        "https://artificialanalysis.ai/models/gpt-5-6-luna",
+        "https://github.com/evalplus/repoqa"
+      ]
+    },
+    {
+      "id": "migration_guide",
+      "task": "Complex migration and integration documentation",
+      "default": {
+        "modelKey": "kimi",
+        "effort": "max"
+      },
+      "escalation": {
+        "modelKey": "fable",
+        "effort": "high"
+      },
+      "execution": "worker",
+      "external": false,
+      "requirements": [],
+      "stakes": "medium",
+      "handoff": "Provide old/new interfaces, known compatibility breaks and tested patches. Organize by user action; link exact code evidence and unresolved cases.",
+      "acceptance": "Follow the guide on a representative old client; verify commands and resulting behavior.",
+      "confidence": "moderate",
+      "evidence": "Repository Q&A and long-context strengths transfer to synthesizing accurate guidance; writing-specific ROI is unmeasured.",
+      "equationProfile": null,
+      "sources": [
+        "https://artificialanalysis.ai/agents/coding-agents",
+        "https://artificialanalysis.ai/evaluations/artificial-analysis-long-context-reasoning"
+      ]
+    },
+    {
+      "id": "tool_automation",
+      "task": "Stateful engineering-tool automation",
+      "default": {
+        "modelKey": "deepseek",
+        "effort": "max"
+      },
+      "escalation": {
+        "modelKey": "grok",
+        "effort": "high"
+      },
+      "execution": "worker",
+      "external": true,
+      "requirements": [
+        "connected_tools"
+      ],
+      "stakes": "medium",
+      "handoff": "Give desired final state, allowed actions, object IDs and constraints. Verify actual tool/database state after writes; keep a ledger of side effects and reversibility.",
+      "acceptance": "Final-state predicates and absence of unintended changes, plus idempotence where required.",
+      "confidence": "moderate",
+      "evidence": "V4.1 Flash leads the reviewed AA AutomationBench partial score. Partial credit and missing comparable whole-task cost do not establish dollars per success.",
+      "equationProfile": "stateful_tool_quality_reference",
+      "sources": [
+        "https://artificialanalysis.ai/models/deepseek-v4-1-flash"
+      ]
+    },
+    {
+      "id": "c_cpp_security_repair",
+      "task": "C/C++ memory-safety repair with semantic preservation",
+      "default": {
+        "modelKey": "sol",
+        "effort": "medium"
+      },
+      "escalation": {
+        "modelKey": "fable",
+        "effort": "high"
+      },
+      "execution": "worker",
+      "external": false,
+      "requirements": [],
+      "stakes": "high",
+      "handoff": "Provide the sanitizer report, vulnerable snapshot, build environment and reproduction. Require localization beyond the crash stack and preservation of valid inputs. Let the worker investigate the root cause; do not prescribe a single-function patch. Return the patch, causal explanation and validation evidence. Give Sol medium the reproduction, sanitizer report and versioned build environment. Ask it to trace the violated invariant to its origin rather than patching only the crash site. Allow edits across the necessary dependency path; verify benign behavior independently.",
+      "acceptance": "Check multiple exploit variants, benign-path sanitizer behavior, reference-passing regressions and observable output semantics. Require independent security review; missing validation stages never count as passes.",
+      "confidence": "moderate",
+      "evidence": "September PatchBench reports Sol medium with Codex at59.2% joint security/semantic pass, versus97.2% on the supplied PoC alone. This is the best published configuration in that paper, not a demonstrated ROI winner against Astra/Fable5.1/DeepSeek4.1. Costs are missing; a$5 cap is not a task bill. Manual audit still found partially unfixed accepted patches.",
+      "equationProfile": "c_cpp_security_quality_reference",
+      "sources": [
+        "https://arxiv.org/html/2609.04075v1",
+        "https://github.com/ai-sec-lab/PatchBench/tree/8dd22756cb4d29ee2cebf5e179544b963c2bcbbd"
+      ]
+    },
+    {
+      "id": "security_patch_backport",
+      "task": "Backport a known security fix across versions or forks",
+      "default": {
+        "modelKey": "sol",
+        "effort": "medium"
+      },
+      "escalation": {
+        "modelKey": "astra",
+        "effort": "xhigh"
+      },
+      "execution": "worker",
+      "external": false,
+      "requirements": [],
+      "stakes": "high",
+      "handoff": "Provide the reviewed upstream fix, source/target commits, affected symbols and supported target versions. Re-derive the security invariant in the target, trace renamed/moved dependencies and adapt the smallest complete fix. Distinguish missing context from a clean cherry-pick. Give Sol medium both versioned code states and the reviewed upstream repair intent. Require a target-side dependency and symbol map before adapting the patch. A successful textual application is not a security verdict.",
+      "acceptance": "Target-version build and regression checks, vulnerable/patched PoC differential, compatibility tests and independent review of propagated dependencies. Textual similarity to the upstream patch is insufficient.",
+      "confidence": "low",
+      "evidence": "Sol medium is a transfer from current C/C++ repair evidence. Porting Benchmark shows that source-patch structural agreement can disagree with executable remediation; no September model/effort/cost comparison establishes this backport winner.",
+      "equationProfile": null,
+      "sources": [
+        "https://arxiv.org/html/2608.17671v1",
+        "https://arxiv.org/html/2609.04075v1"
+      ]
+    },
+    {
+      "id": "mcp_complex_workflows",
+      "task": "Complex MCP workflows across repository and business tools",
+      "default": {
+        "modelKey": "kimi",
+        "effort": "max"
+      },
+      "escalation": {
+        "modelKey": "sol",
+        "effort": "max"
+      },
+      "execution": "worker",
+      "external": true,
+      "requirements": [
+        "connected_tools"
+      ],
+      "stakes": "high",
+      "handoff": "Provide desired final states, exact object IDs, permissions and immutable starting snapshots. Permit investigation across tools, preserve intermediate artifacts, and verify each consequential state change against the request.",
+      "acceptance": "Independent final-state predicates, collateral-change checks and complete side-effect ledger. Confirm tool versions and final object IDs before acceptance.",
+      "confidence": "moderate",
+      "evidence": "MCPMark Verified KimiK3max96.06% versus Solmax92.91% on127tasks. Costs are unavailable and these are single runs; this is the measured quality choice, with ROI unresolved. Do not transfer old unverified MCPMark results to this cohort.",
+      "equationProfile": "mcp_tool_quality_reference",
+      "sources": [
+        "https://mcpmark.ai/leaderboard/verified"
+      ]
+    },
+    {
+      "id": "browser_operation",
+      "task": "Complex browser operation for engineering workflows",
+      "default": {
+        "modelKey": "astra",
+        "effort": "medium"
+      },
+      "escalation": {
+        "modelKey": "astra",
+        "effort": "high"
+      },
+      "execution": "worker",
+      "external": true,
+      "requirements": [
+        "browser"
+      ],
+      "stakes": "medium",
+      "handoff": "Provide target task and allowed actions. Read the current page state before acting, retain screenshots/DOM evidence, and verify the intended final state.",
+      "acceptance": "Independent final-state checks and action log; handle dialogs and unexpected navigation explicitly.",
+      "confidence": "moderate",
+      "evidence": "Browser Use V2 current60-task figure reports Astra medium77.3% weighted rubric completion, well above the plotted alternatives. This is partial completion, not77.3% fully solved tasks; exact current per-task outputs/costs were not public in the reviewed tree. Gemini3.8 and Fable5.1 are absent. Higher-effort escalation is a hypothesis.",
+      "equationProfile": null,
+      "sources": [
+        "https://github.com/browser-use/benchmark/tree/421390ea7fa4708f3d89d7695f9a16debb861daf"
+      ]
+    },
+    {
+      "id": "browser_read_first_attempt",
+      "task": "Bounded read-only browser lookup: cheap first attempt",
+      "default": {
+        "modelKey": "luna",
+        "effort": "high"
+      },
+      "escalation": {
+        "modelKey": "astra",
+        "effort": "medium"
+      },
+      "execution": "read",
+      "external": true,
+      "requirements": [
+        "browser"
+      ],
+      "stakes": "low",
+      "handoff": "Give one concrete lookup, allowed domains and exact fields. Read current page state, retain source passages, and return missing facts rather than expanding into an open-ended browsing project.",
+      "acceptance": "Check every returned field against the visible source, preserve URL/time and escalate missing or conflicting evidence.",
+      "confidence": "low",
+      "evidence": "Browser Use V2 plots Luna high around41% weighted rubric completion at about$.36 per task. This is a promising cheap first pass, not measured success on this narrower read-only role; authoritative extraction and escalation are required.",
+      "equationProfile": null,
+      "sources": [
+        "https://github.com/browser-use/benchmark/tree/421390ea7fa4708f3d89d7695f9a16debb861daf"
+      ]
+    },
+    {
+      "id": "desktop_operation",
+      "task": "Desktop GUI workflows and application verification",
+      "default": {
+        "modelKey": "astra",
+        "effort": "high"
+      },
+      "escalation": {
+        "modelKey": "astra",
+        "effort": "xhigh"
+      },
+      "execution": "worker",
+      "external": true,
+      "requirements": [
+        "desktop"
+      ],
+      "stakes": "medium",
+      "handoff": "State the goal, app, input artifacts and permitted actions. Observe before acting; prefer structured app controls and verify the saved artifact or final state.",
+      "acceptance": "Artifact/content validation plus observable UI state; do not equate successful clicks with task completion.",
+      "confidence": "low",
+      "evidence": "Strong current system/computer-use prior. OSWorld ranks agent systems with varying step limits; it does not provide a directly comparable September ROI winner.",
+      "equationProfile": null,
+      "sources": [
+        "https://www.tbench.ai/leaderboard/terminal-bench/4.0",
+        "https://osworld-v1.xlang.ai/"
+      ]
+    },
+    {
+      "id": "whole_repository_stack_migration",
+      "task": "Whole-repository language, framework, platform or build-stack migration",
+      "default": {
+        "modelKey": "opus",
+        "effort": "xhigh"
+      },
+      "escalation": {
+        "modelKey": "astra",
+        "effort": "max"
+      },
+      "execution": "worker",
+      "external": false,
+      "requirements": [],
+      "stakes": "high",
+      "handoff": "Provide the original working system, exact target stack, migration intent and observable interfaces. Require removal of the old implementation from the build closure, then preserve behavior. Give the worker ownership of architecture within those constraints; distinguish necessary redesign from a wrapper around the old stack.",
+      "acceptance": "Independently audit that the migration actually happened, rebuild from submitted source, run all reference-passing behavioral checks, then generate differential counterexamples. Passing the old tests alone is insufficient; record verification cost and remaining untested interfaces.",
+      "confidence": "moderate",
+      "evidence": "SWE Refactor Bench directly favors Opus 5 xhigh: 5/20 fully accepted migrations, versus Sol max 4/20; mean developer API costs $74.9 versus $143.5. The 47/100 composite is not a success probability. Astra/Fable 5.1 are absent and six-agent verification cost is missing. This narrow role differs from localized refactoring.",
+      "equationProfile": null,
+      "sources": [
+        "https://arxiv.org/html/2608.23564v1"
+      ]
+    }
+  ]
+}

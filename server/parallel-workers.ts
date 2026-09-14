@@ -56,6 +56,9 @@ export class ParallelWorkers {
   }
   async complete(key:string,success:boolean,actorSessionId?:string,invocationId?:string):Promise<Outcome> {
     this.arrive(key,{success,actorSessionId,invocationId});
+    // A stopped worker has no candidate to integrate. Its cancellation can
+    // settle immediately without waiting for unrelated workers to finish.
+    if(!success)return {accepted:false,changes:[],note:`Isolated changes were not integrated. Isolated workspace retained: ${this.workspaces.get(key)!.workspace}`};
     await this.ready;return this.outcomes.get(key)!;
   }
   abandon(key:string):void {this.arrive(key,{success:false});}

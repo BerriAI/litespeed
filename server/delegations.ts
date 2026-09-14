@@ -27,6 +27,8 @@ export interface CreateDelegation {
   role?: DelegationSummary['role'];
   isolated?: boolean;
   contextKey?: string;
+  litefusion?: DelegationSummary['litefusion'];
+  reasoningEffort?: string;
 }
 /** Reuse the context while creating a distinct handoff record. */
 export interface ReuseDelegation {
@@ -38,6 +40,7 @@ export interface ReuseDelegation {
   description: string;
   prompt: string;
   contextKey?: string;
+  litefusion?: DelegationSummary['litefusion'];
 }
 const conflict = (message: string) => Object.assign(new Error(message), { status: 409 });
 const missing = () => Object.assign(new Error('Researcher delegation not found in the current parent transcript.'), { status: 404 });
@@ -108,11 +111,35 @@ export class Delegations {
     try { this.origin(latest, true); } catch { return null; }
     return latest;
   }
+  reusableWorker(parentId:string,contextKey:string):DelegationSummary|null {
+    const seen=new Set<string>();
+    for(const row of this.rows('WHERE parent_session_id=? ORDER BY rowid DESC',parentId)) {
+      const data=this.data(row),summary=data.summary;
+      if(seen.has(summary.childSessionId))continue;
+      seen.add(summary.childSessionId);
+      if(!summary.litefusion||summary.isolated||summary.status!=='completed'||data.contextKey!==contextKey)continue;
+      try {this.origin(summary,true);this.assertPin(row,data);}catch{continue;}
+      return clone(summary);
+    }
+    return null;
+  }
+  updateLiteFusion(id:string,patch:Partial<NonNullable<DelegationSummary['litefusion']>>):DelegationSummary {
+    const row=this.row(id),data=this.data(row);
+    if(!data.summary.litefusion)throw conflict('This assignment is not LiteFusion.');
+    data.summary.litefusion={...data.summary.litefusion,...clone(patch)};
+    this.save(row,data);return clone(data.summary);
+  }
   isChild(id: string): boolean { return this.store.isChild(id); }
   activity(id: string, activity: string): DelegationSummary | null {
     const row=this.row(id),data=this.data(row);
     if(data.summary.status!=='running'||data.summary.activity===activity)return null;
     data.summary.activity=activity.slice(0,160);this.save(row,data);return clone(data.summary);
+  }
+  completedActivity(id:string,activity:string):DelegationSummary|null {
+    const row=this.row(id),data=this.data(row);
+    if(data.summary.status!=='running')return null;
+    data.summary.recentActivity=[activity.slice(0,160),...(data.summary.recentActivity??[]).filter(item=>item!==activity)].slice(0,2);
+    this.save(row,data);return clone(data.summary);
   }
   private origin(summary: DelegationSummary, linked: boolean): { assistant: Message; call: ToolCall; results: Message[] } {
     if (this.isChild(summary.parentSessionId)) throw missing();
@@ -129,7 +156,7 @@ export class Delegations {
   }
   private assertPin(row: Row, data: RecordData): void {
     const snapshot = this.store.profileSnapshot(row.child_session_id);
-    if ((snapshot?.active.revision ?? null) !== data.profileRevision || snapshot?.active.profileId) throw conflict('The private researcher instruction snapshot is inconsistent.');
+    if ((snapshot?.active.revision ?? null) !== data.profileRevision || (snapshot?.active.profileId&&!data.summary.litefusion)) throw conflict('The private researcher instruction snapshot is inconsistent.');
   }
   list(parentId: string): DelegationSummary[] {
     this.store.session(parentId);
@@ -181,20 +208,21 @@ export class Delegations {
   }
   create(input: CreateDelegation): { delegation: DelegationSummary; child: Session; user: Message } {
     const now = Date.now(), childId = randomUUID(), id = randomUUID();
-    if (typeof input.prompt !== 'string' || !input.prompt.trim() || Buffer.byteLength(input.prompt) > DELEGATION_LIMITS.promptBytes || input.prompt.includes('\0')) throw invalid('Researcher prompt must be nonempty and at most 16 KiB.');
+    if (typeof input.prompt !== 'string' || !input.prompt.trim() || Buffer.byteLength(input.prompt) > (input.litefusion?256*1024:DELEGATION_LIMITS.promptBytes) || input.prompt.includes('\0')) throw invalid('Assignment prompt is empty or exceeds its durable limit.');
     if (typeof input.description !== 'string' || !input.description.trim() || input.description.length > DELEGATION_LIMITS.description || /[\p{Cc}\p{Cf}]/u.test(input.description)) throw invalid('Researcher description must be a short single-line label.');
     const profile = input.profile === null ? null : validateProfileSnapshot(input.profile);
-    if (profile && (profile.active.profileId !== null || profile.active.tools !== null)) throw conflict('Named project profiles cannot delegate research.');
+    if (profile && !input.litefusion && (profile.active.profileId !== null || profile.active.tools !== null)) throw conflict('Named project profiles cannot delegate research.');
     const user: Message = { id: randomUUID(), sessionId: childId, role: 'user', content: input.prompt, createdAt: now };
     const summary: DelegationSummary = {
       id, parentSessionId: input.parentSessionId, parentTurnId: input.parentTurnId, parentMessageId: input.parentMessageId,
       toolCallId: input.toolCallId, childSessionId: childId, description: input.description, status: 'running', createdAt: now,
       ...(input.role ? { role: input.role } : {}), ...(input.isolated?{isolated:true}:{}),
+      model:input.childSession.model,reasoningEffort:input.reasoningEffort,...(input.litefusion?{litefusion:clone(input.litefusion)}:{}),
     };
     let child!: Session;
     this.history.acceptPrepared(childId, user, () => {
       const parent = this.store.session(input.parentSessionId);
-      if (this.isChild(parent.id) || parent.archived || parent.profile?.profileId) throw conflict('This session cannot delegate research.');
+      if (this.isChild(parent.id) || parent.archived || (parent.profile?.profileId&&!input.litefusion)) throw conflict('This session cannot delegate research.');
       this.history.assertAcceptedTurn(parent.id, input.parentTurnId);
       const { assistant, call, results } = this.origin(summary, false);
       if (call.delegationId || results.length || !['pending', 'running'].includes(call.status)) throw conflict('This task call was already settled or delegated.');
@@ -223,25 +251,26 @@ export class Delegations {
    * The new invocation and child checkpoint are accepted in one transaction. */
   reuse(input: ReuseDelegation): { delegation: DelegationSummary; child: Session; user: Message } {
     const now = Date.now(), id = randomUUID();
-    if (typeof input.prompt !== 'string' || !input.prompt.trim() || Buffer.byteLength(input.prompt) > DELEGATION_LIMITS.promptBytes || input.prompt.includes('\0')) throw invalid('Researcher prompt must be nonempty and at most 16 KiB.');
+    if (typeof input.prompt !== 'string' || !input.prompt.trim() || Buffer.byteLength(input.prompt) > (input.litefusion?256*1024:DELEGATION_LIMITS.promptBytes) || input.prompt.includes('\0')) throw invalid('Assignment prompt is empty or exceeds its durable limit.');
     if (typeof input.description !== 'string' || !input.description.trim() || input.description.length > DELEGATION_LIMITS.description || /[\p{Cc}\p{Cf}]/u.test(input.description)) throw invalid('Researcher description must be a short single-line label.');
     const row = this.row(input.delegationId);
     const user: Message = { id: randomUUID(), sessionId: row.child_session_id, role: 'user', content: input.prompt, createdAt: now };
     let child!: Session, summary!: DelegationSummary;
     this.history.acceptPrepared(row.child_session_id, user, () => {
       const data = this.data(this.row(input.delegationId));
-      if (data.summary.role !== 'sidekick') throw conflict('Only the persistent sidekick can be reused.');
+      if (data.summary.role !== 'sidekick' && !(data.summary.litefusion&&input.litefusion&&!data.summary.isolated)) throw conflict('Only compatible persistent workers can be reused.');
       if (data.summary.parentSessionId !== input.parentSessionId) throw missing();
       if (data.summary.status !== 'completed' || !data.terminal) throw conflict('Only a completed worker context can be reused.');
       if (input.contextKey !== data.contextKey) throw conflict('The worker context configuration changed. Start a fresh context.');
       const parent = this.store.session(input.parentSessionId);
-      if (this.isChild(parent.id) || parent.archived || parent.profile?.profileId) throw conflict('This session cannot delegate research.');
+      if (this.isChild(parent.id) || parent.archived || (parent.profile?.profileId&&!input.litefusion)) throw conflict('This session cannot delegate research.');
       this.history.assertAcceptedTurn(parent.id, input.parentTurnId);
       this.assertPin(row, data);
       summary = {
         id, parentSessionId: input.parentSessionId, childSessionId: row.child_session_id,
         parentTurnId: input.parentTurnId, parentMessageId: input.parentMessageId,
-        toolCallId: input.toolCallId, description: input.description, status: 'running', createdAt: now, role: 'sidekick',
+        toolCallId: input.toolCallId, description: input.description, status: 'running', createdAt: now, role: data.summary.role,
+        model:data.summary.model,reasoningEffort:data.summary.reasoningEffort,...(input.litefusion?{litefusion:clone(input.litefusion)}:{}),
       };
       const { assistant, call, results } = this.origin(summary, false);
       if (call.delegationId || results.length || !['pending', 'running'].includes(call.status)) throw conflict('This task call was already settled or delegated.');

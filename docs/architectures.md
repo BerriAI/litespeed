@@ -1,11 +1,12 @@
 # Multi-model architectures
 
-Litespeed treats the arrangement of models as a session setting. The web picker exposes Single model, Sidekick Fusion, Team Fusion, and Expert Fusion. Models are configurable routes to connected providers, not models bundled with Litespeed. File Pipeline is not implemented.
+Litespeed treats the arrangement of models as a session setting. The web picker exposes Single model, LiteFusion, Sidekick Fusion, Team Fusion, and Expert Fusion. Models are configurable routes to connected providers, not models bundled with Litespeed. File Pipeline is not implemented.
 
 The aim is to reserve stronger models for the work that benefits from them while cheaper models handle suitable assignments. Persistent sidekick context is inspired by [Cognition’s Devin Fusion](https://cognition.com/blog/devin-fusion). Quality, cost, and latency need to be measured for each model combination and task.
 
 ## Arrangements
 
+- **LiteFusion (recommended):** one persistent lead routes task categories to versioned model/reasoning pairs. It can work directly, retain compatible serial workers, start isolated parallel workers, or escalate with evidence. See the [LiteFusion guide](litefusion.md) and [all 63 task cards](litefusion-tasks.md).
 - **Single model:** the existing general-purpose tool loop.
 - **Sidekick Fusion:** the lead plans, delegates, and reviews; a write-capable sidekick retains context across compatible handoffs. Foreground calls wait for its report while the server remains responsive to events, steering, approvals, and cancellation. The two model calls do not run simultaneously during a handoff.
 - **Team Fusion:** the lead uses `delegate` for fresh task-scoped workers. Each receives a self-contained brief with relevant paths, constraints, and acceptance criteria. Source editing belongs to workers; the lead inspects the result and uses `verify` for combined checks.
@@ -55,13 +56,13 @@ New steering invalidates pending publication. After all workers stop, Litespeed 
 
 ## Evidence and accounting
 
-Each uninterrupted stretch of tool calls appears live, then collapses into one work log when the assistant adds text or finishes. Requested workers and experts have separate numbered cards, including while queued, with their own briefs, models, status, reports, and tool transcripts. Runtime activity comes from the executing worker. Verification receipts are based on recorded tools and observed file effects, not a worker's prose. A later successful identical check supersedes the earlier failure without removing its historical record. Unresolved checks, assignments, and missing driver verification remain visible.
+Each uninterrupted stretch of tool calls appears live, then collapses into one work log when the assistant adds text or finishes. Requested workers and experts have separate numbered cards, including while queued, with their model, reasoning, status, current action and recent completed action. Opening a card selects one history inspector; the main conversation never expands parallel worker transcripts. Briefs, reports and earlier attempts remain inspectable. Runtime activity comes from the executing worker. Verification receipts are based on recorded tools and observed file effects, not a worker's prose. A later successful identical check supersedes the earlier failure without removing its historical record. Unresolved checks, assignments, and missing driver verification remain visible.
 
 A durable request ledger attributes usage to the root turn, actor, model, and phase, including worker calls, retries, compaction, and goal review. Repeated cumulative usage chunks update one request. The footer appears once after the root response and expands into a role/model breakdown. Missing usage stays unreported; a partly priced task has no fabricated total cost. No architecture promises a quality, latency, quota, or cost improvement without measurement.
 
 ## Validation
 
-Runner integration tests exercise persistent versus fresh context, parent approvals and edits, repairs, cancellation, hooks, compaction, concurrent private workspaces, conflicts, and integrated verification. Storage tests cover migration, immutable records, recovery, and usage. Browser tests cover selection, task details, history, and the existing session flows. The [terminal client](tui.md) uses the same runner and is covered by real PTY workflows for all four architectures. Existing CLI session execution remains supported.
+Runner integration tests exercise persistent versus fresh context, parent approvals and edits, repairs, cancellation, hooks, compaction, concurrent private workspaces, conflicts, and integrated verification. Storage tests cover migration, immutable records, recovery, and usage. Browser tests cover selection, task details, history, and the existing session flows. The [terminal client](tui.md) uses the same runner and is covered by real PTY workflows for the existing four architectures, plus a dedicated LiteFusion acceptance suite. Existing CLI session execution remains supported.
 
 For an opt-in live smoke comparison against connected providers, run:
 

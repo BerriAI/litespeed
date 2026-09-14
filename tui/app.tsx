@@ -24,13 +24,14 @@ import { EditorKeys } from './editor.js';
 import { Sessions } from './sessions.js';
 import { FilePicker } from './files.js';
 import { attachmentFromFile, editDraft, openShell, suspendTerminal } from './terminalIO.js';
-import { Changes, WorkInspector, WorkerInspector } from './inspectors.js';
+import { WorkerChooser, Changes, WorkInspector, WorkerInspector } from './inspectors.js';
 import { conversationGroups, usageDetails } from './conversation.js';
 import { TaskProgress } from './tasks.js';
 import { UpdateNotice } from './updates.js';
 import { Brand } from './brand.js';
 import { needsSetup } from '../shared/setup.js';
 import { Onboarding } from './onboarding.js';
+import { WorkerInspectionContext } from './workerCard.js';
 import { workerLabels } from '../shared/worker-presentation.js';
 import { architectureInfo } from '../shared/architectures.js';
 import { ModelSettings } from './models.js';
@@ -204,7 +205,7 @@ function SessionApp({ controller, router, onQuit, chooseTheme, themeName, themeM
     { id: 'todos', label: 'Task list', description: 'Follow the agent’s plan and progress', action: () => setPanel(<PlanPanel controller={controller} onClose={close} />) },
     { id: 'changes', label: 'Review changed files', description: 'Recorded file edits and diffs', action: () => setPanel(<Changes controller={controller} onClose={close} />) },
     { id: 'work', label: 'Inspect response steps', description: 'Thinking, commands, outputs, and worker assignments', action: () => menu('Response turns', conversationGroups(controller.detail!).filter(group => group.steps.some(message => message.reasoning || message.toolCalls?.length)).reverse().map((group, index) => ({ id: group.message.id, label: group.steps.find(message => message.content)?.content.slice(0, 100) || `Response ${index + 1}`, description: `${group.steps.flatMap(message => message.toolCalls ?? []).length} steps`, action: () => inspect(group.steps) }))) },
-    { id: 'workers', label: 'Worker assignments', description: 'Brief, report, evidence, and invocation transcript', action: () => menu('Worker assignments', (controller.detail?.delegations ?? []).map(task => ({ id: task.id, label: `${workerLabels(controller.detail!).get(`${task.parentMessageId}:${task.toolCallId}`) || 'Research'} · ${task.description}`, description: `${task.role ?? 'research'} · ${task.status}`, action: () => setPanel(<WorkerInspector controller={controller} invocation={task} onClose={close} />) }))) },
+    { id: 'workers', label: 'Inspect worker', description: 'Brief, report, evidence, and invocation transcript', action: () => setPanel(<WorkerChooser controller={controller} onClose={close} onSelect={task=>setPanel(<WorkerInspector controller={controller} invocation={task} onClose={close} />)}/>) },
     { id: 'fork', label: 'Fork session', description: 'Continue from a copy of this conversation', disabled: busy, action: () => { close(); run(() => controller.fork()); } },
     { id: 'compact', label: 'Compact context', description: 'Summarize earlier context for the next response', disabled: busy, action: () => { close(); run(() => controller.action('Compacting context', () => controller.client.api(controller.path('/compact'), {}))); } },
     { id: 'setup', label: 'Set up Litespeed', description: 'A quick guide to architecture, models, and permissions', disabled: busy, action: () => run(() => openSetup()) },
@@ -281,13 +282,13 @@ function SessionApp({ controller, router, onQuit, chooseTheme, themeName, themeM
   const activeWorkers = detail?.delegations?.filter(task => task.status === 'running') ?? [];
   const actor = activeWorkers.length > 1 ? `${activeWorkers.length} ${activeWorkers.every(task => task.role === 'expert') ? 'experts' : 'workers'}` : activeWorkers.length ? workerLabels(detail!).get(`${activeWorkers[0].parentMessageId}:${activeWorkers[0].toolCallId}`) || 'Research' : 'Driver';
   const model = detail ? effectiveModel(detail.session) : null;
-  const modelSuffix = detail?.session.mode === 'build' && detail.session.architecture ? ` + ${architectureInfo(detail.session.architecture.kind).roles[0].id}` : detail?.session.mode === 'plan' && detail.session.planner ? ' · planner' : '';
+  const modelSuffix = detail?.session.mode === 'build' && detail.session.architecture ? ` + ${architectureInfo(detail.session.architecture.kind).roles[0]?.id ?? 'specialists'}` : detail?.session.mode === 'plan' && detail.session.planner ? ' · planner' : '';
   const modelWidth = Math.max(18, Math.floor((width - (busy ? 36 : 12)) / 2) - 4);
   const modelName = terminalText(model?.model.split('/').at(-1) || 'Choose model');
   const modelSpace = Math.max(1, modelWidth - modelSuffix.length);
   const modelLabel = (modelName.length > modelSpace ? `${modelName.slice(0, modelSpace - 1)}…` : modelName) + modelSuffix;
   const taskWidth = width >= 112 ? Math.min(44, Math.max(32, Math.floor(width / 4))) : 0;
-  return <TranscriptSettingsProvider value={settings}><box width="100%" height="100%" flexDirection="column" backgroundColor={toHex(theme.background)}>
+  return <WorkerInspectionContext.Provider value={task=>setPanel(<WorkerInspector controller={controller} invocation={task} onClose={close}/>)}><TranscriptSettingsProvider value={settings}><box width="100%" height="100%" flexDirection="column" backgroundColor={toHex(theme.background)}>
     {detail ? <>
       <box height={1} flexDirection="row" flexShrink={0}><Button onPress={() => run(sessions)}>{terminalText(detail.session.title || 'New session').slice(0, Math.max(10, Math.floor((width - (busy ? 36 : 12)) / 2) - 4))}</Button><Button disabled={busy} onPress={() => run(openModels)}>{modelLabel}</Button><Button disabled={busy} onPress={() => run(() => controller.configure({ mode: detail.session.mode === 'plan' ? 'build' : 'plan' }))}>{detail.session.mode}</Button><box flexGrow={1} />{busy ? permission || question ? <text fg={toHex(theme.warning)}>waiting for you </text> : <><WorkingScanner color={toHex(theme.primary)} /><text fg={toHex(theme.textMuted)}>{` ${actor} `}</text><InterruptHint /></> : <text fg={toHex(theme.textMuted)}>idle </text>}</box>
       {!taskWidth && <TaskProgress detail={detail} controller={controller} compact />}
@@ -312,5 +313,5 @@ function SessionApp({ controller, router, onQuit, chooseTheme, themeName, themeM
     {(state.notice || pendingLeader || state.sync.connection === 'reconnecting') && <text height={1} flexShrink={0} paddingLeft={1} fg={toHex(theme.warning)}>{terminalText(pendingLeader ? 'Leader…' : state.notice || 'Reconnecting… Showing the last known state.').replace(/\s+/g, ' ').slice(0, width - 2)}</text>}
     <box height={1} flexDirection="row" flexShrink={0}><Button tone="muted" onPress={palette}>Ctrl+P Commands</Button><Button tone="muted" onPress={permissions}>{detail?.session.permissionMode === 'auto' ? 'Allow all tools' : 'Ask first'}</Button><Button tone="muted" onPress={openSettings}>Settings</Button><text fg={toHex(theme.textMuted)}>{state.pending ? `${state.pending}…` : permission || question ? 'Choose an answer above · Esc Esc stop' : busy ? 'Enter queue · Alt+Enter steer' : 'Enter send · Shift+Enter newline'}</text></box>
     {panel}
-  </box></TranscriptSettingsProvider>;
+  </box></TranscriptSettingsProvider></WorkerInspectionContext.Provider>;
 }

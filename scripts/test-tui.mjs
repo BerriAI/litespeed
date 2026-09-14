@@ -117,9 +117,9 @@ try {
   terminal.write('/models\r');
   await waitFor(() => screen().includes('Architecture: Single model'), 'model settings');
   terminal.write('\r');
-  await waitFor(() => screen().includes('Expert Fusion'), 'four architecture choices');
+  await waitFor(() => screen().includes('Expert Fusion'), 'five architecture choices');
   await save('05-architectures');
-  terminal.write('\x1b[B\x1b[B\r');
+  terminal.write('\x1b[B\x1b[B\x1b[B\r');
   await waitFor(() => screen().includes('Worker: Choose a model'), 'team roles');
   terminal.write('\x1b[H\x1b[B\x1b[B\x1b[B\r');
   await waitFor(() => screen().includes('Enter a model ID'), 'worker model search');

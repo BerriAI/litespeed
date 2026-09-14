@@ -354,7 +354,7 @@ function WorkLog({ steps, detail, actors, live, syntax, width, controller, embed
     : <DriverActivity key={section.id} entries={section.kind === 'driver' ? section.entries : [{ message: section.message, call: section.call }]} detail={detail} live={live && index === sections.length - 1} heading={!embedded && Boolean(detail.session.architecture) && (index ? sections[index - 1].kind : precedingActor) !== 'driver'} syntax={syntax} width={width} embedded={embedded} />)}</box>;
 }
 
-export const Transcript = memo(function Transcript({ detail, width, active = true, embedded = false, onInspect, onUsage, controller }: { detail: SessionDetail; width: number; controller?: TerminalController; active?: boolean; embedded?: boolean; onInspect?: (steps: Message[]) => void; onUsage?: (message: Message, usage?: Usage) => void }) {
+export const Transcript = memo(function Transcript({ detail, width, height, active = true, embedded = false, onInspect, onUsage, controller }: { detail: SessionDetail; width: number; height?: number; controller?: TerminalController; active?: boolean; embedded?: boolean; onInspect?: (steps: Message[]) => void; onUsage?: (message: Message, usage?: Usage) => void }) {
   const theme = useTheme(), config = useConfig(), syntax = useSyntax(theme), scroll = useRef<ScrollBoxRenderable>(null);
   const acceleration = useMemo(() => { const native = new MacOSScrollAccel(); return { tick: () => (config.scroll_acceleration.enabled ? native.tick() : 1) * config.scroll_speed, reset: () => native.reset() }; }, [config.scroll_speed, config.scroll_acceleration.enabled]);
   const [limit, setLimit] = useState(120), [following, setFollowing] = useState(true);
@@ -404,7 +404,7 @@ export const Transcript = memo(function Transcript({ detail, width, active = tru
     })}
   </>;
   if (embedded) return <box flexDirection="column" flexShrink={0}>{contents}</box>;
-  return <box width={width} flexGrow={1} minHeight={1} flexDirection="column"><scrollbox ref={scroll} onMouseScroll={event => { if (event.scroll?.direction === 'up') follow(false); else if (event.scroll?.direction === 'down') queueMicrotask(resumeAtBottom); }} scrollAcceleration={acceleration} flexGrow={1} minHeight={1} stickyScroll={following} stickyStart="bottom" viewportCulling paddingLeft={width < 90 ? 1 : 2} paddingRight={width < 90 ? 1 : 2} paddingBottom={1}>{contents}</scrollbox>{!following && <Button onPress={latest}>↓ Latest · Ctrl+G</Button>}</box>;
+  return <box width={width} height={height} flexGrow={height===undefined?1:0} minHeight={1} flexDirection="column"><scrollbox ref={scroll} onMouseScroll={event => { if (event.scroll?.direction === 'up') follow(false); else if (event.scroll?.direction === 'down') queueMicrotask(resumeAtBottom); }} scrollAcceleration={acceleration} height={height===undefined?undefined:Math.max(1,height-1)} flexGrow={height===undefined?1:0} minHeight={1} stickyScroll={following} stickyStart="bottom" viewportCulling paddingLeft={width < 90 ? 1 : 2} paddingRight={width < 90 ? 1 : 2} paddingBottom={1}>{contents}</scrollbox>{!following && <Button onPress={latest}>↓ Latest · Ctrl+G</Button>}</box>;
 });
 
 /** Right-aligned single-press interrupt affordance. */

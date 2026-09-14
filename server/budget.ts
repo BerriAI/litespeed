@@ -59,13 +59,21 @@ export class ModelCatalogCache {
         ...(validContextWindow(model.contextWindow) ? { contextWindow: model.contextWindow } : {}),
         ...(validContextWindow(model.maxInputTokens) ? { maxInputTokens: model.maxInputTokens } : {}),
       };
-      if (limit.contextWindow !== undefined || limit.maxInputTokens !== undefined || limit.reasoningEfforts !== undefined) limits.set(model.id, limit);
+      limits.set(model.id, limit); // Presence is useful even without limit metadata.
     }
     this.entries.delete(provider.id);
     this.entries.set(provider.id, { identity: providerIdentity(provider), createdAt: this.now(), limits });
     while (this.entries.size > BUDGET_LIMITS.catalogProviders) this.entries.delete(this.entries.keys().next().value!);
   }
   get(provider: Provider, model: string): number | undefined { return this.getLimit(provider, model)?.contextWindow; }
+  snapshot(provider: Provider): Array<{ id: string } & CatalogLimit> {
+    const entry=this.entries.get(provider.id);
+    if(!entry)return [];
+    // Reuse the identity/TTL check; never rediscover models during dispatch.
+    const first=entry.limits.keys().next().value;
+    if(first===undefined||!this.getLimit(provider,first))return [];
+    return [...entry.limits].map(([id,limit])=>({id,...structuredClone(limit)}));
+  }
   getLimit(provider: Provider, model: string): CatalogLimit | undefined {
     const entry = this.entries.get(provider.id);
     if (!entry) return undefined;

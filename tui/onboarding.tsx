@@ -1,4 +1,6 @@
 /** @jsxImportSource @opentui/react */
+import { LiteFusionSettings } from './litefusion.js';
+import { bindExactModels, type LiteFusionSelection } from '../shared/litefusion.js';
 import { useState, useSyncExternalStore } from 'react';
 import { architectureWorker, selectArchitecture, type ArchitectureKind, type ModelRoute } from '../shared/architectures.js';
 import { SETUP_ARCHITECTURES, modelGuidance, providerIsConfigured, roleGuidance, roleStepTitle } from '../shared/setup.js';
@@ -18,16 +20,18 @@ const workerLabel = (kind: 'single' | ArchitectureKind) => kind === 'expert-fusi
 
 export function Onboarding({ controller, initial, onClose, quick = false }: { controller: TerminalController; quick?: boolean; initial: Session; onClose: () => void }) {
   const state = useSyncExternalStore(controller.subscribe, controller.getState);
-  const [step, setStep] = useState<SetupStep>('architecture'), [kind, setKind] = useState<'single' | ArchitectureKind>(initial.architecture?.kind ?? (quick || !initial.model ? 'sidekick-fusion' : 'single'));
+  const [step, setStep] = useState<SetupStep>('architecture'), [kind, setKind] = useState<'single' | ArchitectureKind>(initial.architecture?.kind ?? (quick || !initial.model ? 'litefusion' : 'single'));
   const [from, setFrom] = useState<'walkthrough' | 'review'>('walkthrough');
   const [shunt, setShunt] = useState<ShuntSelection>(initial.shunt ?? { enabled: false });
   const [driver, setDriver] = useState<ModelRoute>({ providerId: initial.providerId, model: initial.model });
+  const [fusion,setFusion]=useState<LiteFusionSelection>(initial.architecture?.kind==='litefusion'?initial.architecture:{kind:'litefusion',gatewayProviderId:initial.providerId});
   const [worker, setWorker] = useState<ModelRoute | null>(initial.architecture ? architectureWorker(initial.architecture) : null);
-  const [permissionMode, setPermissionMode] = useState(initial.permissionMode), [view, setView] = useState<'main' | 'providers' | 'advanced' | 'skills'>('main');
+  const [permissionMode, setPermissionMode] = useState(initial.permissionMode), [view, setView] = useState<'main' | 'providers' | 'advanced' | 'skills' | 'litefusion'>('main');
   const [revision, setRevision] = useState(initial.configRevision ?? 0);
 
   if (!state.settings) return null;
   const back = () => setView('main');
+  if(view==='litefusion')return <LiteFusionSettings controller={controller} settings={state.settings} value={fusion} onChange={setFusion} onClose={back}/>;
   if (view === 'skills') return <SkillImporter controller={controller} workspace={initial.workspace} onClose={back} onImported={() => {}} />;
   if (view === 'providers') return <Providers controller={controller} onClose={back} />;
   if (view === 'advanced') return <ShuntSettings controller={controller} settings={state.settings} value={shunt} onChange={setShunt} onClose={back} />;
@@ -53,6 +57,7 @@ export function Onboarding({ controller, initial, onClose, quick = false }: { co
 
   if (step === 'gateway') {
     return <GatewaySetup quick={quick} controller={controller} settings={state.settings} providerId={driver.providerId || defaultProviderId} onClose={() => setStep('architecture')} onProviders={() => setView('providers')} onContinue={providerId => { setDriver(current => ({ providerId, model: current.providerId === providerId ? current.model : '' })); setStep(nextAfterArchitecture(true)); }} onConnected={result => {
+      setFusion(current=>bindExactModels({...current,gatewayProviderId:result.providerId},result.models));
       setDriver(current => ({ providerId: result.providerId, model: current.providerId === result.providerId && result.models.some(model => model.id === current.model) ? current.model : '' }));
       setWorker(current => current?.providerId === result.providerId && result.models.some(model => model.id === current.model) ? current : null);
       setShunt(current => current.enabled && current.model.providerId === result.providerId && !result.models.some(model => model.id === current.model.model) ? { ...current, model: { providerId: result.providerId, model: '' } } : current);
@@ -72,6 +77,7 @@ export function Onboarding({ controller, initial, onClose, quick = false }: { co
     { id: 'architecture', label: `Architecture: ${SETUP_ARCHITECTURES.find(item => item.kind === kind)!.name}`, description: SETUP_ARCHITECTURES.find(item => item.kind === kind)!.description, action: () => { setFrom('walkthrough'); setStep('architecture'); } },
     { id: 'driver', label: `${kind === 'single' ? 'Model' : 'Driver'}: ${driver.model || 'Choose a model'}`, description: modelGuidance(kind, 'driver'), action: () => openRole('driver', true) },
     ...(roles.includes('worker') ? [{ id: 'worker', label: `${workerLabel(kind)}: ${worker?.model || 'Choose a model'}`, description: modelGuidance(kind, 'worker'), action: () => openRole('worker', true) }] : []),
+    ...(kind==='litefusion'?[{id:'litefusion',label:'63 task routes and handoffs',action:()=>setView('litefusion')}]:[]),
     { id: 'advanced', label: `Advanced settings · Shunt ${shunt.enabled ? 'On' : 'Off'}`, description: `${SHUNT_DESCRIPTION} ${shunt.enabled && !shuntConfigured(shunt, state.settings.providers) ? 'Choose a Shunt model to enable it.' : SHUNT_MODEL_HINT}`, action: () => setView('advanced') },
     ...(!quick ? [{ id: 'providers', label: 'Manage providers', description: 'Connect an API or sign in to ChatGPT', action: () => setView('providers') },
     { id: 'permissions', label: `Permissions: ${permissionMode === 'auto' ? 'Allow all tools' : 'Ask first'}`, description: permissionMode === 'ask' ? 'Review actions and remember tools you trust' : 'No routine prompts; explicit project rules still apply', action: () => setPermissionMode(permissionMode === 'auto' ? 'ask' : 'auto') }] : []),
@@ -80,7 +86,7 @@ export function Onboarding({ controller, initial, onClose, quick = false }: { co
   ]} />;
 
   async function save() {
-    const patch = { ...driver, architecture: kind === 'single' ? null : worker ? selectArchitecture(kind, worker) : null, permissionMode, shunt };
+    const patch = { ...driver, architecture: kind === 'single' ? null : kind==='litefusion'?fusion:worker ? selectArchitecture(kind, worker) : null, permissionMode, shunt };
     if (!await controller.configure(patch, revision)) return;
     setRevision(controller.detail!.session.configRevision ?? 0);
     if (await controller.action('Remembering setup', () => controller.client.api('/workspace-preferences', { ...controller.detail!.session, ...patch, setupComplete: true }))) onClose();

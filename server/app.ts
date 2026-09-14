@@ -1,3 +1,4 @@
+import { LiteFusionEvaluations, evaluationSchema } from './litefusion-evaluations.js';
 import { VERSION } from '../shared/version.js';
 import type { UpdateStatus } from '../shared/updates.js';
 import { shuntSchema } from './shunt.js';
@@ -6,7 +7,9 @@ import { gatewayBaseUrl } from '../shared/setup.js';
 import { clientSurface } from '../shared/client.js';
 import { REASONING_EFFORTS } from '../shared/types.js';
 import { WorkspacePreferences } from './workspace-preferences.js';
-import { architectureWorker } from '../shared/architectures.js';
+import { architectureProviders } from '../shared/architectures.js';
+import { liteFusionSchema, captureLiteFusion } from './litefusion-routing.js';
+import { LITEFUSION_ROLES, LITEFUSION_MODELS, LITEFUSION_VERSION, validateLiteFusion } from '../shared/litefusion.js';
 import express, { type Express, type Response } from 'express';
 import { z } from 'zod';
 import { realpath, stat, readdir } from 'node:fs/promises';
@@ -39,6 +42,7 @@ const settingsSchema = z.object({providers:z.array(providerSchema).max(30).refin
 // architecture: the optional multi-model arrangement (shared/architectures.ts); null clears it.
 const modelRouteSchema = z.object({providerId:z.string().min(1).max(64),model:z.string().min(1).max(250)}).strict();
 const architectureSchema = z.discriminatedUnion('kind', [
+  liteFusionSchema,
   z.object({kind:z.literal('sidekick-fusion'),sidekick:modelRouteSchema}).strict(),
   z.object({kind:z.literal('team-fusion'),worker:modelRouteSchema,concurrency:z.union([z.literal(1),z.literal(2),z.literal(3),z.literal(4)]).optional()}).strict(),
   z.object({kind:z.literal('expert-fusion'),expert:modelRouteSchema,concurrency:z.union([z.literal(1),z.literal(2),z.literal(3),z.literal(4)]).optional()}).strict(),
@@ -198,11 +202,39 @@ export function createApp(options:AppOptions = {}) {
     if(provider.kind==='codex')modelCatalog.clear(provider.id);
     try{const models=await listModels(provider,AbortSignal.timeout(30000));if(provider.kind!=='codex')modelCatalog.remember(provider,models);res.json({ok:true,models:models.length});}catch(error){res.status(502).json({ok:false,error:safeError(error,store)});}
   });
+  const checkArchitecture=(architecture: import('../shared/architectures.js').ArchitectureSelection)=>{
+    architectureProviders(architecture).forEach(checkProvider);
+    if(architecture.kind==='litefusion') {
+      try {validateLiteFusion(architecture);}catch(error){throw httpError(400,error instanceof Error?error.message:'Invalid LiteFusion policy.');}
+    }
+  };
+  const fusionEvaluations=new LiteFusionEvaluations(store);
+  app.post('/api/sessions/:id/litefusion/evaluations',(req,res)=>{
+    const session=store.session(req.params.id);
+    if(store.isChild(session.id))throw httpError(404,'Session not found.');
+    if(session.architecture?.kind!=='litefusion')throw httpError(400,'This session does not use LiteFusion.');
+    res.status(201).json(fusionEvaluations.record(session.id,evaluationSchema.parse(req.body)));
+  });
+  app.get('/api/litefusion/catalog',(_req,res)=>res.json({version:LITEFUSION_VERSION,roles:LITEFUSION_ROLES,models:LITEFUSION_MODELS}));
+  app.post('/api/litefusion/routes',(req,res)=>{
+    const selection=liteFusionSchema.parse(req.body);checkArchitecture(selection);
+    const {version,hash,routes}=captureLiteFusion(selection,store.settings().providers);
+    res.json({version,hash,routes,executionVerified:false});
+  });
+  app.get('/api/sessions/:id/litefusion/export',(req,res)=>{
+    const session=store.session(req.params.id);
+    if(store.isChild(session.id))throw httpError(404,'Session not found.');
+    if(session.architecture?.kind!=='litefusion')throw httpError(400,'This session does not use LiteFusion.');
+    const assignments=runner.delegations.list(session.id);
+    const turns=[...new Set(assignments.map(item=>item.parentTurnId))];
+    for(const message of store.messages(session.id))if(message.role==='user'&&!turns.includes(message.id))turns.push(message.id);
+    res.json({schemaVersion:1,sessionId:session.id,policyVersion:LITEFUSION_VERSION,selection:session.architecture,assignments,turns:turns.map(id=>{const evaluations=fusionEvaluations.list(session.id,id);return {id,usage:runner.usage.turn(session.id,id),checks:store.messages(session.id).filter(message=>message.turnId===id).flatMap(message=>(message.toolCalls??[]).filter(call=>['verify','bash'].includes(call.name)).map(call=>({id:call.id,command:call.args.command,status:call.status,execution:call.execution}))),evaluation:evaluations.at(-1)??{success:null,source:null},evaluations};}),limitations:['Unreported costs remain unknown.','Worker completion is not an external success label.']});
+  });
   const preferences=new WorkspacePreferences(store);
   app.get('/api/workspace-preferences',async(req,res)=>res.json(preferences.get(await workspace(req.query.workspace))));
   app.post('/api/workspace-preferences',async(req,res)=>{
     const input=sessionSchema.required({providerId:true,model:true}).extend({setupComplete:z.boolean().optional()}).parse(req.body), root=await workspace(input.workspace);
-    checkProvider(input.providerId);if(input.architecture)checkProvider(architectureWorker(input.architecture).providerId);if(input.planner)checkProvider(input.planner.providerId);if(!shuntConfigured(input.shunt,store.settings().providers))throw httpError(400,'Choose an API-key Shunt model or turn Shunt off.');
+    checkProvider(input.providerId);if(input.architecture)checkArchitecture(input.architecture);if(input.planner)checkProvider(input.planner.providerId);if(!shuntConfigured(input.shunt,store.settings().providers))throw httpError(400,'Choose an API-key Shunt model or turn Shunt off.');
     if(input.setupComplete&&!input.model.trim())throw httpError(400,'Choose a model to finish setup.');
     preferences.save(root,{...input,shunt:input.shunt??undefined,architecture:input.architecture??undefined,planner:input.planner??undefined,outputStyle:input.outputStyle??undefined},true);
     res.json({ok:true});
@@ -224,7 +256,7 @@ export function createApp(options:AppOptions = {}) {
       if(!selection.planner)delete selection.planner;else checkProvider(selection.planner.providerId);
       if(!selection.shunt)delete selection.shunt;else if(!shuntConfigured(selection.shunt,store.settings().providers))throw httpError(400,'Choose an API-key Shunt model or turn Shunt off.');
       // architecture:null means "single model" on create; each role needs a real provider.
-      if(!selection.architecture)delete selection.architecture;else checkProvider(architectureWorker(selection.architecture).providerId);
+      if(!selection.architecture)delete selection.architecture;else checkArchitecture(selection.architecture);
       // outputStyle:null means "no style" on create, mirroring planner.
       if(!selection.outputStyle)delete selection.outputStyle;
       checkProvider(selection.providerId);
@@ -280,7 +312,7 @@ export function createApp(options:AppOptions = {}) {
     const configChange=patch.shunt!==undefined||patch.modelReasoning!==undefined||patch.model!==undefined||patch.providerId!==undefined||patch.mode!==undefined||patch.permissionMode!==undefined||patch.planner!==undefined||patch.architecture!==undefined||patch.outputStyle!==undefined;
     if(configChange){runner.assertIdle(req.params.id);runner.history.assertReady(req.params.id);}
     if(!shuntConfigured(patch.shunt,store.settings().providers))throw httpError(400,'Choose an API-key Shunt model or turn Shunt off.');
-    checkProvider(patch.providerId);if(patch.planner)checkProvider(patch.planner.providerId);if(patch.architecture)checkProvider(architectureWorker(patch.architecture).providerId);
+    checkProvider(patch.providerId);if(patch.planner)checkProvider(patch.planner.providerId);if(patch.architecture)checkArchitecture(patch.architecture);
     const session=store.updateSession(req.params.id,patch,expectedConfigRevision);
     const modelChange=patch.shunt!==undefined||patch.modelReasoning!==undefined||patch.model!==undefined||patch.providerId!==undefined||patch.planner!==undefined||patch.architecture!==undefined||patch.outputStyle!==undefined;
     if(configChange){preferences.save(session.workspace,session,modelChange);publishConfiguration(req.params.id);}res.json(session);

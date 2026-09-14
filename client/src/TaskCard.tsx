@@ -1,3 +1,4 @@
+import { workerState } from '../../shared/worker-presentation';
 import { useEffect, useLayoutEffect, useRef, useState } from 'react';
 import { BookOpen, Check, RotateCw, X, Zap } from 'lucide-react';
 import type { DelegationDetail, DelegationSummary } from '../../shared/delegation';
@@ -11,20 +12,21 @@ const sidekick = (task: DelegationSummary) => Boolean(task.role);
 const actor = (task: DelegationSummary) => task.role === 'expert' ? 'Expert' : task.role === 'worker' ? 'Worker' : 'Sidekick';
 const statusLabel = (task: DelegationSummary) => task.status === 'running' && sidekick(task) ? 'Working' : statusLabels[task.status];
 export const delegationPath = (task: DelegationSummary) => `/sessions/${encodeURIComponent(task.parentSessionId)}/delegations/${encodeURIComponent(task.id)}`;
-export function TaskCard({ task, tool, label, awaitingApproval, expanded, onCancel, cancelling, error }: { task?: DelegationSummary; tool?: ToolCall; label?: string; awaitingApproval?: boolean; expanded: boolean; onCancel: () => void; cancelling: boolean; error?: string }) {
+export function TaskCard({ task, tool, label, awaitingApproval, expanded, onCancel, cancelling, error, onInspect }: { task?: DelegationSummary; tool?: ToolCall; label?: string; awaitingApproval?: boolean; expanded: boolean; onCancel: () => void; cancelling: boolean; error?: string; onInspect?: () => void }) {
   const running = task?.status === 'running';
   const fusion = Boolean(task?.role || tool?.name === 'delegate' || tool?.name === 'sidekick');
   const identity = label ?? (task && fusion ? actor(task) : 'Research');
   const worker = tool?.name === 'delegate' || task?.role === 'worker' || task?.role === 'expert';
   const description = task?.description || String(tool?.args.description || `${identity} task`);
-  const state = cancelling ? 'Cancelling…' : task ? running ? task.activity || statusLabel(task) : statusLabel(task) : awaitingApproval ? 'Needs approval' : tool?.status === 'pending' ? 'Queued' : tool?.status === 'running' ? 'Starting' : tool?.status === 'error' ? 'Failed' : tool?.status === 'denied' ? 'Not started' : 'Completed';
+  const state = cancelling ? 'Cancelling…' : task ? running ? task.activity || statusLabel(task) : worker ? workerState(task) : statusLabel(task) : awaitingApproval ? 'Needs approval' : tool?.status === 'pending' ? 'Queued' : tool?.status === 'running' ? 'Starting' : tool?.status === 'error' ? 'Failed' : tool?.status === 'denied' ? 'Not started' : 'Completed';
   const failure=task?.error || (!task && tool?.status==='error' ? tool.output : undefined);
   return <section className={`research-task${worker ? ' worker-task' : ''}`} role="region" aria-label={`${identity} task`}>
     {fusion && <div className="task-identity"><span className="task-actor"><Zap size={13} />{identity}</span><span className={`task-state${running ? ' active' : ''}`} role="status">{running && <span className="working-dot" />}{state}</span></div>}
-    <div className="research-task-heading">{!fusion && <BookOpen size={16} />}<strong title={fusion ? `${identity} · edits and commands use this session’s permissions` : "Read-only research"}>{description}</strong>{!fusion && <span className="task-state" role="status">{!running && (task?.status === 'completed' ? <Check size={12} /> : <X size={12} />)}{state}</span>}<div className="research-task-actions">{running && <button className="text-button" disabled={cancelling} onClick={onCancel}>Cancel task</button>}</div></div>
+    <div className="research-task-heading">{!fusion && <BookOpen size={16} />}<strong title={fusion ? `${identity} · edits and commands use this session’s permissions` : "Read-only research"}>{description}</strong>{!fusion && <span className="task-state" role="status">{!running && (task?.status === 'completed' ? <Check size={12} /> : <X size={12} />)}{state}</span>}<div className="research-task-actions">{worker && task && <button className="text-button" onClick={onInspect}>Inspect worker</button>}{running && <button className="text-button" disabled={cancelling} onClick={onCancel}>Cancel task</button>}</div></div>
+    {worker && <><p className="worker-model">{task?.model || task?.litefusion?.resolved.model || 'Resolving model'}{task?.reasoningEffort && ` · ${task.reasoningEffort}`}{task?.litefusion?.previousAttemptId && ` · ${task.litefusion.reason}`}</p>{task?.recentActivity?.at(-1) && <p className="worker-recent">Previous: {task.recentActivity.at(-1)}</p>}{awaitingApproval && <p className="worker-attention">Needs approval · respond in the conversation</p>}{task?.litefusion?.request && <p className="worker-attention">{workerState(task)}: {task.litefusion.request.reason}</p>}{task?.verificationNote && <p className="worker-attention">{task.verificationNote}</p>}</>}
     {failure && <p className="error-text" role="status">{failure}</p>}
     {error && <p className="error-text" role="alert">{error}</p>}
-    {expanded && (task ? <TaskTranscript task={task} label={identity} /> : <div className="task-pending">
+    {!worker && expanded && (task ? <TaskTranscript task={task} label={identity} /> : <div className="task-pending">
       <p>{awaitingApproval ? 'Waiting for permission to start.' : tool?.status === 'pending' ? 'Waiting to start. Its transcript will appear here.' : tool?.status === 'running' ? 'Starting this task…' : tool?.output || 'No live transcript is available for this task.'}</p>
       {typeof tool?.args.prompt === 'string' && <details className="task-assignment"><summary>Assignment from driver</summary><div className="markdown"><Markdown content={tool.args.prompt} /></div></details>}
     </div>)}

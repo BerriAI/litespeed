@@ -3,22 +3,34 @@ import { useEffect, useMemo, useRef, useState, useSyncExternalStore } from 'reac
 import { useTerminalDimensions } from '@opentui/react';
 import { createTwoFilesPatch } from 'diff';
 import type { DelegationDetail, DelegationSummary, FileChange, Message, SessionDetail } from '../shared/types.js';
+import { logicalWorkers, workerLabels } from '../shared/worker-presentation.js';
 import { terminalText } from './protocol.js';
 import { InvocationSync } from './invocation.js';
 import { TerminalController } from './controller.js';
-import { Menu, TextViewer, Dialog } from './ui.js';
+import { Menu, TextViewer, Dialog, Button } from './ui.js';
 import { Transcript } from './transcript.js';
 import { toHex } from './theme.js';
 import { useConfig, useTheme } from './context.js';
 
+/** Keep the chooser live when opened before queued workers acquire identities. */
+export function WorkerChooser({controller,onSelect,onClose}:{controller:TerminalController;onSelect:(task:DelegationSummary)=>void;onClose:()=>void}) {
+  const {sync}=useSyncExternalStore(controller.subscribe,controller.getState);
+  const detail=sync.detail,labels=detail?workerLabels(detail):new Map<string,string>();
+  return <Menu title="Worker assignments" onClose={onClose} items={(detail?logicalWorkers(detail):[]).map(task=>({id:task.id,label:`${labels.get(`${task.parentMessageId}:${task.toolCallId}`)||'Research'} · ${task.description}`,description:`${task.role??'research'} · ${task.status}`,action:()=>onSelect(task)}))}/>;
+}
+
 export function WorkerInspector({ controller, invocation, onClose }: { controller: TerminalController; invocation: DelegationSummary; onClose: () => void }) {
-  const [view, setView] = useState('main');
+  const root=useSyncExternalStore(controller.subscribe,controller.getState);
+  const [view, setView] = useState('transcript');
+  const [selected,setSelected]=useState(invocation);
+  invocation=root.sync.detail?.delegations?.find(item=>item.id===selected.id)??selected;
   const { width, height } = useTerminalDimensions();
   const path = `/sessions/${encodeURIComponent(invocation.parentSessionId)}/delegations/${encodeURIComponent(invocation.id)}`;
   const sync = useMemo(() => new InvocationSync(controller.client, invocation), [controller.client, path]);
   const { detail, error } = useSyncExternalStore(sync.subscribe, sync.getState);
   useEffect(() => { void sync.start(); return () => sync.stop(); }, [sync]);
-  if (view === 'transcript' && detail) return <Dialog title={`${invocation.role || 'Research'} · ${detail.delegation.status}`} width={width - 2} onClose={() => setView('main')} footer={error || 'Read-only invocation transcript · PgUp PgDn scroll · Esc back'}><box height={Math.max(2, height - 10)}><Transcript detail={detail} width={width - 8} /></box></Dialog>;
+  if(view==='attempts')return <Menu title="Worker attempt history" onClose={()=>setView('transcript')} items={(controller.detail?.delegations??[]).filter(item=>item.childSessionId===invocation.childSessionId||invocation.litefusion&&item.litefusion?.assignmentId===invocation.litefusion.assignmentId).map((item,index)=>({id:item.id,label:`${index+1}. ${item.model??item.role} · ${item.status}`,description:item.description,action:()=>{setSelected(item);setView('transcript');}}))}/>;
+  if(view==='transcript')return <Dialog title={`${invocation.description} · ${invocation.status}`} width={width-2} onClose={onClose} footer={error||invocation.error||'Read-only worker history · PgUp PgDn scroll · Esc returns to your draft'}><box flexDirection="row"><Button onPress={()=>setView('attempts')}>Attempt history</Button><Button onPress={()=>setView('main')}>Brief / evidence</Button>{invocation.status==='running'&&<Button onPress={()=>{void controller.action('Stopping worker',()=>controller.client.api(`${path}/cancel`,{}));}}>Stop worker</Button>}</box><box height={Math.max(2,height-11)}>{detail?<Transcript key={invocation.id} detail={detail} width={width-8} height={Math.max(2,height-11)}/>:<text>{error||'Loading worker history…'}</text>}</box></Dialog>;
   if (view === 'brief') return <TextViewer title="Assignment brief" text={detail?.messages.filter(message => message.role === 'user').map(message => message.content).join('\n\n') || 'No brief is available.'} onClose={() => setView('main')} />;
   if (view === 'report') return <TextViewer title="Worker report" text={detail?.messages.filter(message => message.role === 'assistant' && message.content).map(message => message.content).join('\n\n') || (detail?.delegation.status === 'running' ? 'The worker is still working.' : 'No report was produced.')} onClose={() => setView('main')} />;
   if (view === 'evidence') return <TextViewer title="Tool evidence" text={detail?.messages.flatMap(message => (message.toolCalls ?? []).map(call => `${call.name} · ${call.status}\n${JSON.stringify(call.args, null, 2)}\n${call.output || ''}`)).join('\n\n') || 'No tool calls recorded.'} onClose={() => setView('main')} />;

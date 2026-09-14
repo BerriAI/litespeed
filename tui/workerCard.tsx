@@ -1,12 +1,15 @@
 /** @jsxImportSource @opentui/react */
-import { useState, type ReactNode } from 'react';
+import { createContext, useContext, useState, type ReactNode } from 'react';
 import type { DelegationDetail, DelegationSummary, ToolCall } from '../shared/types.js';
 import type { TerminalController } from './controller.js';
 import { useInvocation } from './useInvocation.js';
 import { useTheme } from './context.js';
 import { toHex } from './theme.js';
 import { terminalText } from './protocol.js';
+import { workerState } from '../shared/worker-presentation.js';
 import { Button } from './ui.js';
+
+export const WorkerInspectionContext=createContext<((task:DelegationSummary)=>void)|null>(null);
 
 type Props = { task?: DelegationSummary; call: ToolCall; label: string; controller?: TerminalController; width: number; needsApproval: boolean; defaultOpen?: boolean; renderTranscript: (detail: DelegationDetail, width: number) => ReactNode };
 
@@ -43,6 +46,19 @@ function BoundWorkerActivity(props: Props & { task: DelegationSummary; controlle
   const invocation = useInvocation(props.controller.client, props.task);
   return <WorkerActivity {...props} {...invocation} />;
 }
+function CompactWorker({task,call,label,controller,needsApproval}:Props) {
+  const theme=useTheme(),inspect=useContext(WorkerInspectionContext);
+  return <box border={['left']} borderColor={toHex(task?.status==='running'?theme.primary:theme.border)} paddingLeft={1} flexDirection="column" flexShrink={0}>
+    <box flexDirection="row"><text fg={toHex(theme.text)}>{terminalText(`${label} · ${task?.description??String(call.args.description??'Assignment')}`)}</text><box flexGrow={1}/>{task&&inspect&&<Button onPress={()=>inspect(task)}>Inspect</Button>}{task?.status==='running'&&controller&&<Button onPress={()=>{void controller.action('Stopping worker',()=>controller.client.api(`/sessions/${task.parentSessionId}/delegations/${task.id}/cancel`,{}));}}>Stop</Button>}</box>
+    <text fg={toHex(theme.textMuted)}>{terminalText(task?`${task.model??'Worker'} / ${task.reasoningEffort??'default'} · ${workerState(task)}${task.litefusion?.previousAttemptId?` · ${task.litefusion.reason}`:''}`:call.status==='pending'?'Queued':call.status)}</text>
+    {task?.status==='running'&&task.activity&&<text fg={toHex(theme.text)}>{terminalText(task.activity)}</text>}
+    {task?.recentActivity?.at(-1)&&<text fg={toHex(theme.textMuted)}>{terminalText(`Previous: ${task.recentActivity.at(-1)}`)}</text>}
+    {needsApproval&&<text fg={toHex(theme.warning)}>Needs approval · respond in the conversation</text>}
+    {task?.litefusion?.request&&<text fg={toHex(theme.warning)}>{terminalText(task.litefusion.request.reason)}</text>}
+    {(task?.error||task?.verificationNote||call.status==='error'&&call.output)&&<text fg={toHex(theme.error)}>{terminalText(task?.error||task?.verificationNote||call.output||'')}</text>}
+  </box>;
+}
 export function WorkerCard(props: Props) {
+  if(props.call.name==='delegate'||props.task?.role==='worker'||props.task?.role==='expert')return <CompactWorker {...props}/>;
   return props.task && props.controller ? <BoundWorkerActivity {...props} task={props.task} controller={props.controller} /> : <WorkerActivity {...props} />;
 }

@@ -1,5 +1,5 @@
 import type { Session } from '../shared/types.js';
-import { architectureWorker } from '../shared/architectures.js';
+import { architectureProviders } from '../shared/architectures.js';
 import type { Store } from './store.js';
 
 export type WorkspaceSelection = Pick<Session,'providerId'|'model'|'shunt'|'architecture'|'planner'|'modelReasoning'|'outputStyle'> & { permissionMode?: Session['permissionMode']; setupComplete?: boolean };
@@ -13,7 +13,7 @@ export class WorkspacePreferences {
     for(const key of ['shunt','architecture','planner','modelReasoning','outputStyle'] as const)if(selection[key]===null)delete selection[key];
     const available=(id:string)=>this.store.settings().providers.some(provider=>provider.id===id);
     if(!available(selection.providerId))return {};
-    if(selection.architecture&&!available(architectureWorker(selection.architecture).providerId))delete selection.architecture;
+    if(selection.architecture&&!architectureProviders(selection.architecture).every(available))delete selection.architecture;
     if(selection.planner&&!available(selection.planner.providerId))delete selection.planner;
     return selection;
   }

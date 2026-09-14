@@ -60,7 +60,7 @@ try{
   terminal.write('\t');await waitFor(()=>screen().includes('/settings '),'Tab completes command');
   terminal.write('\x15/setup\r');
   await waitFor(()=>screen().includes('How would you like to work?'),'architecture-first setup');await save('00-setup-architecture');
-  terminal.write('\x1b[B\x1b[B\r');await waitFor(()=>screen().includes('Choose your driver model'),'driver chooser');await waitFor(()=>screen().includes('✓ test-model')||screen().includes('test-model'),'driver listed');terminal.write('test-model');await waitFor(()=>screen().includes('✓ test-model'),'driver found');terminal.write('\r');
+  terminal.write('\x1b[B\x1b[B\x1b[B\r');await waitFor(()=>screen().includes('Choose your driver model'),'driver chooser');await waitFor(()=>screen().includes('✓ test-model')||screen().includes('test-model'),'driver listed');terminal.write('test-model');await waitFor(()=>screen().includes('✓ test-model'),'driver found');terminal.write('\r');
   await waitFor(()=>screen().includes('Choose your worker model'),'worker chooser');terminal.write('test-fast');await waitFor(()=>screen().includes('› test-fast'),'worker found');terminal.write('\r');
   await waitFor(()=>screen().includes('Worker: test-fast')&&screen().includes('Driver: test-model'),'review selected');await save('02-setup-models');
   assert(screen().includes('Advanced settings'));
@@ -70,7 +70,7 @@ try{
   terminal.write('test-model');await waitFor(()=>screen().includes('✓ test-model'),'base found');terminal.write('\r');
   await waitFor(()=>screen().includes('Review your setup'),'single reaches review');assert(!screen().includes('Worker:'));
   terminal.write('\x1b[H\r');await waitFor(()=>screen().includes('How would you like to work?'),'restore team architecture');
-  terminal.write('\x1b[H\x1b[B\x1b[B\r');await waitFor(()=>screen().includes('Choose your driver model'),'team driver again');
+  terminal.write('\x1b[H\x1b[B\x1b[B\x1b[B\r');await waitFor(()=>screen().includes('Choose your driver model'),'team driver again');
   terminal.write('test-model');await waitFor(()=>screen().includes('✓ test-model'),'team driver found');terminal.write('\r');
   await waitFor(()=>screen().includes('Choose your worker model'),'team worker again');terminal.write('test-fast');
   await waitFor(()=>screen().includes('✓ test-fast'),'team worker found');terminal.write('\r');await waitFor(()=>screen().includes('Review your setup'),'team review again');
@@ -135,29 +135,20 @@ try{
       await waitFor(()=>screen().includes('Write sidekick-note.txt'),'sidekick card opens its bound invocation by default');await save('07-sidekick');clickLine('▾',screen().split('\n').findIndex(line=>line.trim()==='Sidekick')+1);
       await waitFor(()=>!screen().includes('Write sidekick-note.txt'),'sidekick card collapses without resolving its permission');terminal.write('4');
     }else{
-      await waitFor(()=>screen().split('\n').some(line=>line.trim()===label+' 1')&&screen().split('\n').some(line=>line.trim()===label+' 2'),'both worker cards');
-      await waitFor(()=>screen().includes('beta is inspecting its assignment.'),'worker card opens its bound child transcript by default');
-      assert(!screen().includes('A small project for browser tests.'));
-      let card=screen().split('\n').findIndex(line=>line.trim()===label+' 2');
-      await waitFor(()=>screen().split('\n').some((line,index)=>index>card&&line.includes('1 step')),'child work log is visible');
-      await new Promise(done=>setTimeout(done,150));card=screen().split('\n').findIndex(line=>line.trim()===label+' 2');clickLine('▸ 1 step',card+1);
-      await waitFor(()=>screen().includes('Read README.md'),'child work log opens');clickLine('Read README.md',card+1);
-      await waitFor(()=>screen().includes('A small project for browser tests.'),'child tool result opens inline');await save('05-'+label.toLowerCase()+'s');
-      terminal.write('\x1b[5~');await new Promise(done=>setTimeout(done,150));
-      assert(screen().includes('beta is inspecting its assignment.'),'Page Up reads the shared conversation');
-      terminal.write('\x07');await new Promise(done=>setTimeout(done,150));
-      card=screen().split('\n').findIndex(line=>line.trim()===label+' 2');clickLine('Read README.md',card+1);
-      await waitFor(()=>!screen().includes('A small project for browser tests.'),'child tool result collapses');
-      terminal.resize(80,24);emulator.resize(80,24);await new Promise(done=>setTimeout(done,300));await save('06-'+label.toLowerCase()+'s-narrow-expanded');
-      terminal.resize(100,38);emulator.resize(100,38);
+      await waitFor(()=>screen().includes(label+' 1 ·')&&screen().includes(label+' 2 ·'),'both compact worker cards');
+      assert(!screen().includes('beta is inspecting its assignment.'));
+      terminal.write('\x10');await waitFor(()=>screen().includes('Search…'),'command search');terminal.write('Inspect worker');await waitFor(()=>screen().includes('Inspect worker'),'worker command');terminal.write('\r');
+      await waitFor(()=>screen().includes('Worker assignments'),'worker list');await save('05-worker-menu');terminal.write('beta');await waitFor(()=>screen().includes('› '+label+' 2'),'beta option');terminal.write('\r');
+      await waitFor(()=>screen().includes('Read-only worker history'),'single worker history');
+      await waitFor(()=>screen().includes('beta is inspecting its assignment.'),'selected worker history is visible');
+      assert(!screen().includes('alpha is inspecting its assignment.'));
+      await save('05-'+label.toLowerCase()+'s');
+      terminal.resize(80,24);emulator.resize(80,24);await new Promise(done=>setTimeout(done,300));await save('06-'+label.toLowerCase()+'s-narrow-inspector');
+      terminal.resize(100,38);emulator.resize(100,38);terminal.write('\x1b');
+      await waitFor(()=>!screen().includes('Read-only worker history'),'inspector closes');
+      assert(!screen().includes('beta is inspecting its assignment.'));
       await fetch(base+'/fixture/delegations/release',{method:'POST'});
       await waitFor(()=>screen().includes('Driver report: both assignments are complete.'),'driver receives completed workers');
-      await waitFor(()=>screen().split('\n').some(line=>line.trim()===label+' 2'),'completed worker identity remains visible');
-      card=screen().split('\n').findIndex(line=>line.trim()===label+' 2');
-      clickLine('▸ Review beta',card+1);
-      await waitFor(()=>screen().includes('beta is inspecting its assignment.'),'completed worker reopens directly');
-      await waitFor(()=>screen().includes('beta final report: inspection complete.'),'completed child transcript keeps its final update');clickLine('▾ Review beta',screen().split('\n').findIndex(line=>line.trim()===label+' 2')+1);
-      await waitFor(()=>!screen().includes('beta is inspecting its assignment.'),'worker card collapses without stopping work');
     }
     await fetch(base+'/fixture/delegations/release',{method:'POST'});
     await waitFor(async()=>(await api(`/sessions/${next.id}`)).session.status==='idle','workers finish');
@@ -166,9 +157,21 @@ try{
     const architecture=kind==='single'?null:{kind,[kind==='team-fusion'?'worker':'expert']:{providerId:'fixture',model:'test-fast'}};
     const shuntSession=await api('/sessions',{workspace:settings.workspace,providerId:'fixture',model:'test-model',architecture,permissionMode:'auto',shunt:{enabled:true,model:{providerId:'fixture',model:'budget-model'}}});await launch(shuntSession,120,42);
     terminal.write((kind==='single'?'SHUNT_BROWSER':'SHUNT_WORKERS')+'\r');
-    await waitFor(()=>screen().includes('fixture exports a greeting'),'Shunt result visible inline');
-    if(kind!=='single')await waitFor(()=>screen().split('Shunt reader').length>=3,'Shunt appears in both workers');
-    assert(!screen().includes('Inspect'));await save('07-shunt-'+kind);
+    if(kind==='single'){
+      await waitFor(()=>screen().includes('fixture exports a greeting'),'Shunt result visible inline');
+      assert(!screen().includes('Inspect'));await save('07-shunt-'+kind);
+    }else{
+      const role=kind==='team-fusion'?'Worker':'Expert';
+      await waitFor(()=>screen().includes(role+' 2 ·'),'compact Shunt workers');
+      assert(!screen().includes('fixture exports a greeting'));
+      for(const name of ['alpha','beta']){
+        terminal.write('/workers\r');await waitFor(()=>screen().includes('Worker assignments'),'Shunt worker list');
+        terminal.write(name);await waitFor(()=>screen().includes('› '+role),'Shunt worker found');terminal.write('\r');
+        await waitFor(()=>screen().includes('fixture exports a greeting'),'selected Shunt reader');
+        assert.equal(screen().split('Shunt reader').length,2);await save('07-shunt-'+kind+'-'+name);
+        terminal.write('\x1b');await waitFor(()=>!screen().includes('Read-only worker history'),'close Shunt history');
+      }
+    }
     await fetch(base+'/fixture/delegations/release',{method:'POST'});
     await waitFor(async()=>(await api(`/sessions/${shuntSession.id}`)).session.status==='idle','Shunt finishes');
   }
@@ -199,13 +202,12 @@ try{
   await waitFor(()=>screen().includes('LiteLLM API key'),'enter fresh key');terminal.write('wrong-key\r');
   await waitFor(()=>screen().includes('HTTP 401'),'gateway error stays in setup');assert.equal((await api('/settings')).providers.length,0);
   terminal.write('\x1b[H\r');await waitFor(()=>screen().includes('LiteLLM API key'),'correct key');terminal.write('fixture-key\r');
-  await waitFor(()=>screen().includes('Choose your driver model'),'driver chooser');assert(screen().includes('powerful reasoning'));assert(screen().includes('Astra, Fable, Sol, Opus'));await save('09-driver-guidance');await waitFor(()=>screen().includes('test-model'),'driver listed');assert(!screen().includes('Gateway base URL'));terminal.write('test-model');await waitFor(()=>screen().includes('test-model')&&screen().includes('› '),'driver found');terminal.write('\r');
-  await waitFor(()=>screen().includes('Choose your sidekick model'),'sidekick chooser');assert(screen().includes('efficient coding workhorse'));assert(screen().includes('DeepSeek Flash, Muse Spark, Gemini Flash'));await save('09-sidekick-guidance');terminal.write('test-fast');await waitFor(()=>screen().includes('› test-fast'),'sidekick found');terminal.write('\r');
-  await waitFor(()=>screen().includes('Sidekick: test-fast')&&screen().includes('Driver: test-model'),'sidekick chosen');await save('09-recommended-models');terminal.write('\x1b[F\r');
+  await waitFor(()=>screen().includes('Choose your driver model'),'driver chooser');assert(screen().includes('persistent lead'));assert(screen().includes('Astra, Fable, Sol, Opus'));await save('09-driver-guidance');await waitFor(()=>screen().includes('test-model'),'driver listed');assert(!screen().includes('Gateway base URL'));terminal.write('test-model');await waitFor(()=>screen().includes('test-model')&&screen().includes('› '),'driver found');terminal.write('\r');
+  await waitFor(()=>screen().includes('Review your setup')&&screen().includes('Driver: test-model'),'lead chosen');await save('09-recommended-models');terminal.write('\x1b[F\r');
   await waitFor(async()=>(await api('/workspace-preferences?workspace='+encodeURIComponent(settings.workspace))).setupComplete===true,'fresh setup persisted');
   const freshSettings=await api('/settings');assert.equal(freshSettings.providers[0].baseUrl,settings.providers[0].baseUrl+'/setup-auth');assert(!JSON.stringify(freshSettings).includes('fixture-key'));
-  assert.equal(freshSettings.defaultModel,'test-model');assert.equal((await api('/workspace-preferences?workspace='+encodeURIComponent(settings.workspace))).architecture.kind,'sidekick-fusion');
-  const next=await api('/sessions',{workspace:settings.workspace+'/src'});await launch(next,80,24);await waitFor(()=>screen().includes('A fresh start.'),'next folder opens chat');assert(!screen().includes('Gateway base URL'));assert.equal(next.model,'test-model');assert.equal(next.architecture.kind,'sidekick-fusion');assert.equal(next.architecture.sidekick.model,'test-fast');await save('10-next-folder-ready');
+  assert.equal(freshSettings.defaultModel,'test-model');assert.equal((await api('/workspace-preferences?workspace='+encodeURIComponent(settings.workspace))).architecture.kind,'litefusion');
+  const next=await api('/sessions',{workspace:settings.workspace+'/src'});await launch(next,80,24);await waitFor(()=>screen().includes('A fresh start.'),'next folder opens chat');assert(!screen().includes('Gateway base URL'));assert.equal(next.model,'test-model');assert.equal(next.architecture.kind,'litefusion');await save('10-next-folder-ready');
   console.log('Fresh TUI gateway setup passed: blank URL, masked key, failed authentication, model discovery, and saved setup.');
   console.log('TUI interactions passed: first-run setup, saved models, live Allow all, two workers, two experts, Sidekick handoff, and narrow/wide rendering.');
 }finally{await stopTerminal();await browser?.close();server.kill('SIGTERM');await rm(config,{recursive:true,force:true});}

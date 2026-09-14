@@ -196,6 +196,7 @@ interface Catalog {
   definitions: readonly ToolDefinition[];
   names: ReadonlyMap<string, string>;
   digest: string;
+  readOnly: ReadonlySet<string>;
 }
 interface Entry {
   name: string;
@@ -300,6 +301,7 @@ export class McpManager implements ExternalTools {
     // (advertise: true). Membership is read from the entry's pinned config, so
     // a later settings edit cannot repartition an accepted turn.
     const gateway = new Map<string, string>();
+    const readOnly = new Set<string>();
     for (const entry of this.entries.values()) {
       if (entry.status !== 'connected' || !entry.connection?.ready || !entry.catalog) continue;
       for (const definition of entry.catalog.definitions) {
@@ -308,6 +310,7 @@ export class McpManager implements ExternalTools {
         routes.set(name, { entry, connection: entry.connection, generation: entry.generation, remote: entry.catalog.names.get(name)!, scope: digest([entry.name, entry.fingerprint, entry.catalog.digest]), validity: entry.validity.signal });
         if (entry.config.advertise !== true) gateway.set(name, entry.name);
         definitions.push(definition);
+        if(entry.catalog.readOnly.has(name))readOnly.add(name);
       }
     }
     const released = new AbortController();
@@ -323,6 +326,7 @@ export class McpManager implements ExternalTools {
     return Object.freeze({
       definitions: freeze(definitions),
       gatewayTools: () => gateway,
+      readOnlyTools: () => readOnly,
       scope: (name: string) => assert(name).scope,
       assertCurrent: (name: string) => { assert(name); },
       execute: (name: string, args: Record<string, unknown>, requestSignal: AbortSignal) => {
@@ -474,6 +478,7 @@ export class McpManager implements ExternalTools {
   private async discover(entry: Entry, connection: Connection, signal: AbortSignal): Promise<Catalog> {
     const definitions: ToolDefinition[] = [], names = new Map<string, string>(), remoteNames = new Set<string>(), cursors = new Set<string>();
     const identity: unknown[] = [];
+    const readOnly = new Set<string>();
     let cursor: string | undefined, bytes = 0;
     for (let page = 0; page < MCP_LIMITS.pages; page++) {
       const result = await abortable(connection.client.request({ method: 'tools/list', ...(cursor ? { params: { cursor } } : {}) }, ListToolsResultSchema, { signal, timeout: MCP_LIMITS.requestMs }), signal);
@@ -491,12 +496,13 @@ export class McpManager implements ExternalTools {
         const name = `mcp_${raw.slice(0, 48)}_${suffix}`;
         if (names.has(name)) throw new SafeError('MCP tool name collision.');
         names.set(name, tool.name);
+        if(tool.annotations?.readOnlyHint===true)readOnly.add(name);
         definitions.push({ type: 'function', function: { name, description: clean(`[${entry.name}] ${tool.description || tool.name}`, entry.config, 8000), parameters: structuredClone(tool.inputSchema) } });
         identity.push(tool);
       }
       if (result.nextCursor === undefined) {
         identity.sort((a, b) => (a as { name: string }).name < (b as { name: string }).name ? -1 : 1);
-        return { definitions: freeze(definitions), names, digest: digest(identity) };
+        return { definitions: freeze(definitions), names, readOnly, digest: digest(identity) };
       }
       if (!result.nextCursor || result.nextCursor.length > 4096 || cursors.has(result.nextCursor)) throw new SafeError('Invalid MCP pagination cursor.');
       cursors.add(result.nextCursor); cursor = result.nextCursor;
