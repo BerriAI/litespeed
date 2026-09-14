@@ -12,9 +12,9 @@ export function conversationGroups(detail: SessionDetail) {
 }
 
 export type ActivityEntry = { message: Message; call?: ToolCall };
-export type ActivitySection = { kind: 'driver'; id: string; entries: ActivityEntry[] } | { kind: 'worker'; id: string; message: Message; call: ToolCall; label: string; task?: DelegationSummary };
+export type ActivitySection = { kind: 'driver'; id: string; entries: ActivityEntry[] } | { kind: 'worker'; id: string; message: Message; call: ToolCall; label: string; task?: DelegationSummary;scheduled?:import('../shared/litefusion-tasks.js').LiteFusionTask };
 export function activityActors(detail: SessionDetail) {
-  const actors = new Map([...workerLabels(detail)].map(([key, label]) => [key, { label, task: undefined as DelegationSummary | undefined, hidden:false }]));
+  const actors = new Map<string,{label:string;task?:DelegationSummary;scheduled?:import('../shared/litefusion-tasks.js').LiteFusionTask;hidden:boolean}>([...workerLabels(detail)].map(([key, label]) => [key, { label, task: undefined as DelegationSummary | undefined, hidden:false }]));
   for (const [key,row] of workerProjection(detail)) actors.set(key,{label:actors.get(key)?.label??'Research',...row});
   return actors;
 }

@@ -49,7 +49,7 @@ describe('durable foreground researcher storage', () => {
       status TEXT NOT NULL, data TEXT NOT NULL, UNIQUE(parent_session_id,parent_turn_id,parent_message_id,tool_call_id));
       INSERT INTO delegations_legacy SELECT * FROM delegations;
       DROP TABLE delegations; ALTER TABLE delegations_legacy RENAME TO delegations;
-      DELETE FROM schema_migrations WHERE version=1;`);
+      DELETE FROM schema_migrations WHERE version IN (1,2);`);
     reopen();
     const restored=delegations.transcript(root.parent.id,first.delegation.id);
     expect(restored.messages).toEqual(before.messages);expect(restored.delegation).toEqual({...before.delegation,legacyContext:true});
@@ -57,7 +57,7 @@ describe('durable foreground researcher storage', () => {
     const second=delegations.reuse({...next.input,delegationId:first.delegation.id,contextKey:'compatible'});
     expect(second.child.id).toBe(first.child.id);expect(second.delegation.id).not.toBe(first.delegation.id);
     expect(delegations.transcript(root.parent.id,first.delegation.id).messages).toEqual(before.messages);
-    expect(store.db.prepare('SELECT version FROM schema_migrations').all()).toEqual([{version:1}]);
+    expect(store.db.prepare('SELECT version FROM schema_migrations').all()).toEqual([{version:1},{version:2}]);
   });
   it.each(['build', 'plan'] as const)('atomically creates hidden child, prompt, pin, history and exact parent link from %s', async mode => {
     const profile = await skill(), root = origin({ profile, mode }); const { child, user, delegation } = delegations.create(root.input);

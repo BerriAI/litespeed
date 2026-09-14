@@ -1,16 +1,17 @@
-# Litespeed 0.1.14
+# Litespeed 0.1.15
 
-LiteFusion adds one persistent lead with task-specific specialist models and reasoning levels.
+LiteFusion is now a complete architecture with an Opus/high lead, asynchronous specialists, and a quieter web workspace.
 
-- Choose **LiteFusion** in Models or `/models`. It is recommended during new setup; existing architecture selections stay saved.
-- Inspect and customize all 63 task cards, their default and shared hard/escalation routes, handoff instructions, and gateway deployment bindings. Compatible serial workers keep their own context; the lead owns assistance, handoffs and final acceptance.
-- The terminal footer groups message actions and session controls, consistently labeled `Action [Shortcut]`. F3 opens Permissions, F4 opens Settings, and Ctrl+P opens Commands. Clickable Send/New line actions preserve normal input behavior, and hints reflect configured bindings.
-- Parallel workers appear as compact progress rows in the terminal and web app. Open one worker history at a time, inspect earlier attempts, or stop one worker while the others continue. Closing the inspector restores your draft.
-- Export reviewed routing policies and per-session evaluation records for Devin. Worker completion, integration, reported costs and external success labels remain separate.
-- Mercury Edit 2 and Voyage Code 4 have explicit chat-model fallbacks for version-checked edit suggestions and repository search. Continuous autocomplete and vector indexing are unavailable.
+- Switch between LiteFusion, Single Model, Sidekick, Team, and Expert. Each architecture remembers its own model arrangement. LiteFusion has one Lead setting; unrelated Driver, Planner, and Shunt controls are removed from its setup.
+- The lead can continue useful work while specialists run. The host schedules dependencies and waits for events without model polling. Task identities, attempts, and private workspaces survive continuation and escalation; interrupted work is never replayed automatically.
+- Explicit provider failures can switch a worker once to its configured escalation route, preserving partial work and recording the availability reason. Lead failures remain visible and require recovery; there is no silent lead replacement.
+- Web chat has larger text, neutral light/dark themes, a simpler composer, compact worker activity, and one history inspector. Task details and attempt history expand on demand. The file panel remembers your choice across conversations and reloads.
+- Both clients keep all 63 task cards and per-task handoffs available for customization. Concurrency defaults to host capacity; there is no default assignment-count cutoff. Advanced experiment overrides remain available.
+- Changes requested during a response apply after active work settles. Worker cancellation, version-checked integration, stale settings protection, retained reports, and export accounting remain explicit.
+- `/new` is the visible new-session command. `/clear` and `/reset` remain compatible aliases without duplicate menu entries.
 
-The bundled model roster is an initial research policy. Quality and cost improvements require independent evaluation; this release does not claim measured ROI gains.
+Run `litespeed update`, then reopen Litespeed. In Models, select **LiteFusion**. Existing custom LiteFusion sessions preserve their lead: choose **Restore preset** to load the recommended Opus/high setup. Check the model IDs available on your gateway.
 
-Run `litespeed update`, then reopen the terminal UI. Select **LiteFusion** in Models to use it in an existing session. Saved sessions, settings, and keys are preserved.
+The model roster remains a research policy awaiting independent evaluation. No measured cost or quality improvement is claimed. Devin exports include task attempts, reported costs, lead wait time, and external evaluation labels separately.
 
-Packages include Node, Bun, native terminal dependencies, and the web app for Apple silicon and Intel Macs.
+Packages include the terminal runtime and web app for Apple silicon and Intel Macs.

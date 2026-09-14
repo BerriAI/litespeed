@@ -53,8 +53,8 @@ export class TerminalController {
     if (accepted && session) await this.open(session.id);
     return session;
   }
-  configurationReady() {
-    if (this.state.pending || isRunning(this.detail) || this.detail?.history?.pendingRecovery) throw new Error('Finish the response or recover history before changing configuration.');
+  configurationReady(allowRunning=false) {
+    if (this.state.pending || (!allowRunning&&isRunning(this.detail)) || this.detail?.history?.pendingRecovery) throw new Error('Finish the response or recover history before changing configuration.');
   }
   async action(label: string, operation: () => Promise<unknown>): Promise<boolean> {
     if (this.state.pending) { this.notice('Another action is still being accepted.'); return false; }
@@ -128,6 +128,10 @@ export class TerminalController {
   steerQueued(id: string) { return this.action('Steering driver', () => this.client.api(this.path(`/queue/${encodeURIComponent(id)}/steer`), {})); }
   queue(action: 'pause' | 'resume' | 'remove', id?: string) {
     return this.action('Updating queue', () => this.client.api(this.path(`/queue/${action === 'remove' ? encodeURIComponent(id!) : action}`), action === 'remove' ? undefined : {}, action === 'remove' ? 'DELETE' : 'POST'));
+  }
+  configureArchitecture(configuration:import('../shared/architecture-config.js').ArchitectureConfiguration,expectedConfigRevision=this.detail?.session.configRevision??0, expectedPendingId:string|null=this.detail?.session.pendingArchitecture?.id??null) {
+    this.configurationReady(true);
+    return this.action('Saving architecture',()=>this.client.api(this.path('/architecture'),{...configuration,expectedConfigRevision,expectedPendingId},'PUT'));
   }
   configure(patch: Record<string, unknown>, expectedConfigRevision = this.detail?.session.configRevision ?? 0) {
     this.configurationReady();

@@ -1,4 +1,5 @@
-import { WorkerInspector } from './WorkerInspector';
+import { architectureConfiguration } from '../../shared/architecture-config';
+import { PendingTaskInspector, WorkerInspector } from './WorkerInspector';
 import { workerProjection } from '../../shared/worker-presentation';
 import { goalTurnLabel } from '../../shared/goals.js';
 import { Updates } from './Updates';
@@ -90,13 +91,13 @@ export default function App() {
   const [paletteOpen, setPaletteOpen] = useState(false);
   const [modelsOpen, setModelsOpen] = useState(false);
   const [sidebarOpen, setSidebarOpen] = useState(false);
-  const [desktopWorkspaceOpen, setDesktopWorkspaceOpen] = useState(() => { if (activeId) return true; try { return localStorage.getItem('litespeed.workspace-panel-open') !== 'false'; } catch { return true; } });
+  const [desktopWorkspaceOpen, setDesktopWorkspaceOpen] = useState(() => { try { return localStorage.getItem('litespeed.workspace-panel-open') === 'true'; } catch { return false; } });
   const [compactWorkspace, setCompactWorkspace] = useState(() => window.innerWidth <= 1000);
   const [mobileWorkspaceOpen, setMobileWorkspaceOpen] = useState(false);
   const workspaceOpen = compactWorkspace ? mobileWorkspaceOpen : desktopWorkspaceOpen;
   const setWorkspaceOpen = compactWorkspace ? setMobileWorkspaceOpen : setDesktopWorkspaceOpen;
   useEffect(() => { try { localStorage.setItem('litespeed.workspace-panel-open', String(desktopWorkspaceOpen)); } catch { /* Keep the current layout if storage is unavailable. */ } }, [desktopWorkspaceOpen]);
-  useEffect(() => { if (activeId) setDesktopWorkspaceOpen(true); setMobileWorkspaceOpen(false); }, [activeId]);
+  useEffect(() => { setMobileWorkspaceOpen(false); }, [activeId]);
   useEffect(() => {
     const media = window.matchMedia('(max-width: 1000px)');
     const update = () => { setCompactWorkspace(media.matches); setMobileWorkspaceOpen(false); };
@@ -134,12 +135,14 @@ export default function App() {
   const running = detail?.session.status === 'running' || detail?.session.status === 'waiting';
   const delegations = detail ? visibleDelegations(detail) : [];
   const workerRows=detail?workerProjection(detail):new Map();
-  const inspected=inspectedWorker?delegations.find(task=>task.id===inspectedWorker):undefined;
+  const inspected=inspectedWorker?(delegations.find(task=>task.id===inspectedWorker)??delegations.findLast(task=>task.asyncTaskId===inspectedWorker)):undefined;
+  const pendingInspection=!inspected&&inspectedWorker?detail?.tasks?.find(task=>task.id===inspectedWorker):undefined;
   const actors = detail ? workerLabels(detail) : new Map<string, string>();
   const history = detail?.history;
   const historyDisabled = running || busy || queueBusy || submissionBusy || historyBusy || configBusy || sessionLoading;
   const legacyUndo = history?.hasCheckpoints === false && !history.pendingRecovery;
   const composerDisabled = busy || historyBusy || configBusy || Boolean(history?.pendingRecovery);
+  const architectureDisabled=busy||queueBusy||submissionBusy||historyBusy||configBusy||sessionLoading||Boolean(history?.pendingRecovery);
   const selectionDisabled = historyDisabled || answering.size > 0 || Boolean(history?.pendingRecovery || (!activeId && pendingSession.current));
   const workspace = detail?.session.workspace ?? (!activeId ? pendingSession.current?.workspace : undefined) ?? settings?.workspace ?? '';
 
@@ -151,7 +154,7 @@ export default function App() {
 
   useEffect(() => {
     const session = detail?.session;
-    if (session && session.id === currentId.current && !configBusy) setSelection({ providerId: session.providerId, model: session.model, mode: session.mode, permissionMode: session.permissionMode, shunt: session.shunt, planner: session.planner, outputStyle: session.outputStyle, modelReasoning: session.modelReasoning, architecture: session.architecture });
+    if (session && session.id === currentId.current && !configBusy) setSelection({ providerId: session.providerId, model: session.model, mode: session.mode, permissionMode: session.permissionMode, shunt: session.shunt, planner: session.planner, outputStyle: session.outputStyle, modelReasoning: session.modelReasoning, architecture: session.architecture,architectureConfigurations:session.architectureConfigurations });
   }, [detail?.session.modelReasoning, detail?.session.providerId, detail?.session.model, detail?.session.mode, detail?.session.permissionMode, detail?.session.planner?.providerId, detail?.session.planner?.model, detail?.session.outputStyle, detail?.session.architecture, detail?.session.configRevision, configBusy]);
   const provider = settings?.providers.find(p => p.id === selection.providerId);
   const closeSettings = useCallback(() => { setSettingsOpen(false); setProfileDialog(null); }, []);
@@ -287,7 +290,7 @@ export default function App() {
       try {
         const initial = await api<SessionDetail>(`/sessions/${id}`);
         if (!live) return;
-        setDetail(initial); setSelection({ providerId: initial.session.providerId, model: initial.session.model, mode: initial.session.mode, permissionMode: initial.session.permissionMode, shunt: initial.session.shunt, planner: initial.session.planner, outputStyle: initial.session.outputStyle, modelReasoning: initial.session.modelReasoning, architecture: initial.session.architecture }); setSessionLoading(false);
+        setDetail(initial); setSelection({ providerId: initial.session.providerId, model: initial.session.model, mode: initial.session.mode, permissionMode: initial.session.permissionMode, shunt: initial.session.shunt, planner: initial.session.planner, outputStyle: initial.session.outputStyle, modelReasoning: initial.session.modelReasoning, architecture: initial.session.architecture,architectureConfigurations:initial.session.architectureConfigurations }); setSessionLoading(false);
         source = new EventSource(`/api/sessions/${id}/events`);
         source.onopen = () => {
           if (!live) return;
@@ -332,10 +335,10 @@ export default function App() {
     setBusy(true); setError('');
     try { await action(); } catch (e) { setError(errorMessage(e)); } finally { setBusy(false); }
   }
-  function configurationLocked() {
+  function configurationLocked(allowRunning=false) {
     const current = detailRef.current;
     return configOperation.current || busy || historyOperation.current || submissionOperation.current || queueOperation.current || answerOperations.current.size > 0 ||
-      current?.session.status === 'running' || current?.session.status === 'waiting' || Boolean(current?.history?.pendingRecovery) ||
+      (!allowRunning&&(current?.session.status === 'running' || current?.session.status === 'waiting')) || Boolean(current?.history?.pendingRecovery) ||
       (!currentId.current && Boolean(pendingSession.current));
   }
   function openProfiles(skillsOnly = false) {
@@ -399,7 +402,8 @@ export default function App() {
     });
   }
   async function changeSelection(next: Selection) {
-    if (configurationLocked()) return;
+    const modelsOnly=next.mode===selection.mode&&next.permissionMode===selection.permissionMode&&JSON.stringify(architectureConfiguration(next))!==JSON.stringify(architectureConfiguration(selection));
+    if (configurationLocked(modelsOnly)) return;
     const previous = selection, id = activeId, request = ++selectionRequest.current;
     setSelection(next);
     if (!id) {
@@ -412,7 +416,8 @@ export default function App() {
     const stillHere = () => currentId.current === id && selectionRequest.current === request;
     const cursor = detailRef.current?.lastEventId ?? 0;
     try {
-      const session = await patch<Session>(`/sessions/${id}`, { ...next, expectedConfigRevision: detailRef.current?.session.configRevision ?? 0 });
+      const session = modelsOnly?await api<Session>(`/sessions/${id}/architecture`,{method:'PUT',body:JSON.stringify({...architectureConfiguration(next),expectedConfigRevision:detailRef.current?.session.configRevision??0,expectedPendingId:detailRef.current?.session.pendingArchitecture?.id??null})}):await patch<Session>(`/sessions/${id}`, { ...next, expectedConfigRevision: detailRef.current?.session.configRevision ?? 0 });
+      if(session.pendingArchitecture)setToast('Architecture queued. Active work will finish with its current configuration.');
       if (stillHere()) setDetail(d => d?.session.id === id && (d.lastEventId ?? 0) <= cursor ? { ...d, session: reconcileSession(d.session, session) } : d);
     } catch (e) {
       if (stillHere()) { setSelection(previous); setError(errorMessage(e)); }
@@ -648,7 +653,7 @@ export default function App() {
     });
   }
   const builtins = [
-    { name: 'models', description: 'Choose models and how they work together', disabled: selectionDisabled, run: () => setModelsOpen(true) },
+    { name: 'models', description: 'Choose models and how they work together', disabled: architectureDisabled, run: () => setModelsOpen(true) },
     { name: 'setup', description: 'Connect a gateway and choose your setup', disabled: selectionDisabled, run: () => setSetup({selection, id:activeId, revision:detail?.session.configRevision ?? 0, workspace}) },
     { name: 'skills', description: 'Browse and use project skills', disabled: selectionDisabled, run: () => openProfiles(true) },
     { name: 'settings', description: 'Providers, preferences, and permissions', run: () => setSettingsOpen(true) },
@@ -681,7 +686,7 @@ export default function App() {
   return <div className={`app ${sidebarOpen ? 'sidebar-is-open' : ''}`}>
     <a className="skip-link" href="#main-content">Skip to conversation</a>
     {sidebarOpen && <button className="sidebar-backdrop" aria-label="Close navigation" onClick={() => setSidebarOpen(false)} />}
-    <aside ref={sidebarRef} className="sidebar" aria-label="Session navigation"><div className="sidebar-brand"><button className="brand" onClick={newSession} aria-label="Litespeed home"><Logo /></button><button className="icon-button sidebar-close" aria-label="Close navigation" onClick={() => setSidebarOpen(false)}><PanelLeftClose size={17} /></button></div>
+    <aside ref={sidebarRef} className="sidebar" aria-label="Session navigation"><div className="sidebar-brand"><button className="brand" onClick={newSession} aria-label="Litespeed home"><Logo /><span className="brand-name">Litespeed</span></button><button className="icon-button sidebar-close" aria-label="Close navigation" onClick={() => setSidebarOpen(false)}><PanelLeftClose size={17} /></button></div>
       <div className="sidebar-top"><button className="new-session" onClick={newSession}><Plus size={17} /><span>New session</span><kbd>⌘ N</kbd></button></div>
       <div className="sessions-heading"><span>{archived ? 'Archived sessions' : 'Your sessions'}</span><button className={`icon-button ${archived ? 'selected' : ''}`} aria-label={archived ? 'Show recent sessions' : 'Show archived sessions'} title={archived ? 'Show recent sessions' : 'Show archived sessions'} onClick={() => setArchived(v => !v)}><Archive size={14} /></button></div>
       {sessions.length > 5 || search ? <div className="session-search"><Search size={13} /><input aria-label="Filter sessions" placeholder="Filter sessions…" value={search} onChange={e => setSearch(e.target.value)} />{search && <button aria-label="Clear session search" onClick={() => setSearch('')}><X size={12} /></button>}</div> : null}
@@ -694,28 +699,28 @@ export default function App() {
         {detail && <button className={`icon-button ${terminalOpen ? 'selected' : ''}`} aria-label={terminalOpen ? 'Hide terminal pane' : 'Open terminal'} aria-expanded={terminalOpen} title="Open a local shell (not sandboxed)" onClick={() => setTerminalOpen(v => !v)}><Terminal size={18} /></button>}
         <button className={`icon-button workspace-toggle ${workspaceOpen ? 'selected' : ''}`} aria-label={workspaceOpen ? 'Hide workspace panel' : 'Show workspace panel'} title="Files, changes, and plan" aria-expanded={workspaceOpen} onClick={() => setWorkspaceOpen(v => !v)}><PanelRight size={18} /></button></div></header>
       {error && <div className="global-alert" role="alert"><span>{error}</span>{!settings ? <button onClick={() => void load()}>Retry connection</button> : activeId && !detail ? <button onClick={() => { setError(''); setSessionReload(v => v + 1); }}>Retry</button> : null}<button className="icon-button" aria-label="Dismiss error" onClick={() => setError('')}><X size={15} /></button></div>}
-      <div className="main-panels"><div className={`main-stage ${inspected && compactWorkspace ? 'worker-inspection-hidden' : ''} ${!activeId ? 'welcome-stage' : ''}`}>
+      <div className="main-panels"><div className={`main-stage ${(inspected||pendingInspection) && compactWorkspace ? 'worker-inspection-hidden' : ''} ${!activeId ? 'welcome-stage' : ''}`}>
         {loading ? <div className="app-loading"><Logo /><LiteSpeed active /><p>Opening your workspace…</p></div> : !settings ? <EmptyState icon={<Terminal size={30} />} title="Let’s get connected.">The local server is not available. Check that Litespeed is running, then retry the connection.<button className="button primary" onClick={() => void load()}>Try again</button></EmptyState> : activeId ? <>
           {goalVisible && detail && <div className={`goal-banner ${goal.status}`} role="status"><Target size={14} /><div className="goal-banner-body"><strong>{goal.status === 'blocked' ? 'Goal paused' : 'Session goal'}</strong><span title={goal.text}>{goal.text}</span></div><span className="goal-banner-turns">{goalTurnLabel(goal.turns, goal.maxTurns)}</span><button className="button secondary" disabled={busy || running} onClick={() => void clearSessionGoal()}>Clear goal</button></div>}
           {sessionLoading ? <div className="app-loading"><LiteSpeed active /><p>Opening this conversation…</p></div> : detail ? <Conversation detail={detail} connection={connection} busy={busy} onAllowAll={() => void changePermissionMode('auto')} renderTask={(tool, message, expanded) => {
             const row=workerRows.get(`${message.id}:${tool.id}`);
             if(row?.hidden)return <></>;
             const task = row?.task ?? delegations.find(item => item.id === tool.delegationId && item.toolCallId === tool.id && item.parentMessageId === message.id);
-            return task || actors.has(`${message.id}:${tool.id}`) ? <TaskCard onInspect={()=>{if(task){inspectorTrigger.current=document.activeElement as HTMLElement;setInspectedWorker(task.id);}}} task={task} tool={tool} label={actors.get(`${message.id}:${tool.id}`)} awaitingApproval={detail.permissions.some(request => Boolean(task && request.invocationId===task.id) || request.toolCallId === tool.id)} expanded={expanded} onCancel={() => { if (task) void cancelTask(task); }} cancelling={Boolean(task && cancellingTasks.has(task.id))} error={task && taskErrors.get(task.id)} /> : null;
+            return task || actors.has(`${message.id}:${tool.id}`) ? <TaskCard scheduled={row?.scheduled} onInspect={()=>{if(task||row?.scheduled){inspectorTrigger.current=document.activeElement as HTMLElement;setInspectedWorker(task?.id??row!.scheduled!.id);}}} task={task} tool={tool} label={actors.get(`${message.id}:${tool.id}`)} awaitingApproval={detail.permissions.some(request => Boolean(task && request.invocationId===task.id) || request.toolCallId === tool.id)} expanded={expanded} onCancel={() => {if(row?.scheduled)void act(async()=>{await post(`/sessions/${activeId}/tasks/${row.scheduled!.id}/cancel`);});else if(task)void cancelTask(task);}} cancelling={Boolean(task && cancellingTasks.has(task.id))} error={task && taskErrors.get(task.id)} /> : null;
           }} onDecide={(id, decision) => void act(async () => { await post(`/sessions/${activeId}/permissions/${id}`, { decision }); await refreshDetail(activeId); })} onFork={messageId => void fork(messageId)} renderQuestion={request => <QuestionCard key={request.id} request={request} draft={questionDrafts.get(request.id) ?? emptyQuestionDraft()} onChange={value => changeQuestionDraft(request.id, value)} onAnswer={answer => answerQuestion(request, answer)} onStop={() => void stopResponse(request.sessionId)} busy={answering.has(request.id)} disabled={busy || historyBusy || Boolean(history?.pendingRecovery)} error={questionErrors.get(request.id)} />} /> : <EmptyState title="This session couldn’t be opened">Choose another session, or start a fresh one.<button className="button secondary" onClick={newSession}><Plus size={15} />New session</button></EmptyState>}
-          {detail && <div className="chat-composer">{history?.pendingRecovery && <TurnHistory history={history} disabled={historyDisabled} busy={historyBusy} running={running} preparing={submissionBusy || queueBusy} onAction={askHistory} />}<CommandArea key={activeId} commands={composerCommands} text={text} setText={setText}><Composer onCommand={runCommand} key={activeId} onPermissionMode={mode => void changePermissionMode(mode)} settings={settings} selection={selection} onSelection={v => void changeSelection(v)} selectionDisabled={selectionDisabled} onSend={(content, files) => send(expandSlashCommand(content, commands), files)} onQueue={(content, files) => queueMessage(expandSlashCommand(content, commands), files)} onSteer={content => steerMessage(content)} queue={detail.queue} queueBusy={queueBusy} onQueueAction={(action, queueId) => void queueAction(action, queueId)} onCancel={() => void stopResponse(activeId)} running={running} disabled={composerDisabled} workspace={workspace} text={text} setText={setText} attachments={attachments} setAttachments={setAttachments} draftNotice={draftNotice} onSettings={() => setSettingsOpen(true)} /></CommandArea></div>}
+          {detail && <div className="chat-composer">{detail.session.pendingArchitecture&&<p className="field-hint" role="status">{detail.session.pendingArchitecture.expectedRevision===(detail.session.configRevision??0)?`Architecture queued: ${detail.session.pendingArchitecture.configuration.architecture?.kind??'single model'}. It applies after active work finishes.`:'Pending architecture needs review because configuration changed. Open Models to review it.'}</p>}{history?.pendingRecovery && <TurnHistory history={history} disabled={historyDisabled} busy={historyBusy} running={running} preparing={submissionBusy || queueBusy} onAction={askHistory} />}<CommandArea key={activeId} commands={composerCommands} text={text} setText={setText}><Composer onCommand={runCommand} key={activeId} onPermissionMode={mode => void changePermissionMode(mode)} settings={settings} selection={selection} onSelection={v => void changeSelection(v)} selectionDisabled={selectionDisabled} architectureDisabled={architectureDisabled} pendingSelection={detail?.session.pendingArchitecture?{...selection,...detail.session.pendingArchitecture.configuration}:undefined} onSend={(content, files) => send(expandSlashCommand(content, commands), files)} onQueue={(content, files) => queueMessage(expandSlashCommand(content, commands), files)} onSteer={content => steerMessage(content)} queue={detail.queue} queueBusy={queueBusy} onQueueAction={(action, queueId) => void queueAction(action, queueId)} onCancel={() => void stopResponse(activeId)} running={running} disabled={composerDisabled} workspace={workspace} text={text} setText={setText} attachments={attachments} setAttachments={setAttachments} draftNotice={draftNotice} onSettings={() => setSettingsOpen(true)} /></CommandArea></div>}
           {terminalOpen && detail && <div className="terminal-dock"><Suspense fallback={<div className="app-loading"><LiteSpeed compact active /><p>Opening terminal…</p></div>}><SessionTerminal key={activeId} sessionId={activeId} onClose={() => setTerminalOpen(false)} /></Suspense></div>}
         </> : <div className="welcome"><h1><Logo /><span>Litespeed<span className="brand-period">.</span></span></h1>
-          <div className="welcome-input"><CommandArea commands={composerCommands} text={text} setText={setText}><Composer onCommand={runCommand} settings={settings} selection={selection} onSelection={v => void changeSelection(v)} selectionDisabled={selectionDisabled} onSend={(content, files) => send(expandSlashCommand(content, commands), files)} onCancel={() => {}} running={false} disabled={composerDisabled} welcome workspace={workspace} text={text} setText={setText} attachments={attachments} setAttachments={setAttachments} draftNotice={draftNotice} onSettings={() => setSettingsOpen(true)} /></CommandArea></div>
+          <div className="welcome-input"><CommandArea commands={composerCommands} text={text} setText={setText}><Composer onCommand={runCommand} settings={settings} selection={selection} onSelection={v => void changeSelection(v)} selectionDisabled={selectionDisabled} architectureDisabled={architectureDisabled} pendingSelection={detail?.session.pendingArchitecture?{...selection,...detail.session.pendingArchitecture.configuration}:undefined} onSend={(content, files) => send(expandSlashCommand(content, commands), files)} onCancel={() => {}} running={false} disabled={composerDisabled} welcome workspace={workspace} text={text} setText={setText} attachments={attachments} setAttachments={setAttachments} draftNotice={draftNotice} onSettings={() => setSettingsOpen(true)} /></CommandArea></div>
           <div className="suggestions">{suggestions.map(({ Icon, label, description, prompt }) => <button key={label} onClick={() => { setText(prompt); document.getElementById('message-input')?.focus(); }}><span className="suggestion-icon"><Icon size={17} /></span><span><strong>{label}</strong><small>{description}</small></span><ArrowRight className="suggestion-arrow" size={14} /></button>)}</div>
           {(!provider?.configured && provider?.baseUrl && !/localhost|127\.0\.0\.1/.test(provider.baseUrl)) && <button className="setup-hint" onClick={() => setSettingsOpen(true)}><Shield size={13} />Connect your provider to get started<ArrowRight size={13} /></button>}
         </div>}
-      </div>{inspected && detail && <WorkerInspector task={inspected} detail={detail} onSelect={setInspectedWorker} onClose={closeWorker} onCancel={()=>void cancelTask(inspected)} cancelling={cancellingTasks.has(inspected.id)} error={taskErrors.get(inspected.id)} />}<div className="workspace-retained" hidden={Boolean(inspected)}>{workspaceOpen && settings && <Workspace workspace={workspace} sessionId={activeId ?? undefined} todos={detail?.todos ?? []} refreshKey={refreshKey} onClose={() => setWorkspaceOpen(false)} onUndo={legacyUndo ? () => askHistory('legacy') : undefined} running={historyDisabled} />}</div></div>
+      </div>{inspected && detail && <WorkerInspector task={inspected} detail={detail} onSelect={setInspectedWorker} onClose={closeWorker} onCancel={()=>void cancelTask(inspected)} cancelling={cancellingTasks.has(inspected.id)} error={taskErrors.get(inspected.id)} />}{pendingInspection&&detail&&<PendingTaskInspector task={pendingInspection} detail={detail} onClose={closeWorker} onCancel={()=>void act(async()=>{await post(`/sessions/${activeId}/tasks/${pendingInspection.id}/cancel`);})}/>}<div className="workspace-retained" hidden={Boolean(inspected||pendingInspection)}>{workspaceOpen && settings && <Workspace workspace={workspace} sessionId={activeId ?? undefined} todos={detail?.todos ?? []} refreshKey={refreshKey} onClose={() => setWorkspaceOpen(false)} onUndo={legacyUndo ? () => askHistory('legacy') : undefined} running={historyDisabled} />}</div></div>
     </main>
     <input type="file" accept="application/json,.json" hidden tabIndex={-1} ref={importInput} aria-label="Import session JSON" onChange={e => { const f = e.target.files?.[0]; if (f) void importSession(f); e.target.value = ''; }} />
     {!settingsOpen && profileDialog && profileDialog.id === activeId && <ProfilePicker skillsOnly={profileDialog.skillsOnly} key={`${profileDialog.id ?? 'new'}-${profileDialog.view}`} workspace={profileDialog.workspace} sessionId={profileDialog.id} initialChoice={profileDialog.choice} selection={profileDialog.selection} disabled={selectionDisabled} onClose={closeProfiles} onApply={applyProfile} />}
     {contextSession && contextSession === activeId && !running && latestContext && <Modal title="Context details" onClose={() => setContextSession(null)}><div className="context-dialog"><ContextIndicator context={latestContext} /></div></Modal>}
-    {modelsOpen && settings && <ModelPicker settings={settings} selection={selection} disabled={selectionDisabled} onChange={value => void changeSelection(value)} onClose={() => setModelsOpen(false)} onSettings={() => setSettingsOpen(true)} workspace={workspace} />}
+    {modelsOpen && settings && <ModelPicker settings={settings} selection={detail?.session.pendingArchitecture?{...selection,...detail.session.pendingArchitecture.configuration}:selection} disabled={architectureDisabled} onChange={value => void changeSelection(value)} onClose={() => setModelsOpen(false)} onSettings={() => setSettingsOpen(true)} workspace={workspace} />}
     {setup && settings && <Onboarding key={`${setup.id}:${setup.workspace}`} selection={setup.selection} settings={settings} workspace={setup.workspace} quick={setup.quick} onSave={saveSetup} onSettings={saveSettings} onClose={() => setSetup(null)} renderProviders={close => <Settings settings={settings} onClose={close} onSave={saveSettings} />} />}
     {settingsOpen && settings && <Settings settings={settings} profilesDisabled={selectionDisabled} onProfiles={() => { setSidebarOpen(false); openProfiles(); }} profiles={profileDialog && profileDialog.id === activeId ? <ProfilePicker embedded key={`${profileDialog.id ?? 'new'}-${profileDialog.view}`} workspace={profileDialog.workspace} sessionId={profileDialog.id} initialChoice={profileDialog.choice} selection={profileDialog.selection} disabled={selectionDisabled} onClose={closeSettings} onApply={applyProfile} /> : null} onClose={closeSettings} onSave={saveSettings} />}
     {paletteOpen && <CommandPalette sessions={sessions} commands={commands} onClose={closePalette} onSession={navigate} onPrompt={p => { setText(p); setPaletteOpen(false); setTimeout(() => document.getElementById('message-input')?.focus(), 50); }} actions={[{ name: 'New session', description: 'Start with a clean slate', Icon: Plus, run: newSession, shortcut: '⌘ N' }, { name: 'Settings', description: 'Models, providers, and workspace', Icon: Settings2, run: () => setSettingsOpen(true) }, { name: 'Toggle workspace', description: 'Files, Git changes, and plan', Icon: PanelRight, run: () => setWorkspaceOpen(v => !v) }, { name: 'Import session', description: 'Restore a conversation from JSON', Icon: Upload, run: () => importInput.current?.click() }, ...(activeId ? [{ name: 'Export session', description: 'Save this conversation as JSON', Icon: Download, run: () => void exportSession() }] : [])]} />}

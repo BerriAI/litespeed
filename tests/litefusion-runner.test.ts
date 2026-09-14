@@ -19,15 +19,15 @@ const calls=(res:ServerResponse,list:Array<{name:string;args:Record<string,unkno
 const selection:LiteFusionSelection={kind:'litefusion',gatewayProviderId:'fixture',bindings:{glm:{providerId:'fixture',model:'cheap'},gemini:{providerId:'fixture',model:'coder'},astra:{providerId:'fixture',model:'strong'},luna:{providerId:'fixture',model:'reader'},kimi:{providerId:'fixture',model:'research'}}};
 const assignment=(extra:Record<string,unknown>={})=>({roleId:'bounded_patch',workstream:'feature',description:'Implement the note',prompt:'Write note.txt and report the observed result.',reason:'Bounded change with exact output.',acceptance:['note.txt contains working'],constraints:[],files:['note.txt'],evidence:[],...extra});
 
-describe('LiteFusion foreground runtime',()=>{
+describe('LiteFusion task runtime',()=>{
   let directory:string,store:Store,server:Server,provider:Server,url:string,runner:ReturnType<typeof createApp>['runner'];
   let requests:any[],respond:(body:any,res:ServerResponse)=>void;
   const api=async(path:string,body?:unknown)=>{const response=await fetch(url+'/api'+path,{method:body===undefined?'GET':'POST',headers:{'Content-Type':'application/json'},...(body===undefined?{}:{body:JSON.stringify(body)})});return {status:response.status,body:await response.json()};};
   const create=async(extra:Record<string,unknown>={})=>{const result=await api('/sessions',{permissionMode:'auto',architecture:selection,...extra});expect(result.status).toBe(201);return result.body;};
   beforeEach(async()=>{
     directory=await realpath(await mkdtemp(join(tmpdir(),'litefusion-test-')));store=new Store(join(directory,'state'));requests=[];
-    respond=(body,res)=>body.model==='lead'?(body.messages.some((m:any)=>m.role==='tool')?reply(res):calls(res,[{name:'delegate',args:assignment()}])):body.messages.at(-1)?.role==='tool'?reply(res,'Wrote note.txt; inspect the result.'):calls(res,[{name:'write_file',args:{path:'note.txt',content:'working'}}]);
-    provider=createServer(async(req,res)=>{const chunks:Buffer[]=[];for await(const chunk of req)chunks.push(chunk);const body=JSON.parse(Buffer.concat(chunks).toString());requests.push(body);respond(body,res);});
+    respond=(body,res)=>body.model==='lead'?(body.messages.some((m:any)=>m.role==='tool')?reply(res):calls(res,[{name:'delegate',args:assignment()},{name:'wait_tasks',args:{}}])):body.messages.at(-1)?.role==='tool'?reply(res,'Wrote note.txt; inspect the result.'):calls(res,[{name:'write_file',args:{path:'note.txt',content:'working'}}]);
+    provider=createServer(async(req,res)=>{const chunks:Buffer[]=[];for await(const chunk of req)chunks.push(chunk);const body=JSON.parse(Buffer.concat(chunks).toString());requests.push(body);if(body.model==='lead'&&store.sessions().some(session=>runner?.active(session.id)&&runner.tasks.list(session.id).some(task=>task.status==='queued'||task.status==='running'))){calls(res,[{name:'wait_tasks',args:{}}]);return;}respond(body,res);});
     const baseUrl=await listen(provider);store.saveSettings({workspace:directory,providers:[{id:'fixture',name:'Local fixture',kind:'openai',baseUrl}],defaultProvider:'fixture',defaultModel:'lead',memoryEnabled:false});
     const app=createApp({store});runner=app.runner;server=createServer(app.app);url=await listen(server);
   });
@@ -134,7 +134,7 @@ describe('LiteFusion foreground runtime',()=>{
     let id='';respond=(body,res)=>{
       if(body.model!=='lead'){reply(res,'Patch report.');return;}
       if(!body.messages.some((m:any)=>m.role==='tool'))calls(res,[{name:'delegate',args:assignment()}]);
-      else if(body.messages.filter((m:any)=>m.role==='tool').length===1)calls(res,[{name:'delegate',args:assignment({roleId:'doc_lookup',continueFrom:runner.delegations.list(id)[0].id})}]);else reply(res);
+      else if(!body.messages.some((m:any)=>m.role==='tool'&&m.content.includes('retain the original role')))calls(res,[{name:'delegate',args:assignment({roleId:'doc_lookup',continueFrom:runner.delegations.list(id)[0].id})}]);else reply(res);
     };
     const session=await create();id=session.id;runner.start(id,'Implement.');await runner.whenIdle();
     expect(runner.delegations.list(id)).toHaveLength(1);expect(requests.some(body=>body.model==='research')).toBe(false);
@@ -150,12 +150,12 @@ describe('LiteFusion foreground runtime',()=>{
     const session=await create();runner.start(session.id,'Suggest an edit.');await runner.whenIdle();
     const task=runner.delegations.list(session.id)[0];expect(task.status).toBe('failed');
     expect(task.litefusion?.filesAfter?.[0].sha256).not.toBe(file.sha256);
-    expect(store.messages(session.id).flatMap(m=>m.toolCalls??[]).at(-1)?.output).toContain('edit target changed');
+    expect(runner.delegations.report(session.id,task.id)).toContain('edit target changed');
     expect(await readFile(join(directory,'draft.ts'),'utf8')).toBe('changed concurrently');
   });
   it('escalates a failed attempt with stable assignment identity and failure evidence',async()=>{
     let id='';respond=(body,res)=>{
-      if(body.model==='cheap'){res.writeHead(401,{'Content-Type':'application/json'});res.end(JSON.stringify({error:{message:'Fixture denied the worker request.'}}));return;}
+      if(body.model==='cheap'){res.writeHead(400,{'Content-Type':'application/json'});res.end(JSON.stringify({error:{message:'Fixture denied the worker request.'}}));return;}
       if(body.model!=='lead'){reply(res,'Repaired with supplied evidence.');return;}
       const records=id?runner.delegations.list(id):[];
       if(records.length===0)calls(res,[{name:'delegate',args:assignment()}]);
@@ -164,11 +164,11 @@ describe('LiteFusion foreground runtime',()=>{
     const session=await create();id=session.id;runner.start(id,'Implement.');await runner.whenIdle();
     const [first,second]=runner.delegations.list(id);expect(first.status).toBe('failed');expect(second.status).toBe('completed');
     expect(second.litefusion).toMatchObject({assignmentId:first.litefusion!.assignmentId,previousAttemptId:first.id,tier:'escalation',reason:'escalation'});
-    expect(JSON.stringify(requests.find(body=>body.model==='coder').messages)).toContain('Provider request failed (HTTP 401)');
+    expect(JSON.stringify(requests.find(body=>body.model==='coder').messages)).toContain('Provider request failed (HTTP 400)');
   });
   it('can escalate a failed task in a later user turn without erasing its history',async()=>{
     let id='',repairNext=false;respond=(body,res)=>{
-      if(body.model==='cheap'){res.writeHead(401);res.end('{}');return;}
+      if(body.model==='cheap'){res.writeHead(400);res.end('{}');return;}
       if(body.model!=='lead'){reply(res,'Repaired.');return;}
       const tasks=id?runner.delegations.list(id):[];
       if(!tasks.length)calls(res,[{name:'delegate',args:assignment()}]);
@@ -198,7 +198,7 @@ describe('LiteFusion foreground runtime',()=>{
     };
     const session=await create();id=session.id;runner.start(id,'Implement and repair.');await runner.whenIdle();
     const tasks=runner.delegations.list(id);expect(tasks).toHaveLength(2);expect(tasks[1].litefusion?.sameRouteRepairs).toBe(1);
-    expect(store.messages(id).some(m=>m.role==='tool'&&m.content.includes('one same-route repair'))).toBe(true);
+    expect(runner.tasks.list(id).some(task=>task.error?.includes('one same-route repair'))).toBe(true);
     const detail=(await api(`/sessions/${id}`)).body;expect(logicalWorkers(detail)).toHaveLength(1);expect(new Set(workerLabels(detail).values())).toEqual(new Set(['Task 1']));
   });
   it('continues a compatible serial worker instead of rebuilding its context',async()=>{

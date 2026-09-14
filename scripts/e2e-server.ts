@@ -41,9 +41,10 @@ const mock=createServer(async(req,res)=>{
       const name=prompt.includes('alpha.txt')?'alpha':'beta';
       if(data.messages.at(-1)?.role!=='tool') {toolCall=true;emit({tool_calls:[{index:0,id:`lf-write-${name}`,type:'function',function:{name:'write_file',arguments:JSON.stringify({path:`${name}.txt`,content:`${name} written`})}}]});}
       else {emit({content:`${name} worker report`});await new Promise<void>(resolve=>{const release=()=>{pendingDelegations.delete(release);res.off('close',release);resolve();};pendingDelegations.add(release);res.once('close',release);});if(res.destroyed)return;}
-    } else if(data.messages.at(-1)?.role!=='tool') {
+    } else if(!data.messages.some((message:any)=>message.role==='assistant'&&message.tool_calls?.some((call:any)=>call.function.name==='delegate'))) {
       toolCall=true;emit({tool_calls:['alpha','beta'].map((name,index)=>({index,id:`lf-${name}`,type:'function',function:{name:'delegate',arguments:JSON.stringify({roleId:'bounded_patch',workstream:name,description:`Write ${name}`,prompt:`Write ${name}.txt`,files:[`${name}.txt`],reason:'Independent bounded files',acceptance:[`${name}.txt contains ${name} written`]})}}))});
-    } else emit({content:'LiteFusion fixture finished. Review the integrated files.'});
+    } else if(data.messages.filter((message:any)=>message.role==='system'&&String(message.content).startsWith('LiteFusion task result.')).length<2){toolCall=true;emit({tool_calls:[{index:0,id:'lf-wait',type:'function',function:{name:'wait_tasks',arguments:'{}'}}]});}
+    else emit({content:'LiteFusion fixture finished. Review the integrated files.'});
   }else if(prompt.includes('SHUNT_WORKERS')&&data.messages.at(-1)?.role!=='tool') {
     toolCall=true;emit({tool_calls:['alpha','beta'].map((name,index)=>({index,id:`shunt-worker-${name}`,type:'function',function:{name:'delegate',arguments:JSON.stringify({description:`Read ${name}`,prompt:`SHUNT_CHILD ${name}`})}}))});
   }else if((prompt.includes('SHUNT_BROWSER')||prompt.includes('SHUNT_CHILD'))&&data.messages.at(-1)?.role!=='tool') {

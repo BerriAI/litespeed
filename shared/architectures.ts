@@ -53,7 +53,7 @@ export function architectureWorker(selection: ArchitectureSelection): ModelRoute
 }
 
 export function architectureProviders(selection: ArchitectureSelection): string[] {
-  return selection.kind === 'litefusion' ? [...new Set([selection.gatewayProviderId,...Object.values(selection.bindings ?? {}).map(route=>route.providerId)])] : [architectureWorker(selection)!.providerId];
+  return selection.kind === 'litefusion' ? [...new Set([selection.gatewayProviderId,...(selection.lead?[selection.lead.providerId]:[]),...Object.values(selection.bindings ?? {}).map(route=>route.providerId)])] : [architectureWorker(selection)!.providerId];
 }
 export function strictFusion(selection?: ArchitectureSelection): boolean { return selection?.kind === 'team-fusion' || selection?.kind === 'expert-fusion'; }
 
