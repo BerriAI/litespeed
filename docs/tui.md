@@ -147,3 +147,7 @@ This replacement has been exercised on macOS with Node 26 and Bun 1.4.2. Linux t
 The header identifies the active driver, Sidekick, or worker count. Handoffs appear where they happened in the conversation. Expand a handoff card to read that invocation’s full transcript and inspect its tool calls in place. Each Sidekick handoff keeps its own transcript even when the model reuses context. Worker transcripts stream live. Old responses do not reparse merely because you type a draft.
 
 Use `/permissions` or the footer to switch between **Ask first** and **Allow all tools**, even during a run. Approval prompts say whether a grant applies to a tool for the session or one external path; `4` selects Allow all tools. Explicit ask/deny rules still apply. `/queue` lets you promote a queued text message to **Steer driver now**.
+
+## Footer actions
+
+The footer groups message actions on the left and session controls on the right. Each item uses `Action [Shortcut]` and is clickable. **F3** opens Permissions, **F4** opens Settings, and **Ctrl+P** opens Commands. Permission mode is shown in its picker. Configure `permissions_open`, `settings_open`, or `command_list` in terminal keybindings to change these shortcuts; the footer follows those bindings. Narrow terminals omit the optional newline hint first and wrap whole action groups when necessary.

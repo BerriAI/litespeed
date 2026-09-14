@@ -50,7 +50,7 @@ try {
   terminal.onData(data => { raw += data; emulator.write(data); });
   };
   launch();
-  await waitFor(() => screen().includes('Ctrl+P Commands'), 'composer ready');
+  await waitFor(() => screen().includes('Commands [Ctrl+P]'), 'composer ready');
   await save('01-ready');
   // Let the initial editor focus settle before injecting a command through the PTY.
   await new Promise(done => setTimeout(done, 200));
@@ -130,7 +130,7 @@ try {
   terminal.write('\x1b[F\x1b[A\r');
   await waitFor(async () => (await detail()).session.architecture?.worker?.model === 'test-fast', 'architecture saved');
   await api(`/sessions/${session.id}`, { architecture: null, expectedConfigRevision: (await detail()).session.configRevision }, 'PATCH');
-  await waitFor(() => screen().includes('Ctrl+P Commands') && !screen().includes('Save applies'), 'back to composer');
+  await waitFor(() => screen().includes('Commands [Ctrl+P]') && !screen().includes('Save applies'), 'back to composer');
   terminal.write('/settings\r');
   await waitFor(() => screen().includes('Project profiles'), 'settings sections');
   await save('06-settings');
@@ -189,7 +189,7 @@ try {
   terminal.write('queued follow-up\r');
   await waitFor(async () => (await detail()).queue.items.length === 1, 'follow-up queued');
   assert(screen().includes('queued follow-up')&&screen().includes('Steer now'),'queued content and direct steering stay visible');
-  assert(screen().includes('Enter queue · Alt+Enter steer'),'running composer accurately labels both actions');
+  assert(screen().includes('Queue [Enter] · Steer [Alt+Enter]'),'running composer accurately labels both actions');
   terminal.write('\x1b');
   await waitFor(() => screen().includes('idle') && screen().includes('Press Up to edit') && !screen().includes('Interrupting'), 'queue task stopped');
   terminal.write('/queue\r');
@@ -209,7 +209,7 @@ try {
   await waitFor(() => screen().includes('Ask Litespeed to do'), 'composer after queue removal');
   await waitFor(() => !screen().includes('×') && !screen().includes('Updating queue') && screen().includes('Ask Litespeed to do'), 'queue action finished');
   terminal.write('slow response steering fixture');
-  await waitFor(() => screen().includes('slow response steering fixture') && screen().includes('Enter send'), 'steering task ready to send');
+  await waitFor(() => screen().includes('slow response steering fixture') && screen().includes('Send [Enter]'), 'steering task ready to send');
   terminal.write('\r');
   await waitFor(() => screen().includes('Queue a follow-up'), 'steering target running');
   terminal.write('driver steering from terminal');
@@ -248,7 +248,7 @@ try {
   terminal.write('/shell\r');
   await waitFor(() => screen().includes('Litespeed shell'), 'shell owns terminal');
   terminal.write('printf \"shell handoff verified\\n\"; exit\r');
-  await waitFor(() => screen().includes('Ctrl+P Commands') && screen().includes('Ask Litespeed to do'), 'shell returns terminal to composer');
+  await waitFor(() => screen().includes('Commands [Ctrl+P]') && screen().includes('Ask Litespeed to do'), 'shell returns terminal to composer');
   // Bracketed paste retains Unicode and newlines without sending on newline.
   const beforePaste = (await detail()).messages.length;
   terminal.write('\x1b[200~Hello 世界 👩🏽‍💻\nSecond pasted line\x1b[201~');
@@ -274,14 +274,14 @@ try {
   await new Promise(done => setTimeout(done, 250)); await save('08-wide');
   terminal.resize(80, 12); emulator.resize(80, 12);
   await new Promise(done => setTimeout(done, 250)); await save('09-short');
-  assert(screen().includes('Ctrl+P Commands'), 'short terminal keeps controls visible');
+  assert(screen().includes('Commands [Ctrl+P]'), 'short terminal keeps controls visible');
   terminal.resize(80, 24); emulator.resize(80, 24);
   await new Promise(done => setTimeout(done, 300)); await save('05-small');
   terminal.write('\x03'); await new Promise(done => setTimeout(done, 100)); terminal.write('\x03');
   const status = await Promise.race([exit, new Promise((_, reject) => setTimeout(() => reject(new Error('Terminal did not exit')), 5000))]);
   assert.equal(status.exitCode, 0);
   launch();
-  await waitFor(() => screen().includes('unfinished draft') && screen().includes('Ctrl+P Commands'), 'draft restored after process restart');
+  await waitFor(() => screen().includes('unfinished draft') && screen().includes('Commands [Ctrl+P]'), 'draft restored after process restart');
   terminal.write('\x03'); await new Promise(done => setTimeout(done, 100)); terminal.write('\x03');
   assert.equal((await exit).exitCode, 0);
   console.log('TUI PTY passed: drafts, send, approval preview/allow/always/deny, questions, steering, family cancellation, queue, history, four architectures, planner, profiles, goals, references, Unicode paste, editor, shell, sessions, restart, resize, and clean exit.');

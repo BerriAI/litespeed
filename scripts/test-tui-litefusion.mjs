@@ -25,7 +25,7 @@ try{
   const settings=await api('/settings');session=await api('/sessions',{workspace:settings.workspace,providerId:'fixture',model:'test-model',permissionMode:'auto',architecture:{kind:'litefusion',gatewayProviderId:'fixture',bindings:{glm:{providerId:'fixture',model:'test-fast'}}}});
   emulator=new xterm.Terminal({cols:120,rows:40,allowProposedApi:true});
   terminal=pty.spawn(process.execPath,['bin/litespeed.mjs','tui','--url',base,'--session',session.id],{cwd:root,name:'xterm-256color',cols:120,rows:40,env:{...process.env,TERM:'xterm-256color',LITESPEED_DISABLE_PROJECT_CONFIG:'1',LITESPEED_CONFIG_DIR:config,XDG_CONFIG_HOME:config,XDG_STATE_HOME:config}});
-  terminal.onData(data=>emulator.write(data));await waitFor(()=>screen().includes('Ctrl+P Commands')&&screen().includes('Ask Litespeed'),'composer ready');await delay(200);
+  terminal.onData(data=>emulator.write(data));await waitFor(()=>screen().includes('Commands [Ctrl+P]')&&screen().includes('Ask Litespeed'),'composer ready');await delay(200);
   assert(screen().includes('+ specialists'));
   terminal.write('/models\r');await waitFor(()=>screen().includes('Architecture: LiteFusion'),'LiteFusion saved in TUI');terminal.write('\x1b[H'+'\x1b[B'.repeat(3)+'\r');
   await waitFor(()=>screen().includes('All 63 task routes and handoffs'),'routing editor');terminal.write('\r');await waitFor(()=>screen().includes('all 63 tasks'),'searchable task catalog');terminal.write('technical documentation');await delay(150);terminal.write('\r');await waitFor(()=>screen().includes('Hard / escalation:')&&screen().includes('Luna'),'task route pair');await save('01-task-routing');

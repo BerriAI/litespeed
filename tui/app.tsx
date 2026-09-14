@@ -1,6 +1,7 @@
 /** @jsxImportSource @opentui/react */
+import { Footer, shortcutLabel } from './footer.js';
 import { goalTurnLabel } from '../shared/goals.js';
-import { useCallback, useEffect, useMemo, useRef, useState, useSyncExternalStore, type ReactNode } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState, useSyncExternalStore, type ReactNode, type RefObject } from 'react';
 import { useBlur, useFocus, useKeyboard, useRenderer, useSelectionHandler, useTerminalDimensions } from '@opentui/react';
 import type { TextareaRenderable } from '@opentui/core';
 import { readFile, writeFile } from 'node:fs/promises';
@@ -51,8 +52,8 @@ function LoadingScreen() {
   return <box flexGrow={1} justifyContent="center" alignItems="center" flexDirection="column">{visible && <><Brand /><box marginTop={1} flexDirection="row" gap={1}><WorkingScanner color={toHex(theme.primary)} /><text fg={toHex(theme.textMuted)}>Connecting to Litespeed…</text></box></>}</box>;
 }
 
-function Composer({ controller, focused, onSubmit, onReference, onSuggestionsChange, commands }: { commands: {name: string; description: string; skill?: boolean}[]; controller: TerminalController; focused: boolean; onSubmit: () => void; onReference: (prefix: string) => void; onSuggestionsChange: (open: boolean) => void }) {
-  const theme = useTheme(), editor = useRef<TextareaRenderable>(null);
+function Composer({ editorRef, controller, focused, onSubmit, onReference, onSuggestionsChange, commands }: { editorRef:RefObject<TextareaRenderable|null>; commands: {name: string; description: string; skill?: boolean}[]; controller: TerminalController; focused: boolean; onSubmit: () => void; onReference: (prefix: string) => void; onSuggestionsChange: (open: boolean) => void }) {
+  const theme = useTheme(), editor = editorRef;
   const { draft, pending, sync } = useSyncExternalStore(controller.subscribe, controller.getState);
   const queued = Boolean(sync.detail?.queue?.items.length);
   const { height, width } = useTerminalDimensions(), config = useConfig();
@@ -118,6 +119,7 @@ export function App({ controller, config, theme: initialTheme, themeName: initia
 function SessionApp({ controller, router, onQuit, chooseTheme, themeName, themeMode }: { controller: TerminalController; router: KeymapRouter; onQuit: (code?: number) => void; chooseTheme: (name: string, mode: 'system' | 'light' | 'dark') => void; themeName: string; themeMode: 'system' | 'light' | 'dark' }) {
   const theme = useTheme(), { width } = useTerminalDimensions(), renderer = useRenderer();
   const state = useSyncExternalStore(controller.subscribe, controller.getState);
+  const composerEditor=useRef<TextareaRenderable>(null);
   const config = useConfig(), terminalFocused = useRef(true), previousStatus = useRef<string | undefined>(undefined);
   useFocus(() => { terminalFocused.current = true; }); useBlur(() => { terminalFocused.current = false; });
   useSelectionHandler(selection => {
@@ -307,11 +309,19 @@ function SessionApp({ controller, router, onQuit, chooseTheme, themeName, themeM
         {detail.queue.items.length > 3 && <text height={1} fg={toHex(theme.textMuted)}>{`  +${detail.queue.items.length - 3} more · /queue to view all`}</text>}
       </box> : null}
       {state.draft.attachments.length > 0 && <text fg={toHex(theme.textMuted)}>{state.draft.attachments.map(item => `⌕ ${item.name}`).join('  ')}</text>}
-      {!panel && permission ? <PermissionPrompt key={permission.id} request={permission} controller={controller} onOverlayChange={setPromptOverlay} disabled={Boolean(state.pending)} /> : !panel && question ? <QuestionPrompt key={question.id} request={question} controller={controller} onOverlayChange={setPromptOverlay} disabled={Boolean(state.pending)} /> : <Composer onSuggestionsChange={setSuggestionsOpen} commands={[...commands.map(item => ({name:item.id, description:item.label})), {name:'help', description:'Browse all commands'}, ...projectCommands.filter(item => !commands.some(command => command.id === item.name)).map(item => ({name:item.name, description:item.description})), ...skillCommands(skills, reserved)]} controller={controller} focused={!panel} onSubmit={submit} onReference={prefix => setPanel(<FilePicker controller={controller} initialQuery={prefix} onClose={close} onPick={file => { const draft = controller.getState().draft; if (draft.attachments.length >= 10) { controller.notice('A message can have up to 10 attachments.'); return; } controller.setDraft({ text: draft.text.replace(/@[^\s]*$/, ''), attachments: [...draft.attachments, { name: file.name, path: file.path }] }); close(); }} />)} />}
+      {!panel && permission ? <PermissionPrompt key={permission.id} request={permission} controller={controller} onOverlayChange={setPromptOverlay} disabled={Boolean(state.pending)} /> : !panel && question ? <QuestionPrompt key={question.id} request={question} controller={controller} onOverlayChange={setPromptOverlay} disabled={Boolean(state.pending)} /> : <Composer editorRef={composerEditor} onSuggestionsChange={setSuggestionsOpen} commands={[...commands.map(item => ({name:item.id, description:item.label})), {name:'help', description:'Browse all commands'}, ...projectCommands.filter(item => !commands.some(command => command.id === item.name)).map(item => ({name:item.name, description:item.description})), ...skillCommands(skills, reserved)]} controller={controller} focused={!panel} onSubmit={submit} onReference={prefix => setPanel(<FilePicker controller={controller} initialQuery={prefix} onClose={close} onPick={file => { const draft = controller.getState().draft; if (draft.attachments.length >= 10) { controller.notice('A message can have up to 10 attachments.'); return; } controller.setDraft({ text: draft.text.replace(/@[^\s]*$/, ''), attachments: [...draft.attachments, { name: file.name, path: file.path }] }); close(); }} />)} />}
     </> : state.sync.phase === 'error' ? <box flexGrow={1} justifyContent="center" alignItems="center" flexDirection="column"><text fg={toHex(theme.error)}>{state.sync.error}</text><Button onPress={() => run(() => controller.open(controller.sessionId))}>Reconnect</Button><Button onPress={palette}>Commands</Button></box> : <LoadingScreen />}
     <UpdateNotice controller={controller} onRestart={() => { process.send?.({ type: 'litespeed-restart', sessionId: controller.sessionId }); onQuit(75); }} />
     {(state.notice || pendingLeader || state.sync.connection === 'reconnecting') && <text height={1} flexShrink={0} paddingLeft={1} fg={toHex(theme.warning)}>{terminalText(pendingLeader ? 'Leader…' : state.notice || 'Reconnecting… Showing the last known state.').replace(/\s+/g, ' ').slice(0, width - 2)}</text>}
-    <box height={1} flexDirection="row" flexShrink={0}><Button tone="muted" onPress={palette}>Ctrl+P Commands</Button><Button tone="muted" onPress={permissions}>{detail?.session.permissionMode === 'auto' ? 'Allow all tools' : 'Ask first'}</Button><Button tone="muted" onPress={openSettings}>Settings</Button><text fg={toHex(theme.textMuted)}>{state.pending ? `${state.pending}…` : permission || question ? 'Choose an answer above · Esc Esc stop' : busy ? 'Enter queue · Alt+Enter steer' : 'Enter send · Shift+Enter newline'}</text></box>
+    <Footer width={width} message={permission||question||!detail?[]:[
+      {id:'send',label:busy?'Queue':'Send',shortcut:shortcutLabel('input_submit',config.keybinds),onPress:submit,disabled:Boolean(panel||state.pending||!state.draft.text.trim()&&!state.draft.attachments.length)},
+      busy?{id:'steer',label:'Steer',shortcut:'Alt+Enter',onPress:()=>run(()=>send('steer')),disabled:Boolean(panel||state.pending||!state.draft.text.trim()||state.draft.attachments.length)}:{id:'newline',label:'New line',shortcut:shortcutLabel('input_newline',config.keybinds),optional:true,onPress:()=>{composerEditor.current?.insertText('\n');},disabled:Boolean(panel||state.pending)},
+    ]} session={[
+      {id:'commands',label:'Commands',shortcut:shortcutLabel('command_list',config.keybinds),onPress:palette},
+      {id:'permissions',label:'Permissions',shortcut:shortcutLabel('permissions_open',config.keybinds),onPress:permissions,disabled:!detail},
+      {id:'settings',label:'Settings',shortcut:shortcutLabel('settings_open',config.keybinds),onPress:openSettings},
+    ]}/>
+
     {panel}
   </box></TranscriptSettingsProvider></WorkerInspectionContext.Provider>;
 }

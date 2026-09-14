@@ -33,7 +33,7 @@ try {
   terminal.onData(data => { raw += data; const match = /Stop it with: kill (\d+)/.exec(data); if (match) serverPid = Number(match[1]); emulator.write(data); });
   await waitFor(() => screen().includes('LITESPEED_SMOKE_SHELL>'), 'Invoking shell did not open');
   terminal.write('litespeed\r');
-  await waitFor(() => screen().includes('How would you like to work?') && screen().includes('Ctrl+P Commands'), 'Production TUI did not open');
+  await waitFor(() => screen().includes('How would you like to work?') && screen().includes('Commands [Ctrl+P]'), 'Production TUI did not open');
   assert(serverPid, 'launcher reports the owned backend PID');
   const sessions = await (await fetch(`${base}/api/sessions`)).json();
   assert.equal(sessions.sessions.length, 1);
@@ -44,12 +44,12 @@ try {
   terminal.write('\x1a');
   await waitFor(() => screen().includes('Stopped') && screen().includes('LITESPEED_SMOKE_SHELL>'), 'Suspend did not return to invoking shell');
   terminal.write('fg\r');
-  await waitFor(() => screen().includes('A fresh start.') && screen().includes('Ctrl+P Commands'), 'Foreground did not restore terminal');
+  await waitFor(() => screen().includes('A fresh start.') && screen().includes('Commands [Ctrl+P]'), 'Foreground did not restore terminal');
   const promptsBeforeQuit = promptCount();
   terminal.write('\x03');
   await waitFor(() => screen().includes('Ctrl+C again to exit'), 'First quit key was not handled');
   terminal.write('\x03');
-  await waitFor(() => promptCount() > promptsBeforeQuit && screen().includes('LITESPEED_SMOKE_SHELL>') && !screen().includes('Ctrl+P Commands'), 'Quit did not restore invoking shell');
+  await waitFor(() => promptCount() > promptsBeforeQuit && screen().includes('LITESPEED_SMOKE_SHELL>') && !screen().includes('Commands [Ctrl+P]'), 'Quit did not restore invoking shell');
   terminal.write('exit\r');
   const result = await Promise.race([exited, delay(5000).then(() => { throw new Error(`Invoking shell did not exit after TUI shutdown\n${screen()}`); })]);
   assert.equal(result.exitCode, 0);

@@ -51,11 +51,29 @@ try{
   async function launch(session,cols=100,rows=38){
     await stopTerminal();emulator=new xterm.Terminal({cols,rows,allowProposedApi:true});
     terminal=pty.spawn(process.execPath,['bin/litespeed.mjs','tui','--url',base,'--session',session.id,'--workspace',settings.workspace],{cwd:root,cols,rows,name:'xterm-256color',env:{...process.env,PATH:config+':'+process.env.PATH,SSH_CONNECTION:'',SSH_TTY:'',LITESPEED_TEST_CLIPBOARD:clipboard,TERM:'xterm-256color',LITESPEED_DISABLE_PROJECT_CONFIG:'1',LITESPEED_CONFIG_DIR:config,XDG_CONFIG_HOME:config,XDG_STATE_HOME:config}});
-    const display=emulator;terminal.onData(chunk=>display.write(chunk));await waitFor(()=>screen().includes('Ctrl+P Commands'),'ready');
+    const display=emulator;terminal.onData(chunk=>display.write(chunk));await waitFor(()=>screen().includes('Commands [Ctrl+P]'),'ready');
     await new Promise(done=>setTimeout(done,100));
   }
   const session=await api('/sessions',{workspace:settings.workspace});await launch(session,80,24);
   assert(!screen().includes('Connect your LiteLLM gateway'));
+  await waitFor(()=>screen().includes('Send [Enter]')&&screen().includes('Permissions [F3]')&&screen().includes('Settings [F4]'),'uniform narrow footer');
+  assert(!screen().includes('New line [Shift+Enter]'));
+  const modeBefore=(await api(`/sessions/${session.id}`)).session.permissionMode;
+  terminal.write('Footer draft');terminal.write('\x1bOR');
+  await waitFor(()=>screen().includes('Rules and defaults'),'F3 opens permission picker');
+  assert.equal((await api(`/sessions/${session.id}`)).session.permissionMode,modeBefore);
+  terminal.write('\x1b');await waitFor(()=>!screen().includes('Rules and defaults')&&screen().includes('Footer draft'),'permissions preserves draft');
+  terminal.write('\x1bOS');await waitFor(()=>screen().includes('API connections and ChatGPT sign-in'),'F4 opens settings');
+  terminal.write('\x1b');await waitFor(()=>!screen().includes('API connections and ChatGPT sign-in')&&screen().includes('Footer draft'),'settings preserves draft');
+  terminal.resize(120,38);emulator.resize(120,38);await waitFor(()=>screen().includes('New line [Shift+Enter]'),'wide footer shows editing alternative');
+  terminal.write('\x15AB\x1b[D');await new Promise(done=>setTimeout(done,100));clickLine('New line [Shift+Enter]');
+  await waitFor(()=>screen().split('\n').some(line=>/^│ A\s+│$/.test(line))&&screen().split('\n').some(line=>/^│ B\s+│$/.test(line)),'footer newline inserts at cursor');
+  terminal.write('\x7f');await waitFor(()=>screen().includes('AB'),'backspace rejoins inserted newline');
+  terminal.write('\x05\x15');await save('00-uniform-footer');
+  clickLine('Settings [F4]');await waitFor(()=>screen().includes('API connections and ChatGPT sign-in'),'footer settings click');terminal.write('\x1b');
+  await waitFor(()=>!screen().includes('API connections and ChatGPT sign-in'),'close footer settings');
+  terminal.resize(80,24);emulator.resize(80,24);
+
   terminal.write('/set');await waitFor(()=>screen().includes('/settings')&&screen().includes('/setup'),'slash suggestions');await save('00-slash-commands');
   terminal.write('\t');await waitFor(()=>screen().includes('/settings '),'Tab completes command');
   terminal.write('\x15/setup\r');
