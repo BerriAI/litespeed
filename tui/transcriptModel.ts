@@ -40,6 +40,66 @@ export function outputBudget(maxLines: number, width: number): number {
   return maxLines * Math.max(20, width - 6);
 }
 
+/** Inline markers that arrive in halves while a response streams. */
+const STREAM_MARKERS = ['**', '~~', '`'] as const;
+
+/** A fence is open when an odd number of fence lines has arrived. Everything
+ * after it is code: its markers are literal and must never be completed. */
+function insideOpenFence(content: string): boolean {
+  let open = false;
+  for (const line of content.split('\n')) if (/^\s{0,3}(?:```|~~~)/.test(line)) open = !open;
+  return open;
+}
+
+/** Start of the last paragraph: inline emphasis never crosses a blank line. */
+function lastParagraphStart(content: string): number {
+  let start = 0;
+  for (const match of content.matchAll(/\n[ \t]*\n/g)) start = match.index + match[0].length;
+  return start;
+}
+
+/** Complete the inline markers left dangling by a partially arrived response.
+ *
+ * `marked` — the parser behind both markdown renderers — only recognizes a
+ * marker pair, so a half-arrived `**bold` is tokenized as plain text and the
+ * terminal shows its literal asterisks until the closer lands, then reflows the
+ * rest of the paragraph when concealment removes them. Closing the pair
+ * virtually renders the emphasis immediately and keeps the text on one column,
+ * so nothing shifts when the real closer arrives.
+ *
+ * Only the trailing paragraph is examined, only outside fenced code, and only
+ * for markers whose opener looks like an opener (CommonMark wants a non-space
+ * to its right). An unmatched marker with nothing after it yet is dropped
+ * rather than closed, because `****` is literal text. Balanced content, code
+ * fences and every settled response are returned unchanged. */
+export function stableStreamingMarkdown(content: string): string {
+  if (!content || insideOpenFence(content)) return content;
+  const start = lastParagraphStart(content);
+  const region = content.slice(start);
+  const open: string[] = [];
+  for (let index = 0; index < region.length;) {
+    if (region[index] === '\\') { index += 2; continue; }
+    const marker = STREAM_MARKERS.find(candidate => region.startsWith(candidate, index));
+    if (!marker) { index += 1; continue; }
+    const rest = region.slice(index + marker.length);
+    if (open.at(-1) === marker) open.pop();
+    // A code span swallows other markers until its backtick closes.
+    else if (open.at(-1) === '`') { index += marker.length; continue; }
+    // An opener needs a non-space to its right, or nothing yet because the rest
+    // of the word has not arrived. `2 ** 3` is prose, not a dangling opener.
+    else if (marker === '`' || rest === '' || !/^\s/.test(rest)) open.push(marker);
+    index += marker.length;
+  }
+  if (!open.length) return content;
+  // A closer is only a closer with a non-space to its left, so the whitespace a
+  // word boundary just delivered has to stay outside the completed pair.
+  const trailing = region.match(/\s+$/)?.[0] ?? '';
+  let tail = trailing ? region.slice(0, -trailing.length) : region;
+  // Drop openers that have no content yet; close the ones that do.
+  while (open.length && tail.endsWith(open.at(-1)!)) tail = tail.slice(0, -open.pop()!.length);
+  return content.slice(0, start) + tail + open.reverse().join('') + trailing;
+}
+
 /** Reasoning summaries may begin with a bolded title on its own paragraph. */
 export function reasoningSummary(content: string): { title: string | null; body: string } {
   const trimmed = content.trim();
