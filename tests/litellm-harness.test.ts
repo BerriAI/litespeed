@@ -96,6 +96,20 @@ describe('LiteLLM repository navigation',()=>{
     expect(result.symbols[0]).toMatchObject({path:'litellm/router.py',name:'resolve_team_router_name'});
     expect(result.symbolScan).toMatchObject({files:800,partial:true});
   });
+  it('shows inline matches inside a named file even when no function name matches',async()=>{
+    await put('litellm/main.py','def finish():\n    return response.choices\n');
+    const result=JSON.parse(await litellmContext(root,{path:'litellm/main.py',query:'choices'},new AbortController().signal));
+    expect(result.symbols).toEqual([]);expect(result.references[0]).toMatchObject({line:2,preview:'return response.choices'});
+  });
+  it('preloads routing early returns and reaches MCP client methods',async()=>{
+    await put('litellm/router.py','def get_available_deployment():\n    if pinned:\n        return pinned\n    return select()\ndef unrelated():\n    return 0\n');
+    await put('litellm/experimental_mcp_client/client.py','async def list_resources(): pass\n');
+    const signal=new AbortController().signal;
+    const routing=JSON.parse(await litellmContext(root,{query:'router strategy override'},signal));
+    expect(routing.routingEntrypoints.definitions).toEqual([{name:'get_available_deployment',line:1,returns:[{line:3,statement:'return pinned'},{line:4,statement:'return select()'}],moreReturns:false}]);
+    const discovery=JSON.parse(await litellmContext(root,{query:'MCP resources discovery'},signal));
+    expect(discovery.symbols[0]).toMatchObject({path:'litellm/experimental_mcp_client/client.py',name:'list_resources'});
+  });
   it('keeps one model in both onboarding and architecture routing',()=>{
     const selection=selectArchitecture('litellm-specific',{providerId:'gateway',model:'flash'});
     expect(selection).toEqual({kind:'litellm-specific'});expect(architectureProviders(selection)).toEqual([]);expect(architectureWorker(selection)).toBeNull();

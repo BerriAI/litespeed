@@ -4,7 +4,7 @@ import path from 'node:path';
 import fg from 'fast-glob';
 import type { ToolDefinition } from '../shared/types.js';
 
-export const LITELLM_HARNESS_VERSION='2026-09-15.16';
+export const LITELLM_HARNESS_VERSION='2026-09-15.17';
 export const litellmContextTool:ToolDefinition={type:'function',function:{name:'litellm_context',description:'Navigate the current LiteLLM checkout. Give a task query to find relevant definitions, inline conditions and existing tests. Give a source path to see its symbol outline and test partners; add a symbol name to read that definition with numbered lines, or callers to find functions invoking a named helper in that file. Reads only this workspace, never Git history or remote answers.',parameters:{type:'object',properties:{query:{type:'string',maxLength:1000},path:{type:'string',maxLength:500},symbol:{type:'string',maxLength:200},callers:{type:'string',maxLength:200,description:'Python helper name whose call sites and enclosing functions to find; requires path.'}},additionalProperties:false}}};
 
 const playbooks = [
@@ -144,6 +144,16 @@ function callSites(text:string,name:string){
   return {calls:matches.slice(0,60),moreCalls:matches.length>60,note:'Syntactic call matches in this file, not a complete call graph. Inspect dynamic dispatch and counterpart entrypoints before concluding coverage.'};
 }
 
+function routingReturnSites(text:string){
+  const lines=text.split('\n'),symbols=outline(text);
+  const names=new Set(['get_available_deployment','async_get_available_deployment','get_available_deployment_for_pass_through','async_get_available_deployment_for_pass_through']);
+  return symbols.filter(symbol=>names.has(symbol.name)).map(symbol=>{
+    const end=symbols.find(next=>next.line>symbol.line&&next.indent<=symbol.indent)?.line??lines.length+1;
+    const returns=lines.slice(symbol.line,end-1).flatMap((line,index)=>/^\s*return\b/.test(line)?[{line:symbol.line+index+1,statement:line.trim().slice(0,180)}]:[]);
+    return {name:symbol.name,line:symbol.line,returns:returns.slice(0,16),moreReturns:returns.length>16};
+  });
+}
+
 async function matchingSymbols(workspace:string,files:string[],tokens:string[],signal:AbortSignal){
   const proxy=tokens.some(t=>/(?:^|_)(budget|auth|team|member|spend|redis|guardrail|proxy)/.test(t));
   const router=tokens.some(t=>/(?:^|_)(router|deployment|retry|fallback|routing|tags?)/.test(t));
@@ -152,15 +162,16 @@ async function matchingSymbols(workspace:string,files:string[],tokens:string[],s
   // matching area rather than silently hiding symbols in the other categories.
   const caching=tokens.some(t=>/(?:^|_)(cache|cached|caching|redis)/.test(t));
   const integrations=tokens.some(t=>/(?:^|_)(logging|callback|integration|langfuse|s3)/.test(t));
+  const mcp=tokens.some(t=>/(?:^|_)(mcp|discovery)/.test(t));
   const responses=tokens.some(t=>/(?:^|_)(responses|bridge)/.test(t));
   const shared=tokens.some(t=>/(?:^|_)(choices|convert|schema|params|stream|cost)/.test(t));
-  const roots=[...providers.map(p=>'litellm/llms/'+p+'/'),...(proxy?['litellm/proxy/','enterprise/']:[]),...(router?['litellm/router.py','litellm/router_utils/','litellm/router_strategy/']:[]),...(caching?['litellm/caching/']:[]),...(integrations?['litellm/integrations/']:[]),...(responses?['litellm/responses/','litellm/main.py']:[]),...(shared?['litellm/litellm_core_utils/','litellm/utils.py']:[])];
+  const roots=[...providers.map(p=>'litellm/llms/'+p+'/'),...(proxy?['litellm/proxy/','enterprise/']:[]),...(router?['litellm/router.py','litellm/router_utils/','litellm/router_strategy/']:[]),...(caching?['litellm/caching/']:[]),...(integrations?['litellm/integrations/']:[]),...(responses?['litellm/responses/','litellm/main.py']:[]),...(mcp?['litellm/experimental_mcp_client/','litellm/proxy/_experimental/mcp_server/']:[]),...(shared?['litellm/litellm_core_utils/','litellm/utils.py']:[])];
   if(!roots.length)roots.push('litellm/litellm_core_utils/','litellm/utils.py');
   const buckets=roots.map(root=>files.filter(p=>p.endsWith('.py')&&(root.endsWith('/')?p.startsWith(root):p===root)));
-  const candidates:string[]=[];
+  const candidates:string[]=[],seen=new Set<string>();
   // A large proxy/enterprise tree must not consume the scan budget before the
   // router or provider area gets a turn. Keep the overall limit, interleave roots.
-  for(let row=0;row<Math.max(...buckets.map(bucket=>bucket.length));row++)for(const bucket of buckets)if(bucket[row])candidates.push(bucket[row]);
+  for(let row=0;row<Math.max(...buckets.map(bucket=>bucket.length));row++)for(const bucket of buckets)if(bucket[row]&&!seen.has(bucket[row])){seen.add(bucket[row]);candidates.push(bucket[row]);}
   const matches:{path:string;name:string;line:number;score:number}[]=[];
   const references:{path:string;line:number;preview:string;score:number}[]=[];
   let bytes=0,scanned=0;
@@ -209,16 +220,24 @@ export async function litellmContext(workspace:string,args:Record<string,unknown
     }
     const terms=words(String(args.query??''));
     const selected=terms.length?symbols.map(symbol=>({symbol,score:terms.reduce((n,term)=>n+Number(symbol.name.toLowerCase().includes(term)),0)})).filter(item=>item.score).sort((a,b)=>b.score-a.score||a.symbol.line-b.symbol.line).map(item=>item.symbol):symbols;
-    return JSON.stringify({path:file,lines:lines.length,symbols:selected.slice(0,100),moreSymbols:selected.length>100,tests},null,2);
+    const references=terms.length?lines.flatMap((line,index)=>{
+      const trimmed=line.trim(),score=terms.reduce((n,term)=>n+Number(line.toLowerCase().includes(term)),0);
+      if(!score||!trimmed||trimmed.startsWith('#')||/^(?:(?:async\s+)?def|class)\s/.test(trimmed))return [];
+      return [{line:index+1,preview:trimmed.slice(0,240),score}];
+    }).sort((a,b)=>b.score-a.score||a.line-b.line).slice(0,20):undefined;
+    return JSON.stringify({path:file,lines:lines.length,symbols:selected.slice(0,100),moreSymbols:selected.length>100,references,tests},null,2);
   }
   const aliases:Record<string,string>={conversion:'convert',translation:'transform',streaming:'stream',configuration:'config',authentication:'auth',authorization:'auth',parameters:'params',retries:'retry'};
   const tokens=[...new Set(words(String(args.query??'')).flatMap(word=>[word,...(aliases[word]?[aliases[word]]:[])]))].slice(0,24);
   const ui=/\b(ui|dashboard|frontend|react|component)\b/i.test(String(args.query??''));
   const ranked=files.filter(p=>!p.startsWith('tests/')&&(ui||!p.startsWith('ui/'))).map(p=>({path:p,score:tokens.reduce((score,word)=>score+(p.toLowerCase().includes(word)?(p.split('/').includes(word)?5:2):0),0)})).filter(p=>p.score>0).sort((a,b)=>b.score-a.score||a.path.length-b.path.length||a.path.localeCompare(b.path)).slice(0,8);
   const symbols=tokens.length&&!ui?await matchingSymbols(workspace,files,tokens,signal):undefined;
-  let routingCallers:unknown;
+  let routingCallers:unknown,routingEntrypoints:unknown;
+  if(symbols?.roots.includes('litellm/router.py')&&files.includes('litellm/router.py')&&/(?:strateg|override|callback|account)/i.test(String(args.query??''))){
+    try{routingEntrypoints={path:'litellm/router.py',definitions:routingReturnSites(await sourceFile(workspace,'litellm/router.py')),note:'Syntactic return sites, including early returns. Check whether a proposed downstream wrapper is reached by every relevant entrypoint; routing methods can also be called directly. Nested definitions may be included.'};}catch{signal.throwIfAborted();}
+  }
   if(symbols?.roots.includes('litellm/router.py')&&files.includes('litellm/router.py')&&/(?:retr|fallback|tags?)/i.test(String(args.query??''))){
     try{const routerText=await sourceFile(workspace,'litellm/router.py');routingCallers={path:'litellm/router.py',wrappers:['function_with_fallbacks','async_function_with_fallbacks'].map(name=>({name,...callSites(routerText,name)}))};}catch{signal.throwIfAborted();}
   }
-  return JSON.stringify({query:args.query??'',routingCallers,playbooks:learnedContext(String(args.query??''),files),references:symbols?.references,symbols:symbols?.matches.map(s=>({...s,tests:partners(files,s.path).slice(0,2)})),symbolScan:symbols&&{roots:symbols.roots,files:symbols.scanned,partial:symbols.partial},matches:ranked.map(p=>({path:p.path,tests:partners(files,p.path).slice(0,3)})),hint:'Use path + symbol for a definition, path + query to filter a large outline, or grep within the relevant directory for an exact term. Ranked paths and symbols are navigation hints, not proof of the cause.'},null,2);
+  return JSON.stringify({query:args.query??'',routingCallers,routingEntrypoints,playbooks:learnedContext(String(args.query??''),files),references:symbols?.references,symbols:symbols?.matches.map(s=>({...s,tests:partners(files,s.path).slice(0,2)})),symbolScan:symbols&&{roots:symbols.roots,files:symbols.scanned,partial:symbols.partial},matches:ranked.map(p=>({path:p.path,tests:partners(files,p.path).slice(0,3)})),hint:'Use path + symbol for a definition, path + query to filter a large outline, or grep within the relevant directory for an exact term. Ranked paths and symbols are navigation hints, not proof of the cause.'},null,2);
 }
