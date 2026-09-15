@@ -8,7 +8,7 @@ import type { ReasoningEffort } from '../../shared/types.js';
 
 const directory=process.argv[2],kind=process.argv[3],effort=process.argv[4] as ReasoningEffort;
 const timeoutSeconds=Number(process.argv[5]);
-const task=JSON.parse(readFileSync(join(directory,'task.json'),'utf8'));
+const task=JSON.parse(readFileSync(join(directory,'solver-task.json'),'utf8'));
 const {id}=task,label=process.argv[6],workspace=join(directory,'workspace');
 const prompt=readFileSync(join(directory,'prompt.txt'),'utf8');
 const started=Date.now();let timedOut=false;

@@ -27,6 +27,9 @@ export function replaySandboxProfile(options:{runDirectory:string;runtimeRoot:st
     '(allow file-read-metadata)',
     ...[runtime,python,node].map(root=>`(allow file-read* (subpath ${quote(root)}))`),
     `(allow file-read* file-write* (subpath ${quote(run)}))`,
+    // Host-owned records retain hidden test selection and frozen source hashes.
+    `(deny file-read* file-write* (literal ${quote(run+'/task.json')}))`,
+    ...['harness-source.json','launch.json','isolation.sb','prompt.txt','solver-task.json','runner-connection.json'].map(file=>`(deny file-write* (literal ${quote(run+'/'+file)}))`),
   ].join('\n')+'\n';
 }
 

@@ -105,3 +105,5 @@ If a solver exits before writing its completion artifact, the launcher preserves
 `reflect.py RUN_DIRECTORY` sends a qualified train/dev trajectory, its private reference and acceptance output to the metered model for diagnosis. Held-out tasks are rejected. The response is untrusted advice; the script neither edits the harness nor promotes a suggestion. Keep any candidate-selection set separate from the next frozen comparison.
 
 Protocol 6 also isolates Git configuration and resolves the installed Git executable before applying Seatbelt. Ordinary `git diff` and `git status` work without reading the user's global configuration or writing xcrun's shared cache. Earlier protocol-5 trials can contain these infrastructure failures; keep their measurements separate from the final comparison.
+
+The solver receives only task identifiers and the public task prompt. Protocol 6 blocks reads of the host task manifest (reference revisions and acceptance node IDs), and blocks writes to captured source/launch metadata. The scorer reads that protected manifest, not solver-selected test nodes. This preserves the recorded oracle without claiming full adversarial isolation.

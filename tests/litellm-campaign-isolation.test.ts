@@ -13,11 +13,13 @@ it.skipIf(process.platform!=='darwin')('blocks live source and reference data, i
     const outside=join(dirs.sourceRepo,'future.py'),answer=join(dirs.campaignRoot,'reference.patch'),inside=join(dirs.runDirectory,'source.py'),dependency=join(dirs.pythonEnvironment,'dependency'),sharedTemp=join(root,'other-run-probe.py');
     for(const file of [outside,answer,inside,dependency,sharedTemp])writeFileSync(file,'fixture');
     symlinkSync(outside,join(dirs.runDirectory,'link.py'));
+    const manifest=join(dirs.runDirectory,'task.json'),sourceRecord=join(dirs.runDirectory,'harness-source.json');
+    writeFileSync(manifest,'hidden selection');writeFileSync(sourceRecord,'frozen source');
     const git=execFileSync('/usr/bin/xcrun',['--find','git'],{encoding:'utf8'}).trim();
     const gitEnv={...process.env,...replayGitEnvironment(),TMPDIR:dirs.runDirectory};
     execFileSync(git,['init','-q'],{cwd:dirs.runDirectory,env:gitEnv});
     const profile=join(root,'profile.sb');writeFileSync(profile,replaySandboxProfile(dirs));
-    for(const file of [outside,answer,sharedTemp,join(dirs.runDirectory,'link.py')]){
+    for(const file of [outside,answer,sharedTemp,manifest,join(dirs.runDirectory,'link.py')]){
       expect(spawnSync('/usr/bin/sandbox-exec',['-f',profile,'/bin/cat',file],{encoding:'utf8'}).status).not.toBe(0);
       expect(spawnSync('/usr/bin/sandbox-exec',['-f',profile,'/bin/sh','-c','cat "$1"','shell',file],{encoding:'utf8'}).status).not.toBe(0);
     }
@@ -27,6 +29,7 @@ it.skipIf(process.platform!=='darwin')('blocks live source and reference data, i
     for(const file of [inside,dependency])expect(execFileSync('/usr/bin/sandbox-exec',['-f',profile,'/bin/cat',file],{encoding:'utf8'})).toBe('fixture');
     expect(spawnSync('/usr/bin/sandbox-exec',['-f',profile,'/bin/sh','-c','echo changed > "$1"','shell',outside]).status).not.toBe(0);
     expect(spawnSync('/usr/bin/sandbox-exec',['-f',profile,'/bin/sh','-c','echo changed > "$1"','shell',inside]).status).toBe(0);
+    expect(spawnSync('/usr/bin/sandbox-exec',['-f',profile,'/bin/sh','-c','echo changed > "$1"','shell',sourceRecord]).status).not.toBe(0);
     const temporary=execFileSync('/usr/bin/sandbox-exec',['-f',profile,'/usr/bin/mktemp',join(dirs.runDirectory,'probe.XXXXXXXX')],{encoding:'utf8'}).trim();
     expect(temporary.startsWith(dirs.runDirectory+'/')).toBe(true);
   }finally{rmSync(root,{recursive:true,force:true});}

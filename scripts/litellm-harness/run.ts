@@ -42,6 +42,8 @@ symlinkSync(git,join(executableDirectory,'git'));
 const prompt=task.prompt+'\n\nImplement the fix in this checkout, add a focused regression test, and verify it. Keep the change scoped. This is an offline task: do not browse the web, inspect unrelated files outside this checkout, fetch Git history, commit or push. Dependencies are preinstalled. To run Python tests, use LITELLM_LOCAL_MODEL_COST_MAP=True '+process.env.LITELLM_EVAL_PYTHON+' -m pytest -c '+pytestConfig+' --rootdir='+workspace+' --noconftest -p no:cacheprovider -p pytest_asyncio.plugin -p pytest_mock -p respx.plugin <targeted test path> -q. The supplied pytest config and interpreter are permitted evaluation infrastructure. PYTEST_DISABLE_PLUGIN_AUTOLOAD=1 and PYTHON_DOTENV_DISABLED=1 are already set; retain the explicit local-cost-map prefix on Python commands. Use $TMPDIR for temporary probes, not /tmp; temporary files are private to this run. Do not run the entire suite or install dependencies.';
 writeFileSync(join(directory,'prompt.txt'),prompt);
 writeFileSync(join(directory,'task.json'),JSON.stringify(task,null,2));
+// The solver needs identifiers, not reference revisions or hidden test names.
+writeFileSync(join(directory,'solver-task.json'),JSON.stringify({id:task.id,prompt_revision:task.prompt_revision,snapshot_revision:task.snapshot_revision}));
 writeFileSync(join(directory,'harness-source.json'),JSON.stringify({base:execFileSync('git',['rev-parse','HEAD'],{cwd:resolve(import.meta.dirname,'../..'),encoding:'utf8'}).trim(),node:process.version,files:Object.fromEntries(['server/runner.ts','server/tools.ts','server/litellm-harness.ts','scripts/litellm-harness/run.ts','scripts/litellm-harness/solve.ts','scripts/litellm-harness/isolation.ts'].map(file=>{const source=readFileSync(resolve(import.meta.dirname,'../..',file),'utf8');return [file,{sha256:createHash('sha256').update(source).digest('hex'),source}];}))},null,2));
 const started=Date.now();
 const timeoutSeconds=kind==='codex'||label.startsWith('comparison-')||label.startsWith('replication-')?900:600;
@@ -63,7 +65,7 @@ process.env.PATH=executableDirectory+':'+(process.env.PATH??'/usr/bin:/bin');
 const child=spawn('/usr/bin/sandbox-exec',['-f',profile,process.execPath,'--import','tsx',join(import.meta.dirname,'solve.ts'),directory,kind,effort,String(timeoutSeconds),label],{cwd:runtimeRoot,env:process.env,stdio:'inherit',detached:true});
 let outerTimedOut=false;
 writeFileSync(join(directory,'launch.json'),JSON.stringify({id,kind,label,effort,startedAt:started,timeoutSeconds,pid:child.pid,evaluationProtocol:6},null,2));
-const outerTimeout=setTimeout(()=>{outerTimedOut=true;if(child.pid)try{process.kill(-child.pid,'SIGKILL');}catch{}},(timeoutSeconds+45)*1000);
+const outerTimeout=setTimeout(()=>{outerTimedOut=true;writeFileSync(join(directory,'launch.json'),JSON.stringify({id,kind,label,effort,startedAt:started,timeoutSeconds,pid:child.pid,evaluationProtocol:6,outerTimedOut:true},null,2));if(child.pid)try{process.kill(-child.pid,'SIGKILL');}catch{}},(timeoutSeconds+45)*1000);
 const exit=await new Promise<number|null>((resolve,reject)=>{child.on('close',resolve);child.on('error',reject);}).finally(()=>clearTimeout(outerTimeout));
 if(!existsSync(join(directory,'result.json'))){
   try{execFileSync(process.env.LITELLM_EVAL_PYTHON!,[join(import.meta.dirname,'recover.py'),directory],{env:process.env,stdio:'pipe'});}catch{}
