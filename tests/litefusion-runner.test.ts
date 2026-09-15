@@ -119,16 +119,28 @@ describe('LiteFusion task runtime',()=>{
     expect(requests.some(body=>body.model==='cheap')).toBe(false);expect(requests.find(body=>body.model==='coder').reasoning_effort).toBe('high');
     expect(runner.delegations.list(session.id)[0].litefusion).toMatchObject({reason:'hard',tier:'escalation'});
   });
-  it('continues an escalated worker on its actual route and preserves the original requested route',async()=>{
+  it.each(['attempt','task','workstream'] as const)('continues an escalated worker with a redundant hard flag using a %s reference',async(reference)=>{
     let id='';respond=(body,res)=>{
       if(body.model!=='lead'){reply(res,'Result with evidence.');return;}
       const tasks=id?runner.delegations.list(id):[];
       if(!tasks.length)calls(res,[{name:'delegate',args:assignment({hard:true})}]);
-      else if(tasks.length===1)calls(res,[{name:'delegate',args:assignment({continueFrom:tasks[0].id})}]);else reply(res);
+      else if(tasks.length===1)calls(res,[{name:'delegate',args:assignment({continueFrom:reference==='attempt'?tasks[0].id:reference==='task'?runner.tasks.list(id)[0].id:'feature',hard:true})}]);else reply(res);
     };
     const session=await create();id=session.id;runner.start(id,'Implement the hard task and check the result.');await runner.whenIdle();
     const [first,second]=runner.delegations.list(id);expect(second.childSessionId).toBe(first.childSessionId);
     expect(second.litefusion).toMatchObject({requested:first.litefusion!.requested,tier:'escalation',resolved:{model:'coder'},effort:'high',contextReused:true});
+  });
+  it('rejects a default-to-hard continuation before changing the task or invoking another worker',async()=>{
+    let id='',attempted=false;respond=(body,res)=>{
+      if(body.model!=='lead'){reply(res,'Result with evidence.');return;}
+      const tasks=id?runner.delegations.list(id):[];
+      if(!tasks.length)calls(res,[{name:'delegate',args:assignment()}]);
+      else if(!attempted){attempted=true;calls(res,[{name:'delegate',args:assignment({continueFrom:runner.tasks.list(id)[0].id,hard:true})}]);}else reply(res);
+    };
+    const session=await create();id=session.id;runner.start(id,'Implement.');await runner.whenIdle();
+    expect(runner.delegations.list(id)).toHaveLength(1);expect(requests.filter(body=>body.model==='coder')).toHaveLength(0);
+    expect(runner.tasks.list(id)[0].status).toBe('completed');
+    expect(store.messages(id).flatMap(m=>m.toolCalls??[]).findLast(call=>call.name==='delegate')?.output).toContain('Use repairOf to escalate');
   });
   it('rejects relabeling a continuation as a different task',async()=>{
     let id='';respond=(body,res)=>{

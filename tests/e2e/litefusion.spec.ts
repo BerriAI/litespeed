@@ -86,3 +86,32 @@ test('a gateway without matching specialists visibly reports lead-only operation
     expect(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth)).toBe(true);
   }finally{await request.delete(`/api/sessions/${session.id}`);await request.patch('/api/settings',{data:{providers:settings.providers}});}
 });
+
+for(const width of [1440,390])test(`handoff recovery and long worker reports stay compact at ${width}px`,async({page,request})=>{
+  await page.setViewportSize({width,height:1000});
+  const session=await(await request.post('/api/sessions',{data:{providerId:'fixture',model:'test-model',permissionMode:'auto',architecture:{kind:'litefusion',gatewayProviderId:'fixture',bindings:{gemini:{providerId:'fixture',model:'test-fast'}}}}})).json();
+  try{
+    await page.goto(`/#session/${session.id}`);const composer=page.getByRole('textbox',{name:'Message Litespeed',exact:true});
+    await composer.fill('LITEFUSION_HANDOFF_BROWSER');await page.getByRole('button',{name:'Send message',exact:true}).click();
+    await expect(page.getByText('Handoff retried successfully',{exact:true})).toBeVisible();
+    const cards=page.locator('.worker-task');await expect(cards).toHaveCount(1);await expect(cards.first()).toContainText('Task 1');
+    await expect(cards.first().getByRole('button',{name:'Inspect worker'})).toBeEnabled();
+    await expect(page.locator('.work-warning')).toHaveCount(0);
+    await expect(page.getByText('Choose continueFrom to resume a worker or repairOf to escalate, not both.',{exact:true})).toBeHidden();
+    await page.getByText('Handoff retried successfully',{exact:true}).click();
+    await expect(page.getByText('Choose continueFrom to resume a worker or repairOf to escalate, not both.',{exact:true})).toBeVisible();
+    await page.getByText('Handoff retried successfully',{exact:true}).click();
+    await request.post('/fixture/delegations/release');
+    await expect(page.getByRole('article',{name:'Assistant message'}).last()).toContainText('Evidence is retained in its inspector.');
+    const detail=await(await request.get(`/api/sessions/${session.id}`)).json();
+    expect(detail.messages.some((m:any)=>m.internal==='worker_result'&&m.content.includes('FULL_WORKER_EVIDENCE'))).toBe(true);
+    await expect(page.getByText('LiteFusion task result.',{exact:false})).toHaveCount(0);
+    await expect(page.getByText('FULL_WORKER_EVIDENCE',{exact:false})).toHaveCount(0);
+    expect(await cards.first().evaluate(el=>el.getBoundingClientRect().height)).toBeLessThan(180);
+    await cards.first().getByRole('button',{name:'Inspect worker'}).click();
+    await page.getByText('Worker report and evidence',{exact:true}).click();
+    await expect(page.locator('.worker-details pre')).toContainText('FULL_WORKER_EVIDENCE');
+    await page.screenshot({path:`/tmp/litefusion-handoff-web-${width}.png`,animations:'disabled'});
+    expect(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth)).toBe(true);
+  }finally{await request.post(`/api/sessions/${session.id}/cancel`);await request.post('/fixture/delegations/release');await request.delete(`/api/sessions/${session.id}`);}
+});

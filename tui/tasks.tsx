@@ -6,7 +6,7 @@ import { useTheme } from './context.js';
 import { useInvocation } from './useInvocation.js';
 import { toHex } from './theme.js';
 import { terminalText } from './protocol.js';
-import { workerLabels } from '../shared/worker-presentation.js';
+import { workerLabels, compactWorkerText, taskState, taskAttention } from '../shared/worker-presentation.js';
 import { TODO_MARKERS } from './transcriptModel.js';
 import { taskInvocations } from './conversation.js';
 import { WorkerInspectionContext } from './workerCard.js';
@@ -35,7 +35,7 @@ export function TaskProgress({ detail, controller, compact = false }: { detail: 
     const last=detail.messages.findLast(message=>message.role==='user')?.id;
     const scheduled=(detail.tasks??[]).filter(task=>task.turnId===last||['queued','running','blocked'].includes(task.status));
     const shown=compact?scheduled.filter(task=>task.status==='running'||task.status==='blocked').slice(0,1):scheduled;
-    return <box flexDirection="column" paddingLeft={1} paddingRight={1} flexShrink={0}>{!compact&&<text fg={toHex(theme.text)}>Tasks</text>}<TaskItems todos={detail.todos} actor="Lead" compact={compact}/>{shown.map(task=>{const attempt=detail.delegations?.findLast(item=>item.asyncTaskId===task.id);return <box key={task.id} flexDirection="column" marginBottom={compact?0:1} onMouseDown={()=>inspect?.(attempt??task)}><text fg={toHex(theme.text)}>{terminalText(task.description)}</text><text fg={toHex(task.error?theme.warning:theme.textMuted)}>{terminalText(task.error??attempt?.activity??task.status)}</text></box>;})}{compact&&scheduled.length>shown.length&&<text fg={toHex(theme.textMuted)}>{`${scheduled.length-shown.length} more tasks · /workers to inspect`}</text>}</box>;
+    return <box flexDirection="column" paddingLeft={1} paddingRight={1} flexShrink={0}>{!compact&&<text fg={toHex(theme.text)}>Tasks</text>}<TaskItems todos={detail.todos} actor="Lead" compact={compact}/>{shown.map(task=>{const attempt=detail.delegations?.findLast(item=>item.asyncTaskId===task.id);return <box key={task.id} flexDirection="column" marginBottom={compact?0:1} onMouseDown={()=>inspect?.(attempt??task)}><text fg={toHex(theme.text)} height={compact?1:2} wrapMode="word">{terminalText(compactWorkerText(task.description,100))}</text><text fg={toHex(task.error?theme.warning:theme.textMuted)} height={1}>{terminalText(taskState(attempt,task))}</text>{!compact&&taskAttention(attempt,task)&&<text fg={toHex(theme.textMuted)} height={2} wrapMode="word">{terminalText(taskAttention(attempt,task))}</text>}</box>;})}{compact&&scheduled.length>shown.length&&<text fg={toHex(theme.textMuted)}>{`${scheduled.length-shown.length} more tasks · /workers to inspect`}</text>}</box>;
   }
   const active = tasks.filter(task => task.status === 'running');
   const shown = compact ? active.slice(0, 1) : tasks;

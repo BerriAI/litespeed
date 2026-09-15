@@ -6,7 +6,7 @@ import { join, relative, resolve, sep } from 'node:path';
 import type { FileChange } from '../shared/types.js';
 
 export const SNAPSHOT_LIMITS = { files: 10000, bytes: 12 * 1024 * 1024, fileBytes: 2 * 1024 * 1024 };
-export const SNAPSHOT_IGNORES = new Set(['.git','.litespeed',...LEGACY_NAMES.map(name => `.${name}`),'node_modules','dist','build','coverage','.next','.venv','venv','__pycache__','target','test-results','playwright-report']);
+export const SNAPSHOT_IGNORES = new Set(['.git','.litespeed',...LEGACY_NAMES.map(name => `.${name}`),'node_modules','dist','build','coverage','.next','.venv','venv','__pycache__','target','test-results','test-results-tui','playwright-report']);
 export interface WorkspaceSnapshot { files: Record<string,string>; omitted: Record<string,string>; truncated: boolean }
 
 /** Bounded source-file observation. Does not follow symlinks, read outside the
@@ -39,9 +39,12 @@ export function snapshotChanges(before: WorkspaceSnapshot, after: WorkspaceSnaps
   const paths=new Set([...Object.keys(before.files),...Object.keys(after.files)]), changes:FileChange[]=[];
   let incomplete=before.truncated||after.truncated;
   for(const path of new Set([...Object.keys(before.omitted),...Object.keys(after.omitted)])) {
+    if(path.split('/').some(part=>SNAPSHOT_IGNORES.has(part)))continue;
     if(before.omitted[path]!==after.omitted[path]||Object.hasOwn(before.files,path)||Object.hasOwn(after.files,path))incomplete=true;
   }
   for(const path of paths) {
+    // Old persisted command snapshots may predate a generated-directory exclusion.
+    if(path.split('/').some(part=>SNAPSHOT_IGNORES.has(part)))continue;
     if(Object.hasOwn(before.omitted,path)||Object.hasOwn(after.omitted,path))continue;
     const old=Object.hasOwn(before.files,path)?before.files[path]:null,next=Object.hasOwn(after.files,path)?after.files[path]:null;
     if(old!==next)changes.push({path,before:old,after:next});

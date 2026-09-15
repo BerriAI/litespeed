@@ -36,6 +36,25 @@ const mock=createServer(async(req,res)=>{
     emit({content:'The fixture exports a greeting. Shunt kept the source out of the caller context.'});
     if(prompt.includes('LIVE_SHUNT'))await new Promise<void>(resolve=>{const release=()=>{pendingDelegations.delete(release);res.off('close',release);resolve();};pendingDelegations.add(release);res.once('close',release);});
     if(res.destroyed)return;
+  }else if(prompt.includes('LITEFUSION_HANDOFF_BROWSER')) {
+    const child=data.messages.some((m:any)=>m.role==='system'&&String(m.content).includes('You are a LiteFusion worker.'));
+    const call=(args:any)=>{toolCall=true;emit({tool_calls:[{index:0,id:`handoff-${providerRequests}`,type:'function',function:{name:'delegate',arguments:JSON.stringify(args)}}]});};
+    if(child) {
+      if(prompt.includes('Follow up')) {
+        emit({content:'Retry worker is checking the result.'});
+        await new Promise<void>(resolve=>{const release=()=>{pendingDelegations.delete(release);res.off('close',release);resolve();};pendingDelegations.add(release);res.once('close',release);});if(res.destroyed)return;
+        toolCall=true;emit({tool_calls:[{index:0,id:'handoff-help',type:'function',function:{name:'worker_request',arguments:JSON.stringify({outcome:'needs_help',reason:'Workspace history needs recovery. '+ 'Detailed blocker context. '.repeat(80),evidence:'FULL_WORKER_EVIDENCE '+ 'Observed test output.\n'.repeat(300)})}}]});
+      }else emit({content:'Initial check complete.'});
+    }else {
+      const count=data.messages.flatMap((m:any)=>m.tool_calls??[]).filter((c:any)=>c.function.name==='delegate').length;
+      const reports=data.messages.filter((m:any)=>m.role==='system'&&String(m.content).startsWith('LiteFusion task result.')).map((m:any)=>JSON.parse(m.content.slice(m.content.indexOf('\n')+1)));
+      const assignment={roleId:'bounded_patch',workstream:'markdown',description:'Fix heading rendering',prompt:'Initial check',reason:'Reproduce handoff recovery',acceptance:['Report evidence'],hard:true};
+      if(!count)call(assignment);
+      else if(reports.length&&count===1)call({...assignment,prompt:'Follow up',continueFrom:reports[0].taskId,repairOf:reports[0].attemptId});
+      else if(reports.length&&count===2)call({...assignment,prompt:'Follow up',continueFrom:reports[0].taskId});
+      else if(reports.length<2){toolCall=true;emit({tool_calls:[{index:0,id:'handoff-wait',type:'function',function:{name:'wait_tasks',arguments:'{}'}}]});}
+      else emit({content:'The worker needs lead attention. Evidence is retained in its inspector.'});
+    }
   }else if(prompt.includes('LITEFUSION_BROWSER')) {
     const child=data.messages.some((m:any)=>m.role==='system'&&typeof m.content==='string'&&m.content.includes('You are a LiteFusion worker.'));
     if(child) {
