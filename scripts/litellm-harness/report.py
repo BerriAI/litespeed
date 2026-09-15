@@ -33,15 +33,18 @@ for case in cases:
     tasks.append(task)
 
 ledger = json.loads((root / 'spend.json').read_text())
-priced = [record for record in ledger['records'] if isinstance(record.get('usage'), dict)
-          and all(isinstance(record['usage'].get(key), (int, float)) for key in ['prompt_tokens', 'completion_tokens'])]
+token_priced = [record for record in ledger['records'] if isinstance(record.get('usage'), dict)
+                and all(isinstance(record['usage'].get(key), (int, float)) for key in ['prompt_tokens', 'completion_tokens'])]
+priced = [record for record in ledger['records'] if record.get('costKnown') is True
+          or ('costKnown' not in record and record in token_priced)]
 money = {'ceilingUsd': ledger['limitUsd'], 'committedUsd': ledger['committedUsd'],
          'pricedUsd': sum(record['chargedUsd'] for record in priced),
          'pricedRequests': len(priced), 'admittedRequests': len(ledger['records']),
          'unpricedRequests': len(ledger['records']) - len(priced), 'astraUsd': None}
-known_input = sum(record['usage'].get('prompt_tokens', 0) for record in priced)
-known_cached = sum(max(0, min(record['usage'].get('prompt_tokens', 0), (record['usage'].get('prompt_tokens_details') or {}).get('cached_tokens', 0))) for record in priced)
-known_output = sum(record['usage'].get('completion_tokens', 0) for record in priced)
+known_input = sum(record['usage'].get('prompt_tokens', 0) for record in token_priced)
+known_cached = sum(max(0, min(record['usage'].get('prompt_tokens', 0), (record['usage'].get('prompt_tokens_details') or {}).get('cached_tokens', 0))) for record in token_priced)
+known_output = sum(record['usage'].get('completion_tokens', 0) for record in token_priced)
+money['requestsWithTokenUsage'] = len(token_priced)
 money['knownTokenCosts'] = {'uncachedInputUsd': (known_input - known_cached) * 0.22 / 1e6, 'cachedInputUsd': known_cached * 0.007 / 1e6, 'outputUsd': known_output * 0.66 / 1e6}
 money['knownInputTokens'] = known_input
 money['knownCachedInputTokens'] = known_cached

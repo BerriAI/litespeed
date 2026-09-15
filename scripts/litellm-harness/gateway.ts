@@ -2,7 +2,7 @@ import { createServer } from 'node:http';
 import { mkdirSync, readFileSync, writeFileSync, appendFileSync } from 'node:fs';
 import { resolve, join } from 'node:path';
 import { randomBytes } from 'node:crypto';
-import { CampaignBudget, FLASH_MODEL, FLASH_PRICES, usageCost, lockCampaign } from './budget.js';
+import { CampaignBudget, FLASH_MODEL, FLASH_PRICES, responseCharge, lockCampaign } from './budget.js';
 
 const directory=resolve(process.env.LITELLM_CAMPAIGN_DIR??'');
 if(!process.env.LITELLM_CAMPAIGN_DIR||!process.env.LITELLM_CAMPAIGN_KEY_FILE)throw new Error('Set LITELLM_CAMPAIGN_DIR and LITELLM_CAMPAIGN_KEY_FILE outside the repository.');
@@ -44,28 +44,28 @@ const server=createServer(async(req,res)=>{
     requestId=budget.reserve(label,reservation);
     writeFileSync(join(directory,'requests',requestId+'.request.json'),JSON.stringify(body),{mode:0o600});
     const controller=new AbortController();const timer=setTimeout(()=>controller.abort(),600_000);
-    res.on('close',()=>{if(!res.writableEnded)controller.abort();});
+    // Drain an admitted request after the client cancels so its final usage can
+    // settle the reservation. Output remains capped and the upstream timer still
+    // applies. Aborting here previously left many $0.2523 reservations unpriced.
     let upstream:Response;
     try {upstream=await fetch(upstreamUrl,{method:'POST',headers:{Authorization:`Bearer ${key}`,'Content-Type':'application/json'},body:JSON.stringify(body),signal:controller.signal});}
     catch(error){clearTimeout(timer);throw error;}
-    res.writeHead(upstream.status,{'Content-Type':upstream.headers.get('content-type')??'application/json'});
+    if(!res.destroyed)res.writeHead(upstream.status,{'Content-Type':upstream.headers.get('content-type')??'application/json'});
     const raw:Buffer[]=[];
-    try {if(upstream.body){const reader=upstream.body.getReader();try{while(true){const {value,done}=await reader.read();if(done)break;const data=Buffer.from(value);raw.push(data);res.write(data);}}finally{reader.releaseLock();}}}
+    try {if(upstream.body){const reader=upstream.body.getReader();try{while(true){const {value,done}=await reader.read();if(done)break;const data=Buffer.from(value);raw.push(data);if(!res.destroyed)res.write(data);}}finally{reader.releaseLock();}}}
     finally {clearTimeout(timer);}
     const text=Buffer.concat(raw).toString();writeFileSync(join(directory,'requests',requestId+'.response.txt'),text,{mode:0o600});
     let usage:unknown;
     if(body.stream){for(const line of text.split('\n'))if(line.startsWith('data: ')){try{const part=JSON.parse(line.slice(6));if(part.usage)usage=part.usage;}catch{}}}
     else {try{usage=JSON.parse(text).usage;}catch{}}
-    const calculated=usageCost(usage),reported=Number(upstream.headers.get('x-litellm-response-cost'));
-    const charge=calculated===undefined?undefined:Math.max(calculated,Number.isFinite(reported)?reported:0);
-    budget.settle(requestId,charge,{usage,seconds:(Date.now()-started)/1000});requestId=undefined;
+    const {costUsd:charge,...pricing}=responseCharge(usage,upstream.headers.get('x-litellm-response-cost'));
+    budget.settle(requestId,charge,{usage,...pricing,httpStatus:upstream.status,seconds:(Date.now()-started)/1000});requestId=undefined;
     appendFileSync(join(directory,'events.jsonl'),JSON.stringify({at:new Date().toISOString(),label,status:upstream.status,chargeUsd:charge,committedUsd:budget.committedUsd})+'\n',{mode:0o600});
-    res.end();
+    if(!res.destroyed)res.end();
   }catch(error){
     if(requestId)budget.settle(requestId,undefined,{seconds:(Date.now()-started)/1000});
     const message=(error instanceof Error?error.message:'Campaign request failed').split(key).join('[redacted]');
-    if(!res.headersSent)res.writeHead(429,{'Content-Type':'application/json'});
-    res.end(JSON.stringify({error:{message}}));
+    if(!res.destroyed){if(!res.headersSent)res.writeHead(429,{'Content-Type':'application/json'});res.end(JSON.stringify({error:{message}}));}
   }
 });
 server.listen(0,'127.0.0.1',()=>{

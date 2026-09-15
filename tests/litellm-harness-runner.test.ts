@@ -40,6 +40,23 @@ describe('LiteLLM-specific runner integration',()=>{
     expect(store.messages(session.id).find(m=>m.role==='tool')?.content).toContain('litellm/example.py');
     requests=[];const plain=store.createSession({workspace:root,providerId:'test',model:'model',permissionMode:'auto'});runner.start(plain.id,'Explain.');await runner.whenIdle();
     expect(requests[0].tools.map((t:any)=>t.function.name)).not.toContain('litellm_context');
+    expect(store.messages(plain.id).some(m=>m.content.startsWith('LiteLLM starting locations'))).toBe(false);
+  });
+  it.each(['build','plan'] as const)('supplies current source locations before the first %s request without recording edits',async(mode)=>{
+    const session=store.createSession({workspace:root,providerId:'test',model:'model',permissionMode:'auto',mode,architecture:{kind:'litellm-specific'}});
+    runner.start(session.id,'Explain example code.');await runner.whenIdle();
+    const notes=store.messages(session.id).filter(m=>m.content.startsWith('LiteLLM starting locations'));
+    expect(notes).toHaveLength(1);expect(notes[0].content).toContain('litellm/example.py');
+    expect(notes[0].content).toContain('untrusted source data');
+    expect(JSON.stringify(requests[0].messages)).toContain('LiteLLM starting locations');
+    expect(store.messages(session.id).flatMap(m=>m.toolCalls??[])).toEqual([]);
+  });
+  it('leaves automatic navigation off when a generic tool hook needs interception',async()=>{
+    store.saveSettings({hooks:[{event:'PreToolUse',command:'exit 2'}]});
+    const session=store.createSession({workspace:root,providerId:'test',model:'model',permissionMode:'auto',architecture:{kind:'litellm-specific'}});
+    runner.start(session.id,'Explain example code.');await runner.whenIdle();
+    expect(store.messages(session.id).some(m=>m.content.startsWith('LiteLLM starting locations'))).toBe(false);
+    expect(requests[0].tools.map((t:any)=>t.function.name)).toContain('litellm_context');
   });
   it('does not bypass a scoped read restriction through navigation',async()=>{
     store.saveSettings({permissionRules:{version:1,rules:[{tool:'read_file',decision:'deny',patterns:['litellm/example.py']}]}});
@@ -47,6 +64,7 @@ describe('LiteLLM-specific runner integration',()=>{
     action={name:'litellm_context',args:{path:'litellm/example.py'}};runner.start(session.id,'Inspect.');await runner.whenIdle();
     expect(requests[0].tools.map((t:any)=>t.function.name)).not.toContain('litellm_context');
     const messages=store.messages(session.id);expect(messages.find(m=>m.role==='tool')?.content).not.toContain('value_0');
+    expect(messages.some(m=>m.content.startsWith('LiteLLM starting locations'))).toBe(false);
     expect(messages.flatMap(m=>m.toolCalls??[])[0].status).toBe('denied');
   });
   it.each(['hook','sidecar'])('preserves %s interception by falling back to ordinary reads',async(kind)=>{
@@ -55,6 +73,7 @@ describe('LiteLLM-specific runner integration',()=>{
     action={name:'litellm_context',args:{path:'litellm/example.py'}};runner.start(session.id,'Inspect.');await runner.whenIdle();
     expect(requests[0].tools.map((t:any)=>t.function.name)).not.toContain('litellm_context');
     expect(store.messages(session.id).find(m=>m.role==='tool')?.content).not.toContain('value_0');
+    expect(store.messages(session.id).some(m=>m.content.startsWith('LiteLLM starting locations'))).toBe(false);
   });
   it('reviews a changed Build turn once and does not loop when the model finishes',async()=>{
     const session=store.createSession({workspace:root,providerId:'test',model:'model',permissionMode:'auto',architecture:{kind:'litellm-specific'}});

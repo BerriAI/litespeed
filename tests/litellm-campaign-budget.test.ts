@@ -2,7 +2,7 @@ import { mkdtempSync, rmSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { describe, expect, it } from 'vitest';
-import { CampaignBudget, usageCost, lockCampaign } from '../scripts/litellm-harness/budget.js';
+import { CampaignBudget, usageCost, responseCharge, lockCampaign } from '../scripts/litellm-harness/budget.js';
 
 describe('paid harness campaign admission',()=>{
   it('allows only one gateway process to own a campaign ledger',()=>{
@@ -26,5 +26,14 @@ describe('paid harness campaign admission',()=>{
     expect(usageCost({prompt_tokens:1e6,completion_tokens:1e6,prompt_tokens_details:{cached_tokens:500000}})).toBeCloseTo(0.7735);
     expect(usageCost(undefined)).toBeUndefined();expect(usageCost({prompt_tokens:10})).toBeUndefined();
     expect(usageCost({prompt_tokens:-1,completion_tokens:0})).toBeUndefined();
+    expect(usageCost({prompt_tokens:10,completion_tokens:1,prompt_tokens_details:{cached_tokens:NaN}})).toBeUndefined();
+  });
+  it('accepts an explicit zero-cost header but retains uncertainty when the header is absent or invalid',()=>{
+    expect(responseCharge(undefined,null)).toEqual({});
+    for(const header of ['', ' ', '-1', 'NaN', 'Infinity'])expect(responseCharge(undefined,header)).toEqual({});
+    expect(responseCharge(undefined,'0')).toMatchObject({costUsd:0,pricingSource:'header'});
+    expect(responseCharge(undefined,'0.017')).toMatchObject({costUsd:0.017,pricingSource:'header'});
+    expect(responseCharge({prompt_tokens:1e6,completion_tokens:0},'0.10')).toMatchObject({costUsd:0.22,pricingSource:'tokens-and-header'});
+    expect(responseCharge({prompt_tokens:1e6,completion_tokens:0},'0.30')).toMatchObject({costUsd:0.30,pricingSource:'tokens-and-header'});
   });
 });

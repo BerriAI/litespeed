@@ -85,4 +85,16 @@ describe('LiteLLM repository navigation',()=>{
     expect(modelRoles('litellm-specific')).toEqual(['driver']);expect(nextAfterRole('litellm-specific','driver')).toBe('review');
     expect(saveEnabled({step:'review',kind:'litellm-specific',driver:{providerId:'g',model:'m'},worker:null,shuntOk:true,providerConfigured:()=>true})).toBe(true);
   });
+  it('finds sync and async callers even when endpoint names do not match the query',async()=>{
+    await put('litellm/router.py','class Router:\n    def function_with_fallbacks(self):\n        pass\n    def completion(self):\n        return self.function_with_fallbacks()\n    async def acreate_batch(self):\n        return await self.async_function_with_fallbacks()\n    async def acancel_batch(self):\n        return await self.async_function_with_fallbacks()\n');
+    const signal=new AbortController().signal;
+    const direct=JSON.parse(await litellmContext(root,{path:'litellm/router.py',callers:'async_function_with_fallbacks'},signal));
+    expect(direct.calls.map((c:{caller:string})=>c.caller)).toEqual(['acreate_batch','acancel_batch']);
+    expect(direct.calls[0].definitionLine).toBe(6);
+    const initial=JSON.parse(await litellmContext(root,{query:'router retries'},signal));
+    expect(initial.routingCallers.wrappers[0].calls[0].caller).toBe('completion');
+    expect(initial.routingCallers.wrappers[1].calls).toHaveLength(2);
+    await expect(litellmContext(root,{callers:'helper'},signal)).rejects.toThrow('requires path');
+    await expect(litellmContext(root,{path:'litellm/router.py',callers:'helper.*'},signal)).rejects.toThrow('Python identifier');
+  });
 });
