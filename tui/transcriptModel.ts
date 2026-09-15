@@ -256,6 +256,8 @@ export function toolRow(call: ToolCall): ToolRowModel {
       return { ...base, icon: '%', text: `WebFetch ${str(args.url)}`, pending: 'Fetching from the web…' };
     case 'web_search':
       return { ...base, icon: '◈', text: `Web Search "${str(args.query)}"`, pending: 'Searching web…' };
+    case 'wait_tasks':
+      return {...base,icon:'◷',text:running?'Waiting for workers':'Worker updates received',pending:'Waiting for workers'};
     case 'delegate':
     case 'sidekick':
     case 'task': {

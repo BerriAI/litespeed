@@ -1,16 +1,14 @@
-# Litespeed 0.1.16
+# Litespeed 0.1.17
 
-LiteFusion now connects its specialists automatically, including in existing sessions that were missing saved model connections.
+LiteFusion now keeps worker coordination out of your conversation and shows one card per actual task.
 
-- Connect your gateway and start chatting. The backend discovers matching model identities, keeps explicit choices, and resolves each task to its default model or configured escalation route. If neither is connected, the lead handles the task with a visible explanation.
-- Both the terminal and web UI show specialist task coverage, backup usage, and work left to the lead. A gateway with no specialist connections or only the lead model is labeled clearly. First-time setup keeps the detailed roster behind “View model assignments.”
-- New setups prefer Opus/high, then Astra/high when supported and listed. If neither is listed, choose your lead once. Existing leads and custom task assignments are preserved.
-- Substantial research, implementation, testing and review now default to coherent delegation after brief scoping. Small tasks can stay with the lead. There is no forced worker quota or extra classifier call.
-- Terminal streaming markdown no longer flashes incomplete bold/code markers, and live tool rows line up with the collapsed step summaries. Code fences retain their literal content during streaming.
-- Discovery is cached and does not run paid probes. Automatic connection repair does not queue an architecture change. Active turns keep their model assignments; explicit model edits show “Model settings updated” and apply after the turn.
+- Resuming a worker already on its hard-task route accepts a redundant `hard` flag. Changing a default-route worker to its escalation route still requires an explicit escalation.
+- Rejected handoffs no longer create phantom task numbers. An accepted retry appears on the same task as “Handoff retried successfully,” with readable details collapsed underneath. The card opens the current worker; unresolved handoffs remain visible.
+- Internal worker-result messages stay in model context and exports, but no longer dump JSON into terminal or web chat. Existing saved sessions get the same presentation repair.
+- Worker cards and the terminal sidebar show bounded status and blocker summaries. Full reports and evidence are available inside the worker inspector. Terminal error details preserve newlines while escaping terminal control sequences.
+- Generated terminal-test recordings are excluded from source undo snapshots, preventing repeated test runs from creating command-history conflicts. Source conflict checks remain enabled.
+- The release checks now exercise rejected handoffs, successful retries, long blocked-worker reports, inspector navigation, and preserved drafts in the real terminal.
 
-Run `litespeed update`, then reopen Litespeed. Existing LiteFusion sessions discover missing connections automatically; no reset or manual session repair is needed.
+Run `litespeed update`, then reopen Litespeed after active work finishes. No session reset is needed. An already interrupted task may still need the lead to inspect retained work and explicitly continue it.
 
-Gateway listings do not verify credits, tool support or performance. The routing roster remains a research policy awaiting independent evaluation. Local checks use fake gateways and do not benchmark commercial models.
-
-Packages include the terminal runtime and web app for Apple silicon and Intel Macs.
+Includes the terminal runtime and web app for Apple silicon and Intel Macs. Tests use local scripted providers; no paid model benchmarks were run.

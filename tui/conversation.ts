@@ -1,7 +1,7 @@
 import { cacheHitLabel, usagePhase } from '../shared/usage.js';
 import type { DelegationSummary, Message, SessionDetail, ToolCall, Usage } from '../shared/types.js';
 import { conversationBlocks } from '../shared/conversation-blocks.js';
-import { workerLabels, workerProjection } from '../shared/worker-presentation.js';
+import { workerLabels, workerProjection, type WorkerProjection } from '../shared/worker-presentation.js';
 import { visibleDelegations } from '../shared/events.js';
 import { formatDuration } from './transcriptModel.js';
 
@@ -12,9 +12,9 @@ export function conversationGroups(detail: SessionDetail) {
 }
 
 export type ActivityEntry = { message: Message; call?: ToolCall };
-export type ActivitySection = { kind: 'driver'; id: string; entries: ActivityEntry[] } | { kind: 'worker'; id: string; message: Message; call: ToolCall; label: string; task?: DelegationSummary;scheduled?:import('../shared/litefusion-tasks.js').LiteFusionTask };
+export type ActivitySection = { kind: 'driver'; id: string; entries: ActivityEntry[] } | { kind: 'worker'; id: string; message: Message; call: ToolCall; label: string; task?: DelegationSummary;scheduled?:import('../shared/litefusion-tasks.js').LiteFusionTask;handoffs?:WorkerProjection['handoffs'] };
 export function activityActors(detail: SessionDetail) {
-  const actors = new Map<string,{label:string;task?:DelegationSummary;scheduled?:import('../shared/litefusion-tasks.js').LiteFusionTask;hidden:boolean}>([...workerLabels(detail)].map(([key, label]) => [key, { label, task: undefined as DelegationSummary | undefined, hidden:false }]));
+  const actors = new Map<string,WorkerProjection & {label:string}>([...workerLabels(detail)].map(([key, label]) => [key, { label, task: undefined as DelegationSummary | undefined, hidden:false }]));
   for (const [key,row] of workerProjection(detail)) actors.set(key,{label:actors.get(key)?.label??'Research',...row});
   return actors;
 }

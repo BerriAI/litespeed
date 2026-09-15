@@ -2,7 +2,7 @@ import { cacheHitLabel, usagePhase } from '../../shared/usage';
 import { shuntLabel } from '../../shared/shunt';
 import { steeringContent } from '../../shared/steering-presentation';
 import { conversationBlocks } from './conversation-blocks';
-import { memo, useLayoutEffect, useRef, useState, type ReactNode } from 'react';
+import { createContext, useContext, memo, useLayoutEffect, useRef, useState, type ReactNode } from 'react';
 import type { QuestionRequest } from '../../shared/questions';
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
@@ -11,6 +11,8 @@ import type { Message, PermissionRequest, SessionDetail, ToolCall, Usage } from 
 import { CopyButton, Logo, LiteSpeed } from './ui';
 import { withoutVerificationNotice } from '../../shared/verification';
 import { executionFailed } from '../../shared/receipts';
+import { workerProjection, type WorkerProjection } from '../../shared/worker-presentation';
+const WorkerRowsContext=createContext(new Map<string,WorkerProjection>());
 
 export const Markdown = memo(function Markdown({ content }: { content: string }) {
   return <ReactMarkdown remarkPlugins={[remarkGfm]} components={{
@@ -72,7 +74,7 @@ export function Conversation({ detail, connection, onDecide, onAllowAll, onFork,
     const observer = new ResizeObserver(() => { viewport.scrollTop = viewport.scrollHeight; });
     observer.observe(content); return () => observer.disconnect();
   }, [atBottom, inline]);
-  return <div className="conversation-shell"><div className="conversation-scroll" ref={scroll} onScroll={e => { const el = e.currentTarget; setAtBottom(el.scrollHeight - el.scrollTop - el.clientHeight < 100); }}><div className="conversation-content">
+  return <WorkerRowsContext.Provider value={workerProjection(detail)}><div className="conversation-shell"><div className="conversation-scroll" ref={scroll} onScroll={e => { const el = e.currentTarget; setAtBottom(el.scrollHeight - el.scrollTop - el.clientHeight < 100); }}><div className="conversation-content">
     <div className="conversation-start"><span />{new Date(detail.session.createdAt).toLocaleDateString(undefined, { month: 'long', day: 'numeric' })}<span /></div>
     {groups.map(({ message, startsRun, endsRun, closesTranscript, runUsage, steps }, index) => <MessageView lead={detail.session.architecture?.kind==='litefusion'} driver={!inline && Boolean(detail.session.architecture)} workerNoun={detail.session.architecture?.kind === 'expert-fusion' ? 'expert' : 'worker'} key={message.id} message={message} running={running && message.id === last?.id} grouped={message.role === 'assistant' && !startsRun} tail={endsRun} live={running && closesTranscript && index === groups.length - 1} runUsage={runUsage} steps={steps} expanded={steps.some(step=>step.toolCalls?.some(call=>call.taskId&&detail.tasks?.some(task=>task.id===call.taskId&&['queued','running','blocked'].includes(task.status))))||(expandedSteps.get(message.id)??inline)} onExpand={open => setExpandedSteps(current => { const next = new Map(current); next.set(message.id,open); return next; })} inline={inline} workActivity={workActivity} onFork={() => onFork(message.id)} disabled={busy || running} readOnly={readOnly} renderTask={readOnly ? undefined : renderTask} />)}
     {!detail.messages.length && <div className="session-empty"><Logo /><h2>{readOnly ? 'No transcript yet.' : 'A fresh start.'}</h2><p>{readOnly ? 'Research messages will appear here when available. This view cannot start a run.' : 'Give your agent a task. It will work in this session’s workspace.'}</p></div>}
@@ -80,29 +82,31 @@ export function Conversation({ detail, connection, onDecide, onAllowAll, onFork,
     {!readOnly && detail.permissions.map(request => <Approval key={request.id} request={request} onDecide={onDecide} onAllowAll={onAllowAll} busy={busy} />)}
     {running && !last?.content && !last?.reasoning && !hasWork && !detail.permissions.length && !detail.questions?.length && <div className="run-status" role="status"><LiteSpeed compact active /><span>{detail.session.status === 'waiting' ? detail.questions?.length ? 'Waiting for your answer' : 'Waiting for your approval' : detail.session.mode === 'plan' ? 'Exploring and planning' : last?.activity || 'Working'}<span className="animated-ellipsis">…</span></span></div>}
     {connection !== 'connected' && <div className="connection-status" role="status"><Clock3 size={13} />{connection === 'reconnecting' ? 'Reconnecting to your session… Your run continues on the server.' : 'Connecting to live updates…'}</div>}
-  </div></div>{!atBottom && <button className="scroll-bottom" aria-label="Jump to latest" title="Jump to latest" onClick={() => { scroll.current?.scrollTo({ top: scroll.current.scrollHeight, behavior: 'smooth' }); setAtBottom(true); }}><ArrowDown size={16} /></button>}</div>;
+  </div></div>{!atBottom && <button className="scroll-bottom" aria-label="Jump to latest" title="Jump to latest" onClick={() => { scroll.current?.scrollTo({ top: scroll.current.scrollHeight, behavior: 'smooth' }); setAtBottom(true); }}><ArrowDown size={16} /></button>}</div></WorkerRowsContext.Provider>;
 }
 /** Show work live, then fold the completed block when prose continues. */
 function WorkLog({ workerNoun, messages, live, renderTask, workActivity, expanded, onExpand }: { expanded: boolean; onExpand: (open: boolean) => void; messages: Message[]; live: boolean; workerNoun: string; workActivity?: string|false; renderTask?: (tool: ToolCall, message: Message, expanded: boolean) => ReactNode }) {
-  const calls = messages.flatMap(message => (message.toolCalls ?? []).map(tool => ({ tool, message })));
+  const workerRows=useContext(WorkerRowsContext);
+  const shown=(message:Message)=>(message.toolCalls??[]).filter(tool=>!workerRows.get(`${message.id}:${tool.id}`)?.hidden);
+  const calls = messages.flatMap(message => shown(message).map(tool => ({ tool, message })));
   const thinking = messages.filter(message => message.reasoning);
   if (!calls.length && !thinking.length) return null;
   const current = calls.findLast(({ tool }) => tool.status === 'running' || tool.status === 'pending')?.tool;
   const working = live && workActivity!==false && Boolean(current || !messages.at(-1)?.content);
   const visible = live || expanded;
   const action = current && (current.args?.description || current.args?.path || current.args?.command || current.args?.pattern);
-  const workers = calls.filter(({tool}) => tool.name === 'delegate');
+  const workers = calls.filter(({tool,message}) => tool.name === 'delegate'&&(!workerRows.has(`${message.id}:${tool.id}`)||workerRows.get(`${message.id}:${tool.id}`)?.logicalId));
   const runningWorkers = workers.filter(({tool}) => tool.status === 'running').length;
   const queuedWorkers = workers.filter(({tool}) => tool.status === 'pending').length;
   const workerStates = [runningWorkers && `${runningWorkers} running`, queuedWorkers && `${queuedWorkers} queued`].filter(Boolean).join(' · ');
   const label = workers.length ? `${workers.length} ${workerNoun}${workers.length === 1 ? '' : 's'}${working && workerStates ? ` · ${workerStates}` : ''}${calls.length > workers.length ? ` · ${calls.length - workers.length} other ${calls.length-workers.length===1?'step':'steps'}` : ''}` : working ? workActivity || (current ? `${toolLabels[current.name] || (current.name === 'sidekick' ? 'Sidekick' : current.name)}${typeof action === 'string' ? ` · ${action}` : ''}` : 'Thinking') : calls.length ? `${calls.length} ${calls.length === 1 ? 'step' : 'steps'}` : 'Thought process';
-  const failed = calls.filter(({ tool }) => tool.status === 'error' || tool.status === 'denied').length;
+  const failed = calls.filter(({tool,message}) => {const issues=workerRows.get(`${message.id}:${tool.id}`)?.handoffs;return issues?issues.some(issue=>!issue.recovered):tool.status==='error'||tool.status==='denied';}).length;
   const modified = calls.filter(({ tool }) => tool.intercepted).length;
   return <details className={`work-log${working ? ' active' : ''}`} aria-label="Response steps" open={visible}>
     <summary onClick={event => { event.preventDefault(); if (!live) onExpand(!expanded); }}>{working ? <span className="working-dot" /> : <Check size={13} />}<span>{label}</span>{failed > 0 && <span className="work-warning">{failed} {failed === 1 ? 'issue' : 'issues'}</span>}{modified > 0 && <span className="work-warning">{modified} modified {modified === 1 ? 'tool' : 'tools'}</span>}<ChevronRight size={13} className="disclosure-chevron" /></summary>
     <div className="work-log-body">
       {messages.map(message => <div key={message.id}>{message.reasoning && <div className="thinking-inline markdown"><Markdown content={message.reasoning} /></div>}
-        {toolGroups(message.toolCalls ?? []).map(group => group[0].name === 'delegate' ? <div className="worker-grid" key={group[0].id}>{group.map(tool => <div key={tool.id}>{renderTask?.(tool, message, visible) ?? <ToolCard tool={tool} />}</div>)}</div> : group.map(tool => <div key={tool.id}>{renderTask?.(tool, message, visible) ?? <ToolCard tool={tool} />}</div>))}
+        {toolGroups(shown(message)).map(group => group[0].name === 'delegate' ? <div className="worker-grid" key={group[0].id}>{group.map(tool => <div key={tool.id}>{renderTask?.(tool, message, visible) ?? <ToolCard tool={tool} />}</div>)}</div> : group.map(tool => <div key={tool.id}>{renderTask?.(tool, message, visible) ?? <ToolCard tool={tool} />}</div>))}
       </div>)}
     </div>
   </details>;

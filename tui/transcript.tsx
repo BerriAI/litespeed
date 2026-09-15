@@ -360,7 +360,7 @@ function WorkLog({ steps, detail, actors, live, syntax, width, controller, embed
   const sections = activitySections(steps, actors);
   if (!sections.length) return null;
   return <box flexDirection="column" flexShrink={0} gap={1} marginTop={hasText ? 1 : 0}>{sections.map((section, index) => section.kind === 'worker' && controller
-    ? <WorkerCard key={section.id} scheduled={section.scheduled} task={section.task} call={section.call} label={section.label} controller={controller} width={width - 6} defaultOpen={live || settings.toolDetails || settings.showThinking} needsApproval={detail.permissions.some(item => item.toolCallId === section.call.id)} renderTranscript={(child, childWidth) => <Transcript detail={child} width={childWidth} active={false} embedded />} />
+    ? <WorkerCard key={section.id} handoffs={section.handoffs} scheduled={section.scheduled} task={section.task} call={section.call} label={section.label} controller={controller} width={width - 6} defaultOpen={live || settings.toolDetails || settings.showThinking} needsApproval={detail.permissions.some(item => item.toolCallId === section.call.id)} renderTranscript={(child, childWidth) => <Transcript detail={child} width={childWidth} active={false} embedded />} />
     : <DriverActivity key={section.id} entries={section.kind === 'driver' ? section.entries : [{ message: section.message, call: section.call }]} detail={detail} live={live && index === sections.length - 1} heading={!embedded && Boolean(detail.session.architecture) && (index ? sections[index - 1].kind : precedingActor) !== 'driver'} syntax={syntax} width={width} embedded={embedded} />)}</box>;
 }
 

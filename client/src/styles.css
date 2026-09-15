@@ -1156,3 +1156,10 @@ fieldset.model-picker { padding: 22px 24px; gap: 22px; overflow: visible; }
   .worker-open { gap: 9px; padding: 12px 4px; }
   .worker-title { display: grid; gap: 3px; }
 }
+
+.handoff-history { margin: 4px 0 8px 34px; color: var(--secondary); font-size: 12px; }
+.handoff-history summary { cursor: pointer; }
+.handoff-history pre { white-space: pre-wrap; overflow-wrap: anywhere; font: inherit; }
+.handoff-attention { margin: 4px 0 8px 34px; color: var(--secondary); font-size: 12px; overflow-wrap: anywhere; }
+
+.worker-details pre { white-space: pre-wrap; overflow-wrap: anywhere; max-height: 320px; overflow: auto; font-size: 12px; line-height: 1.5; }

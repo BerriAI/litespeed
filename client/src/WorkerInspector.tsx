@@ -2,7 +2,7 @@ import { useEffect, useRef } from 'react';
 import { ArrowLeft, Square } from 'lucide-react';
 import type { DelegationSummary, SessionDetail } from '../../shared/types';
 import type { LiteFusionTask } from '../../shared/litefusion-tasks';
-import { logicalWorkers, workerLabels, workerState } from '../../shared/worker-presentation';
+import { logicalWorkers, workerLabels, workerState, taskAttention, workerReport } from '../../shared/worker-presentation';
 import { liteFusionRole } from '../../shared/litefusion';
 import { TaskTranscript } from './TaskCard';
 
@@ -26,9 +26,9 @@ export function WorkerInspector({ task, detail, onSelect, onClose, onCancel, can
       {task.litefusion && <dl><div><dt>Specialty</dt><dd>{liteFusionRole(task.litefusion.roleId).task}</dd></div><div><dt>Routing</dt><dd>{task.litefusion.reason.replaceAll('_', ' ')}</dd></div><div><dt>Context</dt><dd>{task.litefusion.contextReused ? 'Continued from the previous attempt' : 'Fresh context'}</dd></div><div><dt>Changes</dt><dd>{task.litefusion.integration.replaceAll('_', ' ')}</dd></div><div><dt>Lead review</dt><dd>{resolution ? resolution.evidence : 'No acceptance recorded'}</dd></div></dl>}
       <label>Attempt history<select aria-label="Worker attempt" value={task.id} onChange={event => onSelect(event.target.value)}>{history.map((item, index) => <option key={item.id} value={item.id}>{index + 1}. {item.model} · {workerState(item)}</option>)}</select></label>
     </details>
-    {task.litefusion?.request && <p className="worker-attention">{task.litefusion.request.reason}</p>}
-    {task.verificationNote && <p className="worker-attention">{task.verificationNote}</p>}
-    {(error || task.error) && <p role="alert" className="error-text">{error || task.error}</p>}
+    {taskAttention(task)&&!resolution&&<p className="worker-attention">{taskAttention(task)}</p>}
+    {workerReport(task)&&<details className="worker-details"><summary>Worker report and evidence</summary><pre>{workerReport(task)}</pre></details>}
+    {error&&<p role="alert" className="error-text">{error}</p>}
     <TaskTranscript key={task.id} task={task} label={label} />
   </aside>;
 }

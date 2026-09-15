@@ -1,5 +1,5 @@
 import type { LiteFusionTask } from '../../shared/litefusion-tasks';
-import { workerState } from '../../shared/worker-presentation';
+import { taskState, taskAttention, compactWorkerText, handoffError, handoffStatus, type HandoffIssue } from '../../shared/worker-presentation';
 import { useEffect, useLayoutEffect, useRef, useState } from 'react';
 import { BookOpen, Check, ChevronRight, Circle, RotateCw, Square, X, Zap } from 'lucide-react';
 import type { DelegationDetail, DelegationSummary } from '../../shared/delegation';
@@ -13,7 +13,7 @@ const sidekick = (task: DelegationSummary) => Boolean(task.role);
 const actor = (task: DelegationSummary) => task.role === 'expert' ? 'Expert' : task.role === 'worker' ? 'Worker' : 'Sidekick';
 const statusLabel = (task: DelegationSummary) => task.status === 'running' && sidekick(task) ? 'Working' : statusLabels[task.status];
 export const delegationPath = (task: DelegationSummary) => `/sessions/${encodeURIComponent(task.parentSessionId)}/delegations/${encodeURIComponent(task.id)}`;
-export function TaskCard({ task, scheduled, tool, label, awaitingApproval, expanded, onCancel, cancelling, error, onInspect }: { scheduled?: LiteFusionTask; task?: DelegationSummary; tool?: ToolCall; label?: string; awaitingApproval?: boolean; expanded: boolean; onCancel: () => void; cancelling: boolean; error?: string; onInspect?: () => void }) {
+export function TaskCard({ task, scheduled, handoffs=[], tool, label, awaitingApproval, expanded, onCancel, cancelling, error, onInspect }: { handoffs?:HandoffIssue[]; scheduled?: LiteFusionTask; task?: DelegationSummary; tool?: ToolCall; label?: string; awaitingApproval?: boolean; expanded: boolean; onCancel: () => void; cancelling: boolean; error?: string; onInspect?: () => void }) {
   const running = task?.status === 'running';
   const fusion = Boolean(task?.role || tool?.name === 'delegate' || tool?.name === 'sidekick');
   const identity = label ?? (task && fusion ? actor(task) : 'Research');
@@ -22,13 +22,13 @@ export function TaskCard({ task, scheduled, tool, label, awaitingApproval, expan
   let state: string;
   if (cancelling) state = 'Cancelling…';
   else if (scheduled?.resolution) state = 'Resolved by lead';
-  else if (scheduled && scheduled.status !== 'completed' && scheduled.status !== task?.status) state = scheduled.status === 'queued' ? 'Queued · waiting for prerequisites or capacity' : scheduled.status[0].toUpperCase() + scheduled.status.slice(1);
-  else if (task) state = running ? task.activity || statusLabel(task) : worker ? workerState(task) : statusLabel(task);
-  else state = awaitingApproval ? 'Needs approval' : tool?.status === 'pending' ? 'Queued' : tool?.status === 'running' ? 'Starting' : tool?.status === 'error' ? 'Failed' : tool?.status === 'denied' ? 'Not started' : 'Completed';
-  const failure=scheduled?.error||task?.error || (!task && tool?.status==='error' ? tool.output : undefined);
+  else if (scheduled && scheduled.status !== 'completed' && scheduled.status !== task?.status) state = scheduled.status === 'queued' ? 'Queued · waiting for prerequisites or capacity' : scheduled.status==='blocked'?'Needs lead attention':scheduled.status[0].toUpperCase() + scheduled.status.slice(1);
+  else if (task) state = worker?taskState(task,scheduled):running?task.activity||statusLabel(task):statusLabel(task);
+  else state = awaitingApproval ? 'Needs approval' : tool?.status === 'pending' ? 'Queued' : tool?.status === 'running' ? 'Starting' : tool?.status === 'error' ? 'Handoff not started' : tool?.status === 'denied' ? 'Not started' : 'Completed';
+  const failure=scheduled?.error||task?.error || (!handoffs.length && !task && tool?.status==='error' ? handoffError(tool.output??'') : undefined);
   if (worker) {
     const canCancel = scheduled ? ['queued', 'running', 'blocked'].includes(scheduled.status) : running;
-    const attention = scheduled?.resolution ? undefined : awaitingApproval ? 'Needs approval · respond in the conversation' : task?.litefusion?.request?.reason || task?.verificationNote || failure;
+    const attention = scheduled?.resolution ? undefined : awaitingApproval ? 'Needs approval · respond in the conversation' : taskAttention(task,scheduled) || failure;
     const recent = task?.recentActivity?.[0];
     const [toolName, ...target] = recent?.split(' · ') ?? [];
     const activity = recent ? [toolLabels[toolName] ?? toolName, ...target].join(' · ') : undefined;
@@ -47,6 +47,8 @@ export function TaskCard({ task, scheduled, tool, label, awaitingApproval, expan
         </button>
         {canCancel && <button className="icon-button worker-stop" aria-label="Cancel task" title="Cancel task" disabled={cancelling} onClick={onCancel}><Square size={13} /></button>}
       </div>
+      {handoffs.length>0&&<details className="handoff-history"><summary>{handoffStatus(handoffs)}</summary>{handoffs.map(issue=><div key={issue.key}><p>{issue.recovered?'Rejected handoff · retry accepted':'Rejected handoff · needs attention'}</p><pre>{handoffError(issue.output)}</pre></div>)}</details>}
+      {handoffs.some(issue=>!issue.recovered)&&<p className="handoff-attention">{compactWorkerText(handoffError(handoffs.findLast(issue=>!issue.recovered)!.output))}</p>}
       {error && <p className="error-text" role="alert">{error}</p>}
     </section>;
   }
