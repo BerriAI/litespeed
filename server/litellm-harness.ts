@@ -4,7 +4,7 @@ import path from 'node:path';
 import fg from 'fast-glob';
 import type { ToolDefinition } from '../shared/types.js';
 
-export const LITELLM_HARNESS_VERSION='2026-09-15.12';
+export const LITELLM_HARNESS_VERSION='2026-09-15.13';
 export const litellmContextTool:ToolDefinition={type:'function',function:{name:'litellm_context',description:'Navigate the current LiteLLM checkout. Give a task query to find relevant definitions, inline conditions and existing tests. Give a source path to see its symbol outline and test partners; add a symbol name to read that definition with numbered lines. Reads only this workspace, never Git history or remote answers.',parameters:{type:'object',properties:{query:{type:'string',maxLength:1000},path:{type:'string',maxLength:500},symbol:{type:'string',maxLength:200}},additionalProperties:false}}};
 
 const playbooks = [
@@ -121,7 +121,11 @@ async function matchingSymbols(workspace:string,files:string[],tokens:string[],s
   // matching area rather than silently hiding symbols in the other categories.
   const roots=[...providers.map(p=>'litellm/llms/'+p+'/'),...(proxy?['litellm/proxy/','enterprise/']:[]),...(router?['litellm/router.py','litellm/router_utils/','litellm/router_strategy/']:[])];
   if(!roots.length)roots.push('litellm/litellm_core_utils/','litellm/utils.py');
-  const candidates=files.filter(p=>p.endsWith('.py')&&roots.some(root=>root.endsWith('/')?p.startsWith(root):p===root));
+  const buckets=roots.map(root=>files.filter(p=>p.endsWith('.py')&&(root.endsWith('/')?p.startsWith(root):p===root)));
+  const candidates:string[]=[];
+  // A large proxy/enterprise tree must not consume the scan budget before the
+  // router or provider area gets a turn. Keep the overall limit, interleave roots.
+  for(let row=0;row<Math.max(...buckets.map(bucket=>bucket.length));row++)for(const bucket of buckets)if(bucket[row])candidates.push(bucket[row]);
   const matches:{path:string;name:string;line:number;score:number}[]=[];
   const references:{path:string;line:number;preview:string;score:number}[]=[];
   let bytes=0,scanned=0;

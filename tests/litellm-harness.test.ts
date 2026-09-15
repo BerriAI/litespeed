@@ -71,6 +71,14 @@ describe('LiteLLM repository navigation',()=>{
     const result=JSON.parse(await litellmContext(root,{query:'get_available_deployment'},new AbortController().signal));
     expect(result.symbols[0]).toMatchObject({path:'litellm/router.py',name:'get_available_deployment'});
   });
+  it('does not let a large proxy tree exhaust the budget before scanning router code',async()=>{
+    await mkdir(join(root,'litellm/proxy'),{recursive:true});
+    await Promise.all(Array.from({length:810},(_,i)=>writeFile(join(root,`litellm/proxy/file_${i}.py`),'def unrelated(): pass\n')));
+    await put('litellm/router.py','def resolve_team_router_name():\n    pass\n');
+    const result=JSON.parse(await litellmContext(root,{query:'team router'},new AbortController().signal));
+    expect(result.symbols[0]).toMatchObject({path:'litellm/router.py',name:'resolve_team_router_name'});
+    expect(result.symbolScan).toMatchObject({files:800,partial:true});
+  });
   it('keeps one model in both onboarding and architecture routing',()=>{
     const selection=selectArchitecture('litellm-specific',{providerId:'gateway',model:'flash'});
     expect(selection).toEqual({kind:'litellm-specific'});expect(architectureProviders(selection)).toEqual([]);expect(architectureWorker(selection)).toBeNull();
