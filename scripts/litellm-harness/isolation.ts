@@ -20,6 +20,9 @@ export function replaySandboxProfile(options:{runDirectory:string;runtimeRoot:st
   const protectedRoots=[...new Set([dirname(home),home,campaign,source])];
   return ['(version 1)','(allow default)',
     ...protectedRoots.map(root=>`(deny file-read* file-write* (subpath ${quote(root)}))`),
+    // A shared /tmp can contain another solver's probes or candidate code.
+    // TMPDIR points into the current run; explicit shared-temp paths fail closed.
+    ...['/tmp','/private/tmp','/var/folders','/private/var/folders'].map(root=>`(deny file-read* file-write* (subpath ${quote(root)}))`),
     // Parent metadata is needed for realpath/getcwd; it does not expose contents.
     '(allow file-read-metadata)',
     ...[runtime,python,node].map(root=>`(allow file-read* (subpath ${quote(root)}))`),
