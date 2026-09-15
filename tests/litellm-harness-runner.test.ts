@@ -49,6 +49,13 @@ describe('LiteLLM-specific runner integration',()=>{
     const messages=store.messages(session.id);expect(messages.find(m=>m.role==='tool')?.content).not.toContain('value_0');
     expect(messages.flatMap(m=>m.toolCalls??[])[0].status).toBe('denied');
   });
+  it.each(['hook','sidecar'])('preserves %s interception by falling back to ordinary reads',async(kind)=>{
+    store.saveSettings(kind==='hook'?{hooks:[{event:'PreToolUse',matcher:'read_file',command:'exit 2'}]}:{sidecars:[{name:'reader',events:['tool_call'],command:'exit 0'}]});
+    const session=store.createSession({workspace:root,providerId:'test',model:'model',permissionMode:'auto',architecture:{kind:'litellm-specific'}});
+    action={name:'litellm_context',args:{path:'litellm/example.py'}};runner.start(session.id,'Inspect.');await runner.whenIdle();
+    expect(requests[0].tools.map((t:any)=>t.function.name)).not.toContain('litellm_context');
+    expect(store.messages(session.id).find(m=>m.role==='tool')?.content).not.toContain('value_0');
+  });
   it('reviews a changed Build turn once and does not loop when the model finishes',async()=>{
     const session=store.createSession({workspace:root,providerId:'test',model:'model',permissionMode:'auto',architecture:{kind:'litellm-specific'}});
     action={name:'write_file',args:{path:'litellm/new.py',content:'value = 1\n'}};

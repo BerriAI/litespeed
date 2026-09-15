@@ -34,6 +34,11 @@ describe('LiteLLM repository navigation',()=>{
     expect(result.symbols[0]).toMatchObject({path:'litellm/proxy/common_utils.py',name:'check_team_member_budget'});
     expect(result.matches.some((m:{path:string})=>m.path.startsWith('ui/'))).toBe(false);
   });
+  it('finds inline guards when their enclosing function name does not describe the behavior',async()=>{
+    await put('litellm/proxy/auth.py','def authenticate():\n    if team_member_spend > team_member_budget:\n        raise ValueError()\n');
+    const result=JSON.parse(await litellmContext(root,{query:'team member budget'},new AbortController().signal));
+    expect(result.references[0]).toMatchObject({path:'litellm/proxy/auth.py',line:2,preview:'if team_member_spend > team_member_budget:'});
+  });
   it('indexes legacy test directories and the proxy schema',async()=>{
     await put('tests/llm_translation/test_conversion.py','def test_empty_result(): pass\n');
     await put('litellm/proxy/schema.prisma','model TeamMembership {\n  id String @id\n}');

@@ -4,11 +4,11 @@ import path from 'node:path';
 import fg from 'fast-glob';
 import type { ToolDefinition } from '../shared/types.js';
 
-export const LITELLM_HARNESS_VERSION='2026-09-15.8';
-export const litellmContextTool:ToolDefinition={type:'function',function:{name:'litellm_context',description:'Navigate the current LiteLLM checkout. Give a task query to find relevant source and existing tests. Give a source path to see its symbol outline and test partners; add a symbol name to read that definition with numbered lines. Reads only this workspace, never Git history or remote answers.',parameters:{type:'object',properties:{query:{type:'string',maxLength:1000},path:{type:'string',maxLength:500},symbol:{type:'string',maxLength:200}},additionalProperties:false}}};
+export const LITELLM_HARNESS_VERSION='2026-09-15.9';
+export const litellmContextTool:ToolDefinition={type:'function',function:{name:'litellm_context',description:'Navigate the current LiteLLM checkout. Give a task query to find relevant definitions, inline conditions and existing tests. Give a source path to see its symbol outline and test partners; add a symbol name to read that definition with numbered lines. Reads only this workspace, never Git history or remote answers.',parameters:{type:'object',properties:{query:{type:'string',maxLength:1000},path:{type:'string',maxLength:500},symbol:{type:'string',maxLength:200}},additionalProperties:false}}};
 
 export const litellmInstructions=`LiteLLM-specific harness ${LITELLM_HARNESS_VERSION}.
-Use litellm_context to find the right source and existing tests before broad exploration. Pass path to inspect a symbol outline, path + query to filter a large outline, then path + symbol to read the definition. A plain read_file defaults to 160 lines in this architecture; choose a range around the relevant definition. Batch independent reads. Once the causal code path and a relevant test are clear, implement and test instead of continuing a broad survey. Apply a complete small edit rather than repeatedly revising comments or speculative helpers. When the cause is uncertain, use the smallest allowed executable probe to distinguish hypotheses; do not repeatedly reconsider the same code without new evidence. Solve the requested behavior instead of trying to reconstruct an imagined upstream patch. Shared helpers can be bypassed by cache-hit or fast paths: trace the actual entrypoint for the reported symptom.
+When available, use litellm_context to find the right source and existing tests before broad exploration. Pass path to inspect a symbol outline, path + query to filter a large outline, then path + symbol to read the definition. A plain read_file defaults to 160 lines in this architecture; choose a range around the relevant definition. Batch independent reads. Once the causal code path and a relevant test are clear, implement and test instead of continuing a broad survey. Apply a complete small edit rather than repeatedly revising comments or speculative helpers. When the cause is uncertain, use the smallest allowed executable probe to distinguish hypotheses; do not repeatedly reconsider the same code without new evidence. Solve the requested behavior instead of trying to reconstruct an imagined upstream patch. Shared helpers can be bypassed by cache-hit or fast paths: trace the actual entrypoint for the reported symptom.
 Repository map: litellm/llms/<provider>/<endpoint>/transformation.py translates provider requests/responses; common_utils.py and handler.py handle shared protocol and transport. litellm/types/llms contains provider schemas. litellm/litellm_core_utils contains shared streaming, response conversion, prompt templates and routing helpers. litellm/proxy contains gateway/auth/spend/guardrails; enterprise contains paid features. tests/test_litellm mirrors the source tree. UI source is ui/litellm-dashboard, not litellm/proxy/_experimental/out (generated output). Model capabilities/prices live in model_prices_and_context_window.json.
 Read CLAUDE.md when AGENTS.md references it. Prefer extending an existing mapped test. Test intended behavior and the relevant unaffected behavior; a bug fix may require changing an assertion that encoded the bug. Check sync/async and streaming/non-streaming counterparts when the changed behavior crosses them. Preserve caller-owned inputs and existing public interfaces.
 Before finalizing a protocol change, check the representation at its boundary. For URLs, compose parsed path/query components rather than appending a path to an arbitrary base string; preserve existing query parameters and add streaming parameters correctly. For images/documents, preserve source kind and MIME metadata, and verify the downstream adapter's expected representation (raw base64 and a data URL are different). For shared parameters, distinguish absent, null and explicit false; preserve caller-owned inputs. These are review heuristics, not instructions to add unrelated behavior.\nUse installed dependencies and focused tests. Inspect pyproject.toml/Makefile or existing environment evidence before guessing a test command. Separate collection/import/infrastructure failures from an assertion failure. Start with your regression test and a small relevant existing selection. If a wider check fails, diagnose whether it is caused by this change before adding more code. Do not repeatedly rerun an unchanged failing setup. Do not run broad suites, generate dashboard bundles, or install packages unless the task needs them.
@@ -70,17 +70,27 @@ async function matchingSymbols(workspace:string,files:string[],tokens:string[],s
   const roots=providers.length?providers.map(p=>'litellm/llms/'+p+'/'):proxy?['litellm/proxy/','enterprise/']:router?['litellm/router.py','litellm/router_utils/','litellm/router_strategy/']:['litellm/litellm_core_utils/','litellm/utils.py'];
   const candidates=files.filter(p=>p.endsWith('.py')&&roots.some(root=>root.endsWith('/')?p.startsWith(root):p===root));
   const matches:{path:string;name:string;line:number;score:number}[]=[];
+  const references:{path:string;line:number;preview:string;score:number}[]=[];
   let bytes=0,scanned=0;
   for(let offset=0;offset<Math.min(candidates.length,800)&&bytes<64*1024*1024;offset+=8){
     signal.throwIfAborted();
     await Promise.all(candidates.slice(offset,Math.min(offset+8,800)).map(async file=>{
       try{const text=await sourceFile(workspace,file);bytes+=Buffer.byteLength(text);scanned++;
         for(const symbol of outline(text)){const score=tokens.reduce((n,t)=>n+Number(symbol.name.toLowerCase().includes(t)),0);if(score)matches.push({path:file,name:symbol.name,line:symbol.line,score});}
+        for(const [index,line] of text.split('\n').entries()){
+          const trimmed=line.trim(),lower=line.toLowerCase();
+          if(!trimmed||trimmed.startsWith('#')||/^(?:(?:async\s+)?def|class)\s/.test(trimmed))continue;
+          const score=tokens.reduce((n,t)=>n+Number(lower.includes(t)),0);
+          if(score>=Math.min(2,tokens.length)){
+            references.push({path:file,line:index+1,preview:trimmed.slice(0,240),score:score+(/^(?:if|elif|assert)\b/.test(trimmed)?0.5:0)});
+            references.sort((a,b)=>b.score-a.score||a.path.localeCompare(b.path)||a.line-b.line);references.length=Math.min(references.length,12);
+          }
+        }
       }catch{signal.throwIfAborted();}
     }));
   }
   signal.throwIfAborted();
-  return {matches:matches.sort((a,b)=>b.score-a.score||a.name.length-b.name.length||a.path.localeCompare(b.path)||a.line-b.line).slice(0,12),scanned,partial:scanned<candidates.length};
+  return {matches:matches.sort((a,b)=>b.score-a.score||a.name.length-b.name.length||a.path.localeCompare(b.path)||a.line-b.line).slice(0,12),references:references.sort((a,b)=>b.score-a.score||a.path.localeCompare(b.path)||a.line-b.line).slice(0,12),scanned,partial:scanned<candidates.length};
 }
 export async function litellmContext(workspace:string,args:Record<string,unknown>,signal:AbortSignal):Promise<string>{
   signal.throwIfAborted();
@@ -107,9 +117,9 @@ export async function litellmContext(workspace:string,args:Record<string,unknown
     return JSON.stringify({path:file,lines:lines.length,symbols:selected.slice(0,100),moreSymbols:selected.length>100,tests},null,2);
   }
   const aliases:Record<string,string>={conversion:'convert',translation:'transform',streaming:'stream',configuration:'config',authentication:'auth',authorization:'auth',parameters:'params',retries:'retry'};
-  const tokens=[...new Set(words(String(args.query??'')).flatMap(word=>[word,...(aliases[word]?[aliases[word]]:[])]))];
+  const tokens=[...new Set(words(String(args.query??'')).flatMap(word=>[word,...(aliases[word]?[aliases[word]]:[])]))].slice(0,24);
   const ui=/\b(ui|dashboard|frontend|react|component)\b/i.test(String(args.query??''));
   const ranked=files.filter(p=>!p.startsWith('tests/')&&(ui||!p.startsWith('ui/'))).map(p=>({path:p,score:tokens.reduce((score,word)=>score+(p.toLowerCase().includes(word)?(p.split('/').includes(word)?5:2):0),0)})).filter(p=>p.score>0).sort((a,b)=>b.score-a.score||a.path.length-b.path.length||a.path.localeCompare(b.path)).slice(0,8);
   const symbols=tokens.length&&!ui?await matchingSymbols(workspace,files,tokens,signal):undefined;
-  return JSON.stringify({query:args.query??'',symbols:symbols?.matches.map(s=>({...s,tests:partners(files,s.path).slice(0,2)})),symbolScan:symbols&&{files:symbols.scanned,partial:symbols.partial},matches:ranked.map(p=>({path:p.path,tests:partners(files,p.path).slice(0,3)})),hint:'Use path + symbol for a definition, path + query to filter a large outline, or grep within the relevant directory for an exact term. Ranked paths and symbols are navigation hints, not proof of the cause.'},null,2);
+  return JSON.stringify({query:args.query??'',references:symbols?.references,symbols:symbols?.matches.map(s=>({...s,tests:partners(files,s.path).slice(0,2)})),symbolScan:symbols&&{files:symbols.scanned,partial:symbols.partial},matches:ranked.map(p=>({path:p.path,tests:partners(files,p.path).slice(0,3)})),hint:'Use path + symbol for a definition, path + query to filter a large outline, or grep within the relevant directory for an exact term. Ranked paths and symbols are navigation hints, not proof of the cause.'},null,2);
 }

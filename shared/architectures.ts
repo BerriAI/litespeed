@@ -28,7 +28,7 @@ export interface ArchitectureInfo { kind: ArchitectureKind; name: string; descri
 export const ARCHITECTURES: readonly ArchitectureInfo[] = [
   {
     kind: 'litellm-specific', name: 'LiteLLM specific',
-    description: 'Repository navigation, focused tests and verification tuned for LiteLLM. One model, fewer detours.',
+    description: 'Repository navigation, focused tests and verification tuned for LiteLLM. One model, code and tests together.',
     roles: [],
   },
   {
