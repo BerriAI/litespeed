@@ -1,5 +1,15 @@
 # MCP connections and tool snapshots
 
+## Import Claude Code or Codex configuration
+
+**Settings → Integrations → Import Claude/Codex MCP servers** explicitly scans only Claude Code user/local entries in `~/.claude.json`, project entries in `<workspace>/.mcp.json`, and Codex user (`$CODEX_HOME/config.toml` or `~/.codex/config.toml`) and project (`<workspace>/.codex/config.toml`) entries.
+
+Choose one or more compatible servers; none are selected by default. Preview returns names, source/scope, transport, environment-variable *names*, compatibility, and collision status only: never commands, arguments, paths, URL credentials/query values, or environment values. The selection is source-hash revalidated at import and guarded by the saved MCP configuration revision. Imports go to **global Litespeed settings**, skip existing names, and are forced to `enabled: false` and `advertise: false`; nothing connects automatically.
+
+Supported imports are stdio `command`/`args`/static `env`, plus HTTP/Streamable HTTP URLs. Static environment values are copied server-side only after confirmation because they may include API keys, and remain masked in Settings. Entries needing headers, bearer/env-header forwarding, `env_vars`, `cwd`, tool filtering, explicit SSE, WebSocket, interpolation, URL credentials/query values/fragments, or other client-specific behavior are rejected rather than changed silently. OAuth login caches, registrations, callback metadata, and cached tokens are never read or copied. A remote endpoint without static credentials may still require authentication that Litespeed does not support.
+
+The picker is available in both the terminal (`/settings` → Integrations) and browser Settings. It supports up to 30 selected servers and 30 saved servers total; duplicate names and capacity limits are shown in the review and skipped. Malformed or unavailable sources are reported independently, so other sources can still be imported. This imports **Claude Code**, not Claude Desktop, and never changes the originals. Review any project-relative commands and paths before enabling an imported server.
+
 MCP connects Litespeed to tools supplied by another process or service. These tools may read or change data outside your project. Configure only commands and endpoints you trust. Tool approval is not a sandbox, and cancellation cannot prove that a remote side effect did not happen.
 
 ## Configure, then connect
