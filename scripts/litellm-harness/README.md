@@ -1,0 +1,63 @@
+# Replaying the LiteLLM harness campaign
+
+These scripts are an evaluation and improvement workbench for the selectable architecture, not a service required to use it. They run real model calls and can incur charges. Set an explicit ceiling and retain the private ledger between runs.
+
+## Setup
+
+Requirements: Node matching this repository, installed Litespeed dependencies, Python with LiteLLM's test dependencies, a local LiteLLM Git checkout containing the task revisions, and a configured Codex CLI for Astra comparisons. Snapshots preserve tracked regular files, including .gitignore, Makefile, database schemas and repository guidance. Generated dashboard output and files above 15 MiB are omitted. Earlier exploratory snapshots filtered by extension and incorrectly omitted some of this metadata; those runs are kept separate. Snapshot cloning currently uses macOS/APFS `cp -cR`; use an equivalent full copy on other filesystems. Python dependencies are shared across historical snapshots, so this is not a reconstruction of every historical CI environment.
+
+Use a private directory outside either repository. Store your gateway key in a mode-0600 file there. Do not put it in scripts, task prompts or command arguments.
+
+```sh
+export LITELLM_CAMPAIGN_DIR=/absolute/private/campaign
+export LITELLM_CAMPAIGN_KEY_FILE=/absolute/private/campaign/gateway-key
+export LITELLM_CAMPAIGN_BASE_URL=https://your-gateway.example
+export LITELLM_CAMPAIGN_LIMIT_USD=100
+export LITELLM_SOURCE_REPO=/absolute/path/to/litellm
+export LITELLM_EVAL_PYTHON=/absolute/path/to/litellm/.venv/bin/python
+
+python3 scripts/litellm-harness/prepare.py
+python3 scripts/litellm-harness/validate.py
+npx tsx scripts/litellm-harness/gateway.ts
+```
+
+The gateway runs in its own terminal. It accepts only `fireworks_ai/deepseek-v4p1-flash`, reserves a conservative maximum request cost before dispatch and refuses calls beyond the saved ceiling. It prices cached input, ordinary input and generated tokens separately. The rates in `budget.ts` were verified against the campaign gateway; check your gateway's rates before starting another campaign. Account-level spend was unavailable on the original key. This ledger covers requests through this local process, not other uses of the account.
+
+Missing usage and interrupted requests retain their full reservation. **Committed dollars are an upper accounting bound, not measured spend.** Do not report unpriced reservations as actual charges. An exclusive lock prevents two gateway processes from separately admitting requests against the same ledger. After a crash, verify that the recorded process is gone before removing `gateway.lock`. Do not reset a ledger to obtain more budget.
+
+## Run and score
+
+In another terminal with the same environment:
+
+```sh
+npx tsx scripts/litellm-harness/run.ts converse-config single baseline
+npx tsx scripts/litellm-harness/run.ts converse-config litellm-specific candidate
+npx tsx scripts/litellm-harness/run.ts converse-config codex astra
+
+python3 scripts/litellm-harness/score.py /absolute/private/campaign/runs/RUN_DIRECTORY
+python3 scripts/litellm-harness/analyze.py
+```
+
+Each run gets a fresh snapshot, a new Git repository with one starting commit, and its own Litespeed state. The original history and reference patch/tests are absent from the solver workspace. Raw traces and credentials are private artifacts, not files to commit in this repository. Scoring copies the candidate into `acceptance-workspace` before restoring reference tests; never use that directory as a solver input. Early exploratory runs were scored in place, so always start another run from a new snapshot.
+
+Litespeed uses the selected architecture, High reasoning, the gateway-advertised 1,048,576-token context window, memory disabled and no connected tools. Its run timeout is 600 seconds. Earlier exploratory runs used an artificially low 131,072-token configuration and some triggered compaction; they must not stand in for the final candidate comparison. Compaction archives are retained for complete tool accounting. Codex uses the installed CLI, exact model `gpt-6-astra`, High reasoning, ephemeral execution, workspace-write policy, disabled web search and a 900-second timeout. Codex account usage is separate from the DeepSeek gateway ceiling; its dollar charge is unavailable and must not be reported as zero.
+
+The scripts tell solvers to work offline and within their checkout. The Litespeed shell is not an OS sandbox. The final pytest scorer blocks network connections and ignores external pytest configuration. This is answer withholding and controlled scoring, not a claim that arbitrary adversarial solvers cannot access the host.
+
+## Task and oracle qualification
+
+The corpus contains retrospective requirements derived from public changes, not original pre-merge issues. `task-prompts.json` corrects omissions found during task auditing. Every solver receives the same task revision. Do not combine runs with different requirements into one comparative score.
+
+Before a paid run, the unpatched snapshot must fail the selected behavioral checks and the reference patch must pass them in the scoring environment. Import errors, missing fixtures, network setup and reference-patch failures are task-environment problems, not model failures. Two initial tasks failed this qualification and remain excluded unless their environment/oracle is repaired.
+
+Reference tests that directly require newly introduced helper names are excluded from primary scoring. Their node IDs remain in each manifest for audit. Alternate implementations can satisfy the public behavior without copying the human patch. Passing the selected tests still does not prove the absence of regressions, security bugs or requirements those tests omit; inspect patches and relevant neighboring behavior as well.
+
+The train/dev/test labels separate improvement tasks from the final task comparison. They are not a chronological future-PR split, and the curator has inspected the reference changes while validating tasks. Do not describe these results as a blind study, a production deployment result, or a guarantee on arbitrary future LiteLLM work.
+
+## Improve deliberately
+
+1. Run a fixed candidate on training/development tasks.
+2. Inspect failures, repeated tool calls, long reads, speculative edits and time spent in commands. Check the task wording and reference environment before blaming the model.
+3. Change one reusable mechanism or instruction, version it, and rerun affected development tasks.
+4. Freeze the candidate before comparing held-out tasks. Preserve failures and repeated trials; do not select only the best run.
+5. Publish task-level acceptance, elapsed time, request/token counts, priced spend, unknown reservations and limitations. Keep raw private transcripts out of the PR.

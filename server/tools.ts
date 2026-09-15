@@ -1,3 +1,4 @@
+import { litellmContext } from './litellm-harness.js';
 import { LEGACY_NAMES } from '../bin/legacy.mjs';
 import { shellInspection } from './shell-inspection.js';
 import { isCheckCommand } from '../shared/receipts.js';
@@ -60,7 +61,7 @@ const IGNORED_DIRS = new Set(['node_modules', 'vendor', 'dist', 'build', 'covera
 // GET (5.6): both mutate nothing, so they join the read-only set AND the
 // researcher child ceiling — a deliberate ceiling expansion recorded in
 // docs/delegation.md and the ceiling tests.
-const READ_ONLY = new Set(['read_file', 'bulk_read', 'view_image', 'glob', 'grep', 'web_fetch', 'web_search', 'todo_read', 'history_search', 'memory_recall', 'tool_output_page', 'bash_output', 'wait']);
+const READ_ONLY = new Set(['litellm_context', 'read_file', 'bulk_read', 'view_image', 'glob', 'grep', 'web_fetch', 'web_search', 'todo_read', 'history_search', 'memory_recall', 'tool_output_page', 'bash_output', 'wait']);
 const string = { type: 'string' };
 const integer = (minimum: number, maximum: number) => ({ type: 'integer', minimum, maximum });
 const definition = (name: string, description: string, properties: Record<string, unknown>, required: string[] = []): ToolDefinition => ({
@@ -1434,6 +1435,7 @@ export async function executeTool(name: string, args: Record<string, unknown>, c
   // Re-rooting an approved search must not expose a hidden/generated start.
   if (context.displayPath && (name === 'glob' || name === 'grep') && ignored(String(args.path))) return name === 'glob' ? 'No files found.' : 'No matches found.';
   switch (name) {
+    case 'litellm_context': return litellmContext(context.workspace,args,context.signal);
     case 'read_file': {
       const offset = numberArg(args, 'offset', 1, 1_000_000);
       const limit = numberArg(args, 'limit', 2000, 2000);
