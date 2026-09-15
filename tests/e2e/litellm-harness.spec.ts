@@ -28,6 +28,7 @@ test('LiteLLM architecture persists one model and displays repository navigation
     await expect(page.locator('.model-trigger')).toContainText('LiteLLM');
     await expect(page.locator('.model-trigger')).not.toContainText('specialists');
     await page.getByRole('combobox',{name:'Agent mode',exact:true}).selectOption('plan');
+    await expect(page.locator('.model-trigger')).toContainText('LiteLLM');
     await page.getByRole('textbox',{name:'Message Litespeed',exact:true}).fill('LITELLM_BROWSER inspect the transformation.');
     await page.getByRole('button',{name:'Send message',exact:true}).click();
     await expect(page.getByRole('article',{name:'Assistant message'}).last()).toContainText('Planning complete.');

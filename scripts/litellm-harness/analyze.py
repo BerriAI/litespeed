@@ -9,7 +9,7 @@ ROOT=Path(os.environ['LITELLM_CAMPAIGN_DIR'])
 records=[]
 for p in sorted((ROOT/'runs').glob('*/result.json')):
     result=json.loads(p.read_text());directory=p.parent
-    record={k:result.get(k) for k in ['id','kind','label','seconds','status','exit','acceptance','timedOut','contextWindow','evaluationProtocol','effort','timeoutSeconds']}
+    record={k:result.get(k) for k in ['id','kind','label','seconds','status','exit','acceptance','timedOut','contextWindow','evaluationProtocol','effort','timeoutSeconds','isolation']}
     record['run']=directory.name
     task=json.loads((directory/'task.json').read_text()) if (directory/'task.json').exists() else {}
     record['promptRevision']=result.get('promptRevision',task.get('prompt_revision',1))
@@ -35,7 +35,7 @@ for p in sorted((ROOT/'runs').glob('*/result.json')):
         usage=result.get('usage',{})
         record['reportedRequests']=usage.get('reportedRequests')
         units=[r['usage'] for r in usage.get('breakdown',[]) if r.get('usage')]
-        record.update({'requests':usage.get('requests'),'inputTokens':sum(x.get('inputTokens',0) for x in units),'cachedTokens':sum(x.get('cachedTokens',0) for x in units),'outputTokens':sum(x.get('outputTokens',0) for x in units),'computedUsd':(sum((x.get('inputTokens',0)-x.get('cachedTokens',0))*0.22/1e6+x.get('cachedTokens',0)*0.007/1e6+x.get('outputTokens',0)*0.66/1e6 for x in units) if units else None),'toolCounts':dict(Counter(c['name'] for c in calls)),'toolErrors':[{k:c.get(k) for k in ['name','args','status','output']} for c in calls if c.get('status') in ['error','denied']],'checks':[{'command':c['execution']['command'],'exit':c['execution'].get('exitCode')} for c in calls if c.get('execution',{}).get('checkKey')],'readCharacters':sum(len(c.get('output','')) for c in calls if c['name'] in ['read_file','grep','glob','litellm_context']),'finalCharacters':len(result.get('final',''))})
+        record.update({'requests':usage.get('requests'),'inputTokens':(sum(x.get('inputTokens',0) for x in units) if units else None),'cachedTokens':(sum(x.get('cachedTokens',0) for x in units) if units else None),'outputTokens':(sum(x.get('outputTokens',0) for x in units) if units else None),'computedUsd':(sum((x.get('inputTokens',0)-x.get('cachedTokens',0))*0.22/1e6+x.get('cachedTokens',0)*0.007/1e6+x.get('outputTokens',0)*0.66/1e6 for x in units) if units else None),'toolCounts':dict(Counter(c['name'] for c in calls)),'toolErrors':[{k:c.get(k) for k in ['name','args','status','output']} for c in calls if c.get('status') in ['error','denied']],'checks':[{'command':c['execution']['command'],'exit':c['execution'].get('exitCode')} for c in calls if c.get('execution',{}).get('checkKey')],'readCharacters':sum(len(c.get('output') or '') for c in calls if c['name'] in ['read_file','grep','glob','litellm_context']),'toolOutputCharacters':sum(len(c.get('output') or '') for c in calls),'bashOutputCharacters':sum(len(c.get('output') or '') for c in calls if c['name'] in ['bash','bash_output']),'finalCharacters':len(result.get('final',''))})
         signatures=Counter((c['name'],json.dumps(c.get('args',{}),sort_keys=True)) for c in calls)
         record['exactRepeatedCalls']=sum(n-1 for n in signatures.values() if n>1)
         for step,m in enumerate([m for m in messages if m['role']=='assistant'],1):

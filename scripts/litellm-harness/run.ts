@@ -1,12 +1,12 @@
-import { readFileSync, writeFileSync, mkdirSync } from 'node:fs';
-import { resolve, join } from 'node:path';
+import { readFileSync, writeFileSync, mkdirSync, copyFileSync, realpathSync } from 'node:fs';
+import { resolve, join, dirname } from 'node:path';
 import { execFileSync, spawn } from 'node:child_process';
 import { createHash, randomUUID } from 'node:crypto';
-import { Store } from '../../server/store.js';
-import { createApp } from '../../server/app.js';
-import { FLASH_MODEL } from './budget.js';
+import { homedir } from 'node:os';
+import { replaySandboxProfile } from './isolation.js';
 import type { ReasoningEffort } from '../../shared/types.js';
 
+if(process.platform!=='darwin')throw new Error('This replay launcher requires macOS sandbox-exec. Port the filesystem isolation before running on another platform.');
 const root=process.env.LITELLM_CAMPAIGN_DIR;
 if(!root)throw new Error('Set LITELLM_CAMPAIGN_DIR to the private campaign directory.');
 const id=process.argv[2],kind=process.argv[3]??'single',label=process.argv[4]??kind;
@@ -14,6 +14,7 @@ const effort=(process.argv[5]??'high') as ReasoningEffort;
 if(!['none','low','medium','high','max'].includes(effort))throw new Error('Choose a supported evaluation reasoning effort.');
 if(!['single','litellm-specific','codex'].includes(kind))throw new Error('Choose single, litellm-specific or codex.');
 if(!/^[a-z0-9-]+$/.test(label))throw new Error('Use a simple campaign label.');
+if(!process.env.LITELLM_SOURCE_REPO)throw new Error('Set LITELLM_SOURCE_REPO so the live source can be blocked.');
 if(!process.env.LITELLM_EVAL_PYTHON)throw new Error('Set LITELLM_EVAL_PYTHON to the installed benchmark interpreter.');
 const corpus=JSON.parse(readFileSync(join(root,'cases.json'),'utf8'));
 const task=corpus.find((c:{id:string})=>c.id===id);
@@ -30,37 +31,24 @@ execFileSync('git',['-c','user.name=Harness Evaluation','-c','user.email=eval@ex
 const prompt=task.prompt+'\n\nImplement the fix in this checkout, add a focused regression test, and verify it. Keep the change scoped. This is an offline task: do not browse the web, inspect files outside this checkout, fetch Git history, commit or push. Dependencies are preinstalled. To run Python tests, use '+process.env.LITELLM_EVAL_PYTHON+' -m pytest -c /dev/null --noconftest -p no:cacheprovider <targeted test path> -q. Set LITELLM_LOCAL_MODEL_COST_MAP=True and PYTHON_DOTENV_DISABLED=1. Do not run the entire suite or install dependencies.';
 writeFileSync(join(directory,'prompt.txt'),prompt);
 writeFileSync(join(directory,'task.json'),JSON.stringify(task,null,2));
-writeFileSync(join(directory,'harness-source.json'),JSON.stringify({base:execFileSync('git',['rev-parse','HEAD'],{cwd:resolve(import.meta.dirname,'../..'),encoding:'utf8'}).trim(),node:process.version,files:Object.fromEntries(['server/runner.ts','server/tools.ts','server/litellm-harness.ts','scripts/litellm-harness/run.ts'].map(file=>{const source=readFileSync(resolve(import.meta.dirname,'../..',file),'utf8');return [file,{sha256:createHash('sha256').update(source).digest('hex'),source}];}))},null,2));
+writeFileSync(join(directory,'harness-source.json'),JSON.stringify({base:execFileSync('git',['rev-parse','HEAD'],{cwd:resolve(import.meta.dirname,'../..'),encoding:'utf8'}).trim(),node:process.version,files:Object.fromEntries(['server/runner.ts','server/tools.ts','server/litellm-harness.ts','scripts/litellm-harness/run.ts','scripts/litellm-harness/solve.ts','scripts/litellm-harness/isolation.ts'].map(file=>{const source=readFileSync(resolve(import.meta.dirname,'../..',file),'utf8');return [file,{sha256:createHash('sha256').update(source).digest('hex'),source}];}))},null,2));
 const started=Date.now();
 const timeoutSeconds=kind==='codex'||label.startsWith('comparison-')||label.startsWith('replication-')?900:600;
-let timedOut=false;
+const runtimeRoot=resolve(import.meta.dirname,'../..');
+const profile=join(directory,'isolation.sb');
+writeFileSync(profile,replaySandboxProfile({runDirectory:directory,runtimeRoot,pythonEnvironment:resolve(process.env.LITELLM_EVAL_PYTHON,'../..'),nodeRoot:dirname(dirname(realpathSync(process.execPath))),home:homedir(),campaignRoot:root,sourceRepo:process.env.LITELLM_SOURCE_REPO}));
+if(kind==='codex'){
+  const auth=join(process.env.CODEX_HOME??join(homedir(),'.codex'),'auth.json');
+  const isolatedHome=join(directory,'codex-home');mkdirSync(isolatedHome,{mode:0o700});
+  copyFileSync(auth,join(isolatedHome,'auth.json'));process.env.CODEX_HOME=isolatedHome;
+}else copyFileSync(join(root,'connection.json'),join(directory,'runner-connection.json'));
 const retainedEnvironment=new Set(['PATH','HOME','USER','LOGNAME','SHELL','TMPDIR','TEMP','TMP','LANG','LC_ALL','CODEX_HOME','TERM','NO_COLOR','FORCE_COLOR','CI','LITELLM_CAMPAIGN_DIR','LITELLM_EVAL_PYTHON']);
 for(const key of Object.keys(process.env))if(!retainedEnvironment.has(key))delete process.env[key];
 process.env.LITELLM_LOCAL_MODEL_COST_MAP='True';process.env.PYTHON_DOTENV_DISABLED='1';
-if(kind==='codex'){
-  const command=['exec','--ignore-user-config','--ignore-rules','--ephemeral','-m','gpt-6-astra','-c','model_reasoning_effort='+JSON.stringify(effort),'-c','approval_policy="never"','-c','web_search="disabled"','-s','workspace-write','--json','-C',workspace,'-'];
-  const child=spawn('codex',command,{env:{...process.env,LITELLM_LOCAL_MODEL_COST_MAP:'True',PYTHON_DOTENV_DISABLED:'1'},stdio:['pipe','pipe','pipe']});
-  const out:string[]=[],err:string[]=[];child.stdout.on('data',s=>out.push(String(s)));child.stderr.on('data',s=>err.push(String(s)));child.stdin.end(prompt);
-  const timeout=setTimeout(()=>{timedOut=true;child.kill('SIGTERM');},timeoutSeconds*1000);
-  const exit=await new Promise<number|null>((resolve,reject)=>{child.on('close',resolve);child.on('error',reject);});clearTimeout(timeout);
-  writeFileSync(join(directory,'codex.jsonl'),out.join(''));writeFileSync(join(directory,'codex.stderr'),err.join(''));
-  writeFileSync(join(directory,'result.json'),JSON.stringify({id,kind,label,promptRevision:task.prompt_revision,snapshotRevision:task.snapshot_revision,evaluationProtocol:3,timeoutSeconds,seconds:(Date.now()-started)/1000,exit,timedOut,model:'gpt-6-astra',effort},null,2));
-}else{
-  const connection=JSON.parse(readFileSync(join(root,'connection.json'),'utf8'));
-  const store=new Store(join(directory,'state'));
-  const provider={id:'campaign',name:'Metered campaign',kind:'openai' as const,...connection,contextWindows:{[FLASH_MODEL]:1048576}};
-  store.saveSettings({workspace,providers:[provider],defaultProvider:provider.id,defaultModel:FLASH_MODEL,permissionMode:'auto',memoryEnabled:false});
-  const {runner}=createApp({store,external:{capture:()=>({definitions:[],scope:()=>'',assertCurrent:()=>{},execute:async()=>'',release:()=>{}})}});
-  const session=store.createSession({workspace,providerId:provider.id,model:FLASH_MODEL,permissionMode:'auto',modelReasoning:{[JSON.stringify([provider.id,FLASH_MODEL])]:effort},...(kind==='single'?{}:{architecture:{kind:'litellm-specific'}})});
-  const timeout=setTimeout(()=>{timedOut=true;void runner.cancel(session.id);},timeoutSeconds*1000);
-  try{runner.start(session.id,prompt);await runner.whenIdle();}finally{clearTimeout(timeout);runner.stopAll();await runner.whenIdle();}
-  const messages=store.messages(session.id),last=messages.findLast(m=>m.role==='assistant');
-  writeFileSync(join(directory,'messages.json'),JSON.stringify(messages,null,2));
-  const archives=store.sessions('',true).filter(s=>s.parentId===session.id).sort((a,b)=>a.createdAt-b.createdAt).map(s=>({sessionId:s.id,messages:store.messages(s.id)}));
-  writeFileSync(join(directory,'archives.json'),JSON.stringify(archives,null,2));
-  writeFileSync(join(directory,'result.json'),JSON.stringify({id,kind,label,promptRevision:task.prompt_revision,snapshotRevision:task.snapshot_revision,contextWindow:1048576,effort,evaluationProtocol:3,timeoutSeconds,seconds:(Date.now()-started)/1000,timedOut,status:store.session(session.id).status,usage:last?.turnUsage,errors:messages.flatMap(m=>m.error?[m.error]:[]),final:last?.content},null,2));
-  store.close();
-}
+const child=spawn('/usr/bin/sandbox-exec',['-f',profile,process.execPath,'--import','tsx',join(import.meta.dirname,'solve.ts'),directory,kind,effort,String(timeoutSeconds),label],{cwd:runtimeRoot,env:process.env,stdio:'inherit',detached:true});
+const outerTimeout=setTimeout(()=>{if(child.pid)try{process.kill(-child.pid,'SIGKILL');}catch{}},(timeoutSeconds+45)*1000);
+const exit=await new Promise<number|null>((resolve,reject)=>{child.on('close',resolve);child.on('error',reject);}).finally(()=>clearTimeout(outerTimeout));
+if(exit!==0)throw new Error('Isolated solver failed (exit '+exit+'). Inspect its private run directory before retrying.');
 execFileSync('git',['add','--intent-to-add','--','.'],{cwd:workspace});
 writeFileSync(join(directory,'candidate.patch'),execFileSync('git',['diff','HEAD'],{cwd:workspace,maxBuffer:20*1024*1024}));
 const completed=JSON.parse(readFileSync(join(directory,'result.json'),'utf8'));
