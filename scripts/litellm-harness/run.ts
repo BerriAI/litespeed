@@ -32,7 +32,7 @@ writeFileSync(join(directory,'prompt.txt'),prompt);
 writeFileSync(join(directory,'task.json'),JSON.stringify(task,null,2));
 writeFileSync(join(directory,'harness-source.json'),JSON.stringify({base:execFileSync('git',['rev-parse','HEAD'],{cwd:resolve(import.meta.dirname,'../..'),encoding:'utf8'}).trim(),node:process.version,files:Object.fromEntries(['server/runner.ts','server/tools.ts','server/litellm-harness.ts','scripts/litellm-harness/run.ts'].map(file=>{const source=readFileSync(resolve(import.meta.dirname,'../..',file),'utf8');return [file,{sha256:createHash('sha256').update(source).digest('hex'),source}];}))},null,2));
 const started=Date.now();
-const timeoutSeconds=kind==='codex'||label.startsWith('comparison-')?900:600;
+const timeoutSeconds=kind==='codex'||label.startsWith('comparison-')||label.startsWith('replication-')?900:600;
 let timedOut=false;
 const retainedEnvironment=new Set(['PATH','HOME','USER','LOGNAME','SHELL','TMPDIR','TEMP','TMP','LANG','LC_ALL','CODEX_HOME','TERM','NO_COLOR','FORCE_COLOR','CI','LITELLM_CAMPAIGN_DIR','LITELLM_EVAL_PYTHON']);
 for(const key of Object.keys(process.env))if(!retainedEnvironment.has(key))delete process.env[key];

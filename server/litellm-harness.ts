@@ -4,11 +4,61 @@ import path from 'node:path';
 import fg from 'fast-glob';
 import type { ToolDefinition } from '../shared/types.js';
 
-export const LITELLM_HARNESS_VERSION='2026-09-15.9';
+export const LITELLM_HARNESS_VERSION='2026-09-15.11';
 export const litellmContextTool:ToolDefinition={type:'function',function:{name:'litellm_context',description:'Navigate the current LiteLLM checkout. Give a task query to find relevant definitions, inline conditions and existing tests. Give a source path to see its symbol outline and test partners; add a symbol name to read that definition with numbered lines. Reads only this workspace, never Git history or remote answers.',parameters:{type:'object',properties:{query:{type:'string',maxLength:1000},path:{type:'string',maxLength:500},symbol:{type:'string',maxLength:200}},additionalProperties:false}}};
 
+const playbooks = [
+  {
+    id: 'router-resolution-and-request-state',
+    matches: (query:string) => /(?:rout|deployment)/i.test(query) && /(?:candidat|strateg|override|select|callback|fallback|team|wildcard)/i.test(query),
+    paths: ['litellm/router.py', 'litellm/router_strategy/simple_shuffle.py', 'litellm/router_strategy/lowest_tpm_rpm_v2.py'],
+    lessons: [
+      'Router resolution is ordered, not a union of matching deployments. Inspect aliases, routing groups, _try_early_resolve_deployments_for_model_not_in_names, team/wildcard/default resolution and _get_all_deployments in their existing order. A candidate-list helper should follow that precedence without accidentally applying fallbacks or admission checks.',
+      'A per-request strategy override must not replace the router-wide selector or add a callback globally. Inspect _get_strategy_selector and _build_strategy_selector for state registration; keep request-local configuration local.',
+      'Removing global callback registration can also remove necessary request accounting. Trace the chosen selector through direct deployment, affinity and normal selection return paths, including sync, async and pass-through methods. Preserve pre_call_check / async_pre_call_check for a request-local selector without running those checks twice for the default selector.',
+      'Write the counterexample that distinguishes the override from the default: two consecutive requests with different strategies, a direct deployment return, or a fallback/default candidate. Avoid testing only the new helper in isolation.'
+    ]
+  },
+  {
+    id: 'dashscope-compatible-rerank-endpoint',
+    matches: (query:string) => /(?:dashscope|qwencloud|qwen.ai.platform)/i.test(query) && /rerank/i.test(query),
+    paths: ['litellm/llms/dashscope/rerank/transformation.py', 'litellm/llms/dashscope/common_utils.py', 'litellm/litellm_core_utils/get_llm_provider_logic.py'],
+    lessons: [
+      'DashScope chat and compatible rerank use different URL families: chat uses /compatible-mode/v1; compatible rerank uses /compatible-api/v1/reranks. Do not infer the native service path from a task calling the endpoint native; inspect the existing request and response contract.',
+      'A recognized DashScope chat base can be an implicit default supplied by get_llm_provider, not necessarily an explicit user rerank endpoint. Trace that upstream default and the rerank-specific environment override before deciding precedence.',
+      'Only remap a recognized chat-shaped base on aliyuncs.com or its subdomains. Preserve custom endpoints, other hostnames and explicit non-chat paths. Regional hostnames should keep their region. An absent base should follow the rerank environment/default path.',
+      'Qwen aliases may define separate rerank environment variables and defaults. Inspect qwen_ai_platform.py and qwencloud.py when present; a shared normalizer can prevent their URL behavior drifting apart. Test custom base, regional chat base, rerank override and no base separately.'
+    ]
+  },
+  {
+    id: 'cached-response-boundaries',
+    matches: (query:string) => /(?:empty|usage.only|cached)/i.test(query) && /(?:choices?|responses?|stream)/i.test(query),
+    paths: ['litellm/litellm_core_utils/llm_response_utils/convert_dict_to_response.py', 'litellm/litellm_core_utils/streaming_handler.py', 'litellm/llms/anthropic/experimental_pass_through/adapters/transformation.py'],
+    lessons: [
+      'Dictionary conversion, cache replay, and the Anthropic compatibility adapter are separate boundaries. Changing a converter does not cover CustomStreamWrapper._dispatch_provider_chunk: its cached_response branch may index the first choice independently.',
+      'An empty choices list, a missing field, and a field of the wrong type are different cases. Check convert_to_model_response_object and both convert_to_streaming_response variants. Model constructors can fabricate a default assistant choice unless empty lists are passed through explicitly.',
+      'For malformed choices, useful LiteLLM diagnostics distinguish no choices from choices that is not a list (TYPE), and include raw keys. Retain the APIError type and the actual supplied type.',
+      'Verify the complete cached iterator, not only a conversion helper: usage-only/empty chunks must not crash on first-choice access or produce duplicate terminal chunks. Anthropic finish-reason conversion also needs to tolerate an absent first choice.'
+    ]
+  },
+  {
+    id: 'budget-cache-reconciliation',
+    matches: (query:string) => /(?:budget|spend)/i.test(query) && /(?:team|redis|counter|reserv)/i.test(query),
+    paths: ['litellm/proxy/auth/user_api_key_auth.py', 'litellm/proxy/auth/auth_checks.py', 'litellm/proxy/spend_tracking/budget_reservation.py', 'litellm/proxy/proxy_server.py'],
+    lessons: [
+      'Cached-key authentication can enforce a team-member budget before common_checks. Inspect the inline comparison in user_api_key_auth.py as well as _check_team_member_budget in auth_checks.py; one can be correct while the other admits a request at the cap.',
+      'A clean Redis miss and an unreachable Redis server differ. A stale per-process in-memory value must not hide an expired authoritative counter. Audit the actual cache-read path used by _counter_can_apply_adjustment, not only the normal get_current_spend path.',
+      'After a reservation disappears, its original delta is no longer meaningful. The database spend used for reseeding is a lagging floor; successful post-call recovery must also preserve the current settled request cost. increment_spend_counters may skip keys already handled as reserved, so merely reseeding can silently lose that cost.',
+      'Keep pre-call reservation resizing separate from post-call settlement/release. Do not apply post-call recovery semantics to an in-flight reservation, or change ordinary team/user admission behavior without evidence.'
+    ]
+  }
+];
+function learnedContext(query:string,files:string[]) {
+  return playbooks.filter(card=>card.matches(query)&&card.paths.some(file=>files.includes(file))).map(card=>({id:card.id,paths:card.paths.filter(file=>files.includes(file)),lessons:card.lessons,provenance:'Learned from training/development fixes. Verify against this checkout and the current user request; this is a debugging guide, not evidence that the bug is present.'}));
+}
+
 export const litellmInstructions=`LiteLLM-specific harness ${LITELLM_HARNESS_VERSION}.
-When available, use litellm_context to find the right source and existing tests before broad exploration. Pass path to inspect a symbol outline, path + query to filter a large outline, then path + symbol to read the definition. A plain read_file defaults to 160 lines in this architecture; choose a range around the relevant definition. Batch independent reads. Once the causal code path and a relevant test are clear, implement and test instead of continuing a broad survey. Apply a complete small edit rather than repeatedly revising comments or speculative helpers. When the cause is uncertain, use the smallest allowed executable probe to distinguish hypotheses; do not repeatedly reconsider the same code without new evidence. Solve the requested behavior instead of trying to reconstruct an imagined upstream patch. Shared helpers can be bypassed by cache-hit or fast paths: trace the actual entrypoint for the reported symptom.
+When available, use litellm_context to find the right source and existing tests before broad exploration. Its relevant playbooks summarize prior LiteLLM fixes; verify those hypotheses in the current source. Pass path to inspect a symbol outline, path + query to filter a large outline, then path + symbol to read the definition. A plain read_file defaults to 160 lines in this architecture; choose a range around the relevant definition. Batch independent reads. Once the causal code path and a relevant test are clear, implement and test instead of continuing a broad survey. Apply a complete small edit rather than repeatedly revising comments or speculative helpers. When the cause is uncertain, use the smallest allowed executable probe to distinguish hypotheses; do not repeatedly reconsider the same code without new evidence. Solve the requested behavior instead of trying to reconstruct an imagined upstream patch. Shared helpers can be bypassed by cache-hit or fast paths: trace the actual entrypoint for the reported symptom.
 Repository map: litellm/llms/<provider>/<endpoint>/transformation.py translates provider requests/responses; common_utils.py and handler.py handle shared protocol and transport. litellm/types/llms contains provider schemas. litellm/litellm_core_utils contains shared streaming, response conversion, prompt templates and routing helpers. litellm/proxy contains gateway/auth/spend/guardrails; enterprise contains paid features. tests/test_litellm mirrors the source tree. UI source is ui/litellm-dashboard, not litellm/proxy/_experimental/out (generated output). Model capabilities/prices live in model_prices_and_context_window.json.
 Read CLAUDE.md when AGENTS.md references it. Prefer extending an existing mapped test. Test intended behavior and the relevant unaffected behavior; a bug fix may require changing an assertion that encoded the bug. Check sync/async and streaming/non-streaming counterparts when the changed behavior crosses them. Preserve caller-owned inputs and existing public interfaces.
 Before finalizing a protocol change, check the representation at its boundary. For URLs, compose parsed path/query components rather than appending a path to an arbitrary base string; preserve existing query parameters and add streaming parameters correctly. For images/documents, preserve source kind and MIME metadata, and verify the downstream adapter's expected representation (raw base64 and a data URL are different). For shared parameters, distinguish absent, null and explicit false; preserve caller-owned inputs. These are review heuristics, not instructions to add unrelated behavior.\nUse installed dependencies and focused tests. Inspect pyproject.toml/Makefile or existing environment evidence before guessing a test command. Separate collection/import/infrastructure failures from an assertion failure. Start with your regression test and a small relevant existing selection. If a wider check fails, diagnose whether it is caused by this change before adding more code. Do not repeatedly rerun an unchanged failing setup. Do not run broad suites, generate dashboard bundles, or install packages unless the task needs them.
@@ -121,5 +171,5 @@ export async function litellmContext(workspace:string,args:Record<string,unknown
   const ui=/\b(ui|dashboard|frontend|react|component)\b/i.test(String(args.query??''));
   const ranked=files.filter(p=>!p.startsWith('tests/')&&(ui||!p.startsWith('ui/'))).map(p=>({path:p,score:tokens.reduce((score,word)=>score+(p.toLowerCase().includes(word)?(p.split('/').includes(word)?5:2):0),0)})).filter(p=>p.score>0).sort((a,b)=>b.score-a.score||a.path.length-b.path.length||a.path.localeCompare(b.path)).slice(0,8);
   const symbols=tokens.length&&!ui?await matchingSymbols(workspace,files,tokens,signal):undefined;
-  return JSON.stringify({query:args.query??'',references:symbols?.references,symbols:symbols?.matches.map(s=>({...s,tests:partners(files,s.path).slice(0,2)})),symbolScan:symbols&&{files:symbols.scanned,partial:symbols.partial},matches:ranked.map(p=>({path:p.path,tests:partners(files,p.path).slice(0,3)})),hint:'Use path + symbol for a definition, path + query to filter a large outline, or grep within the relevant directory for an exact term. Ranked paths and symbols are navigation hints, not proof of the cause.'},null,2);
+  return JSON.stringify({query:args.query??'',playbooks:learnedContext(String(args.query??''),files),references:symbols?.references,symbols:symbols?.matches.map(s=>({...s,tests:partners(files,s.path).slice(0,2)})),symbolScan:symbols&&{files:symbols.scanned,partial:symbols.partial},matches:ranked.map(p=>({path:p.path,tests:partners(files,p.path).slice(0,3)})),hint:'Use path + symbol for a definition, path + query to filter a large outline, or grep within the relevant directory for an exact term. Ranked paths and symbols are navigation hints, not proof of the cause.'},null,2);
 }

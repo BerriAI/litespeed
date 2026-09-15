@@ -47,6 +47,16 @@ describe('LiteLLM repository navigation',()=>{
     expect(result).toContain('1\tdef test_empty_result');
     expect(JSON.parse(await litellmContext(root,{path:'litellm/proxy/schema.prisma'},signal)).lines).toBe(3);
   });
+  it('returns relevant learned guidance only for source anchors present in the checkout',async()=>{
+    const signal=new AbortController().signal;
+    expect(JSON.parse(await litellmContext(root,{query:'team budget'},signal)).playbooks).toEqual([]);
+    await put('litellm/proxy/auth/user_api_key_auth.py','def authenticate(): pass\n');
+    const related=JSON.parse(await litellmContext(root,{query:'team budget'},signal));
+    expect(related.playbooks).toHaveLength(1);
+    expect(related.playbooks[0].paths).toEqual(['litellm/proxy/auth/user_api_key_auth.py']);
+    expect(related.playbooks[0].provenance).toContain('Verify against this checkout');
+    expect(JSON.parse(await litellmContext(root,{query:'openai schema pattern'},signal)).playbooks).toEqual([]);
+  });
   it('keeps one model in both onboarding and architecture routing',()=>{
     const selection=selectArchitecture('litellm-specific',{providerId:'gateway',model:'flash'});
     expect(selection).toEqual({kind:'litellm-specific'});expect(architectureProviders(selection)).toEqual([]);expect(architectureWorker(selection)).toBeNull();
