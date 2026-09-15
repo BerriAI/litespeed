@@ -28,7 +28,11 @@ const directory=join(root,'runs',label+'-'+id+'-'+randomUUID().slice(0,8));mkdir
 const workspace=join(directory,'workspace');execFileSync('cp',['-cR',join(root,'cases',id,'base'),workspace]);
 execFileSync('git',['init','-q'],{cwd:workspace});execFileSync('git',['add','--force','.'],{cwd:workspace});
 execFileSync('git',['-c','user.name=Harness Evaluation','-c','user.email=eval@example.invalid','commit','-qm','Captured task starting state'],{cwd:workspace});
-const prompt=task.prompt+'\n\nImplement the fix in this checkout, add a focused regression test, and verify it. Keep the change scoped. This is an offline task: do not browse the web, inspect files outside this checkout, fetch Git history, commit or push. Dependencies are preinstalled. To run Python tests, use '+process.env.LITELLM_EVAL_PYTHON+' -m pytest -c /dev/null --noconftest -p no:cacheprovider <targeted test path> -q. Set LITELLM_LOCAL_MODEL_COST_MAP=True and PYTHON_DOTENV_DISABLED=1. Do not run the entire suite or install dependencies.';
+// A /dev/null config makes pytest walk ancestors outside the sandbox while
+// collecting. Keep evaluation config beside the checkout, inside its boundary.
+const pytestConfig=join(directory,'pytest.ini');
+writeFileSync(pytestConfig,'[pytest]\nasyncio_mode = auto\n');
+const prompt=task.prompt+'\n\nImplement the fix in this checkout, add a focused regression test, and verify it. Keep the change scoped. This is an offline task: do not browse the web, inspect unrelated files outside this checkout, fetch Git history, commit or push. Dependencies are preinstalled. To run Python tests, use '+process.env.LITELLM_EVAL_PYTHON+' -m pytest -c '+pytestConfig+' --rootdir='+workspace+' --noconftest -p no:cacheprovider -p pytest_asyncio.plugin -p pytest_mock -p respx.plugin <targeted test path> -q. The supplied pytest config and interpreter are permitted evaluation infrastructure. PYTEST_DISABLE_PLUGIN_AUTOLOAD=1, LITELLM_LOCAL_MODEL_COST_MAP=True and PYTHON_DOTENV_DISABLED=1 are already set. Do not run the entire suite or install dependencies.';
 writeFileSync(join(directory,'prompt.txt'),prompt);
 writeFileSync(join(directory,'task.json'),JSON.stringify(task,null,2));
 writeFileSync(join(directory,'harness-source.json'),JSON.stringify({base:execFileSync('git',['rev-parse','HEAD'],{cwd:resolve(import.meta.dirname,'../..'),encoding:'utf8'}).trim(),node:process.version,files:Object.fromEntries(['server/runner.ts','server/tools.ts','server/litellm-harness.ts','scripts/litellm-harness/run.ts','scripts/litellm-harness/solve.ts','scripts/litellm-harness/isolation.ts'].map(file=>{const source=readFileSync(resolve(import.meta.dirname,'../..',file),'utf8');return [file,{sha256:createHash('sha256').update(source).digest('hex'),source}];}))},null,2));
@@ -45,6 +49,7 @@ if(kind==='codex'){
 const retainedEnvironment=new Set(['PATH','HOME','USER','LOGNAME','SHELL','TMPDIR','TEMP','TMP','LANG','LC_ALL','CODEX_HOME','TERM','NO_COLOR','FORCE_COLOR','CI','LITELLM_CAMPAIGN_DIR','LITELLM_EVAL_PYTHON']);
 for(const key of Object.keys(process.env))if(!retainedEnvironment.has(key))delete process.env[key];
 process.env.LITELLM_LOCAL_MODEL_COST_MAP='True';process.env.PYTHON_DOTENV_DISABLED='1';
+process.env.PYTEST_DISABLE_PLUGIN_AUTOLOAD='1';
 const child=spawn('/usr/bin/sandbox-exec',['-f',profile,process.execPath,'--import','tsx',join(import.meta.dirname,'solve.ts'),directory,kind,effort,String(timeoutSeconds),label],{cwd:runtimeRoot,env:process.env,stdio:'inherit',detached:true});
 const outerTimeout=setTimeout(()=>{if(child.pid)try{process.kill(-child.pid,'SIGKILL');}catch{}},(timeoutSeconds+45)*1000);
 const exit=await new Promise<number|null>((resolve,reject)=>{child.on('close',resolve);child.on('error',reject);}).finally(()=>clearTimeout(outerTimeout));
