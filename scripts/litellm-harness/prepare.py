@@ -32,6 +32,17 @@ CASES = [
 
 ]
 
+# A separate catalog and campaign directory preserve earlier frozen datasets.
+# Curators can select public behavior tests and exclude new private-helper tests
+# before qualification; every exclusion is retained in the manifest.
+catalog_path = os.environ.get('LITELLM_CASE_CATALOG')
+catalog = json.loads(Path(catalog_path).read_text()) if catalog_path else []
+if catalog_path:
+    CASES = [(c['id'], c['split'], c['revision'], c['prompt']) for c in catalog]
+    if len({c[0] for c in CASES}) != len(CASES) or any(not re.fullmatch(r'[a-z0-9-]+', c[0]) for c in CASES):
+        raise ValueError('Catalog case IDs must be unique, lowercase path-safe names.')
+catalog_by_id = {c['id']: c for c in catalog}
+
 def git(*args):
     return subprocess.check_output(['git', '-C', str(REPO), *args])
 
@@ -108,9 +119,14 @@ for name, split, rev, prompt in CASES:
                     'test_strategy_resolution_agrees_with_the_deployment_path_for_every_principal',
                     'test_drop_strategy_markers_keeps_plain_deployments_and_rejects_marker_only_sets',
                     'test_team_deployments_across_teams_unions_one_team_and_rejects_two'})
-    record['excluded_reference_nodes']=[n for n in original if coupled(n)]
-    record['test_nodes']=[n for n in original if not coupled(n)]
-    record['oracle_note']='Tests directly calling newly introduced helper names are excluded; alternate implementations may satisfy the public behavior.'
+    selection = catalog_by_id.get(name, {})
+    def selected(node):
+        include = selection.get('include_test_names')
+        exclude = selection.get('exclude_test_names', [])
+        return not coupled(node) and (include is None or node.split('::')[-1] in include) and node.split('::')[-1] not in exclude
+    record['excluded_reference_nodes']=[n for n in original if not selected(n)]
+    record['test_nodes']=[n for n in original if selected(n)]
+    record['oracle_note']=selection.get('oracle_note', 'Tests directly calling newly introduced helper names are excluded; alternate implementations may satisfy the public behavior.')
     (directory/'manifest.json').write_text(json.dumps(record,indent=2))
     manifest.append(record)
     for resource in git('ls-tree','-r','--name-only',base,'--','litellm/litellm_core_utils/tokenizers','litellm/proxy/swagger').decode().splitlines():

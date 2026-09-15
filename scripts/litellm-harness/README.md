@@ -81,3 +81,25 @@ This runs the same 15 HTTP-status checks against the base, the validated human r
 3. Change one reusable mechanism or instruction, version it, and rerun affected development tasks.
 4. Freeze the candidate before comparing held-out tasks. Preserve failures and repeated trials; do not select only the best run.
 5. Publish task-level acceptance, elapsed time, request/token counts, priced spend, unknown reservations and limitations. Keep raw private transcripts out of the PR.
+
+
+## Additional datasets and bounded batches
+
+Set `LITELLM_CASE_CATALOG` to an explicit JSON array of `{id, split, revision, prompt}` records when running `prepare.py`. Optional `include_test_names`, `exclude_test_names`, and `oracle_note` preserve curation decisions. Use a separate campaign directory for a new dataset, but point its `connection.json` at the same metered gateway. Do not create another ledger to bypass a campaign ceiling. Model-written task drafts require review: a curator can invert an error-handling contract or accidentally prescribe a new private helper.
+
+Protocol 5 gives every solver its own temporary directory and pytest configuration. Its printed command explicitly enables the local cost map and the required pytest plugins. This avoids ancestor discovery outside the filesystem boundary and accidental remote cost-map reads. The production shell still filters credential-related environment variables; the replay's explicit test prefix does not weaken that filter.
+
+Use one shared `LITELLM_CAMPAIGN_LOCK_DIR` across all datasets with `batch.py`. `LITELLM_CAMPAIGN_CONCURRENCY` defaults to **3 total trials**, not three per batch. The lock directory pins that capacity and serializes grading. For example:
+
+```sh
+export LITELLM_CAMPAIGN_LOCK_DIR=/absolute/private/campaign/shared-slots
+python3 scripts/litellm-harness/batch.py /absolute/litespeed-checkout replication-v17 litellm-specific medium converse-config vertex-version-path
+```
+
+A batch never silently retries an allocated trial. New attempts use a new label. Freezing the runtime in a separate Git worktree keeps an ongoing batch reproducible while the next candidate changes. Excessive parallelism can produce host stalls and corrupt latency comparisons even when each individual batch has a reasonable worker count.
+
+If a solver exits before writing its completion artifact, the launcher preserves a failed result and partial patch. For older dead runs, `recover.py RUN_DIRECTORY` extracts messages and receipts from the read-only state database after checking that the solver is gone. Recovered trials remain interrupted failures; their message-derived duration is incomplete and must be excluded from successful-run latency summaries. Never restore a recovered workspace into a new solver as though it were an untouched base.
+
+`analyze.py` reports provider-call time, the union of occupied tool intervals, per-tool summed latency, time to first edit and when final review began. Concurrent tool durations can overlap: do not add them to infer wall time. Use recorded timestamps rather than a critic model's estimates.
+
+`reflect.py RUN_DIRECTORY` sends a qualified train/dev trajectory, its private reference and acceptance output to the metered model for diagnosis. Held-out tasks are rejected. The response is untrusted advice; the script neither edits the harness nor promotes a suggestion. Keep any candidate-selection set separate from the next frozen comparison.

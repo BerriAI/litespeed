@@ -1,4 +1,4 @@
-import { readFileSync, writeFileSync, mkdirSync, copyFileSync, realpathSync } from 'node:fs';
+import { readFileSync, writeFileSync, mkdirSync, copyFileSync, realpathSync, existsSync } from 'node:fs';
 import { resolve, join, dirname } from 'node:path';
 import { execFileSync, spawn } from 'node:child_process';
 import { createHash, randomUUID } from 'node:crypto';
@@ -53,10 +53,22 @@ process.env.LITELLM_LOCAL_MODEL_COST_MAP='True';process.env.PYTHON_DOTENV_DISABL
 process.env.PYTEST_DISABLE_PLUGIN_AUTOLOAD='1';
 process.env.TMPDIR=temporaryDirectory;process.env.TMP=temporaryDirectory;process.env.TEMP=temporaryDirectory;
 const child=spawn('/usr/bin/sandbox-exec',['-f',profile,process.execPath,'--import','tsx',join(import.meta.dirname,'solve.ts'),directory,kind,effort,String(timeoutSeconds),label],{cwd:runtimeRoot,env:process.env,stdio:'inherit',detached:true});
-const outerTimeout=setTimeout(()=>{if(child.pid)try{process.kill(-child.pid,'SIGKILL');}catch{}},(timeoutSeconds+45)*1000);
+let outerTimedOut=false;
+writeFileSync(join(directory,'launch.json'),JSON.stringify({id,kind,label,effort,startedAt:started,timeoutSeconds,pid:child.pid,evaluationProtocol:5},null,2));
+const outerTimeout=setTimeout(()=>{outerTimedOut=true;if(child.pid)try{process.kill(-child.pid,'SIGKILL');}catch{}},(timeoutSeconds+45)*1000);
 const exit=await new Promise<number|null>((resolve,reject)=>{child.on('close',resolve);child.on('error',reject);}).finally(()=>clearTimeout(outerTimeout));
-if(exit!==0)throw new Error('Isolated solver failed (exit '+exit+'). Inspect its private run directory before retrying.');
+if(!existsSync(join(directory,'result.json'))){
+  try{execFileSync(process.env.LITELLM_EVAL_PYTHON!,[join(import.meta.dirname,'recover.py'),directory],{env:process.env,stdio:'pipe'});}catch{}
+  const partial=existsSync(join(directory,'result.json'))?JSON.parse(readFileSync(join(directory,'result.json'),'utf8')):{};
+  writeFileSync(join(directory,'result.json'),JSON.stringify({...partial,id,kind,label,effort,promptRevision:task.prompt_revision,snapshotRevision:task.snapshot_revision,evaluationProtocol:5,isolation:'macOS-seatbelt',timeoutSeconds,seconds:(Date.now()-started)/1000,durationIncomplete:false,status:'error',exit,interrupted:true,timedOut:outerTimedOut,errors:['Isolated solver exited without writing a completion artifact. Preserve this failed trial; partial state was recovered when available.']},null,2));
+}
+if(exit!==0){
+  const failed=JSON.parse(readFileSync(join(directory,'result.json'),'utf8'));
+  writeFileSync(join(directory,'result.json'),JSON.stringify({...failed,status:'error',exit,interrupted:true,timedOut:failed.timedOut||outerTimedOut},null,2));
+}
 execFileSync('git',['add','--intent-to-add','--','.'],{cwd:workspace});
 writeFileSync(join(directory,'candidate.patch'),execFileSync('git',['diff','HEAD'],{cwd:workspace,maxBuffer:20*1024*1024}));
 const completed=JSON.parse(readFileSync(join(directory,'result.json'),'utf8'));
 console.log(JSON.stringify({directory,id,kind,label,seconds:completed.seconds,status:completed.status,exit:completed.exit,errors:completed.errors,requests:completed.usage?.requests,inputTokens:completed.usage?.inputTokens,outputTokens:completed.usage?.outputTokens}));
+
+if(exit!==0)process.exitCode=1;
