@@ -100,8 +100,11 @@ for name, split, rev, prompt in CASES:
                 source,nodes=changed_tests(revision,p)
                 target=gold/p;target.parent.mkdir(parents=True,exist_ok=True);target.write_text(source)
                 selected.extend(nodes)
-        (directory/'reference.patch').write_bytes(git('diff',base,revision,'--','litellm','enterprise'))
-        record={'id':name,'split':split,'base':base,'reference':revision,'prompt':prompt,'input_provenance':'Requirements summarized from the public change; retrospective task, not an original pre-merge issue. No reference patch or acceptance tests in solver input.','source_paths':[p for p in paths if p.startswith(('litellm/','enterprise/'))],'test_nodes':selected}
+        reference_paths = catalog_by_id.get(name, {}).get('reference_paths', ['litellm', 'enterprise'])
+        if not reference_paths or any(not isinstance(p, str) or p.startswith('/') or '..' in Path(p).parts or p.startswith('tests') for p in reference_paths):
+            raise ValueError('Reference paths must be explicit repository paths outside the acceptance tests.')
+        (directory/'reference.patch').write_bytes(git('diff',base,revision,'--',*reference_paths))
+        record={'id':name,'split':split,'base':base,'reference':revision,'prompt':prompt,'input_provenance':'Requirements summarized from the public change; retrospective task, not an original pre-merge issue. No reference patch or acceptance tests in solver input.','reference_paths':reference_paths,'source_paths':[p for p in paths if p.startswith(('litellm/','enterprise/'))],'test_nodes':selected}
         (directory/'manifest.json').write_text(json.dumps(record,indent=2))
     record=json.loads((directory/'manifest.json').read_text())
     if record.get('snapshot_revision')!=2:

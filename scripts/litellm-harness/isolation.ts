@@ -29,3 +29,8 @@ export function replaySandboxProfile(options:{runDirectory:string;runtimeRoot:st
     `(allow file-read* file-write* (subpath ${quote(run)}))`,
   ].join('\n')+'\n';
 }
+
+/** Git must not read the user's blocked global configuration in a replay. */
+export function replayGitEnvironment():NodeJS.ProcessEnv {
+  return {GIT_CONFIG_NOSYSTEM:'1',GIT_CONFIG_GLOBAL:'/dev/null',GIT_TERMINAL_PROMPT:'0'};
+}

@@ -21,7 +21,7 @@ if(kind==='codex'){
   const timeout=setTimeout(()=>{timedOut=true;child.kill('SIGTERM');},timeoutSeconds*1000);
   const exit=await new Promise<number|null>((resolve,reject)=>{child.on('close',resolve);child.on('error',reject);});clearTimeout(timeout);
   writeFileSync(join(directory,'codex.jsonl'),out.join(''));writeFileSync(join(directory,'codex.stderr'),err.join(''));
-  writeFileSync(join(directory,'result.json'),JSON.stringify({id,kind,label,promptRevision:task.prompt_revision,snapshotRevision:task.snapshot_revision,evaluationProtocol:5,isolation:'macOS-seatbelt',timeoutSeconds,seconds:(Date.now()-started)/1000,exit,timedOut,model:'gpt-6-astra',effort},null,2));
+  writeFileSync(join(directory,'result.json'),JSON.stringify({id,kind,label,promptRevision:task.prompt_revision,snapshotRevision:task.snapshot_revision,evaluationProtocol:6,isolation:'macOS-seatbelt',timeoutSeconds,seconds:(Date.now()-started)/1000,exit,timedOut,model:'gpt-6-astra',effort},null,2));
 }else{
   const connection=JSON.parse(readFileSync(join(directory,'runner-connection.json'),'utf8'));
   const store=new Store(join(directory,'state'));
@@ -35,6 +35,6 @@ if(kind==='codex'){
   writeFileSync(join(directory,'messages.json'),JSON.stringify(messages,null,2));
   const archives=store.sessions('',true).filter(s=>s.parentId===session.id).sort((a,b)=>a.createdAt-b.createdAt).map(s=>({sessionId:s.id,messages:store.messages(s.id)}));
   writeFileSync(join(directory,'archives.json'),JSON.stringify(archives,null,2));
-  writeFileSync(join(directory,'result.json'),JSON.stringify({id,kind,label,promptRevision:task.prompt_revision,snapshotRevision:task.snapshot_revision,contextWindow:1048576,effort,evaluationProtocol:5,isolation:'macOS-seatbelt',timeoutSeconds,seconds:(Date.now()-started)/1000,timedOut,status:store.session(session.id).status,usage:last?.turnUsage,errors:messages.flatMap(m=>m.error?[m.error]:[]),final:last?.content},null,2));
+  writeFileSync(join(directory,'result.json'),JSON.stringify({id,kind,label,promptRevision:task.prompt_revision,snapshotRevision:task.snapshot_revision,contextWindow:1048576,effort,evaluationProtocol:6,isolation:'macOS-seatbelt',timeoutSeconds,seconds:(Date.now()-started)/1000,timedOut,status:store.session(session.id).status,usage:last?.turnUsage,errors:messages.flatMap(m=>m.error?[m.error]:[]),final:last?.content},null,2));
   store.close();
 }

@@ -1,9 +1,9 @@
-import { readFileSync, writeFileSync, mkdirSync, copyFileSync, realpathSync, existsSync } from 'node:fs';
+import { readFileSync, writeFileSync, mkdirSync, copyFileSync, realpathSync, existsSync, symlinkSync } from 'node:fs';
 import { resolve, join, dirname } from 'node:path';
 import { execFileSync, spawn } from 'node:child_process';
 import { createHash, randomUUID } from 'node:crypto';
 import { homedir } from 'node:os';
-import { replaySandboxProfile } from './isolation.js';
+import { replayGitEnvironment, replaySandboxProfile } from './isolation.js';
 import type { ReasoningEffort } from '../../shared/types.js';
 
 if(process.platform!=='darwin')throw new Error('This replay launcher requires macOS sandbox-exec. Port the filesystem isolation before running on another platform.');
@@ -25,14 +25,20 @@ if(!validity.valid)throw new Error('Task must pass base/reference validation bef
 const testNodesHash=createHash('sha256').update(JSON.stringify(task.test_nodes)).digest('hex');
 if(validity.snapshotRevision!==task.snapshot_revision||validity.testNodesHash!==testNodesHash)throw new Error('Task validation is stale. Run validate.py after changing the snapshot or acceptance selection.');
 const directory=join(root,'runs',label+'-'+id+'-'+randomUUID().slice(0,8));mkdirSync(directory,{recursive:true,mode:0o700});
+const git=execFileSync('/usr/bin/xcrun',['--find','git'],{encoding:'utf8'}).trim();
+const gitEnvironment={...process.env,...replayGitEnvironment()};
 const workspace=join(directory,'workspace');execFileSync('cp',['-cR',join(root,'cases',id,'base'),workspace]);
-execFileSync('git',['init','-q'],{cwd:workspace});execFileSync('git',['add','--force','.'],{cwd:workspace});
-execFileSync('git',['-c','user.name=Harness Evaluation','-c','user.email=eval@example.invalid','commit','-qm','Captured task starting state'],{cwd:workspace});
+execFileSync(git,['init','-q'],{cwd:workspace,env:gitEnvironment});execFileSync(git,['add','--force','.'],{cwd:workspace,env:gitEnvironment});
+execFileSync(git,['-c','user.name=Harness Evaluation','-c','user.email=eval@example.invalid','commit','-qm','Captured task starting state'],{cwd:workspace,env:gitEnvironment});
 // A /dev/null config makes pytest walk ancestors outside the sandbox while
 // collecting. Keep evaluation config beside the checkout, inside its boundary.
 const pytestConfig=join(directory,'pytest.ini');
 writeFileSync(pytestConfig,'[pytest]\nasyncio_mode = auto\n');
 const temporaryDirectory=join(directory,'tmp');mkdirSync(temporaryDirectory,{mode:0o700});
+// Apple's /usr/bin/git shim uses xcrun's shared cache even with TMPDIR set.
+// Select the real installed executable before isolation; only this run's bin is added.
+const executableDirectory=join(directory,'bin');mkdirSync(executableDirectory,{mode:0o700});
+symlinkSync(git,join(executableDirectory,'git'));
 const prompt=task.prompt+'\n\nImplement the fix in this checkout, add a focused regression test, and verify it. Keep the change scoped. This is an offline task: do not browse the web, inspect unrelated files outside this checkout, fetch Git history, commit or push. Dependencies are preinstalled. To run Python tests, use LITELLM_LOCAL_MODEL_COST_MAP=True '+process.env.LITELLM_EVAL_PYTHON+' -m pytest -c '+pytestConfig+' --rootdir='+workspace+' --noconftest -p no:cacheprovider -p pytest_asyncio.plugin -p pytest_mock -p respx.plugin <targeted test path> -q. The supplied pytest config and interpreter are permitted evaluation infrastructure. PYTEST_DISABLE_PLUGIN_AUTOLOAD=1 and PYTHON_DOTENV_DISABLED=1 are already set; retain the explicit local-cost-map prefix on Python commands. Use $TMPDIR for temporary probes, not /tmp; temporary files are private to this run. Do not run the entire suite or install dependencies.';
 writeFileSync(join(directory,'prompt.txt'),prompt);
 writeFileSync(join(directory,'task.json'),JSON.stringify(task,null,2));
@@ -52,22 +58,24 @@ for(const key of Object.keys(process.env))if(!retainedEnvironment.has(key))delet
 process.env.LITELLM_LOCAL_MODEL_COST_MAP='True';process.env.PYTHON_DOTENV_DISABLED='1';
 process.env.PYTEST_DISABLE_PLUGIN_AUTOLOAD='1';
 process.env.TMPDIR=temporaryDirectory;process.env.TMP=temporaryDirectory;process.env.TEMP=temporaryDirectory;
+Object.assign(process.env,replayGitEnvironment());
+process.env.PATH=executableDirectory+':'+(process.env.PATH??'/usr/bin:/bin');
 const child=spawn('/usr/bin/sandbox-exec',['-f',profile,process.execPath,'--import','tsx',join(import.meta.dirname,'solve.ts'),directory,kind,effort,String(timeoutSeconds),label],{cwd:runtimeRoot,env:process.env,stdio:'inherit',detached:true});
 let outerTimedOut=false;
-writeFileSync(join(directory,'launch.json'),JSON.stringify({id,kind,label,effort,startedAt:started,timeoutSeconds,pid:child.pid,evaluationProtocol:5},null,2));
+writeFileSync(join(directory,'launch.json'),JSON.stringify({id,kind,label,effort,startedAt:started,timeoutSeconds,pid:child.pid,evaluationProtocol:6},null,2));
 const outerTimeout=setTimeout(()=>{outerTimedOut=true;if(child.pid)try{process.kill(-child.pid,'SIGKILL');}catch{}},(timeoutSeconds+45)*1000);
 const exit=await new Promise<number|null>((resolve,reject)=>{child.on('close',resolve);child.on('error',reject);}).finally(()=>clearTimeout(outerTimeout));
 if(!existsSync(join(directory,'result.json'))){
   try{execFileSync(process.env.LITELLM_EVAL_PYTHON!,[join(import.meta.dirname,'recover.py'),directory],{env:process.env,stdio:'pipe'});}catch{}
   const partial=existsSync(join(directory,'result.json'))?JSON.parse(readFileSync(join(directory,'result.json'),'utf8')):{};
-  writeFileSync(join(directory,'result.json'),JSON.stringify({...partial,id,kind,label,effort,promptRevision:task.prompt_revision,snapshotRevision:task.snapshot_revision,evaluationProtocol:5,isolation:'macOS-seatbelt',timeoutSeconds,seconds:(Date.now()-started)/1000,durationIncomplete:false,status:'error',exit,interrupted:true,timedOut:outerTimedOut,errors:['Isolated solver exited without writing a completion artifact. Preserve this failed trial; partial state was recovered when available.']},null,2));
+  writeFileSync(join(directory,'result.json'),JSON.stringify({...partial,id,kind,label,effort,promptRevision:task.prompt_revision,snapshotRevision:task.snapshot_revision,evaluationProtocol:6,isolation:'macOS-seatbelt',timeoutSeconds,seconds:(Date.now()-started)/1000,durationIncomplete:false,status:'error',exit,interrupted:true,timedOut:outerTimedOut,errors:['Isolated solver exited without writing a completion artifact. Preserve this failed trial; partial state was recovered when available.']},null,2));
 }
 if(exit!==0){
   const failed=JSON.parse(readFileSync(join(directory,'result.json'),'utf8'));
   writeFileSync(join(directory,'result.json'),JSON.stringify({...failed,status:'error',exit,interrupted:true,timedOut:failed.timedOut||outerTimedOut},null,2));
 }
-execFileSync('git',['add','--intent-to-add','--','.'],{cwd:workspace});
-writeFileSync(join(directory,'candidate.patch'),execFileSync('git',['diff','HEAD'],{cwd:workspace,maxBuffer:20*1024*1024}));
+execFileSync(git,['add','--intent-to-add','--','.'],{cwd:workspace,env:gitEnvironment});
+writeFileSync(join(directory,'candidate.patch'),execFileSync(git,['diff','HEAD'],{cwd:workspace,env:gitEnvironment,maxBuffer:20*1024*1024}));
 const completed=JSON.parse(readFileSync(join(directory,'result.json'),'utf8'));
 console.log(JSON.stringify({directory,id,kind,label,seconds:completed.seconds,status:completed.status,exit:completed.exit,errors:completed.errors,requests:completed.usage?.requests,inputTokens:completed.usage?.inputTokens,outputTokens:completed.usage?.outputTokens}));
 

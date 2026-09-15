@@ -38,7 +38,7 @@ python3 scripts/litellm-harness/score.py /absolute/private/campaign/runs/RUN_DIR
 python3 scripts/litellm-harness/analyze.py
 ```
 
-New runs use evaluation protocol 4. The launcher prepares a snapshot, then starts the solver under a macOS Seatbelt filesystem profile. The live source checkout, other campaign runs and reference artifacts are unreadable; the current run, Litespeed runtime and installed dependency trees remain available. Writes to the live source and dependency environment are blocked. Codex gets a fresh private home with only its authentication copied. The profile and source hashes are retained for audit. This is a filesystem boundary, not complete adversarial isolation: model API networking remains available, and the runtime/dependencies must be trusted.
+New runs use evaluation protocol 6. The launcher prepares a snapshot, then starts the solver under a macOS Seatbelt filesystem profile. The live source checkout, other campaign runs and reference artifacts are unreadable; the current run, Litespeed runtime and installed dependency trees remain available. Writes to the live source and dependency environment are blocked. Codex gets a fresh private home with only its authentication copied. The profile and source hashes are retained for audit. This is a filesystem boundary, not complete adversarial isolation: model API networking remains available, and the runtime/dependencies must be trusted.
 
 Each run gets a fresh snapshot, a new Git repository with one starting commit, and its own Litespeed state. The original history and reference patch/tests are absent from the solver workspace. Raw traces and credentials are private artifacts, not files to commit in this repository. Scoring copies the candidate into `acceptance-workspace` before restoring reference tests; never use that directory as a solver input. Early exploratory runs were scored in place, so always start another run from a new snapshot.
 
@@ -56,7 +56,7 @@ Reference tests that directly require newly introduced helper names are excluded
 
 The train/dev/test labels separate improvement tasks from the final task comparison. They are not a chronological future-PR split, and the curator has inspected the reference changes while validating tasks. Do not describe these results as a blind study, a production deployment result, or a guarantee on arbitrary future LiteLLM work.
 
-The [original plan](comparison-plan.json) records v9, with three trials per route and task. The [follow-up plan](replication-plan.json) records v11, with one additional DeepSeek trial per task. Source hashes and commits distinguish them. The shipped v13 adds separately tested navigation corrections and a [final evaluation](final-evaluation-plan.json) on the same known tasks. This evaluation took place after inspecting previous outcomes; it is post-hoc and must remain separate from the earlier comparisons.
+The [original plan](comparison-plan.json) records v9, with three trials per route and task. The [follow-up plan](replication-plan.json) records v11, with one additional DeepSeek trial per task. Source hashes and commits distinguish them. The v13 follow-up added separately tested navigation corrections and a [final evaluation](final-evaluation-plan.json) on the same known tasks. This evaluation took place after inspecting previous outcomes; it is post-hoc and must remain separate from the earlier comparisons.
 
 ### Access audit
 
@@ -85,7 +85,7 @@ This runs the same 15 HTTP-status checks against the base, the validated human r
 
 ## Additional datasets and bounded batches
 
-Set `LITELLM_CASE_CATALOG` to an explicit JSON array of `{id, split, revision, prompt}` records when running `prepare.py`. Optional `include_test_names`, `exclude_test_names`, and `oracle_note` preserve curation decisions. Use a separate campaign directory for a new dataset, but point its `connection.json` at the same metered gateway. Do not create another ledger to bypass a campaign ceiling. Model-written task drafts require review: a curator can invert an error-handling contract or accidentally prescribe a new private helper.
+Set `LITELLM_CASE_CATALOG` to an explicit JSON array of `{id, split, revision, prompt}` records when running `prepare.py`. Optional `include_test_names`, `exclude_test_names`, and `oracle_note` preserve curation decisions. `reference_paths` can include required non-Python artifacts (such as the model-price JSON schema); its default is `litellm` and `enterprise`. Use a separate campaign directory for a new dataset, but point its `connection.json` at the same metered gateway. Do not create another ledger to bypass a campaign ceiling. Model-written task drafts require review: a curator can invert an error-handling contract or accidentally prescribe a new private helper.
 
 Protocol 5 gives every solver its own temporary directory and pytest configuration. Its printed command explicitly enables the local cost map and the required pytest plugins. This avoids ancestor discovery outside the filesystem boundary and accidental remote cost-map reads. The production shell still filters credential-related environment variables; the replay's explicit test prefix does not weaken that filter.
 
@@ -103,3 +103,5 @@ If a solver exits before writing its completion artifact, the launcher preserves
 `analyze.py` reports provider-call time, the union of occupied tool intervals, per-tool summed latency, time to first edit and when final review began. Concurrent tool durations can overlap: do not add them to infer wall time. Use recorded timestamps rather than a critic model's estimates.
 
 `reflect.py RUN_DIRECTORY` sends a qualified train/dev trajectory, its private reference and acceptance output to the metered model for diagnosis. Held-out tasks are rejected. The response is untrusted advice; the script neither edits the harness nor promotes a suggestion. Keep any candidate-selection set separate from the next frozen comparison.
+
+Protocol 6 also isolates Git configuration and resolves the installed Git executable before applying Seatbelt. Ordinary `git diff` and `git status` work without reading the user's global configuration or writing xcrun's shared cache. Earlier protocol-5 trials can contain these infrastructure failures; keep their measurements separate from the final comparison.
