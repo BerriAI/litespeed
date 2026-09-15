@@ -8,6 +8,7 @@ import { TerminalController } from './controller.js';
 import { Menu, TextPrompt, TextViewer } from './ui.js';
 import { Providers } from './providers.js';
 import { Profiles } from './profiles.js';
+import { McpImporter } from './mcpImport.js';
 
 function Rules({ initial, onSave, onClose, feedback }: { initial: PermissionRuleSet | undefined; onSave: (rules: PermissionRuleSet) => void; onClose: () => void; feedback: string }) {
   const [rules, setRules] = useState(initial?.rules ?? []), [index, setIndex] = useState<number | null>(null), [view, setView] = useState('main');
@@ -58,6 +59,7 @@ export function SettingsPanel({ controller, onClose }: { controller: TerminalCon
   if (view === 'profiles' && controller.detail) return <Profiles controller={controller} initial={controller.detail.session} onClose={back} />;
   if (view === 'rules') return <Rules initial={settings.permissionRules} onClose={() => setView('permissions')} feedback={feedback} onSave={rules => { void run(() => save({ permissionRules: rules }, 'permissions')); }} />;
   if (view === 'workspace') return <TextPrompt title="Default workspace for new sessions" value={settings.workspace} error={feedback} onClose={() => setView('general')} onSave={value => { void run(() => save({ workspace: value }, 'general')); }} />;
+  if (view === 'mcp-import') return <McpImporter controller={controller} workspace={workspace} onClose={() => setView('integrations')} onImported={result => { setView('integrations'); setFeedback(result.skipped.length ? `Imported ${result.imported.length}; skipped ${result.skipped.length}.` : `Imported ${result.imported.length} disabled server${result.imported.length === 1 ? '' : 's'}.`); void (async () => { try { await controller.settings(); setMcp(await controller.client.api<McpSnapshot>('/mcp')); } catch (error) { setFeedback(`Imported ${result.imported.length}; refresh failed: ${(error as Error).message}`); } })(); }} />;
   if (view === 'mcp-config') return <TextPrompt title="MCP configuration" multiline value={JSON.stringify(settings.mcpServers, null, 2)} error={feedback} onClose={() => setView('integrations')} onSave={value => { void run(() => save({ mcpServers: JSON.parse(value), expectedMcpConfigRevision: settings.mcpConfigRevision }, 'integrations')); }} />;
   if (view === 'integrations' && review) {
     const config = settings.mcpServers[review.name];
@@ -74,6 +76,7 @@ export function SettingsPanel({ controller, onClose }: { controller: TerminalCon
     ]} />;
   }
   if (view === 'integrations') return <Menu title="Integrations" onClose={back} footer={feedback || 'Review configuration before connecting a tool server.'} items={[
+    { id: 'import', label: 'Import Claude/Codex MCP servers…', description: 'Select compatible configurations; imports are global and disabled', action: () => setView('mcp-import') },
     { id: 'edit', label: 'Edit MCP configuration', description: 'Tool search and TypeScript execution on by default; each call keeps normal approval', action: () => setView('mcp-config') },
     ...(mcp?.servers ?? []).map(server => ({ id: server.name, label: `${server.name} · ${server.status}`, description: server.error || `${server.tools.length} tools`, action: () => setReview(server) })),
     { id: 'refresh', label: 'Reload status', action: () => { void run(async () => { await controller.settings(); setMcp(await controller.client.api<McpSnapshot>('/mcp')); }); } },
