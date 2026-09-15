@@ -5,14 +5,14 @@ import type { DelegationSummary } from './delegation.js';
 export function visibleDelegations(detail: SessionDetail): DelegationSummary[] {
   return (detail.delegations ?? []).filter(task => task.parentSessionId === detail.session.id && detail.messages.some(message =>
     message.role === 'assistant' && message.id === task.parentMessageId && message.sessionId === detail.session.id && message.toolCalls?.some(tool =>
-      (tool.name === (task.role === 'sidekick' ? 'sidekick' : task.role ? 'delegate' : 'task')) && tool.id === task.toolCallId && tool.delegationId === task.id)));
+      (tool.name === (task.role === 'sidekick' ? 'sidekick' : task.role ? 'delegate' : 'task')) && tool.id === task.toolCallId && (task.asyncTaskId?tool.taskId===task.asyncTaskId:tool.delegationId === task.id))));
 }
 
 /** Session configuration is monotonic even when an older snapshot overlaps a newer mutation. */
 export function reconcileSession(current: Session, incoming: Session): Session {
   if ((incoming.configRevision ?? 0) >= (current.configRevision ?? 0)) return incoming;
   return { ...incoming, providerId: current.providerId, model: current.model, mode: current.mode, planner: current.planner, architecture: current.architecture,
-    modelReasoning: current.modelReasoning, outputStyle: current.outputStyle, permissionMode: current.permissionMode, profile: current.profile, configRevision: current.configRevision };
+    modelReasoning: current.modelReasoning, outputStyle: current.outputStyle, permissionMode: current.permissionMode, profile: current.profile, configRevision: current.configRevision,architectureConfigurations:current.architectureConfigurations,pendingArchitecture:current.pendingArchitecture };
 }
 
 /** Idempotent for snapshot messages and tool updates; SSE replay is deduplicated by event ID by the caller. */
@@ -23,11 +23,17 @@ export function applyEvent(detail: SessionDetail, event: RunEvent): SessionDetai
 function reduceEvent(detail: SessionDetail, event: RunEvent): SessionDetail {
   const data = event.data;
   switch (event.type) {
+    case 'litefusion': return {...detail,litefusion:data};
     case 'session': {
       const session = data.session ?? data;
       // Revision-bearing events are full persisted sessions; an omitted profile means explicitly cleared.
-      const incoming = { ...detail.session, ...session, ...(session.configRevision !== undefined ? { profile: session.profile } : {}) };
-      return { ...detail, session: reconcileSession(detail.session, incoming) };
+      const incoming = { ...detail.session, ...session, ...(session.configRevision !== undefined ? { profile: session.profile,architecture:session.architecture,planner:session.planner,shunt:session.shunt,pendingArchitecture:session.pendingArchitecture } : {}) };
+      const sessionState=reconcileSession(detail.session, incoming);
+      return { ...detail, session: sessionState, ...(sessionState.architecture?.kind!=='litefusion'?{litefusion:undefined}:{}) };
+    }
+    case 'task': {
+      const task=data.task??data;const old=detail.tasks?.find(item=>item.id===task.id);if(old&&old.revision>=task.revision)return detail;
+      return {...detail,tasks:old?detail.tasks!.map(item=>item.id===task.id?task:item):[...detail.tasks??[],task]};
     }
     case 'message': {
       const message = data.message ?? data;

@@ -3,6 +3,7 @@ import type { SessionDetail, PermissionRequest } from '../shared/types.js';
 import { TerminalController } from '../tui/controller.js';
 import type { LitespeedClient } from '../tui/client.js';
 import type { SessionSync } from '../tui/sync.js';
+import { ApiError } from '../tui/client.js';
 
 function harness(status: 'idle' | 'running' = 'idle') {
   const detail = { session: { id: 'parent', configRevision: 7, status }, messages: [], permissions: [], todos: [], queue: { items: [], paused: false }, lastEventId: 0 } as unknown as SessionDetail;
@@ -74,48 +75,82 @@ describe('terminal task controller', () => {
   });
 });
 
-describe('terminal skill activation', () => {
-  const catalog = { revision: 'revision', skills: [{ id: 'verify', name: 'Verify', description: '' }], profiles: [], diagnostics: [] };
-  it('pins a skill with the current profile and revision, without changing mode or model', async () => {
-    const { controller, client, detail } = harness();
-    detail.session.workspace = '/workspace';
-    detail.session.profile = { profileId: 'review', skillIds: [], revision: 'revision', tools: ['read_file'] };
-    client.api.mockResolvedValueOnce(catalog).mockResolvedValueOnce({});
-    controller.setDraft({ text: '/verify', attachments: [{ name: 'keep', content: 'attachment' }] });
-    expect(await controller.activateSkill('verify')).toBe(true);
-    expect(client.api.mock.calls).toEqual([
-      ['/profiles?workspace=%2Fworkspace'],
-      ['/sessions/parent/profile', { expectedConfigRevision: 7, choice: { profileId: 'review', skillIds: ['verify'], catalogRevision: 'revision' } }],
-    ]);
-    expect(controller.getState().draft).toEqual({ text: '', attachments: [{ name: 'keep', content: 'attachment' }] });
-    expect(controller.getState().notice).toContain('paused');
-  });
-  it('refuses changed pinned sources and keeps the draft', async () => {
-    const { controller, client, detail } = harness();
-    detail.session.profile = { profileId: 'review', skillIds: [], revision: 'old', tools: ['read_file'] };
-    client.api.mockResolvedValue(catalog);
-    expect(await controller.activateSkill('verify')).toBe(false);
-    expect(client.api).toHaveBeenCalledTimes(1);
-    expect(controller.getState().notice).toContain('/skills');
+describe('terminal queued input', () => {
+  function queued() {
+    const fixture=harness('running');
+    fixture.detail.queue!.items=['first','second'].map((content,index)=>({id:`q${index}`,sessionId:'parent',content,attachments:[{name:`${content}.txt`,content:`${content} snapshot`}],createdAt:index}));
+    fixture.client.api.mockResolvedValue({items:fixture.detail.queue!.items});
+    return fixture;
+  }
+  it('interrupts the displayed turn and leaves draft input untouched',async()=>{
+    const {controller,client,detail}=harness('running');
+    detail.messages=[{id:'turn',sessionId:'parent',role:'user',content:'Current work',createdAt:1}];
+    await controller.interrupt();expect(client.api.mock.calls).toEqual([['/sessions/parent/interrupt',{turnId:'turn'}]]);
     expect(controller.getState().draft.text).toBe('my unsent work');
   });
-  it('does not activate while running or resend already-active skills', async () => {
-    const { controller, client, detail } = harness('running');
-    await expect(controller.activateSkill('verify')).rejects.toThrow('Finish');
-    expect(client.api).not.toHaveBeenCalled();
-    detail.session.status = 'idle';
-    detail.session.profile = { profileId: null, skillIds: ['verify'], revision: 'old', tools: null };
-    expect(await controller.activateSkill('verify')).toBe(true);
-    expect(client.api).not.toHaveBeenCalled();
+  it('recalls all queued input ahead of the current draft, preserving attachments',async()=>{
+    const {controller,client}=queued();
+    controller.setDraft({text:'draft',attachments:[{name:'draft.txt',content:'draft context'}]});
+    expect(await controller.recallQueued()).toBe(true);
+    expect(client.api.mock.calls).toEqual([['/sessions/parent/queue/recall',{ids:['q0','q1']}]]);
+    expect(controller.getState().draft).toEqual({text:'first\nsecond\ndraft',attachments:[{name:'first.txt',content:'first snapshot'},{name:'second.txt',content:'second snapshot'},{name:'draft.txt',content:'draft context'}]});
   });
-  it('holds the configuration lock during lookup and preserves a newer draft', async () => {
-    const { controller, client } = harness();
-    let resolve!: (value: unknown) => void;
-    client.api.mockImplementationOnce(() => new Promise(done => { resolve = done; }));
-    const pending = controller.activateSkill('verify');
+  it('keeps newer typing and prevents sending or switching during recall',async()=>{
+    const {controller,client,detail}=queued();let resolve!:(value:unknown)=>void;
+    client.api.mockImplementationOnce(()=>new Promise(done=>{resolve=done;}));
+    const recall=controller.recallQueued();expect(await controller.send()).toBe(false);
     await expect(controller.open('other')).rejects.toThrow('Wait');
-    controller.setDraft({ text: 'new draft', attachments: [] });
-    resolve(catalog); await pending;
-    expect(controller.getState().draft.text).toBe('new draft');
+    expect(await controller.recallQueued()).toBe(false);
+    controller.setDraft({text:'newer typing',attachments:[]});resolve({items:detail.queue!.items});
+    expect(await recall).toBe(true);expect(controller.getState().draft.text).toBe('first\nsecond\nnewer typing');expect(client.api).toHaveBeenCalledTimes(1);
+  });
+  it('keeps the draft untouched when the queue changed before recall',async()=>{
+    const {controller,client}=queued();client.api.mockRejectedValue(new ApiError('Queued messages changed.',409));
+    expect(await controller.recallQueued()).toBe(false);
+    expect(controller.getState().draft.text).toBe('my unsent work');expect(controller.getState().notice).toContain('changed');
+  });
+  it('keeps a visible recovery copy if the recall response is lost',async()=>{
+    const {controller,client}=queued();client.api.mockRejectedValue(new TypeError('Network disconnected'));
+    expect(await controller.recallQueued()).toBe(false);
+    expect(controller.getState().draft.text).toBe('first\nsecond\nmy unsent work');expect(controller.getState().notice).toContain('review /queue before resending');
+    expect(client.api).toHaveBeenCalledTimes(1);
+  });
+  it('refuses an oversized combined draft and permits editing one queued message',async()=>{
+    const {controller,client,detail}=queued();detail.queue!.items[0].attachments=Array.from({length:10},(_,index)=>({name:`${index}.txt`,content:'context'}));
+    expect(await controller.recallQueued()).toBe(false);expect(client.api).not.toHaveBeenCalled();
+    client.api.mockResolvedValue({items:[detail.queue!.items[0]]});
+    expect(await controller.recallQueued('q0')).toBe(true);
+    expect(client.api.mock.calls).toEqual([['/sessions/parent/queue/recall',{ids:['q0']}]]);expect(controller.getState().draft.attachments).toHaveLength(10);
+  });
+});
+
+describe('terminal skill invocation', () => {
+  const skills = {skillIds:['verify'],catalogRevision:'revision'};
+  it('recalls the visible skill reference for editing without retaining its old instruction attachment', async () => {
+    const {controller,client,detail}=harness('running');
+    const item={id:'queued',sessionId:'parent',content:'/verify old task',attachments:[{name:'Skill: verify',skillId:'verify',content:'OLD_SKILL_BODY'},{name:'example.txt',content:'FILE_CONTEXT'}],createdAt:1};
+    detail.queue!.items=[item];client.api.mockResolvedValue({items:[item]});
+    controller.setDraft({text:'',attachments:[]});
+    expect(await controller.recallQueued()).toBe(true);
+    expect(controller.getState().draft).toEqual({text:'/verify old task',attachments:[{name:'example.txt',content:'FILE_CONTEXT'}]});
+  });
+  it.each(['idle','running'] as const)('sends skill references and attachments through the %s message path', async status => {
+    const {controller,client}=harness(status);
+    controller.setDraft({text:'/verify check parser',attachments:[{name:'example',content:'context'}]});
+    expect(await controller.send('message',undefined,skills)).toBe(true);
+    expect(client.api.mock.calls).toEqual([[`/sessions/parent/${status==='running'?'queue':'messages'}`,{content:'/verify check parser',attachments:[{name:'example',content:'context'}],skills}]]);
+    expect(controller.getState().draft).toEqual({text:'',attachments:[]});
+  });
+  it('preserves the draft when instruction snapshot validation fails', async () => {
+    const {controller,client}=harness();
+    client.api.mockRejectedValue(new Error('Project instructions changed. Refresh /skills.'));
+    controller.setDraft({text:'/verify check parser',attachments:[]});
+    expect(await controller.send('message',undefined,skills)).toBe(false);
+    expect(controller.getState().draft.text).toBe('/verify check parser');
+  });
+  it('includes a skill invocation in steering without a configuration change', async () => {
+    const {controller,client}=harness('running');
+    expect(await controller.send('steer','/verify check parser',skills)).toBe(true);
+    expect(client.api.mock.calls).toEqual([['/sessions/parent/steer',{content:'/verify check parser',skills}]]);
   });
 });

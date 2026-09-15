@@ -40,6 +40,82 @@ export function outputBudget(maxLines: number, width: number): number {
   return maxLines * Math.max(20, width - 6);
 }
 
+/** Inline markers that arrive in halves while a response streams. */
+const STREAM_MARKERS = ['**', '~~', '`'] as const;
+
+/** Only a matching fence of at least the opening length closes a code block.
+ * Return the last prose boundary so completed code blocks are not scanned as
+ * inline markdown when the next paragraph arrives without a blank line. */
+function trailingProseStart(content: string): number | null {
+  let fence: { marker: string; length: number } | undefined;
+  let offset = 0, start = 0;
+  for (const line of content.split('\n')) {
+    const delimiter = line.match(/^ {0,3}(`{3,}|~{3,})(.*)$/);
+    if (delimiter) {
+      const [_, markers, suffix] = delimiter;
+      if (!fence) {
+        if (markers[0] !== '`' || !suffix.includes('`')) fence = { marker: markers[0], length: markers.length };
+      } else if (markers[0] === fence.marker && markers.length >= fence.length && /^[ \t]*$/.test(suffix)) {
+        fence = undefined;
+        start = Math.min(content.length, offset + line.length + 1);
+      }
+    }
+    offset += line.length + 1;
+  }
+  return fence ? null : start;
+}
+
+/** Start of the last paragraph: inline emphasis never crosses a blank line. */
+function lastParagraphStart(content: string): number {
+  let start = 0;
+  for (const match of content.matchAll(/\n[ \t]*\n/g)) start = match.index + match[0].length;
+  return start;
+}
+
+/** Complete the inline markers left dangling by a partially arrived response.
+ *
+ * `marked` — the parser behind both markdown renderers — only recognizes a
+ * marker pair, so a half-arrived `**bold` is tokenized as plain text and the
+ * terminal shows its literal asterisks until the closer lands, then reflows the
+ * rest of the paragraph when concealment removes them. Closing the pair
+ * virtually renders the emphasis immediately and keeps the text on one column,
+ * so nothing shifts when the real closer arrives.
+ *
+ * Only the trailing paragraph is examined, only outside fenced code, and only
+ * for markers whose opener looks like an opener (CommonMark wants a non-space
+ * to its right). An unmatched marker with nothing after it yet is dropped
+ * rather than closed, because `****` is literal text. Balanced content, code
+ * fences and every settled response are returned unchanged. */
+export function stableStreamingMarkdown(content: string): string {
+  if (!content) return content;
+  const proseStart = trailingProseStart(content);
+  if (proseStart === null) return content;
+  const start = Math.max(proseStart, lastParagraphStart(content));
+  const region = content.slice(start);
+  const open: string[] = [];
+  for (let index = 0; index < region.length;) {
+    if (region[index] === '\\') { index += 2; continue; }
+    const marker = STREAM_MARKERS.find(candidate => region.startsWith(candidate, index));
+    if (!marker) { index += 1; continue; }
+    const rest = region.slice(index + marker.length);
+    if (open.at(-1) === marker) open.pop();
+    // A code span swallows other markers until its backtick closes.
+    else if (open.at(-1) === '`') { index += marker.length; continue; }
+    // An opener needs a non-space to its right, or nothing yet because the rest
+    // of the word has not arrived. `2 ** 3` is prose, not a dangling opener.
+    else if (marker === '`' || rest === '' || !/^\s/.test(rest)) open.push(marker);
+    index += marker.length;
+  }
+  if (!open.length) return content;
+  // A closer is only a closer with a non-space to its left, so the whitespace a
+  // word boundary just delivered has to stay outside the completed pair.
+  const trailing = region.match(/\s+$/)?.[0] ?? '';
+  let tail = trailing ? region.slice(0, -trailing.length) : region;
+  // Drop openers that have no content yet; close the ones that do.
+  while (open.length && tail.endsWith(open.at(-1)!)) tail = tail.slice(0, -open.pop()!.length);
+  return content.slice(0, start) + tail + open.reverse().join('') + trailing;
+}
+
 /** Reasoning summaries may begin with a bolded title on its own paragraph. */
 export function reasoningSummary(content: string): { title: string | null; body: string } {
   const trimmed = content.trim();
@@ -184,6 +260,8 @@ export function toolRow(call: ToolCall): ToolRowModel {
       return { ...base, icon: '%', text: `WebFetch ${str(args.url)}`, pending: 'Fetching from the web…' };
     case 'web_search':
       return { ...base, icon: '◈', text: `Web Search "${str(args.query)}"`, pending: 'Searching web…' };
+    case 'wait_tasks':
+      return {...base,icon:'◷',text:running?'Waiting for workers':'Worker updates received',pending:'Waiting for workers'};
     case 'delegate':
     case 'sidekick':
     case 'task': {

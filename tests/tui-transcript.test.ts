@@ -3,7 +3,7 @@ import type { ToolCall } from '../shared/types.js';
 import {
   collapseToolOutput, extractUnifiedDiff, filetypeOf, formatDuration,
   inlineArgs, outputBudget,
-  questionAnswer, reasoningSummary, scannerFrame, stripAnsi, titlecase, toolRow,
+  questionAnswer, reasoningSummary, scannerFrame, stableStreamingMarkdown, stripAnsi, titlecase, toolRow,
   SCANNER_WIDTH, SPINNER_FRAMES,
 } from '../tui/transcriptModel.js';
 
@@ -63,6 +63,59 @@ describe('collapseToolOutput', () => {
   it('derives the character budget from width with a floor of 20', () => {
     expect(outputBudget(10, 120)).toBe(10 * 114);
     expect(outputBudget(10, 20)).toBe(10 * 20);
+  });
+});
+
+describe('stableStreamingMarkdown', () => {
+  it('closes a half-arrived pair so no literal marker is rendered', () => {
+    expect(stableStreamingMarkdown('Reviewing the **stream')).toBe('Reviewing the **stream**');
+    expect(stableStreamingMarkdown('Use `npm ru')).toBe('Use `npm ru`');
+    expect(stableStreamingMarkdown('Dropping ~~stal')).toBe('Dropping ~~stal~~');
+  });
+  it('keeps a delivered word boundary outside the completed pair', () => {
+    // `**streaming **` is not valid emphasis: a closer needs a non-space to its left.
+    expect(stableStreamingMarkdown('Reviewing the **streaming ')).toBe('Reviewing the **streaming** ');
+    expect(stableStreamingMarkdown('a **soft break\n')).toBe('a **soft break**\n');
+  });
+  it('drops an opener whose content has not arrived, never emitting ****', () => {
+    expect(stableStreamingMarkdown('Reviewing the **')).toBe('Reviewing the ');
+    expect(stableStreamingMarkdown('Reviewing the *')).toBe('Reviewing the *');
+    expect(stableStreamingMarkdown('Use `')).toBe('Use ');
+  });
+  it('leaves balanced and settled content untouched', () => {
+    const settled = 'Reviewing the **streaming transcript** for `conceal` and ~~stale~~ layout.';
+    expect(stableStreamingMarkdown(settled)).toBe(settled);
+    expect(stableStreamingMarkdown('')).toBe('');
+    expect(stableStreamingMarkdown('plain prose')).toBe('plain prose');
+  });
+  it('treats spaced asterisks as prose, not a dangling opener', () => {
+    expect(stableStreamingMarkdown('the product 2 ** 3 and')).toBe('the product 2 ** 3 and');
+    expect(stableStreamingMarkdown('escaped \\**kept')).toBe('escaped \\**kept');
+  });
+  it('never completes markers inside an open code fence', () => {
+    const fenced = 'Example:\n\n```ts\nconst a = 2 ** 3;\nconst b = `x';
+    expect(stableStreamingMarkdown(fenced)).toBe(fenced);
+    // A closed fence leaves the trailing paragraph eligible again.
+    expect(stableStreamingMarkdown('```ts\nconst a = 1;\n```\n\nNow **bo')).toBe('```ts\nconst a = 1;\n```\n\nNow **bo**');
+  });
+  it('keeps shorter and mismatched fences inside the code block literal', () => {
+    for (const source of ['````md\n```\n**literal', '~~~md\n```\n**literal', '```md\n```not-a-closer\n**literal']) {
+      expect(stableStreamingMarkdown(source)).toBe(source);
+    }
+  });
+  it('starts inline completion after a closed fence even without a blank line', () => {
+    expect(stableStreamingMarkdown('```ts\nconst n = 2 ** 3;\n```\nNow **bo')).toBe('```ts\nconst n = 2 ** 3;\n```\nNow **bo**');
+    expect(stableStreamingMarkdown('```ts\nconst n = 2 ** 3;\n```')).toBe('```ts\nconst n = 2 ** 3;\n```');
+  });
+  it('only completes the trailing paragraph', () => {
+    expect(stableStreamingMarkdown('An **unclosed earlier line\n\nNow **bo'))
+      .toBe('An **unclosed earlier line\n\nNow **bo**');
+  });
+  it('closes nested markers from the inside out', () => {
+    expect(stableStreamingMarkdown('a **bold with `cod')).toBe('a **bold with `cod`**');
+  });
+  it('keeps a code span from swallowing the paragraph', () => {
+    expect(stableStreamingMarkdown('call `a ** b` then **mo')).toBe('call `a ** b` then **mo**');
   });
 });
 

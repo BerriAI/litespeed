@@ -56,7 +56,7 @@ export async function fusionCases({ api, terminal, screen, waitFor, save, settin
     terminal.write('1'); await waitFor(async () => !(await detail()).permissions.some(item => item.id === permission.id), 'permission resolved');
   };
   await api(`/sessions/${session.id}/tool-grants`, undefined, 'DELETE');
-  await configure('sidekick-fusion', 1, 'Sidekick');
+  await configure('sidekick-fusion', 2, 'Sidekick');
   terminal.write('SIDEKICK_BROWSER terminal first handoff\r');
   await approve(); await approve(); await idle();
   const first = (await detail()).delegations.at(-1); assert.equal(first.role, 'sidekick'); assert.equal(first.status, 'completed');
@@ -68,16 +68,14 @@ export async function fusionCases({ api, terminal, screen, waitFor, save, settin
   assert(!firstView.messages.some(message => message.content.includes('turn 2')), 'old handoff stays immutable');
   terminal.write('/workers\r');
   await waitFor(() => screen().includes('Worker assignments'), 'worker list'); terminal.write('\r');
-  await waitFor(() => screen().includes('Assignment brief'), 'worker inspector');
-  await save('10-sidekick-inspector'); terminal.write('\x1b[H' + '\x1b[B'.repeat(4) + '\r');
-  await waitFor(() => screen().includes('Read-only invocation transcript'), 'read-only worker transcript');
+  await waitFor(() => screen().includes('Read-only worker history'), 'worker inspector');
+  await save('10-sidekick-inspector');
   await save('11-worker-transcript'); terminal.write('\x1b');
-  await waitFor(() => screen().includes('Assignment brief') && !screen().includes('Read-only invocation transcript'), 'back to worker inspector'); terminal.write('\x1b');
-  await waitFor(() => !screen().includes('Worker evidence is separate'), 'worker inspector closed');
+  await waitFor(() => !screen().includes('Read-only worker history'), 'worker inspector closed');
   await idle();
   await writeFile(join(settings.workspace, 'package.json'), JSON.stringify({ scripts: { test: `node -e "require('node:assert/strict').equal(require('node:fs').readFileSync('answer.txt','utf8'),'42\\n')"` } }));
   const fresh = [];
-  for (const [kind, index, label] of [['team-fusion', 2, 'Worker'], ['expert-fusion', 3, 'Expert']]) {
+  for (const [kind, index, label] of [['team-fusion', 3, 'Worker'], ['expert-fusion', 4, 'Expert']]) {
     await configure(kind, index, label);
     terminal.write(`FUSION_BROWSER terminal ${kind} implement and verify\r`);
     await approve();
@@ -102,7 +100,7 @@ export async function fusionCases({ api, terminal, screen, waitFor, save, settin
   terminal.write('FUSION_BROWSER terminal cancel worker\r');
   await approve();
   await waitFor(async () => (await detail()).permissions.some(item => item.tool === 'write_file') && screen().includes('wants to write a file'), 'worker awaiting decision before stop');
-  terminal.write('\x1b'); await new Promise(done => setTimeout(done, 180)); terminal.write('\x1b');
+  terminal.write('\x1b');
   await idle();
   assert.equal((await detail()).delegations.at(-1).status, 'cancelled');
   assert.equal((await detail()).permissions.length, 0);

@@ -216,7 +216,7 @@ test('desktop and mobile research transcript controls fit without horizontal ove
   await expect(page.getByRole('dialog')).toHaveCount(0);
   await page.evaluate(() => document.fonts.ready);
   expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true); await page.screenshot({ path: 'test-results/delegation-desktop.png', fullPage: true, animations: 'disabled' });
-  await page.getByRole('button', { name: 'Close workspace', exact: true }).click();
+  await expect(page.locator('.workspace-panel')).toHaveCount(0);
   await page.setViewportSize({ width: 390, height: 844 }); expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
   await page.screenshot({ path: 'test-results/delegation-mobile.png', fullPage: true, animations: 'disabled' });
   await request.post('/fixture/delegations/release', { data: {} }); await done(request, session); await expandSteps(page); await expect(transcript(page)).toContainText('RESEARCH_FILE_VERIFIED');

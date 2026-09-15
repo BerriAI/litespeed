@@ -1,15 +1,15 @@
 import { execFile } from 'node:child_process';
 import { promisify } from 'node:util';
 import { randomUUID } from 'node:crypto';
-import { cp, mkdir, rm, symlink, lstat, readdir, realpath } from 'node:fs/promises';
-import { join, relative, resolve, sep } from 'node:path';
+import { cp, mkdir, rm, symlink, lstat, readdir, realpath, readFile, writeFile } from 'node:fs/promises';
+import { join, relative, resolve, sep, dirname } from 'node:path';
 import type { FileChange } from '../shared/types.js';
 import { snapshotWorkspace, snapshotChanges, SNAPSHOT_IGNORES, type WorkspaceSnapshot } from './workspace-snapshot.js';
 import { readRestoreTarget, restoreChanges } from './tools.js';
 import type { History } from './history.js';
 
 export interface WorkerWorkspace { workspace: string; batch: ParallelWorkers; key: string }
-interface Outcome { accepted: boolean; changes: FileChange[]; note: string }
+export interface Outcome { accepted: boolean; changes: FileChange[]; note: string }
 
 /** One bounded batch. Copy the current workspace, including uncommitted source,
  * then integrate nonconflicting patches only after every worker has stopped.
@@ -49,13 +49,38 @@ export class ParallelWorkers {
         await git('git',['-C',destination,'-c','core.hooksPath=/dev/null','init','-q'],{signal});
         await git('git',['-C',destination,'-c','core.hooksPath=/dev/null','add','-A'],{signal});
         await git('git',['-C',destination,'-c','core.hooksPath=/dev/null','-c','user.name=Litespeed','-c','user.email=litespeed@localhost','commit','-qm','Workspace baseline','--allow-empty'],{signal});
+        await writeFile(destination+'.baseline.json',JSON.stringify(baseline),{mode:0o600});
         batch.workspaces.set(key,{workspace:destination,batch,key});
       }
       return batch;
     } catch(error) {await rm(directory,{recursive:true,force:true});throw error;}
   }
+  /** Reconcile root changes into a retained task workspace. Local work survives
+   * a yield; overlapping changes require a fresh context and explicit review. */
+  static async resume(root:string,parentId:string,key:string,history:History,signal:AbortSignal,workspace:string,isCurrent:()=>boolean):Promise<ParallelWorkers> {
+    const data=await realpath(history.store.directory);workspace=await realpath(workspace);root=await realpath(root);
+    if(!workspace.startsWith(join(data,'workers')+sep))throw new Error('Retained workspace is outside the worker store.');
+    const previous=JSON.parse(await readFile(workspace+'.baseline.json','utf8')) as WorkspaceSnapshot;
+    if(!previous.files||!previous.omitted)throw new Error('Retained workspace baseline is unavailable.');
+    const baseline=await snapshotWorkspace(root,[data]),local=await snapshotWorkspace(workspace);
+    const upstream=snapshotChanges(previous,baseline),edits=snapshotChanges(previous,local);
+    if(upstream.incomplete||edits.incomplete)throw new Error('Unsupported file changes prevent context reuse.');
+    const conflicts=upstream.changes.filter(change=>edits.changes.some(edit=>edit.path===change.path&&edit.after!==change.after));
+    if(conflicts.length)throw new Error(`Retained work conflicts with root changes in ${conflicts.map(change=>change.path).join(', ')}.`);
+    signal.throwIfAborted();if(!isCurrent())throw new Error('New steering arrived before workspace reconciliation.');
+    for(const change of upstream.changes) {
+      if(edits.changes.some(edit=>edit.path===change.path))continue;
+      await restoreChanges(workspace,[{path:change.path,before:change.after,after:change.before}],()=>{});
+    }
+    await writeFile(workspace+'.baseline.json',JSON.stringify(baseline),{mode:0o600});
+    const batch=new ParallelWorkers(root,parentId,[key],baseline,history,signal,dirname(workspace),isCurrent);
+    batch.workspaces.set(key,{workspace,batch,key});return batch;
+  }
   async complete(key:string,success:boolean,actorSessionId?:string,invocationId?:string):Promise<Outcome> {
     this.arrive(key,{success,actorSessionId,invocationId});
+    // A stopped worker has no candidate to integrate. Its cancellation can
+    // settle immediately without waiting for unrelated workers to finish.
+    if(!success)return {accepted:false,changes:[],note:`Isolated changes were not integrated. Isolated workspace retained: ${this.workspaces.get(key)!.workspace}`};
     await this.ready;return this.outcomes.get(key)!;
   }
   abandon(key:string):void {this.arrive(key,{success:false});}

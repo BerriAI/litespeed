@@ -47,7 +47,7 @@ test('surfaces provider errors and remains navigable',async({page})=>{
 
 test('discovers models and attaches workspace context',async({page})=>{
   await fresh(page);await page.getByRole('button',{name:'test-model'}).click();await expect(page.getByRole('dialog',{name:'Choose a model'})).toBeVisible();await page.getByRole('button',{name:'Architecture',exact:true}).click();await page.getByRole('option',{name:/^Single model/}).click();await page.getByRole('button',{name:'Model',exact:true}).click();await page.getByRole('option',{name:'test-fast',exact:true}).click();await page.getByRole('button',{name:'Done',exact:true}).click();
-  await page.getByRole('button',{name:'Add workspace file context'}).click();await page.getByRole('textbox',{name:'Search workspace files'}).fill('hello.ts');await page.getByRole('button',{name:'src/hello.ts'}).click();
+  await page.getByRole('button',{name:'Add workspace file context'}).click();await page.getByRole('textbox',{name:'Search workspace files'}).fill('hello.ts');await page.getByRole('button',{name:'src/hello.ts',exact:true}).click();
   await expect(page.getByRole('button',{name:'Remove hello.ts'})).toBeVisible();await send(page,'Read this attached source');await expect(page.getByRole('article',{name:'Your message'})).toContainText('src/hello.ts');await expect(page.getByRole('button',{name:'Stop generation'})).toHaveCount(0);
 });
 
@@ -67,7 +67,7 @@ test('terminal executes real commands, persists on hide and reload, and ends exp
   await command('printf "%s" "$LITESPEED_BROWSER_VALUE" > terminal-browser.txt');await expect.poll(content).toBe('kept');
   await command("printf '\\nTerminal is ready. State survived reconnection.\\n'");
   await page.screenshot({path:'test-results/terminal-desktop.png',fullPage:true,animations:'disabled'});
-  await page.getByRole('button',{name:'Close workspace',exact:true}).click();
+  await expect(page.locator('.workspace-panel')).toHaveCount(0);
   await page.setViewportSize({width:390,height:844});expect(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth)).toBe(true);await page.screenshot({path:'test-results/terminal-mobile.png',fullPage:true,animations:'disabled'});
   await pane.getByRole('button',{name:'End shell',exact:true}).click();await expect(pane.getByRole('status')).toHaveText('Shell ended.');
   await pane.getByRole('button',{name:'Reconnect / new shell',exact:true}).click();await expect(pane.getByRole('status')).toHaveText('Connected');
@@ -90,23 +90,23 @@ test('mobile welcome, sidebar and composer stay within viewport',async({page})=>
   expect(await page.evaluate(()=>document.documentElement.scrollWidth<=window.innerWidth)).toBe(true);await page.screenshot({path:'test-results/conversation-mobile.png',fullPage:true,animations:'disabled'});
 });
 
-test('desktop session entry opens the workspace panel while compact layouts keep it closed', async ({ page, request }) => {
+test('workspace visibility follows the saved choice across sessions while mobile starts closed', async ({ page, request }) => {
   const first = await (await request.post('/api/sessions', { data: { title: 'Panel first', providerId: 'fixture', model: 'test-model' } })).json();
   const second = await (await request.post('/api/sessions', { data: { title: 'Panel second', providerId: 'fixture', model: 'test-model' } })).json();
-  await page.addInitScript(() => localStorage.setItem('litespeed.workspace-panel-open', 'false'));
   await fresh(page);
   await expect(page.locator('.welcome h1 .litespeed-logo')).toBeVisible();
   await page.getByRole('button', { name: 'Panel first', exact: true }).click();
-  await expect(page.locator('.workspace-panel')).toBeVisible();
-  await page.getByRole('button', { name: 'Hide workspace panel', exact: true }).click();
   await expect(page.locator('.workspace-panel')).toHaveCount(0);
+  await page.getByRole('button', { name: 'Show workspace panel', exact: true }).click();
+  await expect(page.locator('.workspace-panel')).toBeVisible();
   await page.getByRole('button', { name: 'Panel second', exact: true }).click();
+  await expect(page.locator('.workspace-panel')).toBeVisible();
+  await page.reload();
   await expect(page.locator('.workspace-panel')).toBeVisible();
   await page.getByRole('button', { name: 'Hide workspace panel', exact: true }).click();
   await page.reload();
-  await expect(page.locator('.workspace-panel')).toBeVisible();
-  await page.setViewportSize({ width: 390, height: 844 });
   await expect(page.locator('.workspace-panel')).toHaveCount(0);
+  await page.setViewportSize({ width: 390, height: 844 });
   await page.getByRole('button', { name: 'Show workspace panel', exact: true }).click();
   await expect(page.locator('.workspace-panel')).toBeVisible();
   await page.goto(`/#session/${first.id}`);

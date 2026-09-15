@@ -1,8 +1,7 @@
-import type { Attachment, PermissionRequest, QuestionAnswer, QuestionRequest, Session, SessionDetail, Settings } from '../shared/types.js';
-import type { ProfileCatalog } from '../shared/profiles.js';
-import { addSkill, checkSkillSource } from '../shared/skill-commands.js';
+import type { Attachment, PermissionRequest, QuestionAnswer, QuestionRequest, QueuedMessage, Session, SessionDetail, Settings } from '../shared/types.js';
+import type { SkillInvocation } from '../shared/skill-commands.js';
 import { SessionSync, type SyncState } from './sync.js';
-import { LitespeedClient } from './client.js';
+import { ApiError, LitespeedClient } from './client.js';
 
 export interface Draft { text: string; attachments: Attachment[] }
 export interface DraftStorage { load(key: string): Draft; save(key: string, draft: Draft): void; remember?(text: string): void; history?(): string[] }
@@ -54,8 +53,8 @@ export class TerminalController {
     if (accepted && session) await this.open(session.id);
     return session;
   }
-  configurationReady() {
-    if (this.state.pending || isRunning(this.detail) || this.detail?.history?.pendingRecovery) throw new Error('Finish the response or recover history before changing configuration.');
+  configurationReady(allowRunning=false) {
+    if (this.state.pending || (!allowRunning&&isRunning(this.detail)) || this.detail?.history?.pendingRecovery) throw new Error('Finish the response or recover history before changing configuration.');
   }
   async action(label: string, operation: () => Promise<unknown>): Promise<boolean> {
     if (this.state.pending) { this.notice('Another action is still being accepted.'); return false; }
@@ -74,22 +73,7 @@ export class TerminalController {
       return false;
     } finally { if (generation === this.generation) this.set({ pending: null }); }
   }
-  async activateSkill(id: string) {
-    this.configurationReady();
-    const session = this.detail?.session, draft = this.state.draft;
-    if (!session) return false;
-    if (session.profile?.skillIds.includes(id)) { this.notice(`Skill ${id} is already active.`); this.setDraft({ ...draft, text: '' }); return true; }
-    const accepted = await this.action('Activating skill', async () => {
-      const catalog = await this.client.api<ProfileCatalog>(`/profiles?workspace=${encodeURIComponent(session.workspace)}`);
-      checkSkillSource(session.profile, catalog.revision);
-      const choice = addSkill(session.profile, id, catalog);
-      await this.client.api(`/sessions/${encodeURIComponent(session.id)}/profile`, { expectedConfigRevision: session.configRevision ?? 0, choice });
-      if (this.state.draft === draft) this.setDraft({ ...draft, text: '' });
-    });
-    if (accepted) this.notice(`Skill ${id} active for this session. Queued messages remain paused.`);
-    return accepted;
-  }
-  async send(kind: 'message' | 'steer' | 'queue' = 'message', content?: string) {
+  async send(kind: 'message' | 'steer' | 'queue' = 'message', content?: string, skills?: SkillInvocation) {
     const detail = this.detail, draft = this.state.draft;
     if (!detail || (!draft.text.trim() && !draft.attachments.length)) return false;
     if (kind === 'steer' && (!isRunning(detail) || draft.attachments.length)) { this.notice('Steering needs a running response and text without attachments.'); return false; }
@@ -98,13 +82,40 @@ export class TerminalController {
     if (queued && (detail.queue?.items.length ?? 0) >= 20) { this.notice('Queue is full. Remove a message or resume it first.'); return false; }
     const path = this.path(kind === 'steer' ? '/steer' : queued ? '/queue' : '/messages');
     const accepted = await this.action(kind === 'steer' ? 'Sending steering' : queued ? 'Queuing' : 'Sending', async () => {
-      await this.client.api(path, { content: content ?? (draft.text.trim() || 'Please review the attached files.'), ...(kind === 'steer' ? {} : { attachments: draft.attachments }) });
+      await this.client.api(path, { content: content ?? (draft.text.trim() || 'Please review the attached files.'), ...(kind === 'steer' ? {} : { attachments: draft.attachments }), ...(skills ? { skills } : {}) });
       if (this.state.draft === draft) this.setDraft(empty());
       try { this.storage?.remember?.(draft.text); } catch { this.notice('Message accepted; input history could not be saved.'); }
     });
     return accepted;
   }
   cancel() { return this.action('Stopping', () => this.client.api(this.path('/cancel'), {})); }
+  interrupt() {
+    const turnId=this.detail?.messages.findLast(message=>message.role==='user')?.id;
+    return turnId ? this.action('Interrupting', () => this.client.api(this.path('/interrupt'), {turnId})) : this.cancel();
+  }
+  async recallQueued(id?: string) {
+    const items=(this.detail?.queue?.items??[]).filter(item=>!id||item.id===id);
+    if(!items.length)return false;
+    const merge=(entries:QueuedMessage[]):Draft=>({text:[...entries.map(item=>item.content),this.state.draft.text].filter(Boolean).join('\n'),attachments:[...entries.flatMap(item=>item.attachments.filter(attachment=>!attachment.skillId)),...this.state.draft.attachments]});
+    const preview=merge(items);
+    if(preview.text.length>200000||preview.attachments.length>10||Buffer.byteLength(JSON.stringify(preview))>12*1024*1024) {
+      this.notice('These queued messages are too large for one draft. Use /queue to edit one message at a time.');return false;
+    }
+    return this.action('Editing queued messages',async()=>{
+      let recalled:QueuedMessage[];
+      try {({items:recalled}=await this.client.api<{items:QueuedMessage[]}>(this.path('/queue/recall'),{ids:items.map(item=>item.id)}));}
+      catch(error) {
+        // A lost response may follow a committed recall. Keep a visible copy
+        // rather than losing the user's input; definite rejections leave it queued.
+        if(!(error instanceof ApiError&&error.status&&error.status>=400&&error.status<500)) {
+          this.setDraft(merge(items));
+          throw new Error('Could not confirm queue recall. Messages were copied into your draft; review /queue before resending.');
+        }
+        throw error;
+      }
+      this.setDraft(merge(recalled));
+    });
+  }
   decide(request: PermissionRequest, decision: 'allow' | 'always' | 'deny') {
     return this.action('Recording decision', () => this.client.api(this.path(`/permissions/${encodeURIComponent(request.id)}`), { decision }));
   }
@@ -117,6 +128,10 @@ export class TerminalController {
   steerQueued(id: string) { return this.action('Steering driver', () => this.client.api(this.path(`/queue/${encodeURIComponent(id)}/steer`), {})); }
   queue(action: 'pause' | 'resume' | 'remove', id?: string) {
     return this.action('Updating queue', () => this.client.api(this.path(`/queue/${action === 'remove' ? encodeURIComponent(id!) : action}`), action === 'remove' ? undefined : {}, action === 'remove' ? 'DELETE' : 'POST'));
+  }
+  configureArchitecture(configuration:import('../shared/architecture-config.js').ArchitectureConfiguration,expectedConfigRevision=this.detail?.session.configRevision??0, expectedPendingId:string|null=this.detail?.session.pendingArchitecture?.id??null) {
+    this.configurationReady(true);
+    return this.action('Saving architecture',()=>this.client.api(this.path('/architecture'),{...configuration,expectedConfigRevision,expectedPendingId},'PUT'));
   }
   configure(patch: Record<string, unknown>, expectedConfigRevision = this.detail?.session.configRevision ?? 0) {
     this.configurationReady();

@@ -1,7 +1,8 @@
 import { cacheHitLabel, usagePhase } from '../../shared/usage';
 import { shuntLabel } from '../../shared/shunt';
+import { steeringContent } from '../../shared/steering-presentation';
 import { conversationBlocks } from './conversation-blocks';
-import { memo, useLayoutEffect, useRef, useState, type ReactNode } from 'react';
+import { createContext, useContext, memo, useLayoutEffect, useRef, useState, type ReactNode } from 'react';
 import type { QuestionRequest } from '../../shared/questions';
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
@@ -10,6 +11,8 @@ import type { Message, PermissionRequest, SessionDetail, ToolCall, Usage } from 
 import { CopyButton, Logo, LiteSpeed } from './ui';
 import { withoutVerificationNotice } from '../../shared/verification';
 import { executionFailed } from '../../shared/receipts';
+import { workerProjection, type WorkerProjection } from '../../shared/worker-presentation';
+const WorkerRowsContext=createContext(new Map<string,WorkerProjection>());
 
 export const Markdown = memo(function Markdown({ content }: { content: string }) {
   return <ReactMarkdown remarkPlugins={[remarkGfm]} components={{
@@ -28,7 +31,7 @@ function CopyCode({ children }: { children: React.ReactNode }) {
   }
   return <CopyButton text={text(children).replace(/\n$/, '')} label="Copy code" />;
 }
-const toolLabels: Record<string, string> = { bulk_read:'Shunt reader',code_write:'Shunt writer', read_file: 'Read file', write_file: 'Write file', edit_file: 'Edit file', glob: 'Find files', grep: 'Search code', bash: 'Run command', web_fetch: 'Fetch page', web_search: 'Search web', view_image: 'View image', todo_write: 'Update plan', todo_read: 'Read plan', task: 'Research task', sidekick: 'Sidekick', delegate: 'Worker', verify: 'Driver verification', takeover: 'Driver takeover', ask_user: 'Ask a question', history_search: 'Search history', memory_remember: 'Remember fact', memory_forget: 'Forget fact', memory_recall: 'Recall memory' };
+export const toolLabels: Record<string, string> = { wait_tasks:'Wait for tasks',resolve_task:'Record task resolution', bulk_read:'Shunt reader',code_write:'Shunt writer', read_file: 'Read file', write_file: 'Write file', edit_file: 'Edit file', glob: 'Find files', grep: 'Search code', bash: 'Run command', web_fetch: 'Fetch page', web_search: 'Search web', view_image: 'View image', todo_write: 'Update plan', todo_read: 'Read plan', task: 'Research task', sidekick: 'Sidekick', delegate: 'Worker', verify: 'Driver verification', takeover: 'Driver takeover', ask_user: 'Ask a question', history_search: 'Search history', memory_remember: 'Remember fact', memory_forget: 'Forget fact', memory_recall: 'Recall memory' };
 function ToolCard({ tool }: { tool: ToolCall }) {
   const working = tool.status === 'running' || tool.status === 'pending' || tool.execution?.status === 'running';
   const failed = tool.status === 'error' || executionFailed(tool.execution);
@@ -71,37 +74,39 @@ export function Conversation({ detail, connection, onDecide, onAllowAll, onFork,
     const observer = new ResizeObserver(() => { viewport.scrollTop = viewport.scrollHeight; });
     observer.observe(content); return () => observer.disconnect();
   }, [atBottom, inline]);
-  return <div className="conversation-shell"><div className="conversation-scroll" ref={scroll} onScroll={e => { const el = e.currentTarget; setAtBottom(el.scrollHeight - el.scrollTop - el.clientHeight < 100); }}><div className="conversation-content">
+  return <WorkerRowsContext.Provider value={workerProjection(detail)}><div className="conversation-shell"><div className="conversation-scroll" ref={scroll} onScroll={e => { const el = e.currentTarget; setAtBottom(el.scrollHeight - el.scrollTop - el.clientHeight < 100); }}><div className="conversation-content">
     <div className="conversation-start"><span />{new Date(detail.session.createdAt).toLocaleDateString(undefined, { month: 'long', day: 'numeric' })}<span /></div>
-    {groups.map(({ message, startsRun, endsRun, closesTranscript, runUsage, steps }, index) => <MessageView driver={!inline && Boolean(detail.session.architecture)} workerNoun={detail.session.architecture?.kind === 'expert-fusion' ? 'expert' : 'worker'} key={message.id} message={message} running={running && message.id === last?.id} grouped={message.role === 'assistant' && !startsRun} tail={endsRun} live={running && closesTranscript && index === groups.length - 1} runUsage={runUsage} steps={steps} expanded={expandedSteps.get(message.id)??inline} onExpand={open => setExpandedSteps(current => { const next = new Map(current); next.set(message.id,open); return next; })} inline={inline} workActivity={workActivity} onFork={() => onFork(message.id)} disabled={busy || running} readOnly={readOnly} renderTask={readOnly ? undefined : renderTask} />)}
+    {groups.map(({ message, startsRun, endsRun, closesTranscript, runUsage, steps }, index) => <MessageView lead={detail.session.architecture?.kind==='litefusion'} driver={!inline && Boolean(detail.session.architecture)} workerNoun={detail.session.architecture?.kind === 'expert-fusion' ? 'expert' : 'worker'} key={message.id} message={message} running={running && message.id === last?.id} grouped={message.role === 'assistant' && !startsRun} tail={endsRun} live={running && closesTranscript && index === groups.length - 1} runUsage={runUsage} steps={steps} expanded={steps.some(step=>step.toolCalls?.some(call=>call.taskId&&detail.tasks?.some(task=>task.id===call.taskId&&['queued','running','blocked'].includes(task.status))))||(expandedSteps.get(message.id)??inline)} onExpand={open => setExpandedSteps(current => { const next = new Map(current); next.set(message.id,open); return next; })} inline={inline} workActivity={workActivity} onFork={() => onFork(message.id)} disabled={busy || running} readOnly={readOnly} renderTask={readOnly ? undefined : renderTask} />)}
     {!detail.messages.length && <div className="session-empty"><Logo /><h2>{readOnly ? 'No transcript yet.' : 'A fresh start.'}</h2><p>{readOnly ? 'Research messages will appear here when available. This view cannot start a run.' : 'Give your agent a task. It will work in this session’s workspace.'}</p></div>}
     {!readOnly && detail.questions?.map(renderQuestion)}
     {!readOnly && detail.permissions.map(request => <Approval key={request.id} request={request} onDecide={onDecide} onAllowAll={onAllowAll} busy={busy} />)}
     {running && !last?.content && !last?.reasoning && !hasWork && !detail.permissions.length && !detail.questions?.length && <div className="run-status" role="status"><LiteSpeed compact active /><span>{detail.session.status === 'waiting' ? detail.questions?.length ? 'Waiting for your answer' : 'Waiting for your approval' : detail.session.mode === 'plan' ? 'Exploring and planning' : last?.activity || 'Working'}<span className="animated-ellipsis">…</span></span></div>}
     {connection !== 'connected' && <div className="connection-status" role="status"><Clock3 size={13} />{connection === 'reconnecting' ? 'Reconnecting to your session… Your run continues on the server.' : 'Connecting to live updates…'}</div>}
-  </div></div>{!atBottom && <button className="scroll-bottom" aria-label="Jump to latest" title="Jump to latest" onClick={() => { scroll.current?.scrollTo({ top: scroll.current.scrollHeight, behavior: 'smooth' }); setAtBottom(true); }}><ArrowDown size={16} /></button>}</div>;
+  </div></div>{!atBottom && <button className="scroll-bottom" aria-label="Jump to latest" title="Jump to latest" onClick={() => { scroll.current?.scrollTo({ top: scroll.current.scrollHeight, behavior: 'smooth' }); setAtBottom(true); }}><ArrowDown size={16} /></button>}</div></WorkerRowsContext.Provider>;
 }
 /** Show work live, then fold the completed block when prose continues. */
 function WorkLog({ workerNoun, messages, live, renderTask, workActivity, expanded, onExpand }: { expanded: boolean; onExpand: (open: boolean) => void; messages: Message[]; live: boolean; workerNoun: string; workActivity?: string|false; renderTask?: (tool: ToolCall, message: Message, expanded: boolean) => ReactNode }) {
-  const calls = messages.flatMap(message => (message.toolCalls ?? []).map(tool => ({ tool, message })));
+  const workerRows=useContext(WorkerRowsContext);
+  const shown=(message:Message)=>(message.toolCalls??[]).filter(tool=>!workerRows.get(`${message.id}:${tool.id}`)?.hidden);
+  const calls = messages.flatMap(message => shown(message).map(tool => ({ tool, message })));
   const thinking = messages.filter(message => message.reasoning);
   if (!calls.length && !thinking.length) return null;
   const current = calls.findLast(({ tool }) => tool.status === 'running' || tool.status === 'pending')?.tool;
   const working = live && workActivity!==false && Boolean(current || !messages.at(-1)?.content);
   const visible = live || expanded;
   const action = current && (current.args?.description || current.args?.path || current.args?.command || current.args?.pattern);
-  const workers = calls.filter(({tool}) => tool.name === 'delegate');
+  const workers = calls.filter(({tool,message}) => tool.name === 'delegate'&&(!workerRows.has(`${message.id}:${tool.id}`)||workerRows.get(`${message.id}:${tool.id}`)?.logicalId));
   const runningWorkers = workers.filter(({tool}) => tool.status === 'running').length;
   const queuedWorkers = workers.filter(({tool}) => tool.status === 'pending').length;
   const workerStates = [runningWorkers && `${runningWorkers} running`, queuedWorkers && `${queuedWorkers} queued`].filter(Boolean).join(' · ');
-  const label = workers.length ? `${workers.length} ${workerNoun}${workers.length === 1 ? '' : 's'}${working && workerStates ? ` · ${workerStates}` : ''}${calls.length > workers.length ? ` · ${calls.length - workers.length} other steps` : ''}` : working ? workActivity || (current ? `${toolLabels[current.name] || (current.name === 'sidekick' ? 'Sidekick' : current.name)}${typeof action === 'string' ? ` · ${action}` : ''}` : 'Thinking') : calls.length ? `${calls.length} ${calls.length === 1 ? 'step' : 'steps'}` : 'Thought process';
-  const failed = calls.filter(({ tool }) => tool.status === 'error' || tool.status === 'denied').length;
+  const label = workers.length ? `${workers.length} ${workerNoun}${workers.length === 1 ? '' : 's'}${working && workerStates ? ` · ${workerStates}` : ''}${calls.length > workers.length ? ` · ${calls.length - workers.length} other ${calls.length-workers.length===1?'step':'steps'}` : ''}` : working ? workActivity || (current ? `${toolLabels[current.name] || (current.name === 'sidekick' ? 'Sidekick' : current.name)}${typeof action === 'string' ? ` · ${action}` : ''}` : 'Thinking') : calls.length ? `${calls.length} ${calls.length === 1 ? 'step' : 'steps'}` : 'Thought process';
+  const failed = calls.filter(({tool,message}) => {const issues=workerRows.get(`${message.id}:${tool.id}`)?.handoffs;return issues?issues.some(issue=>!issue.recovered):tool.status==='error'||tool.status==='denied';}).length;
   const modified = calls.filter(({ tool }) => tool.intercepted).length;
   return <details className={`work-log${working ? ' active' : ''}`} aria-label="Response steps" open={visible}>
     <summary onClick={event => { event.preventDefault(); if (!live) onExpand(!expanded); }}>{working ? <span className="working-dot" /> : <Check size={13} />}<span>{label}</span>{failed > 0 && <span className="work-warning">{failed} {failed === 1 ? 'issue' : 'issues'}</span>}{modified > 0 && <span className="work-warning">{modified} modified {modified === 1 ? 'tool' : 'tools'}</span>}<ChevronRight size={13} className="disclosure-chevron" /></summary>
     <div className="work-log-body">
       {messages.map(message => <div key={message.id}>{message.reasoning && <div className="thinking-inline markdown"><Markdown content={message.reasoning} /></div>}
-        {toolGroups(message.toolCalls ?? []).map(group => group[0].name === 'delegate' ? <div className="worker-grid" key={group[0].id}>{group.map(tool => <div key={tool.id}>{renderTask?.(tool, message, visible) ?? <ToolCard tool={tool} />}</div>)}</div> : group.map(tool => <div key={tool.id}>{renderTask?.(tool, message, visible) ?? <ToolCard tool={tool} />}</div>))}
+        {toolGroups(shown(message)).map(group => group[0].name === 'delegate' ? <div className="worker-grid" key={group[0].id}>{group.map(tool => <div key={tool.id}>{renderTask?.(tool, message, visible) ?? <ToolCard tool={tool} />}</div>)}</div> : group.map(tool => <div key={tool.id}>{renderTask?.(tool, message, visible) ?? <ToolCard tool={tool} />}</div>))}
       </div>)}
     </div>
   </details>;
@@ -116,16 +121,16 @@ function toolGroups(tools: ToolCall[]): ToolCall[][] {
   }
   return groups;
 }
-function MessageView({ driver, workerNoun, message, running, grouped, tail, live, runUsage, steps, workActivity, onFork, disabled, readOnly, renderTask, inline, expanded, onExpand }: { expanded: boolean; onExpand: (open: boolean) => void; driver: boolean; workerNoun: string; message: Message; running: boolean; grouped: boolean; tail: boolean; live: boolean; runUsage?: Usage; steps: Message[]; workActivity?: string|false; onFork: () => void; disabled: boolean; readOnly?: boolean; inline?: boolean; renderTask?: (tool: ToolCall, message: Message, expanded: boolean) => ReactNode }) {
-  const steering = message.role === 'system' && message.content.startsWith('[Steering] ');
-  if (steering) message = { ...message, content: message.content.replace(/^\[Steering\] (?:The user sent this note to the running response\. (?:Update the ongoing task using this latest instruction|It supersedes their earlier request in this turn; follow it as the user's latest instruction)|This user note arrived before the response ended and still needs attention|The user sent this note before the response was interrupted\. It still needs attention): /, '') };
-  if (message.role === 'system' && !steering) return <div className="system-message"><Terminal size={12} />{message.content}</div>;
+function MessageView({ lead, driver, workerNoun, message, running, grouped, tail, live, runUsage, steps, workActivity, onFork, disabled, readOnly, renderTask, inline, expanded, onExpand }: { expanded: boolean; onExpand: (open: boolean) => void; lead?:boolean; driver: boolean; workerNoun: string; message: Message; running: boolean; grouped: boolean; tail: boolean; live: boolean; runUsage?: Usage; steps: Message[]; workActivity?: string|false; onFork: () => void; disabled: boolean; readOnly?: boolean; inline?: boolean; renderTask?: (tool: ToolCall, message: Message, expanded: boolean) => ReactNode }) {
+  const steering = steeringContent(message);
+  if (steering !== undefined) message = { ...message, content: steering };
+  if (message.role === 'system' && steering === undefined) return <div className="system-message"><Terminal size={12} />{message.content}</div>;
   const assistant = message.role === 'assistant';
   const content = assistant ? withoutVerificationNotice(message.content, message.receipts) : message.content;
-  return <article className={`message ${assistant ? 'assistant-message' : 'user-message'}${grouped ? ' grouped' : ''}`} aria-label={assistant ? 'Assistant message' : inline ? 'Assignment from driver' : 'Your message'}>
+  return <article className={`message ${assistant ? 'assistant-message' : 'user-message'}${grouped ? ' grouped' : ''}`} aria-label={assistant ? 'Assistant message' : inline ? 'Assignment' : 'Your message'}>
     {assistant && !grouped && <div className="message-byline"><Logo small /><span>Litespeed</span></div>}
-    <div className="message-body">{assistant && driver && (message.content || !message.toolCalls?.some(tool => tool.name === 'delegate' || tool.name === 'sidekick')) && <div className="driver-identity">Driver</div>}{steering && <span className="steering-label">Steering</span>}
-      {content && (inline && !assistant ? <details className="task-assignment"><summary>Assignment from driver</summary><div className="markdown"><Markdown content={content} /></div></details> : <div className="markdown"><Markdown content={content} /></div>)}
+    <div className="message-body">{assistant && driver && (message.content || !message.toolCalls?.some(tool => tool.name === 'delegate' || tool.name === 'sidekick')) && <div className="driver-identity">{lead?'Lead':'Driver'}</div>}
+      {content && (inline && !assistant ? <details className="task-assignment"><summary>Assignment</summary><div className="markdown"><Markdown content={content} /></div></details> : <div className="markdown"><Markdown content={content} /></div>)}
       {assistant && <WorkLog workerNoun={workerNoun} expanded={expanded} onExpand={onExpand} messages={steps} live={live} renderTask={renderTask} workActivity={workActivity} />}
       {message.attachments && message.attachments.length > 0 && <div className="message-attachments">{message.attachments.map((a, i) => a.dataUrl?.startsWith('data:image/') ? <a href={a.dataUrl} target="_blank" rel="noopener noreferrer" key={i}><img src={a.dataUrl} alt={a.name} /><span>{a.name}</span></a> : <span key={i}><File size={13} />{a.path || a.name}</span>)}</div>}
 

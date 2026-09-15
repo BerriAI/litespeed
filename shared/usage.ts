@@ -4,6 +4,8 @@ export interface RequestUsage {
   id: string; rootSessionId: string; turnId: string; sessionId: string;
   providerId: string; model: string; role: 'lead' | 'driver' | 'sidekick' | 'worker' | 'expert' | 'research' | 'shunt';
   phase: 'response' | 'compaction' | 'review' | 'shunt_read' | 'shunt_write'; invocationId?: string; usage?: Usage;
+  reservedUsd?: number;
+  startedAt?: number; reasoningEffort?: string;
   operationId?: string; callerRole?: Exclude<RequestUsage['role'], 'shunt'>;
 }
 export interface TurnUsage extends Usage { requests: number; reportedRequests: number; breakdown: RequestUsage[] }

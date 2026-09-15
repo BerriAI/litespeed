@@ -30,6 +30,8 @@ Changes made in another Settings window cannot be adopted by a status refresh al
 
 Connected servers use tool search by default. Their individual schemas stay out of the model's tool array; the agent sees the fixed `capability` interface. No additional switch is needed after connecting a server. A server with `"advertise": true` explicitly opts its tools back into direct advertisement. Plan mode, named profiles, and delegated workers retain their existing MCP restrictions.
 
+TypeScript execution is available in unrestricted Build-mode lead sessions, including LiteFusion. LiteFusion specialists can discover and call tools in their scoped MCP catalog; script execution remains unavailable to delegated workers.
+
 The normal workflow is **search → inspect when needed → execute**:
 
 - `{"operation":"search","query":"drive spreadsheet","limit":5}` searches tool and server names and descriptions in the accepted turn's catalog. It returns only matching names, short descriptions, and TypeScript signatures. Search is local, deterministic, and makes no model or server requests. Use `offset` / `nextOffset` to page through matches; the maximum page size is 10.

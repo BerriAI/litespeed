@@ -6,6 +6,7 @@ import { join } from 'node:path';
 import { createServer, request as httpRequest, type Server } from 'node:http';
 import { Store } from '../server/store.js';
 import { createApp } from '../server/app.js';
+import type { SkillCandidate, SkillImportPlan } from '../shared/skill-import.js';
 
 const listen=(server:Server)=>new Promise<string>(resolve=>server.listen(0,'127.0.0.1',()=>resolve(`http://127.0.0.1:${(server.address() as any).port}`)));
 const close=(server:Server)=>new Promise<void>(resolve=>{server.closeAllConnections();server.close(()=>resolve());});
@@ -117,6 +118,77 @@ describe('local API and agent loop',()=>{
     await writeFile(join(dir,'queued.txt'),'QUEUED_SNAPSHOT');await request(`/sessions/${s.id}/queue`,{content:'Follow-up',attachments:[{name:'queued',path:'queued.txt'}]});await writeFile(join(dir,'queued.txt'),'NEW_DISK_VALUE');
     await request(`/sessions/${s.id}/cancel`,{});await until(()=>!runner.active(s.id));expect(calls).toHaveLength(1);expect(store.queue(s.id).paused).toBe(true);expect(store.queue(s.id).items[0].attachments[0].content).toBe('QUEUED_SNAPSHOT');
     expect((await request(`/sessions/${s.id}/messages`,{content:'Skip queue'})).status).toBe(409);mode='text';await request(`/sessions/${s.id}/queue/resume`,{});await until(()=>!runner.active(s.id));expect(calls).toHaveLength(2);expect(JSON.stringify(calls[1])).toContain('QUEUED_SNAPSHOT');expect(JSON.stringify(calls[1])).not.toContain('NEW_DISK_VALUE');
+  });
+  it('interrupts a stream, waits for cleanup, then drains queued snapshots in order',async()=>{
+    mode='slow';const s=await session();
+    const first=await request(`/sessions/${s.id}/messages`,{content:'Initial'});await until(()=>calls.length===1);
+    await writeFile(join(dir,'interrupt.txt'),'QUEUED_SNAPSHOT');
+    await request(`/sessions/${s.id}/queue`,{content:'Second',attachments:[{name:'context',path:'interrupt.txt'}]});
+    await request(`/sessions/${s.id}/queue`,{content:'Third'});await writeFile(join(dir,'interrupt.txt'),'CHANGED_ON_DISK');
+    let release!:()=>void,cleaning=false;const gate=new Promise<void>(resolve=>{release=resolve;});
+    const cleanup=vi.spyOn(runner.jobs,'stopSession').mockImplementationOnce(async()=>{cleaning=true;await gate;});
+    try {
+      mode='text';expect((await request(`/sessions/${s.id}/interrupt`,{turnId:first.data.messageId})).status).toBe(200);
+      await until(()=>cleaning);expect(calls).toHaveLength(1);expect(store.queue(s.id).items).toHaveLength(2);
+      expect(store.messages(s.id).filter(message=>message.role==='user').map(message=>message.content)).toEqual(['Initial']);
+    } finally {release();cleanup.mockRestore();}
+    await until(()=>!runner.active(s.id));
+    expect(store.messages(s.id).filter(message=>message.role==='user').map(message=>message.content)).toEqual(['Initial','Second','Third']);
+    expect(store.messages(s.id).some(message=>message.content==='Starting')).toBe(true);
+    expect(JSON.stringify(calls[1])).toContain('QUEUED_SNAPSHOT');expect(JSON.stringify(calls[1])).not.toContain('CHANGED_ON_DISK');
+    expect(store.queue(s.id).items).toEqual([]);expect(runner.history.state(s.id).pendingRecovery).toBeFalsy();
+  });
+  it('interrupts pending approval without executing it and promotes the queued message',async()=>{
+    mode='tool';const s=await session(),first=await request(`/sessions/${s.id}/messages`,{content:'Write'});
+    await until(()=>runner.permissions(s.id).length===1);await request(`/sessions/${s.id}/queue`,{content:'Instead answer this'});
+    mode='text';expect((await request(`/sessions/${s.id}/interrupt`,{turnId:first.data.messageId})).status).toBe(200);
+    await until(()=>!runner.active(s.id));expect(runner.permissions(s.id)).toEqual([]);
+    await expect(readFile(join(dir,'hello.txt'),'utf8')).rejects.toMatchObject({code:'ENOENT'});
+    expect(store.messages(s.id).filter(message=>message.role==='user').map(message=>message.content)).toEqual(['Write','Instead answer this']);
+  });
+  it('rejects a stale interrupt instead of stopping a different turn',async()=>{
+    mode='slow';const s=await session();await request(`/sessions/${s.id}/messages`,{content:'Current'});await until(()=>calls.length===1);
+    await request(`/sessions/${s.id}/queue`,{content:'Next'});
+    expect((await request(`/sessions/${s.id}/interrupt`,{turnId:'an-earlier-turn'})).status).toBe(409);
+    expect(runner.active(s.id)).toBe(true);expect(store.queue(s.id)).toMatchObject({paused:false});expect(calls).toHaveLength(1);
+  });
+  it.each(['pause','cancel','failure'] as const)('does not promote interrupted work after %s during cleanup',async action=>{
+    mode='slow';const s=await session(),first=await request(`/sessions/${s.id}/messages`,{content:'Initial'});await until(()=>calls.length===1);
+    await request(`/sessions/${s.id}/queue`,{content:'Keep queued'});
+    let release!:()=>void,cleaning=false;const gate=new Promise<void>(resolve=>{release=resolve;});
+    const cleanup=vi.spyOn(runner.jobs,'stopSession').mockImplementationOnce(async()=>{cleaning=true;await gate;if(action==='failure')throw new Error('Cleanup failed');});
+    try {
+      await request(`/sessions/${s.id}/interrupt`,{turnId:first.data.messageId});await until(()=>cleaning);
+      if(action==='pause')await request(`/sessions/${s.id}/queue/pause`,{});
+      if(action==='cancel')await request(`/sessions/${s.id}/cancel`,{});
+    } finally {release();cleanup.mockRestore();}
+    await until(()=>!runner.active(s.id));expect(calls).toHaveLength(1);
+    expect(store.queue(s.id)).toMatchObject({paused:true,items:[{content:'Keep queued'}]});
+  });
+  it('keeps a manually paused queue paused when interrupted',async()=>{
+    mode='slow';const s=await session(),first=await request(`/sessions/${s.id}/messages`,{content:'Initial'});await until(()=>calls.length===1);
+    await request(`/sessions/${s.id}/queue`,{content:'Paused'});await request(`/sessions/${s.id}/queue/pause`,{});
+    await request(`/sessions/${s.id}/interrupt`,{turnId:first.data.messageId});await until(()=>!runner.active(s.id));
+    expect(calls).toHaveLength(1);expect(store.queue(s.id)).toMatchObject({paused:true,manualPause:true,items:[{content:'Paused'}]});
+  });
+  it('recalls only the selected queued messages in order with their snapshots',async()=>{
+    const s=await session();await writeFile(join(dir,'recall.txt'),'SAVED_CONTEXT');
+    const first=await request(`/sessions/${s.id}/queue`,{content:'First',attachments:[{name:'file',path:'recall.txt'}]});
+    const second=await request(`/sessions/${s.id}/queue`,{content:'Second'});
+    await request(`/sessions/${s.id}/queue`,{content:'From another client'});await writeFile(join(dir,'recall.txt'),'NEW_CONTEXT');
+    const recalled=await request(`/sessions/${s.id}/queue/recall`,{ids:[second.data.items[1].id,first.data.items[0].id]});
+    expect(recalled.status).toBe(200);expect(recalled.data.items.map((item:{content:string})=>item.content)).toEqual(['First','Second']);
+    expect(recalled.data.items[0].attachments[0].content).toBe('SAVED_CONTEXT');
+    expect(store.queue(s.id).items.map(item=>item.content)).toEqual(['From another client']);expect(calls).toHaveLength(0);
+  });
+  it('rejects stale or duplicate recall IDs without partially removing input',async()=>{
+    const s=await session(),other=await session();
+    const queue=(await request(`/sessions/${s.id}/queue`,{content:'Keep me'})).data;
+    const foreign=(await request(`/sessions/${other.id}/queue`,{content:'Other'})).data.items[0];
+    for(const ids of [[queue.items[0].id,'already-started'],[queue.items[0].id,foreign.id],[queue.items[0].id,queue.items[0].id]]) {
+      expect((await request(`/sessions/${s.id}/queue/recall`,{ids})).status).toBe(409);
+      expect(store.queue(s.id)).toEqual(queue);
+    }
   });
   it('pauses remaining queue after provider errors and denied tools',async()=>{
     mode='tool';const s=await session();await request(`/sessions/${s.id}/messages`,{content:'Initial'});await until(()=>runner.permissions(s.id).length===1);await request(`/sessions/${s.id}/queue`,{content:'Pending'});
@@ -299,4 +371,69 @@ describe('local API and agent loop',()=>{
     release();await work;await expect(runner.exclusive(s.id,async()=>{throw new Error('failed operation');})).rejects.toThrow('failed operation');await request(`/sessions/${s.id}/messages`,{content:'After lock release'});await until(()=>!runner.active(s.id));expect(calls).toHaveLength(1);
   });
   it('exports and imports history without executing tools',async()=>{const s=await session();store.saveMessage({id:'m1',sessionId:s.id,role:'user',content:'Saved conversation',createdAt:1});const exported=(await request(`/sessions/${s.id}/export`)).data;const imported=await request('/sessions/import',exported);expect(imported.status).toBe(201);expect(imported.data.id).not.toBe(s.id);expect(store.messages(imported.data.id)[0].content).toBe('Saved conversation');expect(calls).toHaveLength(0);});
+});
+
+describe('skill import API',()=>{
+  let dir:string,store:Store,server:Server,provider:Server,base:string;
+  async function request(path:string,body?:unknown,method?:string){const response=await fetch(base+'/api'+path,{method:method||(body===undefined?'GET':'POST'),headers:{'Content-Type':'application/json'},body:body===undefined?undefined:JSON.stringify(body)});return{status:response.status,data:await response.json()};}
+  beforeEach(async()=>{
+    dir=await mkdtemp(join(tmpdir(),'litespeed-api-skills-'));
+    // Seed a Claude project skill inside the workspace so the canonical project
+    // root `.claude/skills/review` is walked (never a symlink escape).
+    await mkdir(join(dir,'.claude','skills','review'),{recursive:true});
+    await writeFile(join(dir,'.claude','skills','review','SKILL.md'),'---\nname: Review skill\ndescription: Checks the work\n---\nREVIEW BODY\n');
+    await writeFile(join(dir,'.claude','skills','review','helper.sh'),'#!/bin/sh\necho hi\n');
+    store=new Store(join(dir,'state'));
+    provider=createServer(async(req,res)=>{res.writeHead(404);res.end('{}');});
+    const providerUrl=await new Promise<string>(resolve=>provider.listen(0,'127.0.0.1',()=>resolve(`http://127.0.0.1:${(provider.address() as any).port}`)));
+    store.saveSettings({workspace:dir,providers:[{id:'test',name:'Test',kind:'openai',baseUrl:providerUrl,apiKey:'secret'}],defaultProvider:'test',defaultModel:'test-model'});
+    const created=createApp({store}),appServer=createServer(created.app);base=await new Promise<string>(resolve=>appServer.listen(0,'127.0.0.1',()=>resolve(`http://127.0.0.1:${(appServer.address() as any).port}`)));server=appServer;
+  });
+  afterEach(async()=>{await close(server);await close(provider);store.close();await rm(dir,{recursive:true,force:true});});
+  const close=(s:Server)=>new Promise<void>(resolve=>{s.closeAllConnections();s.close(()=>resolve());});
+
+  it('discovers, plans and imports a project skill with JSON-clean shapes and conflicts on re-import',async()=>{
+    const discovered=await request(`/skills/discover?workspace=${encodeURIComponent(dir)}`);
+    expect(discovered.status).toBe(200);
+    const discoveredData=discovered.data as { candidates: SkillCandidate[] };
+    const review=discoveredData.candidates.find(c=>c.id==='review');
+    expect(review).toBeDefined();
+    expect(review).toMatchObject({source:'claude',scope:'project',rootId:'claude:project',fileCount:2});
+    expect(review!.sourceHash).toMatch(/^[a-f0-9]{64}$/);
+    // No raw Buffers must ever leak into JSON: every value is JSON-serializable.
+    expect(JSON.stringify(discoveredData)).not.toContain('"type":"Buffer"');
+    expect(JSON.stringify(discoveredData)).not.toContain('<Buffer');
+
+    const plan=await request('/skills/plan',{workspace:dir,rootId:'claude:project',id:'review'});
+    expect(plan.status).toBe(200);
+    expect(JSON.stringify(plan.data)).not.toContain('"type":"Buffer"');
+    expect(JSON.stringify(plan.data)).not.toContain('<Buffer');
+    const planData=plan.data as SkillImportPlan;
+    expect(planData.candidate.id).toBe('review');
+    expect(planData.files.map(f=>f.path)).toEqual(['.litespeed/skills/review/SKILL.md','.litespeed/skills/review/helper.sh']);
+    expect(planData.sourceHash).toBe(review!.sourceHash);
+
+    const imported=await request('/skills/import',{workspace:dir,rootId:'claude:project',id:'review',sourceHash:review!.sourceHash});
+    expect(imported.status).toBe(200);
+    expect(imported.data).toMatchObject({id:'review',name:'Review skill',fileCount:2});
+    expect(imported.data.catalogRevision).toMatch(/^[a-f0-9]{64}$/);
+    expect((await readFile(join(dir,'.litespeed','skills','review','SKILL.md'),'utf8'))).toContain('REVIEW BODY');
+
+    // Re-import conflicts (409) and does not overwrite.
+    const again=await request('/skills/import',{workspace:dir,rootId:'claude:project',id:'review',sourceHash:review!.sourceHash});
+    expect(again.status).toBe(409);
+    expect(await readFile(join(dir,'.litespeed','skills','review','SKILL.md'),'utf8')).toContain('REVIEW BODY');
+  });
+  it('rejects invalid inputs and unknown roots with 400s',async()=>{
+    expect((await request('/skills/plan',{workspace:dir,rootId:'nope:nope',id:'review'})).status).toBe(400);
+    expect((await request('/skills/plan',{workspace:dir,rootId:'claude:project',id:'missing'})).status).toBe(400);
+    expect((await request('/skills/import',{workspace:dir,rootId:'claude:project',id:'review',sourceHash:'not-a-hash'})).status).toBe(400);
+    // A source hash mismatch between plan and apply is a 409 conflict, not success.
+    const discovered=await request(`/skills/discover?workspace=${encodeURIComponent(dir)}`);
+    const discoveredData=discovered.data as { candidates: SkillCandidate[] };
+    const review=discoveredData.candidates.find(c=>c.id==='review');
+    void review;
+    const stale=await request('/skills/import',{workspace:dir,rootId:'claude:project',id:'review',sourceHash:'a'.repeat(64)});
+    expect(stale.status).toBe(409);
+  });
 });

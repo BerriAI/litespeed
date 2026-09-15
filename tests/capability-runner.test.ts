@@ -41,7 +41,10 @@ describe('capability gateway: stable connected-tool surface',()=>{
     scopes={[gw1]:'scope-gw1-v1',[gw2]:'scope-gw2-v1',[direct]:'scope-direct-v1'};
     codeResult=async(name)=>({content:[{type:'text',text:`Executed ${name}`}]});
     respond=(_body,res)=>text(res);
-    provider=createServer(async(req,res)=>{const chunks:Buffer[]=[];for await(const chunk of req)chunks.push(chunk);const body=JSON.parse(Buffer.concat(chunks).toString());calls.push(body);respond(body,res);});
+    provider=createServer(async(req,res)=>{
+      if(req.method==='GET'){res.setHeader('Content-Type','application/json');res.end(JSON.stringify({data:[]}));return;}
+      const chunks:Buffer[]=[];for await(const chunk of req)chunks.push(chunk);const body=JSON.parse(Buffer.concat(chunks).toString());calls.push(body);respond(body,res);
+    });
     store.saveSettings({workspace:directory,providers:[{id:'test',name:'Test',kind:'openai',baseUrl:await listen(provider)}],defaultProvider:'test',defaultModel:'test-model'});
     external={
       capture:vi.fn((signal:AbortSignal):ExternalToolLease=>{
@@ -214,7 +217,7 @@ describe('capability gateway: stable connected-tool surface',()=>{
     expect(names(calls[0])).not.toContain('capability');
   });
 
-  it('searches by default, then executes TypeScript with only a compact result in model history',async()=>{
+  it.each(['single','litefusion'] as const)('%s searches by default, then executes TypeScript with only a compact result in model history',async architecture=>{
     const payload='PRIVATE_DOCUMENT '.repeat(15_000);
     codeResult=async(name,args)=>name===gw2?{content:[],structuredContent:{payload}}:{content:[],structuredContent:{saved:args.text===payload}};
     respond=(body,res)=>{
@@ -223,7 +226,7 @@ describe('capability gateway: stable connected-tool surface',()=>{
       else if(results.length===1)tool(res,'capability',{operation:'execute',code:`const result = await tools[${JSON.stringify(gw2)}]({text:"source"}); const payload: string = result.structuredContent.payload; await tools[${JSON.stringify(gw1)}]({text:payload}); return {saved:true};`},'code-call');
       else text(res);
     };
-    const s=await create({permissionMode:'auto'});await run(s.id);
+    const s=await create({permissionMode:'auto',...(architecture==='litefusion'?{architecture:{kind:'litefusion',gatewayProviderId:'test',bindings:Object.fromEntries(['glm','gemini','astra','luna','kimi'].map(key=>[key,{providerId:'test',model:'test-model'}]))}}:{})});await run(s.id);
     expect(calls).toHaveLength(3);
     expect(calls[0].tools.find((item:ToolDefinition)=>item.function.name==='capability').function.description).toContain('Start with operation "search"');
     expect(names(calls[0])).not.toContain(gw2);

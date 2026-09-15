@@ -1,6 +1,6 @@
 {
   "name": "@litellm/litespeed",
-  "version": "0.1.10",
+  "version": "0.1.17",
   "private": true,
   "license": "Apache-2.0",
   "type": "module",
@@ -30,7 +30,11 @@
     "test:e2e": "playwright test",
     "test:mcp:code": "npm run build && node scripts/test-mcp-code.mjs",
     "check": "npm run typecheck && npm test && npm run build",
+    "test:tui:handoff": "node scripts/test-tui-handoff.mjs",
+    "test:tui:litefusion": "node scripts/test-tui-litefusion.mjs",
     "test:tui": "node scripts/test-tui.mjs",
+    "test:tui:queue": "node scripts/test-tui-queue.mjs",
+    "test:tui:stream": "node scripts/test-tui-stream.mjs",
     "test:tui:flow": "node scripts/test-tui-flow.mjs",
     "test:tui:interactions": "node scripts/test-tui-interactions.mjs",
     "test:tui:startup": "npm run build && node scripts/test-tui-startup.mjs"

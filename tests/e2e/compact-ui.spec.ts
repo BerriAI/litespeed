@@ -17,7 +17,7 @@ for (const viewport of [{ width: 1280, height: 720 }, { width: 390, height: 700 
     const dialog = page.getByRole('dialog');
     await expect(page.getByRole('button', { name: 'Architecture', exact: true })).toContainText('Single model');
     await page.getByRole('button', { name: 'Architecture', exact: true }).click();
-    await expect(page.getByRole('listbox', { name: 'Architecture', exact: true }).getByRole('option')).toHaveCount(4);
+    await expect(page.getByRole('listbox', { name: 'Architecture', exact: true }).getByRole('option')).toHaveCount(5);
     await page.screenshot({ path: `/tmp/litespeed-architectures-${viewport.width}.png`, animations: 'disabled' });
     await page.getByRole('option', { name: /^Sidekick Fusion/ }).click();
     await page.getByRole('button', { name: 'Sidekick model', exact: true }).click();

@@ -4,13 +4,12 @@ import { ARCHITECTURES, type ArchitectureKind } from './architectures.js';
 /** Keep the first-run explanations identical in both clients. */
 export const SETUP_ARCHITECTURES = [
   { kind: 'single' as const, name: 'Single model', recommended: false, description: 'One model does everything. The simplest way to start.' },
-  { ...ARCHITECTURES[0], recommended: true, description: 'A driver plans and reviews. One sidekick does the work and remembers context.' },
-  { ...ARCHITECTURES[1], recommended: false, description: 'A driver splits work among parallel workers. Use a faster, cheaper worker model.' },
-  { ...ARCHITECTURES[2], recommended: false, description: 'A lighter driver calls stronger experts for hard tasks, then checks their work.' },
+  ...ARCHITECTURES.map(item=>({...item,recommended:Boolean(item.recommended)})),
 ];
 export function modelGuidance(kind: 'single' | ArchitectureKind, role: 'driver' | 'worker' | 'planner') {
   if (role === 'planner') return 'A strong reasoning model for planning before implementation.';
   if (kind === 'single') return 'A capable coding model that can plan, implement, and test.';
+  if (kind === 'litefusion') return role === 'driver' ? 'Your persistent lead: plans, routes tasks to specialists, and verifies results. Opus / high is the initial research candidate.' : 'Task-specific models and reasoning are resolved from the routing catalog and your gateway bindings.';
   if (role === 'driver') return kind === 'expert-fusion'
     ? 'An efficient coding model to coordinate experts and check results.'
     : 'A powerful reasoning model to plan, delegate, and review.';

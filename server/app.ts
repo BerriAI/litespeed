@@ -1,3 +1,6 @@
+import { liteFusionReadiness } from '../shared/litefusion-readiness.js';
+import { liteFusionEnvironment } from './litefusion-environment.js';
+import { LiteFusionEvaluations, evaluationSchema } from './litefusion-evaluations.js';
 import { VERSION } from '../shared/version.js';
 import type { UpdateStatus } from '../shared/updates.js';
 import { shuntSchema } from './shunt.js';
@@ -6,7 +9,10 @@ import { gatewayBaseUrl } from '../shared/setup.js';
 import { clientSurface } from '../shared/client.js';
 import { REASONING_EFFORTS } from '../shared/types.js';
 import { WorkspacePreferences } from './workspace-preferences.js';
-import { architectureWorker } from '../shared/architectures.js';
+import { architectureConfiguration, liteFusionPreset } from '../shared/architecture-config.js';
+import { architectureProviders } from '../shared/architectures.js';
+import { liteFusionSchema, captureLiteFusion } from './litefusion-routing.js';
+import { LITEFUSION_ROLES, LITEFUSION_MODELS, LITEFUSION_VERSION, validateLiteFusion } from '../shared/litefusion.js';
 import express, { type Express, type Response } from 'express';
 import { z } from 'zod';
 import { realpath, stat, readdir } from 'node:fs/promises';
@@ -19,6 +25,8 @@ import { Memory } from './memory.js';
 import { listModels } from './providers.js';
 import { modelCatalog } from './budget.js';
 import { readProfileCatalog, readEditableProfile, saveProjectProfile, saveProjectProfileSchema, resolveProfileChoice, profileSourceStatus, type ProfileSnapshot } from './profiles.js';
+import { skillInvocationSchema, snapshotSkillInvocation } from './skill-invocation.js';
+import { skillDiscover, skillPlan, skillApply } from './skill-import.js';
 import { validateRuleSet } from './permissions.js';
 import { validateHooks } from './hooks.js';
 import { validateSidecars } from './sidecars.js';
@@ -37,16 +45,19 @@ const settingsSchema = z.object({providers:z.array(providerSchema).max(30).refin
 // architecture: the optional multi-model arrangement (shared/architectures.ts); null clears it.
 const modelRouteSchema = z.object({providerId:z.string().min(1).max(64),model:z.string().min(1).max(250)}).strict();
 const architectureSchema = z.discriminatedUnion('kind', [
+  liteFusionSchema,
   z.object({kind:z.literal('sidekick-fusion'),sidekick:modelRouteSchema}).strict(),
   z.object({kind:z.literal('team-fusion'),worker:modelRouteSchema,concurrency:z.union([z.literal(1),z.literal(2),z.literal(3),z.literal(4)]).optional()}).strict(),
   z.object({kind:z.literal('expert-fusion'),expert:modelRouteSchema,concurrency:z.union([z.literal(1),z.literal(2),z.literal(3),z.literal(4)]).optional()}).strict(),
 ]);
 const sessionSchema = z.object({shunt:shuntSchema.nullable().optional(),modelReasoning:z.record(z.string().max(400),z.enum(REASONING_EFFORTS)).refine(value=>Object.keys(value).length<=100,'At most 100 model reasoning preferences may be configured.').optional(),title:z.string().trim().min(1).max(200).optional(),workspace:z.string().max(4096).optional(),providerId:z.string().max(64).optional(),model:z.string().max(250).optional(),mode:z.enum(['build','plan']).optional(),permissionMode:z.enum(['ask','auto']).optional(),planner:z.object({providerId:z.string().min(1).max(64),model:z.string().min(1).max(250)}).nullable().optional(),architecture:architectureSchema.nullable().optional(),outputStyle:z.string().regex(/^[a-zA-Z0-9_-]{1,64}$/).nullable().optional()});
+const architectureConfigurationSchema=sessionSchema.pick({providerId:true,model:true,architecture:true,planner:true,shunt:true,modelReasoning:true,outputStyle:true}).required();
+const architectureConfigurationsSchema=z.object({single:architectureConfigurationSchema.optional(),'sidekick-fusion':architectureConfigurationSchema.optional(),'team-fusion':architectureConfigurationSchema.optional(),'expert-fusion':architectureConfigurationSchema.optional(),litefusion:architectureConfigurationSchema.optional()}).strict().refine(value=>Object.entries(value).every(([key,configuration])=>!configuration||(configuration.architecture?.kind??'single')===key),'Saved architecture must match its key.');
 const profileChoiceSchema=z.object({profileId:z.string().min(1).max(64).nullable(),skillIds:z.array(z.string().min(1).max(64)).max(100),catalogRevision:z.string().min(1).max(128).optional()}).strict().refine(choice=>new Set(choice.skillIds).size===choice.skillIds.length,'Skill IDs must be unique.').refine(choice=>(choice.profileId===null&&choice.skillIds.length===0)||Boolean(choice.catalogRevision),'Refresh the profile catalog before choosing profiles or skills.');
 const configRevisionSchema=z.number().int().min(0).max(Number.MAX_SAFE_INTEGER);
 const profileSelectionSchema=z.object({providerId:z.string().min(1).max(64).optional(),model:z.string().min(1).max(250).optional(),mode:z.enum(['build','plan']).optional()}).strict();
-const attachmentSchema = z.object({name:z.string().max(255),path:z.string().max(4096).optional(),content:z.string().max(200000).optional(),mimeType:z.string().max(100).optional(),dataUrl:z.string().max(6000000).regex(/^data:image\/(png|jpeg|gif|webp);base64,[A-Za-z0-9+/=]+$/).optional()});
-const inputSchema = z.object({content:z.string().max(200000),attachments:z.array(attachmentSchema).max(10).optional()}).refine(v=>v.content.trim() || v.attachments?.length,'A message or attachment is required');
+const attachmentSchema = z.object({skillId:z.string().regex(/^[a-z0-9][a-z0-9-]{0,63}$/).optional(),name:z.string().max(255),path:z.string().max(4096).optional(),content:z.string().max(200000).optional(),mimeType:z.string().max(100).optional(),dataUrl:z.string().max(6000000).regex(/^data:image\/(png|jpeg|gif|webp);base64,[A-Za-z0-9+/=]+$/).optional()});
+const inputSchema = z.object({skills:skillInvocationSchema.optional(),content:z.string().max(200000),attachments:z.array(attachmentSchema).max(10).optional()}).refine(v=>v.content.trim() || v.attachments?.length,'A message or attachment is required');
 const queryString = (value:unknown) => typeof value === 'string' ? value : '';
 const httpError = (status:number,message:string) => Object.assign(new Error(message),{status});
 export interface AuthService {
@@ -86,6 +97,13 @@ export function createApp(options:AppOptions = {}) {
   app.get('/api/profiles/edit',async(req,res)=>{const root=await workspace(req.query.workspace),id=z.string().regex(/^[a-z0-9][a-z0-9-]{0,63}$/).parse(req.query.id);res.json(await readEditableProfile(root,id));});
   app.post('/api/profiles/save',async(req,res)=>{const input=saveProjectProfileSchema.parse(req.body),root=await workspace(input.workspace);res.json(await saveProjectProfile(root,input));});
   app.post('/api/profiles/preview',async(req,res)=>{const input=z.object({workspace:z.string().max(4096).optional(),choice:profileChoiceSchema}).strict().parse(req.body),signal=requestSignal(res),root=await workspace(input.workspace);signal.throwIfAborted();const resolved=await resolveProfileChoice(root,input.choice,signal);res.json(profileDetail(resolved.snapshot));});
+  // Skill importer: fixed, server-resolved roots only; discovery is explicit,
+  // plan is the dry run and apply revalidates the source hash. No client path is
+  // ever accepted -- only a fixed root id + skill id, both logged/sanitized.
+  const skillRootSchema=z.enum(['claude:home','claude:project','codex:home','codex:agents-home','codex:project','codex:legacy-project']);
+  app.get('/api/skills/discover',async(req,res)=>{const root=await workspace(req.query.workspace);res.json(await skillDiscover(root));});
+  app.post('/api/skills/plan',async(req,res)=>{const input=z.object({workspace:z.string().max(4096).optional(),rootId:skillRootSchema,id:z.string().regex(/^[a-z0-9][a-z0-9-]{0,63}$/)}).strict().parse(req.body);const root=await workspace(input.workspace);res.json(await skillPlan(root,input.rootId,input.id));});
+  app.post('/api/skills/import',async(req,res)=>{const input=z.object({workspace:z.string().max(4096).optional(),rootId:skillRootSchema,id:z.string().regex(/^[a-z0-9][a-z0-9-]{0,63}$/),sourceHash:z.string().regex(/^[a-f0-9]{64}$/)}).strict().parse(req.body);const root=await workspace(input.workspace);res.json(await skillApply(root,input.rootId,input.id,input.sourceHash));});
   app.get('/api/health',(_req,res)=>res.json({ok:true,name:'litespeed',version:VERSION,...(options.updates?.installation?{installation:options.updates.installation,pid:process.pid}:{})}));
   app.get('/api/updates',async(req,res)=>res.json(options.updates?await options.updates.status(req.query.check==='true'):{currentVersion:VERSION,available:false,packaged:false,restartRequired:false,releaseUrl:'https://github.com/BerriAI/litespeed/releases',command:'Update your source checkout and rebuild.'}));
   app.post('/api/updates/install',async(_req,res)=>{if(!options.updates)throw httpError(409,'Packaged updates are unavailable on this server.');res.json(await options.updates.install());});
@@ -189,11 +207,51 @@ export function createApp(options:AppOptions = {}) {
     if(provider.kind==='codex')modelCatalog.clear(provider.id);
     try{const models=await listModels(provider,AbortSignal.timeout(30000));if(provider.kind!=='codex')modelCatalog.remember(provider,models);res.json({ok:true,models:models.length});}catch(error){res.status(502).json({ok:false,error:safeError(error,store)});}
   });
+  const checkArchitecture=(architecture: import('../shared/architectures.js').ArchitectureSelection)=>{
+    architectureProviders(architecture).forEach(checkProvider);
+    if(architecture.kind==='litefusion') {
+      try {validateLiteFusion(architecture);}catch(error){throw httpError(400,error instanceof Error?error.message:'Invalid LiteFusion policy.');}
+    }
+  };
+  const fusionEvaluations=new LiteFusionEvaluations(store);
+  app.post('/api/sessions/:id/litefusion/evaluations',(req,res)=>{
+    const session=store.session(req.params.id);
+    if(store.isChild(session.id))throw httpError(404,'Session not found.');
+    if(session.architecture?.kind!=='litefusion'&&!runner.tasks.list(session.id).length&&!runner.delegations.list(session.id).some(task=>task.litefusion))throw httpError(400,'This session has no LiteFusion history.');
+    res.status(201).json(fusionEvaluations.record(session.id,evaluationSchema.parse(req.body)));
+  });
+  app.get('/api/litefusion/catalog',(_req,res)=>res.json({version:LITEFUSION_VERSION,roles:LITEFUSION_ROLES,models:LITEFUSION_MODELS}));
+  app.get('/api/litefusion/preset',async(req,res)=>{
+    const provider=store.settings().providers.find(p=>p.id===queryString(req.query.providerId));
+    if(!provider||provider.kind==='codex')throw httpError(400,'Choose an API gateway for the LiteFusion preset.');
+    let models=modelCatalog.snapshot(provider),discoveryError:string|undefined;
+    try {const listed=await listModels(provider,AbortSignal.timeout(15000));modelCatalog.remember(provider,listed);models=listed;}
+    catch(error){discoveryError=safeError(error,store);}
+    const selection=liteFusionPreset(provider.id,models);
+    res.json({selection,discoveryError,executionVerified:false});
+  });
+  app.post('/api/litefusion/routes',async(req,res)=>{
+    // Setup may have discovered specialists before the user chooses a lead.
+    const draft=req.body?.lead?.model===''?{...req.body,lead:undefined}:req.body;
+    const selection=liteFusionSchema.parse(draft);checkArchitecture(selection);
+    const discoveryError=await runner.liteFusionDiscovery.ensure(selection,store.settings().providers);
+    const {version,hash,routes}=captureLiteFusion(selection,store.settings().providers);
+    const lease=options.external?.capture(new AbortController().signal);try{res.json({version,hash,routes,readiness:{...liteFusionReadiness(routes,selection.lead),discoveryError},environment:liteFusionEnvironment(lease?.definitions??[]),executionVerified:false});}finally{lease?.release();}
+  });
+  app.get('/api/sessions/:id/litefusion/export',(req,res)=>{
+    const session=store.session(req.params.id);
+    if(store.isChild(session.id))throw httpError(404,'Session not found.');
+    if(session.architecture?.kind!=='litefusion'&&!runner.tasks.list(session.id).length&&!runner.delegations.list(session.id).some(task=>task.litefusion))throw httpError(400,'This session has no LiteFusion history.');
+    const assignments=runner.delegations.list(session.id);
+    const turns=[...new Set(assignments.map(item=>item.parentTurnId))];
+    for(const message of store.messages(session.id))if(message.role==='user'&&!turns.includes(message.id))turns.push(message.id);
+    res.json({schemaVersion:1,sessionId:session.id,policyVersion:LITEFUSION_VERSION,selection:session.architecture,tasks:runner.tasks.list(session.id),assignments,turns:turns.map(id=>{const evaluations=fusionEvaluations.list(session.id,id);return {id,scheduling:runner.tasks.metrics(session.id,id),usage:runner.usage.turn(session.id,id),checks:store.messages(session.id).filter(message=>message.turnId===id).flatMap(message=>(message.toolCalls??[]).filter(call=>['verify','bash'].includes(call.name)).map(call=>({id:call.id,command:call.args.command,status:call.status,execution:call.execution}))),evaluation:evaluations.at(-1)??{success:null,source:null},evaluations};}),limitations:['Unreported costs remain unknown.','Worker completion is not an external success label.']});
+  });
   const preferences=new WorkspacePreferences(store);
   app.get('/api/workspace-preferences',async(req,res)=>res.json(preferences.get(await workspace(req.query.workspace))));
   app.post('/api/workspace-preferences',async(req,res)=>{
-    const input=sessionSchema.required({providerId:true,model:true}).extend({setupComplete:z.boolean().optional()}).parse(req.body), root=await workspace(input.workspace);
-    checkProvider(input.providerId);if(input.architecture)checkProvider(architectureWorker(input.architecture).providerId);if(input.planner)checkProvider(input.planner.providerId);if(!shuntConfigured(input.shunt,store.settings().providers))throw httpError(400,'Choose an API-key Shunt model or turn Shunt off.');
+    const input=sessionSchema.required({providerId:true,model:true}).extend({setupComplete:z.boolean().optional(),architectureConfigurations:architectureConfigurationsSchema.optional()}).parse(req.body), root=await workspace(input.workspace);
+    checkProvider(input.providerId);if(input.architecture)checkArchitecture(input.architecture);if(input.planner)checkProvider(input.planner.providerId);if(!shuntConfigured(input.shunt,store.settings().providers))throw httpError(400,'Choose an API-key Shunt model or turn Shunt off.');
     if(input.setupComplete&&!input.model.trim())throw httpError(400,'Choose a model to finish setup.');
     preferences.save(root,{...input,shunt:input.shunt??undefined,architecture:input.architecture??undefined,planner:input.planner??undefined,outputStyle:input.outputStyle??undefined},true);
     res.json({ok:true});
@@ -215,7 +273,7 @@ export function createApp(options:AppOptions = {}) {
       if(!selection.planner)delete selection.planner;else checkProvider(selection.planner.providerId);
       if(!selection.shunt)delete selection.shunt;else if(!shuntConfigured(selection.shunt,store.settings().providers))throw httpError(400,'Choose an API-key Shunt model or turn Shunt off.');
       // architecture:null means "single model" on create; each role needs a real provider.
-      if(!selection.architecture)delete selection.architecture;else checkProvider(architectureWorker(selection.architecture).providerId);
+      if(!selection.architecture)delete selection.architecture;else checkArchitecture(selection.architecture);
       // outputStyle:null means "no style" on create, mirroring planner.
       if(!selection.outputStyle)delete selection.outputStyle;
       checkProvider(selection.providerId);
@@ -232,8 +290,13 @@ export function createApp(options:AppOptions = {}) {
     for(const message of imported.messages)store.saveMessage({...message,attachments:message.attachments?.map(({path: _path,...attachment})=>attachment),id:randomUUID(),sessionId:session.id} as Message);
     res.status(201).json(session);
   });
-  app.get('/api/sessions/:id',(req,res)=>res.json({session:store.session(req.params.id),messages:runner.messages(req.params.id),todos:store.todos(req.params.id),permissions:runner.permissions(req.params.id),questions:runner.questions.pending(req.params.id),queue:store.queue(req.params.id),history:runner.history.state(req.params.id),delegations:runner.delegations.list(req.params.id),jobs:runner.jobs.list(req.params.id),lastEventId:store.latestEventId(req.params.id)}));
+  app.get('/api/sessions/:id',async(req,res)=>{
+    const discoveryError=await runner.refreshLiteFusion(req.params.id),readiness=runner.liteFusionStatus(req.params.id);
+    res.json({litefusion:readiness?{...readiness,...(discoveryError?{discoveryError}:{})}:undefined,session:store.session(req.params.id),messages:runner.messages(req.params.id),todos:store.todos(req.params.id),permissions:runner.permissions(req.params.id),questions:runner.questions.pending(req.params.id),queue:store.queue(req.params.id),history:runner.history.state(req.params.id),tasks:runner.tasks.list(req.params.id),delegations:runner.delegations.list(req.params.id),jobs:runner.jobs.list(req.params.id),lastEventId:store.latestEventId(req.params.id) });
+  });
   app.get('/api/sessions/:id/delegations',(req,res)=>res.json({delegations:runner.delegations.list(req.params.id)}));
+  app.get('/api/sessions/:id/tasks/:taskId',(req,res)=>res.json(runner.tasks.get(req.params.id,req.params.taskId)));
+  app.post('/api/sessions/:id/tasks/:taskId/cancel',async(req,res)=>res.json({task:await runner.cancelTask(req.params.id,req.params.taskId)}));
   app.get('/api/sessions/:id/delegations/:delegationId',(req,res)=>{
     const detail=runner.delegations.transcript(req.params.id,req.params.delegationId);
     res.json({...detail,todos:store.todos(detail.session.id),permissions:[],questions:[],queue:{items:[],paused:true},history:{hasCheckpoints:true,canUndo:false,canRedo:false}});
@@ -271,10 +334,27 @@ export function createApp(options:AppOptions = {}) {
     const configChange=patch.shunt!==undefined||patch.modelReasoning!==undefined||patch.model!==undefined||patch.providerId!==undefined||patch.mode!==undefined||patch.permissionMode!==undefined||patch.planner!==undefined||patch.architecture!==undefined||patch.outputStyle!==undefined;
     if(configChange){runner.assertIdle(req.params.id);runner.history.assertReady(req.params.id);}
     if(!shuntConfigured(patch.shunt,store.settings().providers))throw httpError(400,'Choose an API-key Shunt model or turn Shunt off.');
-    checkProvider(patch.providerId);if(patch.planner)checkProvider(patch.planner.providerId);if(patch.architecture)checkProvider(architectureWorker(patch.architecture).providerId);
+    checkProvider(patch.providerId);if(patch.planner)checkProvider(patch.planner.providerId);if(patch.architecture)checkArchitecture(patch.architecture);
     const session=store.updateSession(req.params.id,patch,expectedConfigRevision);
     const modelChange=patch.shunt!==undefined||patch.modelReasoning!==undefined||patch.model!==undefined||patch.providerId!==undefined||patch.planner!==undefined||patch.architecture!==undefined||patch.outputStyle!==undefined;
     if(configChange){preferences.save(session.workspace,session,modelChange);publishConfiguration(req.params.id);}res.json(session);
+  });
+  // A complete architecture configuration can be staged while work runs.
+  // Permissions/mode/workspace remain outside this endpoint and idle-only.
+  app.put('/api/sessions/:id/architecture',(req,res)=>{
+    const input=sessionSchema.pick({providerId:true,model:true,architecture:true,planner:true,shunt:true,modelReasoning:true,outputStyle:true}).required({providerId:true,model:true,architecture:true}).extend({expectedConfigRevision:configRevisionSchema,expectedPendingId:z.string().nullable().optional()}).strict().parse(req.body);
+    const {expectedConfigRevision,expectedPendingId,...value}=input;
+    if((store.session(req.params.id).pendingArchitecture?.id??null)!==(expectedPendingId??null))throw httpError(409,'The pending architecture changed. Refresh and review it before saving.');
+    checkProvider(value.providerId);if(value.architecture)checkArchitecture(value.architecture);if(value.planner)checkProvider(value.planner.providerId);
+    if(!shuntConfigured(value.shunt,store.settings().providers))throw httpError(400,'Choose an API-key Shunt model or turn Shunt off.');
+    const configuration=architectureConfiguration({...value,architecture:value.architecture??undefined,planner:value.planner??undefined,shunt:value.shunt??undefined,outputStyle:value.outputStyle??undefined});
+    if(runner.active(req.params.id)) {
+      const session=store.updateSession(req.params.id,{pendingArchitecture:{id:randomUUID(),requestedAt:Date.now(),expectedRevision:expectedConfigRevision,configuration}},expectedConfigRevision);
+      publishConfiguration(session.id);res.status(202).json(session);return;
+    }
+    runner.assertIdle(req.params.id);runner.history.assertReady(req.params.id);
+    const session=store.updateSession(req.params.id,{...configuration,pendingArchitecture:undefined},expectedConfigRevision);
+    preferences.save(session.workspace,session,true);publishConfiguration(session.id);res.json(session);
   });
   app.delete('/api/sessions/:id',(req,res)=>{runner.assertIdle(req.params.id);runner.deleteSessionJobs(req.params.id);store.deleteSession(req.params.id);runner.removeFromSearchIndex(req.params.id);res.json({ok:true});});
   const memory=new Memory(store);
@@ -302,9 +382,14 @@ export function createApp(options:AppOptions = {}) {
     req.on('close',()=>{clearInterval(heartbeat);unsubscribe();});
   });
   const snapshotInput=async(id:string,body:unknown,surface:unknown)=>{
-    const input=inputSchema.parse(body),session=store.session(id);
+    const {skills,...input}=inputSchema.parse(body),session=store.session(id);
+    // Recalled skill attachments are display snapshots, never instructions to trust on a new send.
+    input.attachments=(input.attachments??[]).filter(attachment=>!attachment.skillId);
+    const invoked=await snapshotSkillInvocation(session.workspace,skills);
+    if(!input.content.trim()&&!input.attachments.length&&!invoked.length)throw httpError(400,'A message or attachment is required.');
+    if(input.attachments.length+invoked.length>10)throw httpError(400,'A message can have up to 10 files and skills combined.');
     for(const attachment of input.attachments||[])if(attachment.path){const file=await readFile(session.workspace,attachment.path);attachment.content=file.content.slice(0,50000)+(file.truncated?'\n[Attachment truncated]':'');}
-    return {...input,clientSurface:clientSurface(surface)};
+    return {...input,attachments:[...input.attachments,...invoked],clientSurface:clientSurface(surface)};
   };
   app.post('/api/sessions/:id/messages',async(req,res)=>{
     const messageId=await runner.submit(req.params.id,()=>snapshotInput(req.params.id,req.body,req.get('X-Litespeed-Client')));
@@ -316,13 +401,17 @@ export function createApp(options:AppOptions = {}) {
     res.status(202).json(queue);
   });
   app.delete('/api/sessions/:id/queue/:queueId',(req,res)=>res.json(runner.removeQueued(req.params.id,req.params.queueId)));
+  app.post('/api/sessions/:id/queue/recall',(req,res)=>{
+    const {ids}=z.object({ids:z.array(z.string().min(1).max(128)).min(1).max(20)}).strict().parse(req.body);
+    res.json(runner.recallQueued(req.params.id,ids));
+  });
   app.post('/api/sessions/:id/queue/:queueId/steer',(req,res)=>res.status(202).json(runner.steer(req.params.id,'',req.params.queueId,clientSurface(req.get('X-Litespeed-Client')))));
   // Mid-turn steering: unlike /queue (waits for the run to end), a steering note
   // is delivered between steps of the ACTIVE response. Child ids are already
   // rejected by the app-level child guard above; the runner 409s when idle.
-  app.post('/api/sessions/:id/steer',(req,res)=>{
-    const {content}=z.object({content:z.string().trim().min(1).max(4000)}).parse(req.body);
-    runner.steer(req.params.id,content,undefined,clientSurface(req.get('X-Litespeed-Client')));
+  app.post('/api/sessions/:id/steer',async(req,res)=>{
+    const input=z.object({content:z.string().trim().min(1).max(4000),skills:skillInvocationSchema.optional()}).parse(req.body);
+    await runner.submitSteering(req.params.id,()=>snapshotInput(req.params.id,input,req.get('X-Litespeed-Client')));
     res.status(202).json({ok:true});
   });
   // GOAL MODE: set one session objective pursued across host-continued turns.
@@ -336,6 +425,10 @@ export function createApp(options:AppOptions = {}) {
   app.post('/api/sessions/:id/queue/pause',(req,res)=>res.json(runner.pauseQueue(req.params.id)));
   app.post('/api/sessions/:id/queue/resume',(req,res)=>res.json(runner.resumeQueue(req.params.id)));
   app.post('/api/sessions/:id/cancel',(req,res)=>{runner.cancel(req.params.id);res.json({ok:true});});
+  app.post('/api/sessions/:id/interrupt',(req,res)=>{
+    const {turnId}=z.object({turnId:z.string().min(1).max(128)}).strict().parse(req.body);
+    runner.interrupt(req.params.id,turnId);res.json({ok:true});
+  });
   app.patch('/api/sessions/:id/permission-mode',(req,res)=>{
     const {permissionMode,expectedConfigRevision}=z.object({permissionMode:z.enum(['ask','auto']),expectedConfigRevision:configRevisionSchema}).strict().parse(req.body);
     res.json(runner.setPermissionMode(req.params.id,permissionMode,expectedConfigRevision));

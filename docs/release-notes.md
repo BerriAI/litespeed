@@ -1,15 +1,14 @@
-# Litespeed 0.1.10
+# Litespeed 0.1.17
 
-A quieter terminal transcript, clearer current tasks, and fixes for interrupted Sidekick work and long-running commands.
+LiteFusion now keeps worker coordination out of your conversation and shows one card per actual task.
 
-- Sidekick shows one assignment title. Driver labels mark changes of speaker, finished reasoning expands through a muted Thought disclosure, and completed tools no longer add generic issue counts. Full worker transcripts remain available inline.
-- The task sidebar shows one current checklist per agent, including a reused Sidekick. Completed items collapse behind their completion count, and wide terminals give tasks more room.
-- Queued messages appear above the composer with a Steer now action. The footer explains Enter to queue and Alt+Enter to steer. Notifications stay clear of the input when resizing.
-- A Sidekick interrupted by steering can continue using its finished invocation ID. Ordinary task-list updates no longer prompt in Ask first mode; explicit permission rules still apply.
-- Blocking polls of a running command no longer trigger the repeated-action guard. Invalid jobs, nonblocking polling loops, and repeated mutations retain protection.
+- Resuming a worker already on its hard-task route accepts a redundant `hard` flag. Changing a default-route worker to its escalation route still requires an explicit escalation.
+- Rejected handoffs no longer create phantom task numbers. An accepted retry appears on the same task as “Handoff retried successfully,” with readable details collapsed underneath. The card opens the current worker; unresolved handoffs remain visible.
+- Internal worker-result messages stay in model context and exports, but no longer dump JSON into terminal or web chat. Existing saved sessions get the same presentation repair.
+- Worker cards and the terminal sidebar show bounded status and blocker summaries. Full reports and evidence are available inside the worker inspector. Terminal error details preserve newlines while escaping terminal control sequences.
+- Generated terminal-test recordings are excluded from source undo snapshots, preventing repeated test runs from creating command-history conflicts. Source conflict checks remain enabled.
+- The release checks now exercise rejected handoffs, successful retries, long blocked-worker reports, inspector navigation, and preserved drafts in the real terminal.
 
-Verified with 1,876 passing tests, typecheck, build, terminal interaction suites, and real Astra/DeepSeek sessions covering Sidekick coding, steering and recovery, parallel workers, Expert permissions, queues, scrolling, and resizing. A real CLI suite completed after eight repeated polls: 125 tests passed and the queued follow-up ran automatically.
+Run `litespeed update`, then reopen Litespeed after active work finishes. No session reset is needed. An already interrupted task may still need the lead to inspect retained work and explicitly continue it.
 
-Update with `litespeed update`, then reopen the terminal UI. Saved sessions, settings, and keys are preserved.
-
-Packages include Node, Bun, native terminal dependencies, and the web app for Apple silicon and Intel Macs.
+Includes the terminal runtime and web app for Apple silicon and Intel Macs. Tests use local scripted providers; no paid model benchmarks were run.

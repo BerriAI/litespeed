@@ -1,4 +1,5 @@
 import type { SessionDetail } from './types.js';
+import type { LiteFusionAssignment } from './litefusion.js';
 
 export type DelegationStatus = 'running' | 'completed' | 'failed' | 'cancelled' | 'timed_out' | 'interrupted';
 export type WorkerRole = 'sidekick' | 'worker' | 'expert';
@@ -25,6 +26,14 @@ export interface DelegationSummary {
   isolated?: boolean;
   /** Runtime-owned phase while this invocation is running. */
   activity?: string;
+  /** Small projection for concurrent cards; the full transcript remains separate. */
+  recentActivity?: string[];
+  model?: string;
+  reasoningEffort?: string;
+  litefusion?: LiteFusionAssignment;
+  /** Host-owned task identity. Its submission receipt is already settled;
+   * terminal reports are delivered as later task events, never a second result. */
+  asyncTaskId?: string;
   /** Older stores retained only the latest origin of a reused Sidekick. */
   legacyContext?: boolean;
 }

@@ -14,18 +14,19 @@ await mkdir(join(root,'src'));await writeFile(join(root,'src','hello.ts'),'expor
 let providerRequests=0;
 const profileRequests:{model:string;messages:any[];tools:any[]}[]=[];
 const pendingSummaries=new Set<()=>void>();
-const delegationRequests:{model:string;messages:any[];tools:any[]}[]=[];
+const delegationRequests:{model:string;messages:any[];tools:any[];reasoningEffort?:string}[]=[];
 const pendingDelegations=new Set<()=>void>();
 const mock=createServer(async(req,res)=>{
   if(req.url?.startsWith('/setup-auth/')&&req.headers.authorization!=='Bearer fixture-key'){res.writeHead(401,{'Content-Type':'application/json'});res.end(JSON.stringify({error:{message:'Invalid API key'}}));return;}
-  if(req.url?.endsWith('/models')){res.setHeader('Content-Type','application/json');res.end(JSON.stringify({data:[{id:'test-model'},{id:'test-fast'},{id:'budget-model',context_window:16384}]}));return;}
+  if(req.url==='/no-specialists/models'){res.setHeader('Content-Type','application/json');res.end(JSON.stringify({data:[{id:'unknown-lead'}]}));return;}
+  if(req.url?.endsWith('/models')){res.setHeader('Content-Type','application/json');res.end(JSON.stringify({data:[{id:'test-model',model_info:{base_model:'claude-opus-5'}},{id:'test-fast',model_info:{base_model:'gemini-3.8-flash'}},{id:'budget-model',context_window:16384}]}));return;}
   const chunks:Buffer[]=[];for await(const chunk of req)chunks.push(chunk);let data:any;
   try{data=JSON.parse(Buffer.concat(chunks).toString());}catch{res.writeHead(400);res.end();return;}
   providerRequests++;
   const lastUser=data.messages.filter((m:any)=>m.role==='user').at(-1)?.content||'';
   const prompt=typeof lastUser==='string'?lastUser:JSON.stringify(lastUser);
   if(prompt.includes('PROFILE_BROWSER')){profileRequests.push({model:data.model,messages:data.messages,tools:data.tools||[]});if(profileRequests.length>30)profileRequests.shift();}
-  if(prompt.includes('DELEGATE_BROWSER')||prompt.includes('DELEGATE_CHILD')||prompt.includes('SIDEKICK_BROWSER')||prompt.includes('SIDEKICK_CHILD')||prompt.includes('FUSION_BROWSER')||prompt.includes('FUSION_CHILD')){delegationRequests.push({model:data.model,messages:data.messages,tools:data.tools||[]});if(delegationRequests.length>100)delegationRequests.shift();}
+  if(prompt.includes('DELEGATE_BROWSER')||prompt.includes('DELEGATE_CHILD')||prompt.includes('SIDEKICK_BROWSER')||prompt.includes('SIDEKICK_CHILD')||prompt.includes('FUSION_BROWSER')||prompt.includes('FUSION_CHILD')){delegationRequests.push({model:data.model,messages:data.messages,tools:data.tools||[],reasoningEffort:data.reasoning_effort});if(delegationRequests.length>100)delegationRequests.shift();}
   if(prompt.includes('provider failure')||(prompt.includes('DELEGATE_CHILD')&&prompt.includes('CHILD_FAILURE'))){res.writeHead(401,{'Content-Type':'application/json'});res.end(JSON.stringify({error:{message:'Fixture provider rejected the request.'}}));return;}
   res.writeHead(200,{'Content-Type':'text/event-stream'});
   const emit=(delta:any,finish_reason?:string)=>res.write(`data: ${JSON.stringify({choices:[{index:0,delta,finish_reason}]})}\n\n`);
@@ -35,6 +36,35 @@ const mock=createServer(async(req,res)=>{
     emit({content:'The fixture exports a greeting. Shunt kept the source out of the caller context.'});
     if(prompt.includes('LIVE_SHUNT'))await new Promise<void>(resolve=>{const release=()=>{pendingDelegations.delete(release);res.off('close',release);resolve();};pendingDelegations.add(release);res.once('close',release);});
     if(res.destroyed)return;
+  }else if(prompt.includes('LITEFUSION_HANDOFF_BROWSER')) {
+    const child=data.messages.some((m:any)=>m.role==='system'&&String(m.content).includes('You are a LiteFusion worker.'));
+    const call=(args:any)=>{toolCall=true;emit({tool_calls:[{index:0,id:`handoff-${providerRequests}`,type:'function',function:{name:'delegate',arguments:JSON.stringify(args)}}]});};
+    if(child) {
+      if(prompt.includes('Follow up')) {
+        emit({content:'Retry worker is checking the result.'});
+        await new Promise<void>(resolve=>{const release=()=>{pendingDelegations.delete(release);res.off('close',release);resolve();};pendingDelegations.add(release);res.once('close',release);});if(res.destroyed)return;
+        toolCall=true;emit({tool_calls:[{index:0,id:'handoff-help',type:'function',function:{name:'worker_request',arguments:JSON.stringify({outcome:'needs_help',reason:'Workspace history needs recovery. '+ 'Detailed blocker context. '.repeat(80),evidence:'FULL_WORKER_EVIDENCE '+ 'Observed test output.\n'.repeat(300)})}}]});
+      }else emit({content:'Initial check complete.'});
+    }else {
+      const count=data.messages.flatMap((m:any)=>m.tool_calls??[]).filter((c:any)=>c.function.name==='delegate').length;
+      const reports=data.messages.filter((m:any)=>m.role==='system'&&String(m.content).startsWith('LiteFusion task result.')).map((m:any)=>JSON.parse(m.content.slice(m.content.indexOf('\n')+1)));
+      const assignment={roleId:'bounded_patch',workstream:'markdown',description:'Fix heading rendering',prompt:'Initial check',reason:'Reproduce handoff recovery',acceptance:['Report evidence'],hard:true};
+      if(!count)call(assignment);
+      else if(reports.length&&count===1)call({...assignment,prompt:'Follow up',continueFrom:reports[0].taskId,repairOf:reports[0].attemptId});
+      else if(reports.length&&count===2)call({...assignment,prompt:'Follow up',continueFrom:reports[0].taskId});
+      else if(reports.length<2){toolCall=true;emit({tool_calls:[{index:0,id:'handoff-wait',type:'function',function:{name:'wait_tasks',arguments:'{}'}}]});}
+      else emit({content:'The worker needs lead attention. Evidence is retained in its inspector.'});
+    }
+  }else if(prompt.includes('LITEFUSION_BROWSER')) {
+    const child=data.messages.some((m:any)=>m.role==='system'&&typeof m.content==='string'&&m.content.includes('You are a LiteFusion worker.'));
+    if(child) {
+      const name=prompt.includes('alpha.txt')?'alpha':'beta';
+      if(data.messages.at(-1)?.role!=='tool') {toolCall=true;emit({tool_calls:[{index:0,id:`lf-write-${name}`,type:'function',function:{name:'write_file',arguments:JSON.stringify({path:`${name}.txt`,content:`${name} written`})}}]});}
+      else {emit({content:`${name} worker report`});await new Promise<void>(resolve=>{const release=()=>{pendingDelegations.delete(release);res.off('close',release);resolve();};pendingDelegations.add(release);res.once('close',release);});if(res.destroyed)return;}
+    } else if(!data.messages.some((message:any)=>message.role==='assistant'&&message.tool_calls?.some((call:any)=>call.function.name==='delegate'))) {
+      toolCall=true;emit({tool_calls:['alpha','beta'].map((name,index)=>({index,id:`lf-${name}`,type:'function',function:{name:'delegate',arguments:JSON.stringify({roleId:'bounded_patch',workstream:name,description:`Write ${name}`,prompt:`Write ${name}.txt`,files:[`${name}.txt`],reason:'Independent bounded files',acceptance:[`${name}.txt contains ${name} written`]})}}))});
+    } else if(data.messages.filter((message:any)=>message.role==='system'&&String(message.content).startsWith('LiteFusion task result.')).length<2){toolCall=true;emit({tool_calls:[{index:0,id:'lf-wait',type:'function',function:{name:'wait_tasks',arguments:'{}'}}]});}
+    else emit({content:'LiteFusion fixture finished. Review the integrated files.'});
   }else if(prompt.includes('SHUNT_WORKERS')&&data.messages.at(-1)?.role!=='tool') {
     toolCall=true;emit({tool_calls:['alpha','beta'].map((name,index)=>({index,id:`shunt-worker-${name}`,type:'function',function:{name:'delegate',arguments:JSON.stringify({description:`Read ${name}`,prompt:`SHUNT_CHILD ${name}`})}}))});
   }else if((prompt.includes('SHUNT_BROWSER')||prompt.includes('SHUNT_CHILD'))&&data.messages.at(-1)?.role!=='tool') {
@@ -182,6 +212,21 @@ const mock=createServer(async(req,res)=>{
     toolCall=true;emit({tool_calls:[{index:0,id:'fixture-question',type:'function',function:{name:'ask_user',arguments:JSON.stringify({question:'Which storage should this project use?',options:[{id:'sqlite',label:'SQLite',description:'A local database with no extra service.'},{id:'postgres',label:'PostgreSQL',description:'A separate database server.'}]})}}]});
   }else if(prompt.includes('ask fixture question')&&prompt.includes('then write')&&data.messages.at(-1)?.tool_call_id==='fixture-question'){
     toolCall=true;emit({tool_calls:[{index:0,id:'fixture-after-answer',type:'function',function:{name:'write_file',arguments:JSON.stringify({path:'answered.txt',content:'The answer did not grant tool permission.\n'})}}]});
+  }else if(prompt.includes('TUI_MARKDOWN_STREAM')){
+    // Streams prose with inline markdown two characters at a time so a test can
+    // observe every intermediate frame, then calls one tool so the same run has
+    // live activity rows and, once settled, a collapsed step summary.
+    if(data.messages.at(-1)?.role==='tool'){emit({content:'Done. The **transcript** is stable.'});}
+    else{
+      emit({reasoning_content:'Planning the streamed transcript check.'});
+      const text='Reviewing the **streaming transcript** for `conceal` markers and ~~stale~~ current layout.';
+      for(const part of text.match(/.{1,2}|\n/g)||[]){if(res.destroyed)return;emit({content:part});await new Promise(r=>setTimeout(r,40));}
+      toolCall=true;emit({tool_calls:[{index:0,id:'stream-read',type:'function',function:{name:'bash',arguments:JSON.stringify({command:'sleep 2'})}}]});
+    }
+  }else if(prompt==='TUI_QUEUE_HOLD'){
+    emit({content:'Waiting for an interrupt.'});
+    await new Promise<void>(resolve=>res.once('close',resolve));
+    if(res.destroyed)return;
   }else if(prompt.includes('create fixture')&&data.messages.at(-1)?.role!=='tool'){
     toolCall=true;emit({tool_calls:[{index:0,id:'fixture-write',type:'function',function:{name:'write_file',arguments:JSON.stringify({path:'result.txt',content:`Created by the browser test.\n${prompt}\n`})}}]});
   }else{

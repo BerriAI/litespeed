@@ -11,8 +11,10 @@
  */
 
 /** The per-session selection persisted on Session.architecture. */
+import type { LiteFusionSelection } from './litefusion.js';
 export interface ModelRoute { providerId: string; model: string }
 export type ArchitectureSelection =
+  | LiteFusionSelection
   | { kind: 'sidekick-fusion'; sidekick: ModelRoute }
   | { kind: 'team-fusion'; worker: ModelRoute; concurrency?: 1 | 2 | 3 | 4 }
   | { kind: 'expert-fusion'; expert: ModelRoute; concurrency?: 1 | 2 | 3 | 4 };
@@ -20,9 +22,14 @@ export type ArchitectureKind = ArchitectureSelection['kind'];
 
 /** One selectable model slot an architecture asks the user to fill. */
 export interface ArchitectureRole { id: string; label: string; hint?: string }
-export interface ArchitectureInfo { kind: ArchitectureKind; name: string; description: string; roles: ArchitectureRole[] }
+export interface ArchitectureInfo { kind: ArchitectureKind; name: string; description: string; roles: ArchitectureRole[]; recommended?: boolean }
 
 export const ARCHITECTURES: readonly ArchitectureInfo[] = [
+  {
+    kind: 'litefusion', name: 'LiteFusion', recommended: true,
+    description: 'One lead routes tasks to specialists, preserves useful context, and verifies their work.',
+    roles: [],
+  },
   {
     kind: 'sidekick-fusion',
     name: 'Sidekick Fusion',
@@ -41,12 +48,17 @@ export const ARCHITECTURES: readonly ArchitectureInfo[] = [
   },
 ] as const;
 
-export function architectureWorker(selection: ArchitectureSelection): ModelRoute {
-  return selection.kind === 'sidekick-fusion' ? selection.sidekick : selection.kind === 'team-fusion' ? selection.worker : selection.expert;
+export function architectureWorker(selection: ArchitectureSelection): ModelRoute | null {
+  return selection.kind === 'litefusion' ? null : selection.kind === 'sidekick-fusion' ? selection.sidekick : selection.kind === 'team-fusion' ? selection.worker : selection.expert;
 }
 
+export function architectureProviders(selection: ArchitectureSelection): string[] {
+  return selection.kind === 'litefusion' ? [...new Set([selection.gatewayProviderId,...(selection.lead?[selection.lead.providerId]:[]),...Object.values(selection.bindings ?? {}).map(route=>route.providerId)])] : [architectureWorker(selection)!.providerId];
+}
+export function strictFusion(selection?: ArchitectureSelection): boolean { return selection?.kind === 'team-fusion' || selection?.kind === 'expert-fusion'; }
+
 export function selectArchitecture(kind: ArchitectureKind, route: ModelRoute): ArchitectureSelection {
-  return kind === 'sidekick-fusion' ? { kind, sidekick: route } : kind === 'team-fusion' ? { kind, worker: route } : { kind, expert: route };
+  return kind === 'litefusion' ? { kind, gatewayProviderId: route.providerId } : kind === 'sidekick-fusion' ? { kind, sidekick: route } : kind === 'team-fusion' ? { kind, worker: route } : { kind, expert: route };
 }
 
 export function architectureInfo(kind: ArchitectureKind): ArchitectureInfo {

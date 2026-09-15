@@ -40,6 +40,8 @@ export const KEYBIND_DEFAULTS: Record<string, BindingValue> = {
   app_toggle_paste_summary: 'none',
   app_toggle_session_directory_filter: 'none',
   command_list: 'ctrl+p',
+  permissions_open: 'f3',
+  settings_open: 'f4',
   help_show: 'none',
   docs_open: 'none',
   // Diff viewer
@@ -237,6 +239,8 @@ export const COMMAND_MAP: Record<string, string> = {
   app_toggle_paste_summary: 'app.toggle.paste_summary',
   app_toggle_session_directory_filter: 'app.toggle.session_directory_filter',
   command_list: 'command.palette.show',
+  permissions_open: 'session.permissions',
+  settings_open: 'app.settings',
   help_show: 'help.show',
   docs_open: 'docs.open',
   diff_open: 'diff.open',

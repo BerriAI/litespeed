@@ -73,5 +73,5 @@ test('built-in slash commands complete with Tab and execute locally without a pr
   await composer(page).fill('/plan');await page.getByRole('button',{name:'Send message',exact:true}).click();
   await expect(page.getByRole('combobox',{name:'Agent mode'})).toHaveValue('plan');
   expect((await detail(request,session)).messages).toHaveLength(0);
-  await expect(page.getByRole('button',{name:'Litespeed home',exact:true})).toHaveText('');
+  await expect(page.getByRole('button',{name:'Litespeed home',exact:true})).toHaveText('Litespeed');
 });

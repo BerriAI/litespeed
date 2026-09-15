@@ -1,4 +1,7 @@
 /** @jsxImportSource @opentui/react */
+import { LiteFusionSettings } from './litefusion.js';
+import { architectureConfiguration, architectureKey, liteFusionConfiguration, rememberArchitecture, specialistGateway, withLiteFusionLead, type ArchitectureConfigurations } from '../shared/architecture-config.js';
+import { bindExactModels, type LiteFusionSelection } from '../shared/litefusion.js';
 import { useEffect, useState, useSyncExternalStore } from 'react';
 import type { Model, ModelReasoning, Session, Settings } from '../shared/types.js';
 import { SHUNT_DESCRIPTION, SHUNT_BENEFIT, SHUNT_MODEL_HINT, shuntCanEnable, shuntConfigured, shuntToggle, type ShuntSelection } from '../shared/shunt.js';
@@ -31,65 +34,58 @@ export function ModelChooser({ controller, settings, value, title, onChange, onC
 /** Edits a complete selection locally, then validates and saves once with the
  * revision captured when this screen opened. Other clients cannot be overwritten. */
 export function ModelSettings({ controller, initial, settings, onClose, onProviders }: { controller: TerminalController; initial: Session; settings: Settings; onClose: () => void; onProviders: () => void }) {
-  const state = useSyncExternalStore(controller.subscribe, controller.getState);
-  const [kind, setKind] = useState<'single' | ArchitectureKind>(initial.architecture?.kind ?? 'single');
-  const [driver, setDriver] = useState<ModelRoute>({ providerId: initial.providerId, model: initial.model });
-  const [worker, setWorker] = useState<ModelRoute | null>(initial.architecture ? architectureWorker(initial.architecture) : null);
-  const [shunt,setShunt]=useState<ShuntSelection>(initial.shunt??{enabled:false});
-  const [planner, setPlanner] = useState<ModelRoute | null>(initial.planner ?? null);
-  const [reasoning, setReasoning] = useState<ModelReasoning>(initial.modelReasoning ?? {});
-  const [concurrency, setConcurrency] = useState<1 | 2 | 3 | 4 | undefined>(initial.architecture?.kind === 'team-fusion' || initial.architecture?.kind === 'expert-fusion' ? initial.architecture.concurrency : undefined);
-  const [style, setStyle] = useState(initial.outputStyle ?? ''), [styles, setStyles] = useState(['concise', 'explanatory', 'learning']);
-  const [view, setView] = useState('main'), [catalog, setCatalog] = useState<Model[]>([]);
-  useEffect(() => { let live = true; controller.client.api<{ styles: string[] }>(`/styles?workspace=${encodeURIComponent(initial.workspace)}`).then(result => { if (live) setStyles([...new Set([...styles, ...result.styles])]); }).catch(() => {}); return () => { live = false; }; }, []);
-  const route = view.includes('shunt') ? shunt.model : view.includes('worker') ? worker : view.includes('planner') ? planner : driver;
-  useEffect(() => {
-    if (!view.startsWith('reasoning:') || !route) return;
-    let live = true; setCatalog([]);
-    controller.client.api<{ models: Model[] }>(`/models?providerId=${encodeURIComponent(route.providerId)}`).then(result => { if (live) setCatalog(result.models); }).catch(() => {});
-    return () => { live = false; };
-  }, [view, route?.providerId]);
-  const back = () => setView('main');
-  const name = kind === 'single' ? 'Single model' : ARCHITECTURES.find(item => item.kind === kind)!.name;
-  const workerLabel = kind === 'team-fusion' ? 'Worker' : kind === 'expert-fusion' ? 'Expert' : 'Sidekick';
-  if (view === 'advanced') return <ShuntSettings controller={controller} settings={settings} value={shunt} onChange={setShunt} onClose={back} reasoning={shunt.model?reasoning[JSON.stringify([shunt.model.providerId,shunt.model.model])]:undefined} onReasoning={()=>setView('reasoning:shunt')}/>;
-  if (view === 'architecture') return <Menu title="Architecture" search={false} onClose={back} items={[
-    ...SETUP_ARCHITECTURES.map(item => ({ id: item.kind, label: `${item.name}${item.recommended ? ' · Recommended' : ''}`, description: item.description, action: () => { setKind(item.kind); back(); } })),
-  ]} />;
-  if (view.startsWith('model:')) return <ModelChooser feedback={modelGuidance(kind, view === 'model:worker' ? 'worker' : view === 'model:planner' ? 'planner' : 'driver')} controller={controller} settings={settings} value={route ?? driver} title={view === 'model:driver' ? kind === 'single' ? 'Model' : 'Driver' : view === 'model:worker' ? workerLabel : 'Planner'} onClose={back} onChange={value => { if (view === 'model:worker') setWorker(value); else if (view === 'model:planner') setPlanner(value); else setDriver(value); back(); }} />;
-  if (view.startsWith('reasoning:') && route) {
-    const key = JSON.stringify([route.providerId, route.model]);
-    const supported = catalog.find(item => item.id === route.model)?.reasoningEfforts ?? REASONING_EFFORTS;
-    return <Menu title={`Reasoning · ${route.model}`} search={false} onClose={back} items={['', ...supported].map(effort => ({ id: effort || 'default', label: effort || 'Default', action: () => { const next = { ...reasoning }; if (effort) next[key] = effort as typeof REASONING_EFFORTS[number]; else delete next[key]; setReasoning(next); back(); } }))} />;
+  const state=useSyncExternalStore(controller.subscribe,controller.getState);
+  const [draft,setDraft]=useState(()=>initial.pendingArchitecture?.configuration??architectureConfiguration(initial));
+  const [saved,setSaved]=useState<ArchitectureConfigurations>(initial.architectureConfigurations??{});
+  const [kind,setKind]=useState(architectureKey(draft)),[view,setView]=useState('main'),[loading,setLoading]=useState(false);
+  const [catalog,setCatalog]=useState<Model[]>([]),[styles,setStyles]=useState(['concise','explanatory','learning']);
+  const worker=draft.architecture?architectureWorker(draft.architecture):null,back=()=>setView('main');
+  const route=view.includes('shunt')?draft.shunt?.model:view.includes('worker')?worker:view.includes('planner')?draft.planner:draft;
+  useEffect(()=>{let live=true;controller.client.api<{styles:string[]}>(`/styles?workspace=${encodeURIComponent(initial.workspace)}`).then(result=>{if(live)setStyles(current=>[...new Set([...current,...result.styles])]);}).catch(()=>{});return()=>{live=false;};},[]);
+  useEffect(()=>{if(!view.startsWith('reasoning:')||!route)return;let live=true;setCatalog([]);controller.client.api<{models:Model[]}>(`/models?providerId=${encodeURIComponent(route.providerId)}`).then(result=>{if(live)setCatalog(result.models);}).catch(()=>{});return()=>{live=false;};},[view,route?.providerId]);
+  const fusion=draft.architecture?.kind==='litefusion'?draft.architecture:undefined;
+  const updateFusion=(value:LiteFusionSelection)=>setDraft(liteFusionConfiguration(value,draft));
+  const workerLabel=kind==='team-fusion'?'Worker':kind==='expert-fusion'?'Expert':'Sidekick';
+  async function chooseArchitecture(next:typeof kind) {
+    const configs=rememberArchitecture({...draft,architectureConfigurations:saved});setSaved(configs);
+    if(configs[next]){setDraft(configs[next]!);setKind(next);back();return;}
+    if(next==='litefusion'){
+      setLoading(true);
+      try{const result=await controller.client.api<{selection:LiteFusionSelection;discoveryError?:string}>(`/litefusion/preset?providerId=${encodeURIComponent(specialistGateway(settings.providers,draft.providerId))}`);updateFusion(result.selection);setKind(next);back();if(result.discoveryError)controller.notice(`Preset loaded; gateway discovery failed: ${result.discoveryError}`);}
+      catch(error){controller.notice((error as Error).message);}finally{setLoading(false);}return;
+    }
+    setKind(next);setDraft({...draft,architecture:next==='single'?null:worker?selectArchitecture(next,worker):null,planner:null,shunt:null});back();
   }
-  if (view === 'concurrency') return <Menu title="Workers at once" search={false} onClose={back} items={[
-    { id: 'auto', label: 'Automatic', description: 'Run independent assignments together within the turn budget.', action: () => { setConcurrency(undefined); back(); } },
-    ...([1, 2, 3, 4] as const).map(count => ({ id: String(count), label: count === 1 ? '1 · sequential' : `${count} · parallel`, action: () => { setConcurrency(count); back(); } })),
-  ]} />;
-  if (view === 'style') return <Menu title="Output style" onClose={back} items={['', ...styles].map(value => ({ id: value || 'default', label: value || 'Default', action: () => { setStyle(value); back(); } }))} />;
-  const fields = (id: string, label: string, value: ModelRoute | null): MenuItem[] => [
-    { id: `model:${id}`, label: `${label}: ${value?.model || 'Choose a model'}`, description: modelGuidance(kind, id as 'driver' | 'worker' | 'planner'), action: () => setView(`model:${id}`) },
-    ...(value ? [{ id: `reasoning:${id}`, label: `Reasoning: ${reasoning[JSON.stringify([value.providerId, value.model])] ?? 'Default'}`, action: () => setView(`reasoning:${id}`) }] : []),
+  if(view==='litefusion'&&fusion)return <LiteFusionSettings controller={controller} settings={settings} value={fusion} onChange={updateFusion} onClose={back}/>;
+  if(view==='advanced')return <ShuntSettings controller={controller} settings={settings} value={draft.shunt??{enabled:false}} onChange={shunt=>setDraft({...draft,shunt})} onClose={back} reasoning={draft.shunt?.model?draft.modelReasoning[JSON.stringify([draft.shunt.model.providerId,draft.shunt.model.model])]:undefined} onReasoning={()=>setView('reasoning:shunt')}/>;
+  if(view==='architecture')return <Menu title="Architecture" search={false} onClose={back} footer={loading?'Loading preset…':state.notice} items={SETUP_ARCHITECTURES.map(item=>({id:item.kind,label:`${item.name}${item.recommended?' · Recommended':''}`,description:item.description,disabled:loading,action:()=>{void chooseArchitecture(item.kind);}}))}/>;
+  if(view.startsWith('model:'))return <ModelChooser controller={controller} settings={settings} value={route??draft} title={view==='model:worker'?workerLabel:view==='model:planner'?'Planner':kind==='single'?'Model':fusion?'Lead':'Driver'} onClose={back} onChange={value=>{
+    if(view==='model:worker'&&kind!=='single')setDraft({...draft,architecture:selectArchitecture(kind,value)});
+    else if(view==='model:planner')setDraft({...draft,planner:value});
+    else if(fusion)updateFusion(withLiteFusionLead(fusion,value,fusion.lead?.effort));
+    else setDraft({...draft,...value});back();
+  }}/>;
+  if(view.startsWith('reasoning:')&&route){const key=JSON.stringify([route.providerId,route.model]),supported=catalog.find(item=>item.id===route.model)?.reasoningEfforts??REASONING_EFFORTS;return <Menu title={`Reasoning · ${route.model}`} search={false} onClose={back} items={['',...supported].map(effort=>({id:effort||'default',label:effort||'Default',action:()=>{const modelReasoning={...draft.modelReasoning};if(effort)modelReasoning[key]=effort as typeof REASONING_EFFORTS[number];else delete modelReasoning[key];if(fusion)updateFusion(withLiteFusionLead(fusion,route,effort as typeof REASONING_EFFORTS[number]||undefined));else setDraft({...draft,modelReasoning});back();}}))}/>;}
+  if(view==='concurrency')return <Menu title="Workers at once" search={false} onClose={back} items={[undefined,1,2,3,4].map(count=>({id:String(count),label:count?String(count):'Automatic',action:()=>{if(draft.architecture?.kind==='team-fusion'||draft.architecture?.kind==='expert-fusion')setDraft({...draft,architecture:{...draft.architecture,concurrency:count as 1|2|3|4|undefined}});back();}}))}/>;
+  if(view==='style')return <Menu title="Output style" onClose={back} items={['',...styles].map(outputStyle=>({id:outputStyle||'default',label:outputStyle||'Default',action:()=>{setDraft({...draft,outputStyle:outputStyle||null});back();}}))}/>;
+  const fields=(id:string,label:string,value:ModelRoute|null):MenuItem[]=>[
+    {id:`model:${id}`,label:`${label}: ${value?.model||'Choose a model'}`,description:modelGuidance(kind,id as 'driver'|'worker'|'planner'),action:()=>setView(`model:${id}`)},
+    ...(value?[{id:`reasoning:${id}`,label:`Reasoning: ${draft.modelReasoning[JSON.stringify([value.providerId,value.model])]??'Default'}`,action:()=>setView(`reasoning:${id}`)}]:[]),
   ];
-  const save = async () => {
-    try {
-      const architecture = kind !== 'single' && worker ? selectArchitecture(kind, worker) : null;
-      if (architecture?.kind === 'team-fusion' || architecture?.kind === 'expert-fusion') architecture.concurrency = concurrency;
-      if (await controller.configure({ ...driver, architecture, planner, shunt, modelReasoning: reasoning, outputStyle: style || null }, initial.configRevision ?? 0)) onClose();
-    } catch (error) { controller.notice(String((error as Error).message)); }
-  };
-  return <Menu title="Models" search={false} onClose={onClose} footer={state.notice || '↑↓ choose · Enter edit · Save applies changes · Esc cancel'} items={[
-    { id: 'architecture', label: `Architecture: ${name}`, action: () => setView('architecture') },
-    ...fields('driver', kind === 'single' ? 'Model' : 'Driver', driver),
-    ...(kind !== 'single' ? fields('worker', workerLabel, worker) : []),
-    ...(kind === 'team-fusion' || kind === 'expert-fusion' ? [{ id: 'workers', label: `Workers at once: ${concurrency ?? 'Automatic'}`, action: () => setView('concurrency') }] : []),
-    { id:'advanced',label:`Advanced settings · Shunt ${shunt.enabled?'On':'Off'}`,description:SHUNT_DESCRIPTION,action:()=>setView('advanced')},
-    { id: 'planner', separatorBefore: true, label: `Planner model: ${planner ? 'On' : 'Off'}`, description: 'Use a different model in Plan mode.', action: () => { if (planner) setPlanner(null); else setView('model:planner'); } },
-    ...(planner ? fields('planner', 'Planner', planner) : []),
-    { id: 'style', separatorBefore: true, label: `Output style: ${style || 'Default'}`, action: () => setView('style') },
-    { id: 'save', separatorBefore: true, label: state.pending ? 'Saving…' : 'Save', disabled: Boolean(state.pending) || !shuntConfigured(shunt,settings.providers) || !driver.model.trim() || !driver.providerId || (kind !== 'single' && !worker), action: () => { void save(); } },
-    { id: 'providers', label: 'Manage providers', action: onProviders },
-  ]} />;
+  return <Menu title="Models" search={false} onClose={onClose} footer={state.notice||(initial.status==='running'||initial.status==='waiting'?'Save queues this configuration after active work finishes.':'Save applies changes · Esc cancels this draft')} items={[
+    {id:'architecture',label:`Architecture: ${SETUP_ARCHITECTURES.find(item=>item.kind===kind)!.name}`,action:()=>setView('architecture')},
+    ...fields('driver',kind==='single'?'Model':fusion?'Lead':'Driver',draft),
+    ...(kind!=='single'&&kind!=='litefusion'?fields('worker',workerLabel,worker):[]),
+    ...(draft.architecture?.kind==='team-fusion'||draft.architecture?.kind==='expert-fusion'?[{id:'workers',label:`Workers at once: ${draft.architecture.concurrency??'Automatic'}`,action:()=>setView('concurrency')}]:[]),
+    ...(fusion?[{id:'litefusion',label:'LiteFusion policy · 63 task routes and handoffs',action:()=>setView('litefusion')}]:[
+      {id:'advanced',label:`Advanced settings · Shunt ${draft.shunt?.enabled?'On':'Off'}`,action:()=>setView('advanced')},
+      {id:'planner',label:`Planner model: ${draft.planner?'On':'Off'}`,action:()=>{if(draft.planner)setDraft({...draft,planner:null});else setView('model:planner');}},
+      ...(draft.planner?fields('planner','Planner',draft.planner):[]),
+    ]),
+    {id:'style',label:`Output style: ${draft.outputStyle||'Default'}`,action:()=>setView('style')},
+    {id:'save',separatorBefore:true,label:state.pending?'Saving…':'Save',disabled:Boolean(state.pending)||!shuntConfigured(draft.shunt,settings.providers)||!draft.model.trim()||(kind!=='single'&&kind!=='litefusion'&&!worker),action:()=>{void controller.configureArchitecture(draft,initial.configRevision??0,initial.pendingArchitecture?.id??null).then(saved=>{if(saved)onClose();});}},
+    {id:'providers',label:'Manage providers',action:onProviders},
+  ]}/>;
 }
 
 export function ShuntSettings({controller,settings,value,onChange,onClose,reasoning,onReasoning}:{controller:TerminalController;settings:Settings;value:ShuntSelection;onChange:(value:ShuntSelection)=>void;onClose:()=>void;reasoning?:string;onReasoning?:()=>void}) {

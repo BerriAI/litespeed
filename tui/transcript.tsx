@@ -15,9 +15,10 @@ import {
   SCANNER_INTERVAL_MS, SPINNER_FRAMES, SPINNER_INTERVAL_MS,
 } from './transcriptModel.js';
 import { activityActors, activitySections, conversationGroups, usageLabel, type ActivityEntry } from './conversation.js';
+import { steeringContent } from '../shared/steering-presentation.js';
 import { Button } from './ui.js';
 import { terminalText } from './protocol.js';
-import { toolRow, reasoningSummary } from './transcriptModel.js';
+import { toolRow, reasoningSummary, stableStreamingMarkdown } from './transcriptModel.js';
 import { useConfig, useTheme } from './context.js';
 import type { TerminalController } from './controller.js';
 import { Brand } from './brand.js';
@@ -29,6 +30,14 @@ export const RAIL_BORDER = {
   topLeft: '┃', topRight: '┃', bottomLeft: '┃', bottomRight: '┃',
   horizontal: ' ', vertical: '┃', topT: '┃', bottomT: '┃', leftT: '┃', rightT: '┃', cross: '┃',
 };
+
+/** One indentation grid for everything under a response. Prose and every
+ * activity label share the text edge; an expandable row puts its chevron in the
+ * two-column gutter before it, so a live tool row, a collapsed step summary and
+ * the text they belong to all line up. `Button` already pads itself by one, so
+ * a row built from one needs no wrapper padding. */
+const ACTIVITY_TEXT = 3;
+const ACTIVITY_CHEVRON = 1;
 
 export interface TranscriptSettings {
   showThinking: boolean;
@@ -115,22 +124,22 @@ function ReasoningRow({ row }: { row: { running: boolean; title: string | null; 
   const theme = useTheme(), settings = useTranscriptSettings(), [expanded, setExpanded] = useState<boolean | null>(null);
   const text = terminalText([row.title, row.body].filter(Boolean).join('\n'), true);
   const open = expanded ?? settings.showThinking;
-  if (row.running) return <box paddingLeft={3} flexShrink={0}><text fg={toHex(theme.textMuted)}><em>Thinking…</em></text></box>;
-  return <box paddingLeft={2} flexShrink={0} flexDirection="column">
+  if (row.running) return <box paddingLeft={ACTIVITY_TEXT} flexShrink={0}><text fg={toHex(theme.textMuted)}><em>Thinking…</em></text></box>;
+  return <box flexShrink={0} flexDirection="column">
     <Button tone="muted" onPress={() => setExpanded(!open)}>{`${open ? '▾' : '▸'} Thought`}</Button>
-    {open && <text paddingLeft={1} fg={toHex(theme.textMuted)} wrapMode="word"><em>{text}</em></text>}
+    {open && <text paddingLeft={ACTIVITY_TEXT} fg={toHex(theme.textMuted)} wrapMode="word"><em>{text}</em></text>}
   </box>;
 }
 
-const TextRow = memo(function TextRow({ text, syntax, compact = false }: { text: string; syntax: SyntaxStyle; compact?: boolean }) {
+const TextRow = memo(function TextRow({ text, syntax, compact = false, streaming = false }: { text: string; syntax: SyntaxStyle; compact?: boolean; streaming?: boolean }) {
   const theme = useTheme();
   return (
-    <box paddingLeft={3} marginTop={compact ? 0 : 1} flexShrink={0}>
+    <box paddingLeft={ACTIVITY_TEXT} marginTop={compact ? 0 : 1} flexShrink={0}>
       <markdown
         syntaxStyle={syntax}
-        streaming
+        streaming={streaming}
         conceal
-        content={text}
+        content={streaming ? stableStreamingMarkdown(text) : text}
         fg={toHex(theme.markdownText)}
         bg={toHex(theme.background)}
       />
@@ -140,10 +149,12 @@ const TextRow = memo(function TextRow({ text, syntax, compact = false }: { text:
 
 const DENIED_MARK = '⊘ ';
 
-function InlineToolRow({ row, awaitingPermission, margin }: {
+function InlineToolRow({ row, awaitingPermission, margin, indent = ACTIVITY_TEXT }: {
   row: ToolRowModel;
   awaitingPermission: boolean;
   margin: 0 | 1;
+  /** Columns before the icon. A chevron row supplies the rest of the gutter. */
+  indent?: number;
 }) {
   const theme = useTheme();
   const [showError, setShowError] = useState(false);
@@ -153,14 +164,14 @@ function InlineToolRow({ row, awaitingPermission, margin }: {
         : theme.text;
   if (row.running && !row.text) {
     return (
-      <box paddingLeft={3} marginTop={margin} flexShrink={0}>
+      <box paddingLeft={indent} marginTop={margin} flexShrink={0}>
         <text fg={toHex(theme.textMuted)}>{`~ ${row.pending}`}</text>
       </box>
     );
   }
   const prefix = row.denied ? DENIED_MARK : `${row.icon} `;
   return (
-    <box paddingLeft={3} marginTop={margin} flexShrink={0} flexDirection="column">
+    <box paddingLeft={indent} marginTop={margin} flexShrink={0} flexDirection="column">
       {row.running
         ? <Spinner color={toHex(theme.text)}>{row.text}</Spinner>
         : (
@@ -311,20 +322,20 @@ function ToolActivity({ call, showDetails, awaitingPermission, syntax, width, em
   if (call.name === 'todo_write') {
     const todos = parseTodos(call.args.todos);
     const title = row.failed ? 'Task update failed' : row.denied ? 'Task update declined' : row.completed ? 'Tasks updated' : 'Update tasks';
-    return <box paddingLeft={2} flexDirection="column" flexShrink={0}>
+    return <box flexDirection="column" flexShrink={0}>
       <Button tone={row.failed ? 'error' : 'muted'} onPress={() => setExpanded(!expanded)}>{`${open ? '▾' : '▸'} ${title} · ${todos.filter(todo => todo.status === 'completed').length}/${todos.length} done`}</Button>
-      {open && todos.map(todo => <text paddingLeft={1} key={todo.id ?? todo.content} fg={toHex(todo.status === 'in_progress' ? theme.text : theme.textMuted)} wrapMode="word">{`${TODO_MARKERS[todo.status] ?? '○'} ${terminalText(todo.content)}`}</text>)}
+      {open && todos.map(todo => <text paddingLeft={ACTIVITY_TEXT} key={todo.id ?? todo.content} fg={toHex(todo.status === 'in_progress' ? theme.text : theme.textMuted)} wrapMode="word">{`${TODO_MARKERS[todo.status] ?? '○'} ${terminalText(todo.content)}`}</text>)}
       {row.error && <text fg={toHex(theme.error)} wrapMode="word">{terminalText(row.error, true)}</text>}
     </box>;
   }
   if(call.shunt||call.routing||call.name==='bulk_read'||call.name==='code_write')return <box flexDirection="column" flexShrink={0}>
     <InlineToolRow row={row} awaitingPermission={awaitingPermission} margin={0}/>
-    {call.output && <box paddingLeft={4} flexShrink={0}>{result}</box>}
+    {call.output && <box paddingLeft={ACTIVITY_TEXT} flexShrink={0}>{result}</box>}
   </box>;
   return <box flexDirection="column" flexShrink={0}>
-    <box onMouseDown={() => setExpanded(!expanded)} flexDirection="row"><text fg={toHex(theme.textMuted)}>{open ? '▾' : '▸'}</text><InlineToolRow row={row} awaitingPermission={awaitingPermission} margin={0} /></box>
-    {call.waitingForWorkspace && <text fg={toHex(theme.textMuted)} wrapMode="word"><em>{terminalText(call.waitingForWorkspace)}</em></text>}
-    {open && <box paddingLeft={4} flexDirection="column" flexShrink={0}>
+    <box paddingLeft={ACTIVITY_CHEVRON} onMouseDown={() => setExpanded(!expanded)} flexDirection="row"><text fg={toHex(theme.textMuted)}>{open ? '▾' : '▸'}</text><InlineToolRow row={row} awaitingPermission={awaitingPermission} margin={0} indent={ACTIVITY_TEXT - ACTIVITY_CHEVRON - 1} /></box>
+    {call.waitingForWorkspace && <text paddingLeft={ACTIVITY_TEXT} fg={toHex(theme.textMuted)} wrapMode="word"><em>{terminalText(call.waitingForWorkspace)}</em></text>}
+    {open && <box paddingLeft={ACTIVITY_TEXT} flexDirection="column" flexShrink={0}>
       {call.intercepted && <text fg={toHex(theme.warning)}>{`Modified by ${terminalText(call.intercepted.by)}: ${terminalText(call.intercepted.reason)}`}</text>}
       {call.mcpCalls?.map(inner => <text key={inner.id} fg={toHex(inner.status === 'error' || inner.status === 'denied' ? theme.error : theme.textMuted)} wrapMode="word">{terminalText(`${inner.name} · ${inner.status} · ${inner.argumentBytes} argument bytes${inner.resultBytes === undefined ? '' : ` · ${inner.resultBytes} result bytes`}`)}</text>)}
       {row.shape === 'block' ? <BlockToolRow row={row} syntax={syntax} width={width - 8} /> : result}
@@ -337,7 +348,7 @@ function DriverActivity({ entries, detail, live, heading, syntax, width, embedde
   const calls = entries.flatMap(entry => entry.call ? [entry.call] : []);
   const open = live || expanded || settings.toolDetails || settings.showThinking;
   return <box flexDirection="column" flexShrink={0}>
-    {heading && <text paddingLeft={3} fg={toHex(theme.textMuted)}>Driver</text>}
+    {heading && <text paddingLeft={ACTIVITY_TEXT} fg={toHex(theme.textMuted)}>{detail.session.architecture?.kind==='litefusion'?'Lead':'Driver'}</text>}
     {!live && calls.length > 0 && <Button tone="muted" onPress={() => setExpanded(!expanded)}>{`${open ? '▾' : '▸'} ${calls.length} ${calls.length === 1 ? 'step' : 'steps'}`}</Button>}
     {(open || !calls.length) && entries.map(({ message, call }) => call
       ? <ToolActivity key={call.id} syntax={syntax.normal} width={width} call={call} showDetails={settings.toolDetails} awaitingPermission={detail.permissions.some(item => (item.toolCallId === call.id || call.mcpCalls?.some(inner => inner.id === item.toolCallId)) && !item.invocationId)} embedded={embedded} />
@@ -350,11 +361,11 @@ function WorkLog({ steps, detail, actors, live, syntax, width, controller, embed
   const sections = activitySections(steps, actors);
   if (!sections.length) return null;
   return <box flexDirection="column" flexShrink={0} gap={1} marginTop={hasText ? 1 : 0}>{sections.map((section, index) => section.kind === 'worker' && controller
-    ? <WorkerCard key={section.id} task={section.task} call={section.call} label={section.label} controller={controller} width={width - 6} defaultOpen={live || settings.toolDetails || settings.showThinking} needsApproval={detail.permissions.some(item => item.toolCallId === section.call.id)} renderTranscript={(child, childWidth) => <Transcript detail={child} width={childWidth} active={false} embedded />} />
+    ? <WorkerCard key={section.id} handoffs={section.handoffs} scheduled={section.scheduled} task={section.task} call={section.call} label={section.label} controller={controller} width={width - 6} defaultOpen={live || settings.toolDetails || settings.showThinking} needsApproval={detail.permissions.some(item => item.toolCallId === section.call.id)} renderTranscript={(child, childWidth) => <Transcript detail={child} width={childWidth} active={false} embedded />} />
     : <DriverActivity key={section.id} entries={section.kind === 'driver' ? section.entries : [{ message: section.message, call: section.call }]} detail={detail} live={live && index === sections.length - 1} heading={!embedded && Boolean(detail.session.architecture) && (index ? sections[index - 1].kind : precedingActor) !== 'driver'} syntax={syntax} width={width} embedded={embedded} />)}</box>;
 }
 
-export const Transcript = memo(function Transcript({ detail, width, active = true, embedded = false, onInspect, onUsage, controller }: { detail: SessionDetail; width: number; controller?: TerminalController; active?: boolean; embedded?: boolean; onInspect?: (steps: Message[]) => void; onUsage?: (message: Message, usage?: Usage) => void }) {
+export const Transcript = memo(function Transcript({ detail, width, height, active = true, embedded = false, onInspect, onUsage, controller }: { detail: SessionDetail; width: number; height?: number; controller?: TerminalController; active?: boolean; embedded?: boolean; onInspect?: (steps: Message[]) => void; onUsage?: (message: Message, usage?: Usage) => void }) {
   const theme = useTheme(), config = useConfig(), syntax = useSyntax(theme), scroll = useRef<ScrollBoxRenderable>(null);
   const acceleration = useMemo(() => { const native = new MacOSScrollAccel(); return { tick: () => (config.scroll_acceleration.enabled ? native.tick() : 1) * config.scroll_speed, reset: () => native.reset() }; }, [config.scroll_speed, config.scroll_acceleration.enabled]);
   const [limit, setLimit] = useState(120), [following, setFollowing] = useState(true);
@@ -377,12 +388,15 @@ export const Transcript = memo(function Transcript({ detail, width, active = tru
     {groups.length > limit && <Button onPress={() => setLimit(count => count + 120)}>Load earlier messages</Button>}
     {!groups.length && <box flexGrow={1} marginTop={2} paddingLeft={2} flexDirection="column"><Brand /><text marginTop={1} fg={toHex(theme.text)}><strong>A fresh start.</strong></text><text fg={toHex(theme.textMuted)}>Give Litespeed a task in this workspace.</text><text fg={toHex(theme.textMuted)}>{terminalText(detail.session.workspace)}</text></box>}
     {visible.map(({ message, startsRun, steps, live, footer, runUsage }, index) => {
+      const steering = steeringContent(message);
+      if (steering !== undefined) {
+        previousActor = undefined;
+        return <UserRow key={message.id} message={{ ...message, role: 'user', content: steering }} first={index === 0} />;
+      }
       if (message.role === 'user') { previousActor = undefined; return embedded ? null : <UserRow key={message.id} message={message} first={index === 0} />; }
       if (message.role === 'system') {
         previousActor = undefined;
-        const steering = message.content.startsWith('[Steering]');
-        const content = message.content.replace(/^\[Steering\] (?:The user sent this note to the running response\. (?:Update the ongoing task using this latest instruction|It supersedes their earlier request in this turn; follow it as the user's latest instruction)|This user note arrived before the response ended and still needs attention|The user sent this note before the response was interrupted\. It still needs attention): /, '');
-        return <box key={message.id} marginTop={1} paddingLeft={3} flexDirection="column" flexShrink={0}>{steering && <text fg={toHex(theme.textMuted)}>You · update</text>}<text fg={toHex(steering ? theme.text : theme.textMuted)} wrapMode="word">{terminalText(content, true)}</text></box>;
+        return <box key={message.id} marginTop={1} paddingLeft={ACTIVITY_TEXT} flexShrink={0}><text fg={toHex(theme.textMuted)} wrapMode="word">{terminalText(message.content, true)}</text></box>;
       }
       const usageMessage = steps.findLast(step => step.turnUsage) ?? steps.at(-1) ?? message;
       const content = withoutVerificationNotice(message.content, message.receipts);
@@ -391,9 +405,11 @@ export const Transcript = memo(function Transcript({ detail, width, active = tru
       const precedingActor = hasText ? 'driver' : previousActor;
       previousActor = activitySections(steps, actors).at(-1)?.kind ?? precedingActor;
       return <box key={message.id} marginTop={index === 0 && embedded ? 0 : 1} flexDirection="column" flexShrink={0}>
-        {showDriver && detail.session.architecture && controller && <text paddingLeft={3} fg={toHex(theme.textMuted)}>Driver</text>}
+        {showDriver && detail.session.architecture && controller && <text paddingLeft={ACTIVITY_TEXT} fg={toHex(theme.textMuted)}>{detail.session.architecture?.kind==='litefusion'?'Lead':'Driver'}</text>}
         {message.reasoning && <ReasoningRow subtle={syntax.subtle} row={{ running: live && !message.content && !message.toolCalls?.length, ...reasoningSummary(message.reasoning) }} />}
-        {content.trim() && <TextRow compact text={terminalText(content, true)} syntax={syntax.normal} />}
+        {/* Text is still arriving only while the run is live and no tool call has
+            followed it in this message; a settled response renders its real source. */}
+        {content.trim() && <TextRow compact streaming={live && !message.toolCalls?.length} text={terminalText(content, true)} syntax={syntax.normal} />}
         <WorkLog steps={steps} detail={detail} actors={actors} live={live} syntax={syntax} width={width} controller={controller} embedded={embedded} precedingActor={precedingActor} hasText={hasText} />
         {message.error && <ErrorRow error={terminalText(message.error, true)} />}
         {footer && (runUsage || message.context) && <box marginTop={1} paddingLeft={2} flexShrink={0}><Button tone="muted" onPress={() => onUsage?.(usageMessage, runUsage)}>{usageLabel(usageMessage, runUsage)}</Button></box>}
@@ -401,14 +417,13 @@ export const Transcript = memo(function Transcript({ detail, width, active = tru
     })}
   </>;
   if (embedded) return <box flexDirection="column" flexShrink={0}>{contents}</box>;
-  return <box width={width} flexGrow={1} minHeight={1} flexDirection="column"><scrollbox ref={scroll} onMouseScroll={event => { if (event.scroll?.direction === 'up') follow(false); else if (event.scroll?.direction === 'down') queueMicrotask(resumeAtBottom); }} scrollAcceleration={acceleration} flexGrow={1} minHeight={1} stickyScroll={following} stickyStart="bottom" viewportCulling paddingLeft={width < 90 ? 1 : 2} paddingRight={width < 90 ? 1 : 2} paddingBottom={1}>{contents}</scrollbox>{!following && <Button onPress={latest}>↓ Latest · Ctrl+G</Button>}</box>;
+  return <box width={width} height={height} flexGrow={height===undefined?1:0} minHeight={1} flexDirection="column"><scrollbox ref={scroll} onMouseScroll={event => { if (event.scroll?.direction === 'up') follow(false); else if (event.scroll?.direction === 'down') queueMicrotask(resumeAtBottom); }} scrollAcceleration={acceleration} height={height===undefined?undefined:Math.max(1,height-1)} flexGrow={height===undefined?1:0} minHeight={1} stickyScroll={following} stickyStart="bottom" viewportCulling paddingLeft={width < 90 ? 1 : 2} paddingRight={width < 90 ? 1 : 2} paddingBottom={1}>{contents}</scrollbox>{!following && <Button onPress={latest}>↓ Latest · Ctrl+G</Button>}</box>;
 });
 
-/** Right-aligned interrupt affordance: `esc interrupt`, escalating after the
- * first press. */
-export function InterruptHint({ pressed }: { pressed: boolean }) {
+/** Right-aligned single-press interrupt affordance. */
+export function InterruptHint() {
   const theme = useTheme();
   return (
-    <text fg={toHex(theme.primary)}>{pressed ? 'esc again to interrupt' : 'esc interrupt'}</text>
+    <text fg={toHex(theme.primary)}>esc interrupt</text>
   );
 }

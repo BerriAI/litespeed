@@ -1,7 +1,7 @@
 import { cacheHitLabel, usagePhase } from '../shared/usage.js';
 import type { DelegationSummary, Message, SessionDetail, ToolCall, Usage } from '../shared/types.js';
 import { conversationBlocks } from '../shared/conversation-blocks.js';
-import { workerLabels } from '../shared/worker-presentation.js';
+import { workerLabels, workerProjection, type WorkerProjection } from '../shared/worker-presentation.js';
 import { visibleDelegations } from '../shared/events.js';
 import { formatDuration } from './transcriptModel.js';
 
@@ -12,13 +12,10 @@ export function conversationGroups(detail: SessionDetail) {
 }
 
 export type ActivityEntry = { message: Message; call?: ToolCall };
-export type ActivitySection = { kind: 'driver'; id: string; entries: ActivityEntry[] } | { kind: 'worker'; id: string; message: Message; call: ToolCall; label: string; task?: DelegationSummary };
+export type ActivitySection = { kind: 'driver'; id: string; entries: ActivityEntry[] } | { kind: 'worker'; id: string; message: Message; call: ToolCall; label: string; task?: DelegationSummary;scheduled?:import('../shared/litefusion-tasks.js').LiteFusionTask;handoffs?:WorkerProjection['handoffs'] };
 export function activityActors(detail: SessionDetail) {
-  const actors = new Map([...workerLabels(detail)].map(([key, label]) => [key, { label, task: undefined as DelegationSummary | undefined }]));
-  for (const task of visibleDelegations(detail)) {
-    const key = `${task.parentMessageId}:${task.toolCallId}`;
-    actors.set(key, { label: actors.get(key)?.label ?? 'Research', task });
-  }
+  const actors = new Map<string,WorkerProjection & {label:string}>([...workerLabels(detail)].map(([key, label]) => [key, { label, task: undefined as DelegationSummary | undefined, hidden:false }]));
+  for (const [key,row] of workerProjection(detail)) actors.set(key,{label:actors.get(key)?.label??'Research',...row});
   return actors;
 }
 export function taskInvocations(detail: SessionDetail) {
@@ -42,6 +39,7 @@ export function activitySections(steps: Message[], actors: ReturnType<typeof act
     if (index > 0 && message.reasoning) append({ message });
     for (const call of message.toolCalls ?? []) {
       const actor = actors.get(`${message.id}:${call.id}`);
+      if(actor?.hidden)continue;
       if (actor) sections.push({ kind: 'worker', id: call.id, message, call, ...actor });
       else append({ message, call });
     }

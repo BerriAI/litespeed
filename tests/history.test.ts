@@ -430,3 +430,22 @@ describe('turn checkpoint history', () => {
     expect(await readFile(join(workspace, 'file.txt'), 'utf8')).toBe('external');
   });
 });
+
+
+describe('generated test recordings and command history',()=>{
+  it('allows test recordings to change between commands while tracking source edits',async()=>{
+    await mkdir(join(workspace,'test-results-tui'));history.accept(id,user());
+    const first=await history.beginCommand(id,workspace);
+    await writeFile(join(workspace,'source.ts'),'one');await writeFile(join(workspace,'test-results-tui/frames.jsonl'),'frame one');await history.finishCommand(first);
+    await writeFile(join(workspace,'test-results-tui/frames.jsonl'),'unrecorded test output');
+    const second=await history.beginCommand(id,workspace);
+    await writeFile(join(workspace,'source.ts'),'two');await writeFile(join(workspace,'test-results-tui/frames.jsonl'),'new test output');
+    await expect(history.finishCommand(second)).resolves.toMatchObject([{path:'source.ts',before:'one',after:'two'}]);
+    expect(store.changes(id).every(change=>change.path==='source.ts')).toBe(true);
+  });
+  it('still refuses unrecorded source conflicts',async()=>{
+    history.accept(id,user());const first=await history.beginCommand(id,workspace);await writeFile(join(workspace,'source.ts'),'one');await history.finishCommand(first);
+    await writeFile(join(workspace,'source.ts'),'external edit');const second=await history.beginCommand(id,workspace);await writeFile(join(workspace,'source.ts'),'two');
+    await expect(history.finishCommand(second)).rejects.toThrow('Unrecorded changes conflict with command history for source.ts');
+  });
+});
