@@ -71,6 +71,23 @@ describe('LiteLLM repository navigation',()=>{
     const result=JSON.parse(await litellmContext(root,{query:'get_available_deployment'},new AbortController().signal));
     expect(result.symbols[0]).toMatchObject({path:'litellm/router.py',name:'get_available_deployment'});
   });
+  it('includes cache, integration and Responses implementations when those areas match',async()=>{
+    await put('litellm/caching/dual_cache.py','def read_cached_value(): pass\n');
+    await put('litellm/integrations/s3_v2.py','def callback_logging(): pass\n');
+    await put('litellm/responses/streaming_iterator.py','def responses_bridge(): pass\n');
+    const result=JSON.parse(await litellmContext(root,{query:'cached callback logging responses bridge'},new AbortController().signal));
+    const paths=result.symbols.map((s:{path:string})=>s.path);
+    expect(paths).toContain('litellm/caching/dual_cache.py');
+    expect(paths).toContain('litellm/integrations/s3_v2.py');
+    expect(paths).toContain('litellm/responses/streaming_iterator.py');
+  });
+  it('shows control-flow exits past a truncated definition read',async()=>{
+    await put('litellm/router.py','def select_route():\n'+ '    value = 1\n'.repeat(260)+'    return value\ndef other():\n    return 2\n');
+    const result=await litellmContext(root,{path:'litellm/router.py',symbol:'select_route'},new AbortController().signal);
+    expect(result).toContain('Definition continues');
+    expect(result).toContain('"line":262,"statement":"return value"');
+    expect(result).not.toContain('return 2');
+  });
   it('does not let a large proxy tree exhaust the budget before scanning router code',async()=>{
     await mkdir(join(root,'litellm/proxy'),{recursive:true});
     await Promise.all(Array.from({length:810},(_,i)=>writeFile(join(root,`litellm/proxy/file_${i}.py`),'def unrelated(): pass\n')));
