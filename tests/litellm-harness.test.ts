@@ -57,6 +57,20 @@ describe('LiteLLM repository navigation',()=>{
     expect(related.playbooks[0].provenance).toContain('Verify against this checkout');
     expect(JSON.parse(await litellmContext(root,{query:'openai schema pattern'},signal)).playbooks).toEqual([]);
   });
+  it('searches every relevant area for mixed provider, proxy and router queries',async()=>{
+    await put('litellm/router.py','def resolve_team_router_name():\n    pass\n');
+    await put('litellm/proxy/auth.py','def resolve_team_auth():\n    pass\n');
+    const result=JSON.parse(await litellmContext(root,{query:'example team router transformation'},new AbortController().signal));
+    const paths=result.symbols.map((symbol:{path:string})=>symbol.path);
+    expect(paths).toContain('litellm/router.py');expect(paths).toContain('litellm/proxy/auth.py');
+    expect(result.symbolScan.roots).toContain('litellm/llms/example/');
+    expect(result.symbolScan.roots).toContain('litellm/proxy/');
+  });
+  it('recognizes area names inside Python symbols',async()=>{
+    await put('litellm/router.py','def get_available_deployment():\n    pass\n');
+    const result=JSON.parse(await litellmContext(root,{query:'get_available_deployment'},new AbortController().signal));
+    expect(result.symbols[0]).toMatchObject({path:'litellm/router.py',name:'get_available_deployment'});
+  });
   it('keeps one model in both onboarding and architecture routing',()=>{
     const selection=selectArchitecture('litellm-specific',{providerId:'gateway',model:'flash'});
     expect(selection).toEqual({kind:'litellm-specific'});expect(architectureProviders(selection)).toEqual([]);expect(architectureWorker(selection)).toBeNull();

@@ -4,7 +4,7 @@ import path from 'node:path';
 import fg from 'fast-glob';
 import type { ToolDefinition } from '../shared/types.js';
 
-export const LITELLM_HARNESS_VERSION='2026-09-15.11';
+export const LITELLM_HARNESS_VERSION='2026-09-15.12';
 export const litellmContextTool:ToolDefinition={type:'function',function:{name:'litellm_context',description:'Navigate the current LiteLLM checkout. Give a task query to find relevant definitions, inline conditions and existing tests. Give a source path to see its symbol outline and test partners; add a symbol name to read that definition with numbered lines. Reads only this workspace, never Git history or remote answers.',parameters:{type:'object',properties:{query:{type:'string',maxLength:1000},path:{type:'string',maxLength:500},symbol:{type:'string',maxLength:200}},additionalProperties:false}}};
 
 const playbooks = [
@@ -114,10 +114,13 @@ function outline(text:string){
 }
 
 async function matchingSymbols(workspace:string,files:string[],tokens:string[],signal:AbortSignal){
-  const proxy=tokens.some(t=>/^(budget|auth|team|member|spend|redis|guardrail|proxy)/.test(t));
-  const router=tokens.some(t=>/^(router|deployment|retry|fallback|routing|tags?)/.test(t));
+  const proxy=tokens.some(t=>/(?:^|_)(budget|auth|team|member|spend|redis|guardrail|proxy)/.test(t));
+  const router=tokens.some(t=>/(?:^|_)(router|deployment|retry|fallback|routing|tags?)/.test(t));
   const providers=[...new Set(files.flatMap(p=>p.startsWith('litellm/llms/')?[p.split('/')[2]]:[]))].filter(provider=>tokens.some(t=>t===provider||provider.startsWith(t+'_')));
-  const roots=providers.length?providers.map(p=>'litellm/llms/'+p+'/'):proxy?['litellm/proxy/','enterprise/']:router?['litellm/router.py','litellm/router_utils/','litellm/router_strategy/']:['litellm/litellm_core_utils/','litellm/utils.py'];
+  // Queries can cross provider, gateway and router boundaries. Search every
+  // matching area rather than silently hiding symbols in the other categories.
+  const roots=[...providers.map(p=>'litellm/llms/'+p+'/'),...(proxy?['litellm/proxy/','enterprise/']:[]),...(router?['litellm/router.py','litellm/router_utils/','litellm/router_strategy/']:[])];
+  if(!roots.length)roots.push('litellm/litellm_core_utils/','litellm/utils.py');
   const candidates=files.filter(p=>p.endsWith('.py')&&roots.some(root=>root.endsWith('/')?p.startsWith(root):p===root));
   const matches:{path:string;name:string;line:number;score:number}[]=[];
   const references:{path:string;line:number;preview:string;score:number}[]=[];
@@ -140,7 +143,7 @@ async function matchingSymbols(workspace:string,files:string[],tokens:string[],s
     }));
   }
   signal.throwIfAborted();
-  return {matches:matches.sort((a,b)=>b.score-a.score||a.name.length-b.name.length||a.path.localeCompare(b.path)||a.line-b.line).slice(0,12),references:references.sort((a,b)=>b.score-a.score||a.path.localeCompare(b.path)||a.line-b.line).slice(0,12),scanned,partial:scanned<candidates.length};
+  return {matches:matches.sort((a,b)=>b.score-a.score||a.name.length-b.name.length||a.path.localeCompare(b.path)||a.line-b.line).slice(0,12),references:references.sort((a,b)=>b.score-a.score||a.path.localeCompare(b.path)||a.line-b.line).slice(0,12),roots,scanned,partial:scanned<candidates.length};
 }
 export async function litellmContext(workspace:string,args:Record<string,unknown>,signal:AbortSignal):Promise<string>{
   signal.throwIfAborted();
@@ -171,5 +174,5 @@ export async function litellmContext(workspace:string,args:Record<string,unknown
   const ui=/\b(ui|dashboard|frontend|react|component)\b/i.test(String(args.query??''));
   const ranked=files.filter(p=>!p.startsWith('tests/')&&(ui||!p.startsWith('ui/'))).map(p=>({path:p,score:tokens.reduce((score,word)=>score+(p.toLowerCase().includes(word)?(p.split('/').includes(word)?5:2):0),0)})).filter(p=>p.score>0).sort((a,b)=>b.score-a.score||a.path.length-b.path.length||a.path.localeCompare(b.path)).slice(0,8);
   const symbols=tokens.length&&!ui?await matchingSymbols(workspace,files,tokens,signal):undefined;
-  return JSON.stringify({query:args.query??'',playbooks:learnedContext(String(args.query??''),files),references:symbols?.references,symbols:symbols?.matches.map(s=>({...s,tests:partners(files,s.path).slice(0,2)})),symbolScan:symbols&&{files:symbols.scanned,partial:symbols.partial},matches:ranked.map(p=>({path:p.path,tests:partners(files,p.path).slice(0,3)})),hint:'Use path + symbol for a definition, path + query to filter a large outline, or grep within the relevant directory for an exact term. Ranked paths and symbols are navigation hints, not proof of the cause.'},null,2);
+  return JSON.stringify({query:args.query??'',playbooks:learnedContext(String(args.query??''),files),references:symbols?.references,symbols:symbols?.matches.map(s=>({...s,tests:partners(files,s.path).slice(0,2)})),symbolScan:symbols&&{roots:symbols.roots,files:symbols.scanned,partial:symbols.partial},matches:ranked.map(p=>({path:p.path,tests:partners(files,p.path).slice(0,3)})),hint:'Use path + symbol for a definition, path + query to filter a large outline, or grep within the relevant directory for an exact term. Ranked paths and symbols are navigation hints, not proof of the cause.'},null,2);
 }
