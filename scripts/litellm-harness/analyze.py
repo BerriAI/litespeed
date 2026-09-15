@@ -9,7 +9,7 @@ ROOT=Path(os.environ['LITELLM_CAMPAIGN_DIR'])
 records=[]
 for p in sorted((ROOT/'runs').glob('*/result.json')):
     result=json.loads(p.read_text());directory=p.parent
-    record={k:result.get(k) for k in ['id','kind','label','seconds','status','exit','acceptance','timedOut','contextWindow','evaluationProtocol','effort','timeoutSeconds','isolation','interrupted','recovered','durationIncomplete']}
+    record={k:result.get(k) for k in ['id','kind','label','seconds','status','exit','acceptance','timedOut','contextWindow','evaluationProtocol','effort','timeoutSeconds','isolation','interrupted','recovered','durationIncomplete','repairParent']}
     record['run']=directory.name
     task=json.loads((directory/'task.json').read_text()) if (directory/'task.json').exists() else {}
     record['promptRevision']=result.get('promptRevision',task.get('prompt_revision',1))

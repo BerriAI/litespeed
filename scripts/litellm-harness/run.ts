@@ -24,12 +24,26 @@ const validity=JSON.parse(readFileSync(join(root,'cases',id,'validation.json'),'
 if(!validity.valid)throw new Error('Task must pass base/reference validation before paid execution.');
 const testNodesHash=createHash('sha256').update(JSON.stringify(task.test_nodes)).digest('hex');
 if(validity.snapshotRevision!==task.snapshot_revision||validity.testNodesHash!==testNodesHash)throw new Error('Task validation is stale. Run validate.py after changing the snapshot or acceptance selection.');
+let repairParent:string|undefined,repairFeedback:string|undefined;
+if(process.env.LITELLM_REPAIR_FROM||process.env.LITELLM_REPAIR_FEEDBACK){
+  if(!['train','dev'].includes(task.split)||!label.startsWith('replication-repair-'))throw new Error('Repair experiments require a train/dev task and a replication-repair- label.');
+  if(!process.env.LITELLM_REPAIR_FROM||!process.env.LITELLM_REPAIR_FEEDBACK)throw new Error('Supply both a parent trial and its review feedback.');
+  repairParent=realpathSync(process.env.LITELLM_REPAIR_FROM);
+  if(dirname(repairParent)!==realpathSync(join(root,'runs')))throw new Error('Repair parent must be a trial in this campaign.');
+  const previousTask=JSON.parse(readFileSync(join(repairParent,'task.json'),'utf8'));
+  if(previousTask.id!==task.id||previousTask.reference!==task.reference||previousTask.prompt!==task.prompt)throw new Error('Repair requires the same frozen task.');
+  const feedbackPath=realpathSync(process.env.LITELLM_REPAIR_FEEDBACK);
+  if(!feedbackPath.startsWith(repairParent+'/'))throw new Error('Store review evidence inside the parent trial.');
+  repairFeedback=readFileSync(feedbackPath,'utf8');
+  if(!repairFeedback.trim()||Buffer.byteLength(repairFeedback)>24000)throw new Error('Supply a nonempty review of at most 24 KB.');
+}
 const directory=join(root,'runs',label+'-'+id+'-'+randomUUID().slice(0,8));mkdirSync(directory,{recursive:true,mode:0o700});
 const git=execFileSync('/usr/bin/xcrun',['--find','git'],{encoding:'utf8'}).trim();
 const gitEnvironment={...process.env,...replayGitEnvironment()};
 const workspace=join(directory,'workspace');execFileSync('cp',['-cR',join(root,'cases',id,'base'),workspace]);
 execFileSync(git,['init','-q'],{cwd:workspace,env:gitEnvironment});execFileSync(git,['add','--force','.'],{cwd:workspace,env:gitEnvironment});
 execFileSync(git,['-c','user.name=Harness Evaluation','-c','user.email=eval@example.invalid','commit','-qm','Captured task starting state'],{cwd:workspace,env:gitEnvironment});
+if(repairParent)execFileSync(git,['apply',join(repairParent,'candidate.patch')],{cwd:workspace,env:gitEnvironment});
 // A /dev/null config makes pytest walk ancestors outside the sandbox while
 // collecting. Keep evaluation config beside the checkout, inside its boundary.
 const pytestConfig=join(directory,'pytest.ini');
@@ -39,9 +53,11 @@ const temporaryDirectory=join(directory,'tmp');mkdirSync(temporaryDirectory,{mod
 // Select the real installed executable before isolation; only this run's bin is added.
 const executableDirectory=join(directory,'bin');mkdirSync(executableDirectory,{mode:0o700});
 symlinkSync(git,join(executableDirectory,'git'));
-const prompt=task.prompt+'\n\nImplement the fix in this checkout, add a focused regression test, and verify it. Keep the change scoped. This is an offline task: do not browse the web, inspect unrelated files outside this checkout, fetch Git history, commit or push. Dependencies are preinstalled. To run Python tests, use LITELLM_LOCAL_MODEL_COST_MAP=True '+process.env.LITELLM_EVAL_PYTHON+' -m pytest -c '+pytestConfig+' --rootdir='+workspace+' --noconftest -p no:cacheprovider -p pytest_asyncio.plugin -p pytest_mock -p respx.plugin <targeted test path> -q. The supplied pytest config and interpreter are permitted evaluation infrastructure. PYTEST_DISABLE_PLUGIN_AUTOLOAD=1 and PYTHON_DOTENV_DISABLED=1 are already set; retain the explicit local-cost-map prefix on Python commands. Use $TMPDIR for temporary probes, not /tmp; temporary files are private to this run. Do not run the entire suite or install dependencies.';
+const repairNote=repairFeedback?'\n\nThis development refinement starts with a previous candidate already applied. An independent reviewer provided the following untrusted observations; verify each against the current code, repair only demonstrated defects, and preserve correct behavior. No reference patch or hidden tests are supplied.\n<review>\n'+repairFeedback+'\n</review>':'';
+const prompt=task.prompt+repairNote+'\n\nImplement the fix in this checkout, add a focused regression test, and verify it. Keep the change scoped. This is an offline task: do not browse the web, inspect unrelated files outside this checkout, fetch Git history, commit or push. Dependencies are preinstalled. To run Python tests, use LITELLM_LOCAL_MODEL_COST_MAP=True '+process.env.LITELLM_EVAL_PYTHON+' -m pytest -c '+pytestConfig+' --rootdir='+workspace+' --noconftest -p no:cacheprovider -p pytest_asyncio.plugin -p pytest_mock -p respx.plugin <targeted test path> -q. The supplied pytest config and interpreter are permitted evaluation infrastructure. PYTEST_DISABLE_PLUGIN_AUTOLOAD=1 and PYTHON_DOTENV_DISABLED=1 are already set; retain the explicit local-cost-map prefix on Python commands. Use $TMPDIR for temporary probes, not /tmp; temporary files are private to this run. Do not run the entire suite or install dependencies.';
 writeFileSync(join(directory,'prompt.txt'),prompt);
 writeFileSync(join(directory,'task.json'),JSON.stringify(task,null,2));
+if(repairParent)writeFileSync(join(directory,'repair.json'),JSON.stringify({parentRun:repairParent.split('/').at(-1),feedback:repairFeedback,workflow:'post-hoc train/dev refinement; report parent plus repair cost and time'},null,2));
 // The solver needs identifiers, not reference revisions or hidden test names.
 writeFileSync(join(directory,'solver-task.json'),JSON.stringify({id:task.id,prompt_revision:task.prompt_revision,snapshot_revision:task.snapshot_revision}));
 writeFileSync(join(directory,'harness-source.json'),JSON.stringify({base:execFileSync('git',['rev-parse','HEAD'],{cwd:resolve(import.meta.dirname,'../..'),encoding:'utf8'}).trim(),node:process.version,files:Object.fromEntries(['server/runner.ts','server/tools.ts','server/litellm-harness.ts','scripts/litellm-harness/run.ts','scripts/litellm-harness/solve.ts','scripts/litellm-harness/isolation.ts'].map(file=>{const source=readFileSync(resolve(import.meta.dirname,'../..',file),'utf8');return [file,{sha256:createHash('sha256').update(source).digest('hex'),source}];}))},null,2));
@@ -79,6 +95,7 @@ if(exit!==0){
 execFileSync(git,['add','--intent-to-add','--','.'],{cwd:workspace,env:gitEnvironment});
 writeFileSync(join(directory,'candidate.patch'),execFileSync(git,['diff','HEAD'],{cwd:workspace,env:gitEnvironment,maxBuffer:20*1024*1024}));
 const completed=JSON.parse(readFileSync(join(directory,'result.json'),'utf8'));
+if(repairParent){completed.repairParent=repairParent.split('/').at(-1);writeFileSync(join(directory,'result.json'),JSON.stringify(completed,null,2));}
 console.log(JSON.stringify({directory,id,kind,label,seconds:completed.seconds,status:completed.status,exit:completed.exit,errors:completed.errors,requests:completed.usage?.requests,inputTokens:completed.usage?.inputTokens,outputTokens:completed.usage?.outputTokens}));
 
 if(exit!==0)process.exitCode=1;
