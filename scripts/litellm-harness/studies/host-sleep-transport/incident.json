@@ -1,0 +1,430 @@
+{
+  "at": "2026-09-16T19:46:21.904650+00:00",
+  "status": "paused; billing reconciliation pending",
+  "evidenceBoundary": "Public snapshot 2026-09-16T12:41:08.847184Z recorded 28042 requests and 60 unknown receipts. Select subsequent unpriced requests by ledger position; original records preserved.",
+  "newUnpricedRequests": 126,
+  "newReservedUsd": 31.791513600000002,
+  "knownUsd": 51.99733616,
+  "totalUnknownRequests": 186,
+  "totalUnknownReservedUsd": 46.93032960000001,
+  "committedUsd": 98.92766575999973,
+  "limitUsd": 100,
+  "pendingRequests": 0,
+  "affectedLabels": [
+    {
+      "label": "replication-p6-ablation-control-r2-converse-config-06d98518",
+      "unpricedRequests": 3,
+      "reservedUsd": 0.7569408000000001,
+      "recordedHttpStatuses": [
+        "None"
+      ],
+      "upstreamResponseFiles": 0
+    },
+    {
+      "label": "replication-p6-ablation-control-r2-databricks-reasoning-8997c2ae",
+      "unpricedRequests": 3,
+      "reservedUsd": 0.7569408000000001,
+      "recordedHttpStatuses": [
+        "None"
+      ],
+      "upstreamResponseFiles": 0
+    },
+    {
+      "label": "replication-p6-ablation-control-r2-empty-choices-8c6c4c48",
+      "unpricedRequests": 3,
+      "reservedUsd": 0.7569408000000001,
+      "recordedHttpStatuses": [
+        "None"
+      ],
+      "upstreamResponseFiles": 0
+    },
+    {
+      "label": "replication-p6-ablation-control-r2-responses-custom-guardrail-a21a2411",
+      "unpricedRequests": 3,
+      "reservedUsd": 0.7569408000000001,
+      "recordedHttpStatuses": [
+        "None"
+      ],
+      "upstreamResponseFiles": 0
+    },
+    {
+      "label": "replication-p6-ablation-control-r2-vertex-version-path-5de25048",
+      "unpricedRequests": 3,
+      "reservedUsd": 0.7569408000000001,
+      "recordedHttpStatuses": [
+        "None"
+      ],
+      "upstreamResponseFiles": 0
+    },
+    {
+      "label": "replication-p6-ablation-no-guides-r2-converse-config-2780bfba",
+      "unpricedRequests": 3,
+      "reservedUsd": 0.7569408000000001,
+      "recordedHttpStatuses": [
+        "None"
+      ],
+      "upstreamResponseFiles": 0
+    },
+    {
+      "label": "replication-p6-ablation-no-guides-r2-databricks-reasoning-c5965d76",
+      "unpricedRequests": 3,
+      "reservedUsd": 0.7569408000000001,
+      "recordedHttpStatuses": [
+        "None"
+      ],
+      "upstreamResponseFiles": 0
+    },
+    {
+      "label": "replication-p6-ablation-no-guides-r2-empty-choices-11f2ab16",
+      "unpricedRequests": 3,
+      "reservedUsd": 0.7569408000000001,
+      "recordedHttpStatuses": [
+        "None"
+      ],
+      "upstreamResponseFiles": 0
+    },
+    {
+      "label": "replication-p6-ablation-no-guides-r2-responses-custom-guardrail-ebc27fcd",
+      "unpricedRequests": 3,
+      "reservedUsd": 0.7569408000000001,
+      "recordedHttpStatuses": [
+        "None"
+      ],
+      "upstreamResponseFiles": 0
+    },
+    {
+      "label": "replication-p6-ablation-no-guides-r2-vertex-version-path-94d7551f",
+      "unpricedRequests": 3,
+      "reservedUsd": 0.7569408000000001,
+      "recordedHttpStatuses": [
+        "None"
+      ],
+      "upstreamResponseFiles": 0
+    },
+    {
+      "label": "replication-p6-ablation-no-preload-r2-converse-config-c5b08df9",
+      "unpricedRequests": 3,
+      "reservedUsd": 0.7569408000000001,
+      "recordedHttpStatuses": [
+        "None"
+      ],
+      "upstreamResponseFiles": 0
+    },
+    {
+      "label": "replication-p6-ablation-no-preload-r2-databricks-reasoning-815c127c",
+      "unpricedRequests": 3,
+      "reservedUsd": 0.7569408000000001,
+      "recordedHttpStatuses": [
+        "None"
+      ],
+      "upstreamResponseFiles": 0
+    },
+    {
+      "label": "replication-p6-ablation-no-preload-r2-empty-choices-c190fcd9",
+      "unpricedRequests": 3,
+      "reservedUsd": 0.7569408000000001,
+      "recordedHttpStatuses": [
+        "None"
+      ],
+      "upstreamResponseFiles": 0
+    },
+    {
+      "label": "replication-p6-ablation-no-preload-r2-responses-custom-guardrail-783a90b9",
+      "unpricedRequests": 3,
+      "reservedUsd": 0.7569408000000001,
+      "recordedHttpStatuses": [
+        "None"
+      ],
+      "upstreamResponseFiles": 0
+    },
+    {
+      "label": "replication-p6-ablation-no-preload-r2-vertex-version-path-6dce2867",
+      "unpricedRequests": 3,
+      "reservedUsd": 0.7569408000000001,
+      "recordedHttpStatuses": [
+        "None"
+      ],
+      "upstreamResponseFiles": 0
+    },
+    {
+      "label": "replication-p6-ablation-no-review-r2-converse-config-9ca881c3",
+      "unpricedRequests": 3,
+      "reservedUsd": 0.7569408000000001,
+      "recordedHttpStatuses": [
+        "None"
+      ],
+      "upstreamResponseFiles": 0
+    },
+    {
+      "label": "replication-p6-ablation-no-review-r2-databricks-reasoning-e252229b",
+      "unpricedRequests": 3,
+      "reservedUsd": 0.7569408000000001,
+      "recordedHttpStatuses": [
+        "None"
+      ],
+      "upstreamResponseFiles": 0
+    },
+    {
+      "label": "replication-p6-ablation-no-review-r2-empty-choices-db835f06",
+      "unpricedRequests": 3,
+      "reservedUsd": 0.7569408000000001,
+      "recordedHttpStatuses": [
+        "None"
+      ],
+      "upstreamResponseFiles": 0
+    },
+    {
+      "label": "replication-p6-ablation-no-review-r2-responses-custom-guardrail-6dd77d00",
+      "unpricedRequests": 3,
+      "reservedUsd": 0.7569408000000001,
+      "recordedHttpStatuses": [
+        "None"
+      ],
+      "upstreamResponseFiles": 0
+    },
+    {
+      "label": "replication-p6-ablation-no-review-r2-vertex-version-path-42a8b436",
+      "unpricedRequests": 3,
+      "reservedUsd": 0.7569408000000001,
+      "recordedHttpStatuses": [
+        "None"
+      ],
+      "upstreamResponseFiles": 0
+    },
+    {
+      "label": "replication-p6-ablation-read-480-r2-converse-config-8402f948",
+      "unpricedRequests": 3,
+      "reservedUsd": 0.7569408000000001,
+      "recordedHttpStatuses": [
+        "None"
+      ],
+      "upstreamResponseFiles": 0
+    },
+    {
+      "label": "replication-p6-ablation-read-480-r2-databricks-reasoning-61ab9dfd",
+      "unpricedRequests": 3,
+      "reservedUsd": 0.7569408000000001,
+      "recordedHttpStatuses": [
+        "None"
+      ],
+      "upstreamResponseFiles": 0
+    },
+    {
+      "label": "replication-p6-ablation-read-480-r2-empty-choices-e80c108f",
+      "unpricedRequests": 3,
+      "reservedUsd": 0.7569408000000001,
+      "recordedHttpStatuses": [
+        "None"
+      ],
+      "upstreamResponseFiles": 0
+    },
+    {
+      "label": "replication-p6-ablation-read-480-r2-responses-custom-guardrail-38cbaf52",
+      "unpricedRequests": 3,
+      "reservedUsd": 0.7569408000000001,
+      "recordedHttpStatuses": [
+        "None"
+      ],
+      "upstreamResponseFiles": 0
+    },
+    {
+      "label": "replication-p6-ablation-read-480-r2-vertex-version-path-39323a50",
+      "unpricedRequests": 3,
+      "reservedUsd": 0.7569408000000001,
+      "recordedHttpStatuses": [
+        "None"
+      ],
+      "upstreamResponseFiles": 0
+    },
+    {
+      "label": "replication-v44-combined-combined-r2-legacy-stream-pipeline-d6979eb7",
+      "unpricedRequests": 1,
+      "reservedUsd": 0.2523136,
+      "recordedHttpStatuses": [
+        "None"
+      ],
+      "upstreamResponseFiles": 0
+    },
+    {
+      "label": "replication-v48-breadth-plain-r1-mapped-error-response-headers-6a8ed7e3",
+      "unpricedRequests": 3,
+      "reservedUsd": 0.7569408000000001,
+      "recordedHttpStatuses": [
+        "None"
+      ],
+      "upstreamResponseFiles": 0
+    },
+    {
+      "label": "replication-v48-breadth-plain-r1-organization-own-memberships-8ecd6a94",
+      "unpricedRequests": 3,
+      "reservedUsd": 0.7569408000000001,
+      "recordedHttpStatuses": [
+        "None"
+      ],
+      "upstreamResponseFiles": 0
+    },
+    {
+      "label": "replication-v48-breadth-plain-r1-team-cooldown-alternatives-b1be76a7",
+      "unpricedRequests": 3,
+      "reservedUsd": 0.7569408000000001,
+      "recordedHttpStatuses": [
+        "None"
+      ],
+      "upstreamResponseFiles": 0
+    },
+    {
+      "label": "replication-v48-breadth-specialized-r1-organization-own-memberships-d0d054b3",
+      "unpricedRequests": 3,
+      "reservedUsd": 0.7569408000000001,
+      "recordedHttpStatuses": [
+        "None"
+      ],
+      "upstreamResponseFiles": 0
+    },
+    {
+      "label": "replication-v48-breadth-specialized-r1-team-cooldown-alternatives-1842ac67",
+      "unpricedRequests": 3,
+      "reservedUsd": 0.7569408000000001,
+      "recordedHttpStatuses": [
+        "None"
+      ],
+      "upstreamResponseFiles": 0
+    },
+    {
+      "label": "replication-v49-deadline-extended-r2-legacy-stream-pipeline-0a980fc3",
+      "unpricedRequests": 3,
+      "reservedUsd": 0.7569408000000001,
+      "recordedHttpStatuses": [
+        "None"
+      ],
+      "upstreamResponseFiles": 0
+    },
+    {
+      "label": "replication-v49-deadline-extended-r2-team-member-budget-dfa198a4",
+      "unpricedRequests": 1,
+      "reservedUsd": 0.2523136,
+      "recordedHttpStatuses": [
+        "None"
+      ],
+      "upstreamResponseFiles": 0
+    },
+    {
+      "label": "replication-v49-deadline-standard-r2-legacy-stream-pipeline-6ae33b7e",
+      "unpricedRequests": 3,
+      "reservedUsd": 0.7569408000000001,
+      "recordedHttpStatuses": [
+        "None"
+      ],
+      "upstreamResponseFiles": 0
+    },
+    {
+      "label": "replication-v51-tool-output-control-r1-legacy-stream-pipeline-86806c98",
+      "unpricedRequests": 3,
+      "reservedUsd": 0.7569408000000001,
+      "recordedHttpStatuses": [
+        "None"
+      ],
+      "upstreamResponseFiles": 0
+    },
+    {
+      "label": "replication-v51-tool-output-control-r1-router-strategy-isolation-5e1bef18",
+      "unpricedRequests": 3,
+      "reservedUsd": 0.7569408000000001,
+      "recordedHttpStatuses": [
+        "None"
+      ],
+      "upstreamResponseFiles": 0
+    },
+    {
+      "label": "replication-v51-tool-output-control-r2-legacy-stream-pipeline-4f08cdc2",
+      "unpricedRequests": 3,
+      "reservedUsd": 0.7569408000000001,
+      "recordedHttpStatuses": [
+        "None"
+      ],
+      "upstreamResponseFiles": 0
+    },
+    {
+      "label": "replication-v51-tool-output-tool-guidance-r1-legacy-stream-pipeline-bca8ca6a",
+      "unpricedRequests": 1,
+      "reservedUsd": 0.2523136,
+      "recordedHttpStatuses": [
+        "None"
+      ],
+      "upstreamResponseFiles": 0
+    },
+    {
+      "label": "replication-v51-tool-output-tool-guidance-r1-router-strategy-isolation-17fdead6",
+      "unpricedRequests": 3,
+      "reservedUsd": 0.7569408000000001,
+      "recordedHttpStatuses": [
+        "None"
+      ],
+      "upstreamResponseFiles": 0
+    },
+    {
+      "label": "replication-v51-tool-output-tool-guidance-r2-legacy-stream-pipeline-a7753f35",
+      "unpricedRequests": 3,
+      "reservedUsd": 0.7569408000000001,
+      "recordedHttpStatuses": [
+        "None"
+      ],
+      "upstreamResponseFiles": 0
+    },
+    {
+      "label": "replication-v53-query-control-r1-realtime-cached-audio-cost-f73d5415",
+      "unpricedRequests": 3,
+      "reservedUsd": 0.7569408000000001,
+      "recordedHttpStatuses": [
+        "None"
+      ],
+      "upstreamResponseFiles": 0
+    },
+    {
+      "label": "replication-v53-query-control-r2-realtime-cached-audio-cost-4dd48416",
+      "unpricedRequests": 3,
+      "reservedUsd": 0.7569408000000001,
+      "recordedHttpStatuses": [
+        "None"
+      ],
+      "upstreamResponseFiles": 0
+    },
+    {
+      "label": "replication-v53-query-query-navigation-r1-mock-input-tokens-0258d424",
+      "unpricedRequests": 3,
+      "reservedUsd": 0.7569408000000001,
+      "recordedHttpStatuses": [
+        "None"
+      ],
+      "upstreamResponseFiles": 0
+    },
+    {
+      "label": "replication-v53-query-query-navigation-r1-realtime-cached-audio-cost-fc104939",
+      "unpricedRequests": 3,
+      "reservedUsd": 0.7569408000000001,
+      "recordedHttpStatuses": [
+        "None"
+      ],
+      "upstreamResponseFiles": 0
+    }
+  ],
+  "receiptAudit": {
+    "verified": 0,
+    "knownReceiptValidation": 1878,
+    "knownMismatches": 0,
+    "applied": false
+  },
+  "diagnostics": {
+    "smallNonstreamingRequest": "HTTP 200 with usage",
+    "smallStreamingRequest": "HTTP 200 with final usage",
+    "combinedCostUsd": 4.4e-06,
+    "powerLog": "Multiple sleep/dark-wake cycles on September 16; lid/HID wake at 12:26:10 America/Los_Angeles. This does not establish billing for interrupted requests.",
+    "gatewayCatch": "Old gateway mapped caught local/transport exceptions to HTTP 429 without retaining the cause. New unpriced records lack an upstream status."
+  },
+  "fixValidation": {
+    "typecheck": "passed",
+    "focusedCampaignTestsPassed": 11,
+    "realHttpTest": "Unreachable local upstream causes one unknown reservation, closes admission, reports readiness 503; a repeat does not reserve again. No provider charge. A second local case verifies the same pause for an HTTP200 response with no usage."
+  },
+  "accountingPolicy": "No unknown charge is treated as zero. No uncertain attempt is silently retried. Billing evidence requested; key-info endpoint returned 403."
+}
