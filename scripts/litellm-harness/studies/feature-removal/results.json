@@ -1,0 +1,2708 @@
+{
+  "status": "interim",
+  "note": "Development selection only. Interim observed-task means can change as slower trials finish. Bootstrap resamples tasks, not attempts; it does not correct adaptive candidate selection or establish future generalization. Token prices exclude requests without usage and do not replace the campaign ledger.",
+  "variants": [
+    {
+      "variant": "control",
+      "evaluated": 7,
+      "expected": 32,
+      "successes": 5,
+      "meanSeconds": 281.81314285714285,
+      "tokenPricedUsd": 0.49630616800000005,
+      "trialsWithoutTokenPrice": 0
+    },
+    {
+      "variant": "no-guides",
+      "evaluated": 6,
+      "expected": 32,
+      "successes": 4,
+      "meanSeconds": 331.1573333333333,
+      "tokenPricedUsd": 0.9286462220000001,
+      "trialsWithoutTokenPrice": 0
+    },
+    {
+      "variant": "no-preload",
+      "evaluated": 6,
+      "expected": 32,
+      "successes": 4,
+      "meanSeconds": 311.31216666666666,
+      "tokenPricedUsd": 0.47319725600000007,
+      "trialsWithoutTokenPrice": 0
+    },
+    {
+      "variant": "no-review",
+      "evaluated": 6,
+      "expected": 32,
+      "successes": 5,
+      "meanSeconds": 398.3521666666667,
+      "tokenPricedUsd": 0.59471191,
+      "trialsWithoutTokenPrice": 0
+    },
+    {
+      "variant": "read-480",
+      "evaluated": 7,
+      "expected": 32,
+      "successes": 6,
+      "meanSeconds": 304.36557142857146,
+      "tokenPricedUsd": 0.45228988000000003,
+      "trialsWithoutTokenPrice": 0
+    }
+  ],
+  "comparisons": [
+    {
+      "variant": "no-guides",
+      "control": "control",
+      "pairedTasks": 0,
+      "expectedTasks": 16,
+      "complete": false,
+      "pairs": []
+    },
+    {
+      "variant": "no-preload",
+      "control": "control",
+      "pairedTasks": 0,
+      "expectedTasks": 16,
+      "complete": false,
+      "pairs": []
+    },
+    {
+      "variant": "no-review",
+      "control": "control",
+      "pairedTasks": 0,
+      "expectedTasks": 16,
+      "complete": false,
+      "pairs": []
+    },
+    {
+      "variant": "read-480",
+      "control": "control",
+      "pairedTasks": 0,
+      "expectedTasks": 16,
+      "complete": false,
+      "pairs": []
+    }
+  ],
+  "trials": [
+    {
+      "dataset": "",
+      "case": "vertex-version-path",
+      "name": "no-guides",
+      "label": "replication-p6-ablation-no-guides-r1",
+      "commit": "6d7fbe3e3c5192b6675c2bea2dc0af3913bd1480",
+      "effort": "medium",
+      "evaluated": true,
+      "success": true,
+      "completed": true,
+      "completionReason": "completed",
+      "seconds": 219.522,
+      "acceptance": {
+        "exit": 0,
+        "tests": 6,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0,
+        "passed": true
+      },
+      "computedUsd": 0.0475538,
+      "activations": {
+        "initialMapNotices": 1,
+        "contextToolCalls": 0,
+        "guideIdsShown": [],
+        "unparsedContextPayloads": 0,
+        "finalReviewNotices": 1,
+        "testFocusNotices": 0,
+        "explorationFocusNotices": 1,
+        "readCallsByEffectiveLimit": {
+          "120": 2,
+          "80": 2,
+          "60": 1,
+          "30": 3,
+          "200": 1,
+          "220": 1,
+          "130": 1,
+          "110": 1,
+          "160": 1,
+          "14": 1,
+          "22": 1,
+          "26": 1
+        },
+        "defaultWindowReadCalls": null,
+        "readLimitProvenance": "unknown: saved arguments include host-injected defaults"
+      }
+    },
+    {
+      "dataset": "",
+      "case": "vertex-version-path",
+      "name": "no-preload",
+      "label": "replication-p6-ablation-no-preload-r1",
+      "commit": "9b7cffd3ff2ca5a5c078321e879c9ee728b9a70c",
+      "effort": "medium",
+      "evaluated": true,
+      "success": true,
+      "completed": true,
+      "completionReason": "completed",
+      "seconds": 271.419,
+      "acceptance": {
+        "exit": 0,
+        "tests": 6,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0,
+        "passed": true
+      },
+      "computedUsd": 0.043904898000000005,
+      "activations": {
+        "initialMapNotices": 0,
+        "contextToolCalls": 1,
+        "guideIdsShown": [
+          "vertex-version-url-components"
+        ],
+        "unparsedContextPayloads": 0,
+        "finalReviewNotices": 1,
+        "testFocusNotices": 0,
+        "explorationFocusNotices": 1,
+        "readCallsByEffectiveLimit": {
+          "200": 1,
+          "180": 1,
+          "160": 1,
+          "300": 1,
+          "130": 1,
+          "80": 3,
+          "40": 1,
+          "60": 1,
+          "55": 1
+        },
+        "defaultWindowReadCalls": null,
+        "readLimitProvenance": "unknown: saved arguments include host-injected defaults"
+      }
+    },
+    {
+      "dataset": "",
+      "case": "vertex-version-path",
+      "name": "no-review",
+      "label": "replication-p6-ablation-no-review-r1",
+      "commit": "33a4ed86b414245c0b87546551b693ff216888e3",
+      "effort": "medium",
+      "evaluated": true,
+      "success": true,
+      "completed": true,
+      "completionReason": "completed",
+      "seconds": 308.497,
+      "acceptance": {
+        "exit": 0,
+        "tests": 6,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0,
+        "passed": true
+      },
+      "computedUsd": 0.13918541,
+      "activations": {
+        "initialMapNotices": 1,
+        "contextToolCalls": 0,
+        "guideIdsShown": [
+          "vertex-version-url-components"
+        ],
+        "unparsedContextPayloads": 0,
+        "finalReviewNotices": 0,
+        "testFocusNotices": 0,
+        "explorationFocusNotices": 1,
+        "readCallsByEffectiveLimit": {
+          "160": 1,
+          "150": 1,
+          "130": 1,
+          "120": 1,
+          "90": 1,
+          "80": 1,
+          "60": 1,
+          "25": 1,
+          "14": 1,
+          "70": 3,
+          "28": 1,
+          "35": 1
+        },
+        "defaultWindowReadCalls": null,
+        "readLimitProvenance": "unknown: saved arguments include host-injected defaults"
+      }
+    },
+    {
+      "dataset": "",
+      "case": "vertex-version-path",
+      "name": "control",
+      "label": "replication-p6-ablation-control-r1",
+      "commit": "f75ab327c649cec9719ac03847f171854d2e32ae",
+      "effort": "medium",
+      "evaluated": true,
+      "success": true,
+      "completed": true,
+      "completionReason": "completed",
+      "seconds": 296.441,
+      "acceptance": {
+        "exit": 0,
+        "tests": 6,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0,
+        "passed": true
+      },
+      "computedUsd": 0.04108156,
+      "activations": {
+        "initialMapNotices": 1,
+        "contextToolCalls": 0,
+        "guideIdsShown": [
+          "vertex-version-url-components"
+        ],
+        "unparsedContextPayloads": 0,
+        "finalReviewNotices": 1,
+        "testFocusNotices": 0,
+        "explorationFocusNotices": 1,
+        "readCallsByEffectiveLimit": {
+          "120": 1,
+          "140": 1,
+          "200": 1,
+          "160": 1,
+          "16": 1,
+          "70": 1,
+          "100": 2,
+          "50": 1,
+          "45": 1,
+          "110": 1,
+          "150": 1
+        },
+        "defaultWindowReadCalls": null,
+        "readLimitProvenance": "unknown: saved arguments include host-injected defaults"
+      }
+    },
+    {
+      "dataset": "",
+      "case": "vertex-version-path",
+      "name": "read-480",
+      "label": "replication-p6-ablation-read-480-r1",
+      "commit": "9e4af4bde94625d6eeca72efb0b9436e9d4fb43b",
+      "effort": "medium",
+      "evaluated": true,
+      "success": true,
+      "completed": true,
+      "completionReason": "completed",
+      "seconds": 201.745,
+      "acceptance": {
+        "exit": 0,
+        "tests": 6,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0,
+        "passed": true
+      },
+      "computedUsd": 0.032898158000000004,
+      "activations": {
+        "initialMapNotices": 1,
+        "contextToolCalls": 1,
+        "guideIdsShown": [
+          "vertex-version-url-components"
+        ],
+        "unparsedContextPayloads": 1,
+        "finalReviewNotices": 1,
+        "testFocusNotices": 0,
+        "explorationFocusNotices": 1,
+        "readCallsByEffectiveLimit": {
+          "120": 1,
+          "130": 1,
+          "80": 1,
+          "60": 1,
+          "160": 1,
+          "15": 1,
+          "30": 2,
+          "20": 1,
+          "140": 1
+        },
+        "defaultWindowReadCalls": null,
+        "readLimitProvenance": "unknown: saved arguments include host-injected defaults"
+      }
+    },
+    {
+      "dataset": "training2",
+      "case": "langfuse-session-traces",
+      "name": "no-guides",
+      "label": "replication-p6-ablation-no-guides-r1",
+      "commit": "6d7fbe3e3c5192b6675c2bea2dc0af3913bd1480",
+      "effort": "medium",
+      "evaluated": true,
+      "success": true,
+      "completed": true,
+      "completionReason": "completed",
+      "seconds": 366.099,
+      "acceptance": {
+        "exit": 0,
+        "tests": 60,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0,
+        "passed": true
+      },
+      "computedUsd": 0.09575091200000001,
+      "activations": {
+        "initialMapNotices": 1,
+        "contextToolCalls": 0,
+        "guideIdsShown": [],
+        "unparsedContextPayloads": 0,
+        "finalReviewNotices": 1,
+        "testFocusNotices": 0,
+        "explorationFocusNotices": 1,
+        "readCallsByEffectiveLimit": {
+          "180": 1,
+          "200": 2,
+          "120": 1,
+          "50": 1,
+          "130": 2,
+          "140": 1,
+          "20": 2,
+          "30": 1,
+          "15": 1,
+          "80": 1,
+          "45": 1
+        },
+        "defaultWindowReadCalls": null,
+        "readLimitProvenance": "unknown: saved arguments include host-injected defaults"
+      }
+    },
+    {
+      "dataset": "training2",
+      "case": "langfuse-session-traces",
+      "name": "read-480",
+      "label": "replication-p6-ablation-read-480-r1",
+      "commit": "9e4af4bde94625d6eeca72efb0b9436e9d4fb43b",
+      "effort": "medium",
+      "evaluated": true,
+      "success": true,
+      "completed": true,
+      "completionReason": "completed",
+      "seconds": 373.231,
+      "acceptance": {
+        "exit": 0,
+        "tests": 60,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0,
+        "passed": true
+      },
+      "computedUsd": 0.077454254,
+      "activations": {
+        "initialMapNotices": 1,
+        "contextToolCalls": 0,
+        "guideIdsShown": [],
+        "unparsedContextPayloads": 0,
+        "finalReviewNotices": 1,
+        "testFocusNotices": 0,
+        "explorationFocusNotices": 1,
+        "readCallsByEffectiveLimit": {
+          "160": 2,
+          "120": 2,
+          "80": 1,
+          "60": 1,
+          "45": 1,
+          "55": 1,
+          "180": 1,
+          "200": 2,
+          "50": 1,
+          "15": 2,
+          "20": 1,
+          "40": 1
+        },
+        "defaultWindowReadCalls": null,
+        "readLimitProvenance": "unknown: saved arguments include host-injected defaults"
+      }
+    },
+    {
+      "dataset": "training2",
+      "case": "langfuse-session-traces",
+      "name": "control",
+      "label": "replication-p6-ablation-control-r1",
+      "commit": "f75ab327c649cec9719ac03847f171854d2e32ae",
+      "effort": "medium",
+      "evaluated": true,
+      "success": true,
+      "completed": true,
+      "completionReason": "completed",
+      "seconds": 343.831,
+      "acceptance": {
+        "exit": 0,
+        "tests": 60,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0,
+        "passed": true
+      },
+      "computedUsd": 0.045080472,
+      "activations": {
+        "initialMapNotices": 1,
+        "contextToolCalls": 0,
+        "guideIdsShown": [],
+        "unparsedContextPayloads": 0,
+        "finalReviewNotices": 1,
+        "testFocusNotices": 0,
+        "explorationFocusNotices": 1,
+        "readCallsByEffectiveLimit": {
+          "180": 1,
+          "130": 1,
+          "45": 1,
+          "200": 1,
+          "80": 2,
+          "40": 2,
+          "140": 1,
+          "150": 1,
+          "30": 1,
+          "70": 1,
+          "35": 1
+        },
+        "defaultWindowReadCalls": null,
+        "readLimitProvenance": "unknown: saved arguments include host-injected defaults"
+      }
+    },
+    {
+      "dataset": "training2",
+      "case": "langfuse-session-traces",
+      "name": "no-review",
+      "label": "replication-p6-ablation-no-review-r1",
+      "commit": "33a4ed86b414245c0b87546551b693ff216888e3",
+      "effort": "medium",
+      "evaluated": true,
+      "success": true,
+      "completed": true,
+      "completionReason": "completed",
+      "seconds": 295.709,
+      "acceptance": {
+        "exit": 0,
+        "tests": 60,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0,
+        "passed": true
+      },
+      "computedUsd": 0.09379686,
+      "activations": {
+        "initialMapNotices": 1,
+        "contextToolCalls": 0,
+        "guideIdsShown": [],
+        "unparsedContextPayloads": 0,
+        "finalReviewNotices": 0,
+        "testFocusNotices": 0,
+        "explorationFocusNotices": 1,
+        "readCallsByEffectiveLimit": {
+          "200": 1,
+          "120": 2,
+          "160": 1,
+          "140": 1,
+          "80": 3,
+          "50": 2,
+          "150": 1,
+          "60": 3,
+          "180": 1,
+          "110": 1,
+          "45": 1,
+          "55": 1,
+          "30": 1
+        },
+        "defaultWindowReadCalls": null,
+        "readLimitProvenance": "unknown: saved arguments include host-injected defaults"
+      }
+    },
+    {
+      "dataset": "training2",
+      "case": "langfuse-session-traces",
+      "name": "no-preload",
+      "label": "replication-p6-ablation-no-preload-r1",
+      "commit": "9b7cffd3ff2ca5a5c078321e879c9ee728b9a70c",
+      "effort": "medium",
+      "evaluated": true,
+      "success": true,
+      "completed": true,
+      "completionReason": "completed",
+      "seconds": 494.4,
+      "acceptance": {
+        "exit": 0,
+        "tests": 60,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0,
+        "passed": true
+      },
+      "computedUsd": 0.078511198,
+      "activations": {
+        "initialMapNotices": 0,
+        "contextToolCalls": 1,
+        "guideIdsShown": [],
+        "unparsedContextPayloads": 0,
+        "finalReviewNotices": 1,
+        "testFocusNotices": 0,
+        "explorationFocusNotices": 1,
+        "readCallsByEffectiveLimit": {
+          "160": 2,
+          "120": 4,
+          "80": 3,
+          "60": 2,
+          "40": 2,
+          "220": 2,
+          "130": 1,
+          "200": 1,
+          "180": 1,
+          "90": 1,
+          "110": 1,
+          "15": 1,
+          "14": 1,
+          "115": 1
+        },
+        "defaultWindowReadCalls": null,
+        "readLimitProvenance": "unknown: saved arguments include host-injected defaults"
+      }
+    },
+    {
+      "dataset": "",
+      "case": "converse-config",
+      "name": "read-480",
+      "label": "replication-p6-ablation-read-480-r1",
+      "commit": "9e4af4bde94625d6eeca72efb0b9436e9d4fb43b",
+      "effort": "medium",
+      "evaluated": true,
+      "success": true,
+      "completed": true,
+      "completionReason": "completed",
+      "seconds": 79.56,
+      "acceptance": {
+        "exit": 0,
+        "tests": 2,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0,
+        "passed": true
+      },
+      "computedUsd": 0.014836892,
+      "activations": {
+        "initialMapNotices": 1,
+        "contextToolCalls": 0,
+        "guideIdsShown": [],
+        "unparsedContextPayloads": 0,
+        "finalReviewNotices": 1,
+        "testFocusNotices": 0,
+        "explorationFocusNotices": 0,
+        "readCallsByEffectiveLimit": {
+          "140": 1,
+          "120": 2,
+          "60": 1,
+          "80": 2,
+          "50": 1,
+          "130": 1,
+          "70": 1,
+          "40": 1
+        },
+        "defaultWindowReadCalls": null,
+        "readLimitProvenance": "unknown: saved arguments include host-injected defaults"
+      }
+    },
+    {
+      "dataset": "",
+      "case": "converse-config",
+      "name": "no-review",
+      "label": "replication-p6-ablation-no-review-r1",
+      "commit": "33a4ed86b414245c0b87546551b693ff216888e3",
+      "effort": "medium",
+      "evaluated": true,
+      "success": true,
+      "completed": true,
+      "completionReason": "completed",
+      "seconds": 126.052,
+      "acceptance": {
+        "exit": 0,
+        "tests": 2,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0,
+        "passed": true
+      },
+      "computedUsd": 0.020552064000000002,
+      "activations": {
+        "initialMapNotices": 1,
+        "contextToolCalls": 1,
+        "guideIdsShown": [],
+        "unparsedContextPayloads": 1,
+        "finalReviewNotices": 0,
+        "testFocusNotices": 0,
+        "explorationFocusNotices": 0,
+        "readCallsByEffectiveLimit": {
+          "160": 1,
+          "100": 1,
+          "70": 3,
+          "45": 1,
+          "40": 2,
+          "55": 1,
+          "56": 1
+        },
+        "defaultWindowReadCalls": null,
+        "readLimitProvenance": "unknown: saved arguments include host-injected defaults"
+      }
+    },
+    {
+      "dataset": "",
+      "case": "converse-config",
+      "name": "no-guides",
+      "label": "replication-p6-ablation-no-guides-r1",
+      "commit": "6d7fbe3e3c5192b6675c2bea2dc0af3913bd1480",
+      "effort": "medium",
+      "evaluated": true,
+      "success": true,
+      "completed": true,
+      "completionReason": "completed",
+      "seconds": 79.183,
+      "acceptance": {
+        "exit": 0,
+        "tests": 2,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0,
+        "passed": true
+      },
+      "computedUsd": 0.013028328,
+      "activations": {
+        "initialMapNotices": 1,
+        "contextToolCalls": 0,
+        "guideIdsShown": [],
+        "unparsedContextPayloads": 0,
+        "finalReviewNotices": 1,
+        "testFocusNotices": 0,
+        "explorationFocusNotices": 0,
+        "readCallsByEffectiveLimit": {
+          "150": 1,
+          "130": 1,
+          "60": 1,
+          "30": 2,
+          "70": 1,
+          "160": 1,
+          "40": 1
+        },
+        "defaultWindowReadCalls": null,
+        "readLimitProvenance": "unknown: saved arguments include host-injected defaults"
+      }
+    },
+    {
+      "dataset": "",
+      "case": "converse-config",
+      "name": "no-preload",
+      "label": "replication-p6-ablation-no-preload-r1",
+      "commit": "9b7cffd3ff2ca5a5c078321e879c9ee728b9a70c",
+      "effort": "medium",
+      "evaluated": true,
+      "success": true,
+      "completed": true,
+      "completionReason": "completed",
+      "seconds": 98.364,
+      "acceptance": {
+        "exit": 0,
+        "tests": 2,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0,
+        "passed": true
+      },
+      "computedUsd": 0.018994678,
+      "activations": {
+        "initialMapNotices": 0,
+        "contextToolCalls": 1,
+        "guideIdsShown": [],
+        "unparsedContextPayloads": 0,
+        "finalReviewNotices": 1,
+        "testFocusNotices": 0,
+        "explorationFocusNotices": 0,
+        "readCallsByEffectiveLimit": {
+          "220": 1,
+          "120": 2,
+          "210": 1,
+          "70": 1,
+          "60": 2,
+          "25": 1,
+          "30": 1
+        },
+        "defaultWindowReadCalls": null,
+        "readLimitProvenance": "unknown: saved arguments include host-injected defaults"
+      }
+    },
+    {
+      "dataset": "",
+      "case": "converse-config",
+      "name": "control",
+      "label": "replication-p6-ablation-control-r1",
+      "commit": "f75ab327c649cec9719ac03847f171854d2e32ae",
+      "effort": "medium",
+      "evaluated": true,
+      "success": true,
+      "completed": true,
+      "completionReason": "completed",
+      "seconds": 70.637,
+      "acceptance": {
+        "exit": 0,
+        "tests": 2,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0,
+        "passed": true
+      },
+      "computedUsd": 0.012658386,
+      "activations": {
+        "initialMapNotices": 1,
+        "contextToolCalls": 0,
+        "guideIdsShown": [],
+        "unparsedContextPayloads": 0,
+        "finalReviewNotices": 1,
+        "testFocusNotices": 0,
+        "explorationFocusNotices": 0,
+        "readCallsByEffectiveLimit": {
+          "80": 2,
+          "160": 1,
+          "120": 1,
+          "60": 1,
+          "40": 1,
+          "36": 1
+        },
+        "defaultWindowReadCalls": null,
+        "readLimitProvenance": "unknown: saved arguments include host-injected defaults"
+      }
+    },
+    {
+      "dataset": "",
+      "case": "dashscope-rerank",
+      "name": "no-review",
+      "label": "replication-p6-ablation-no-review-r1",
+      "commit": "33a4ed86b414245c0b87546551b693ff216888e3",
+      "effort": "medium",
+      "evaluated": true,
+      "success": true,
+      "completed": true,
+      "completionReason": "completed",
+      "seconds": 670.044,
+      "acceptance": {
+        "exit": 0,
+        "tests": 10,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0,
+        "passed": true
+      },
+      "computedUsd": 0.088648216,
+      "activations": {
+        "initialMapNotices": 1,
+        "contextToolCalls": 0,
+        "guideIdsShown": [
+          "dashscope-compatible-rerank-endpoint"
+        ],
+        "unparsedContextPayloads": 0,
+        "finalReviewNotices": 0,
+        "testFocusNotices": 0,
+        "explorationFocusNotices": 1,
+        "readCallsByEffectiveLimit": {
+          "160": 7,
+          "120": 3,
+          "200": 1,
+          "60": 1,
+          "130": 1
+        },
+        "defaultWindowReadCalls": null,
+        "readLimitProvenance": "unknown: saved arguments include host-injected defaults"
+      }
+    },
+    {
+      "dataset": "",
+      "case": "dashscope-rerank",
+      "name": "control",
+      "label": "replication-p6-ablation-control-r1",
+      "commit": "f75ab327c649cec9719ac03847f171854d2e32ae",
+      "effort": "medium",
+      "evaluated": true,
+      "success": false,
+      "completed": true,
+      "completionReason": "completed",
+      "seconds": 168.649,
+      "acceptance": {
+        "exit": 1,
+        "tests": 10,
+        "failures": 1,
+        "errors": 0,
+        "skipped": 0,
+        "passed": false
+      },
+      "computedUsd": 0.031320586,
+      "activations": {
+        "initialMapNotices": 1,
+        "contextToolCalls": 0,
+        "guideIdsShown": [
+          "dashscope-compatible-rerank-endpoint"
+        ],
+        "unparsedContextPayloads": 0,
+        "finalReviewNotices": 1,
+        "testFocusNotices": 0,
+        "explorationFocusNotices": 1,
+        "readCallsByEffectiveLimit": {
+          "160": 9,
+          "180": 1,
+          "60": 2,
+          "30": 1,
+          "120": 1,
+          "100": 1
+        },
+        "defaultWindowReadCalls": null,
+        "readLimitProvenance": "unknown: saved arguments include host-injected defaults"
+      }
+    },
+    {
+      "dataset": "",
+      "case": "dashscope-rerank",
+      "name": "no-guides",
+      "label": "replication-p6-ablation-no-guides-r1",
+      "commit": "6d7fbe3e3c5192b6675c2bea2dc0af3913bd1480",
+      "effort": "medium",
+      "evaluated": true,
+      "success": false,
+      "completed": true,
+      "completionReason": "completed",
+      "seconds": 389.173,
+      "acceptance": {
+        "exit": 1,
+        "tests": 10,
+        "failures": 8,
+        "errors": 0,
+        "skipped": 0,
+        "passed": false
+      },
+      "computedUsd": 0.05559278,
+      "activations": {
+        "initialMapNotices": 1,
+        "contextToolCalls": 0,
+        "guideIdsShown": [],
+        "unparsedContextPayloads": 0,
+        "finalReviewNotices": 1,
+        "testFocusNotices": 0,
+        "explorationFocusNotices": 1,
+        "readCallsByEffectiveLimit": {
+          "160": 7,
+          "120": 5,
+          "200": 1,
+          "80": 1
+        },
+        "defaultWindowReadCalls": null,
+        "readLimitProvenance": "unknown: saved arguments include host-injected defaults"
+      }
+    },
+    {
+      "dataset": "",
+      "case": "dashscope-rerank",
+      "name": "no-preload",
+      "label": "replication-p6-ablation-no-preload-r1",
+      "commit": "9b7cffd3ff2ca5a5c078321e879c9ee728b9a70c",
+      "effort": "medium",
+      "evaluated": true,
+      "success": false,
+      "completed": true,
+      "completionReason": "completed",
+      "seconds": 240.391,
+      "acceptance": {
+        "exit": 1,
+        "tests": 10,
+        "failures": 1,
+        "errors": 0,
+        "skipped": 0,
+        "passed": false
+      },
+      "computedUsd": 0.040769468,
+      "activations": {
+        "initialMapNotices": 0,
+        "contextToolCalls": 1,
+        "guideIdsShown": [
+          "dashscope-compatible-rerank-endpoint"
+        ],
+        "unparsedContextPayloads": 0,
+        "finalReviewNotices": 1,
+        "testFocusNotices": 0,
+        "explorationFocusNotices": 1,
+        "readCallsByEffectiveLimit": {
+          "160": 8,
+          "200": 2,
+          "80": 1,
+          "60": 1,
+          "90": 1
+        },
+        "defaultWindowReadCalls": null,
+        "readLimitProvenance": "unknown: saved arguments include host-injected defaults"
+      }
+    },
+    {
+      "dataset": "",
+      "case": "dashscope-rerank",
+      "name": "read-480",
+      "label": "replication-p6-ablation-read-480-r1",
+      "commit": "9e4af4bde94625d6eeca72efb0b9436e9d4fb43b",
+      "effort": "medium",
+      "evaluated": true,
+      "success": true,
+      "completed": true,
+      "completionReason": "completed",
+      "seconds": 329.232,
+      "acceptance": {
+        "exit": 0,
+        "tests": 10,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0,
+        "passed": true
+      },
+      "computedUsd": 0.057822232,
+      "activations": {
+        "initialMapNotices": 1,
+        "contextToolCalls": 0,
+        "guideIdsShown": [
+          "dashscope-compatible-rerank-endpoint"
+        ],
+        "unparsedContextPayloads": 0,
+        "finalReviewNotices": 1,
+        "testFocusNotices": 0,
+        "explorationFocusNotices": 1,
+        "readCallsByEffectiveLimit": {
+          "480": 5,
+          "70": 3,
+          "50": 1,
+          "40": 1,
+          "200": 1,
+          "140": 1,
+          "400": 1,
+          "230": 1,
+          "120": 2,
+          "12": 2
+        },
+        "defaultWindowReadCalls": null,
+        "readLimitProvenance": "unknown: saved arguments include host-injected defaults"
+      }
+    },
+    {
+      "dataset": "training2",
+      "case": "bedrock-session-tags",
+      "name": "control",
+      "label": "replication-p6-ablation-control-r1",
+      "commit": "f75ab327c649cec9719ac03847f171854d2e32ae",
+      "effort": "medium",
+      "evaluated": true,
+      "success": false,
+      "completed": true,
+      "completionReason": "completed",
+      "seconds": 651.839,
+      "acceptance": {
+        "exit": 1,
+        "tests": 34,
+        "failures": 7,
+        "errors": 0,
+        "skipped": 0,
+        "passed": false
+      },
+      "computedUsd": 0.244945974,
+      "activations": {
+        "initialMapNotices": 1,
+        "contextToolCalls": 0,
+        "guideIdsShown": [
+          "router-resolution-and-request-state"
+        ],
+        "unparsedContextPayloads": 0,
+        "finalReviewNotices": 1,
+        "testFocusNotices": 0,
+        "explorationFocusNotices": 1,
+        "readCallsByEffectiveLimit": {
+          "200": 2,
+          "160": 2,
+          "300": 2,
+          "280": 1,
+          "220": 1,
+          "130": 1,
+          "70": 3,
+          "60": 2,
+          "120": 1,
+          "100": 1,
+          "110": 1,
+          "30": 3,
+          "45": 1,
+          "50": 2,
+          "80": 2,
+          "40": 3,
+          "65": 1
+        },
+        "defaultWindowReadCalls": null,
+        "readLimitProvenance": "unknown: saved arguments include host-injected defaults"
+      }
+    },
+    {
+      "dataset": "training2",
+      "case": "bedrock-session-tags",
+      "name": "no-preload",
+      "label": "replication-p6-ablation-no-preload-r1",
+      "commit": "9b7cffd3ff2ca5a5c078321e879c9ee728b9a70c",
+      "effort": "medium",
+      "evaluated": true,
+      "success": false,
+      "completed": true,
+      "completionReason": "completed",
+      "seconds": 664.132,
+      "acceptance": {
+        "exit": 1,
+        "tests": 34,
+        "failures": 10,
+        "errors": 0,
+        "skipped": 0,
+        "passed": false
+      },
+      "computedUsd": 0.27205395000000004,
+      "activations": {
+        "initialMapNotices": 0,
+        "contextToolCalls": 0,
+        "guideIdsShown": [],
+        "unparsedContextPayloads": 0,
+        "finalReviewNotices": 1,
+        "testFocusNotices": 0,
+        "explorationFocusNotices": 1,
+        "readCallsByEffectiveLimit": {
+          "120": 5,
+          "600": 1,
+          "500": 1,
+          "380": 1,
+          "200": 3,
+          "60": 7,
+          "180": 4,
+          "220": 1,
+          "160": 1,
+          "130": 2,
+          "240": 1,
+          "80": 2,
+          "70": 2,
+          "40": 4,
+          "50": 1,
+          "45": 2,
+          "20": 2,
+          "75": 1,
+          "30": 1
+        },
+        "defaultWindowReadCalls": null,
+        "readLimitProvenance": "unknown: saved arguments include host-injected defaults"
+      }
+    },
+    {
+      "dataset": "training2",
+      "case": "bedrock-session-tags",
+      "name": "no-review",
+      "label": "replication-p6-ablation-no-review-r1",
+      "commit": "33a4ed86b414245c0b87546551b693ff216888e3",
+      "effort": "medium",
+      "evaluated": true,
+      "success": false,
+      "completed": true,
+      "completionReason": "completed",
+      "seconds": 776.569,
+      "acceptance": {
+        "exit": 1,
+        "tests": 34,
+        "failures": 7,
+        "errors": 0,
+        "skipped": 0,
+        "passed": false
+      },
+      "computedUsd": 0.221899646,
+      "activations": {
+        "initialMapNotices": 1,
+        "contextToolCalls": 2,
+        "guideIdsShown": [
+          "router-resolution-and-request-state"
+        ],
+        "unparsedContextPayloads": 0,
+        "finalReviewNotices": 0,
+        "testFocusNotices": 0,
+        "explorationFocusNotices": 1,
+        "readCallsByEffectiveLimit": {
+          "80": 7,
+          "200": 2,
+          "300": 1,
+          "160": 3,
+          "110": 2,
+          "100": 2,
+          "120": 3,
+          "130": 2,
+          "60": 2,
+          "140": 1,
+          "40": 3,
+          "50": 3,
+          "18": 1,
+          "70": 3,
+          "95": 1,
+          "90": 1,
+          "20": 1,
+          "45": 1
+        },
+        "defaultWindowReadCalls": null,
+        "readLimitProvenance": "unknown: saved arguments include host-injected defaults"
+      }
+    },
+    {
+      "dataset": "training2",
+      "case": "bedrock-session-tags",
+      "name": "read-480",
+      "label": "replication-p6-ablation-read-480-r1",
+      "commit": "9e4af4bde94625d6eeca72efb0b9436e9d4fb43b",
+      "effort": "medium",
+      "evaluated": true,
+      "success": false,
+      "completed": true,
+      "completionReason": "completed",
+      "seconds": 665.263,
+      "acceptance": {
+        "exit": 1,
+        "tests": 34,
+        "failures": 10,
+        "errors": 0,
+        "skipped": 0,
+        "passed": false
+      },
+      "computedUsd": 0.171486046,
+      "activations": {
+        "initialMapNotices": 1,
+        "contextToolCalls": 0,
+        "guideIdsShown": [
+          "router-resolution-and-request-state"
+        ],
+        "unparsedContextPayloads": 0,
+        "finalReviewNotices": 1,
+        "testFocusNotices": 0,
+        "explorationFocusNotices": 1,
+        "readCallsByEffectiveLimit": {
+          "480": 3,
+          "420": 1,
+          "262": 1,
+          "130": 1,
+          "80": 3,
+          "70": 6,
+          "60": 6,
+          "120": 2,
+          "180": 2,
+          "50": 1,
+          "40": 5,
+          "75": 1,
+          "45": 1,
+          "30": 1
+        },
+        "defaultWindowReadCalls": null,
+        "readLimitProvenance": "unknown: saved arguments include host-injected defaults"
+      }
+    },
+    {
+      "dataset": "training2",
+      "case": "bedrock-session-tags",
+      "name": "no-guides",
+      "label": "replication-p6-ablation-no-guides-r1",
+      "commit": "6d7fbe3e3c5192b6675c2bea2dc0af3913bd1480",
+      "effort": "medium",
+      "evaluated": true,
+      "success": false,
+      "completed": true,
+      "completionReason": "completed",
+      "seconds": 724.171,
+      "acceptance": {
+        "exit": 1,
+        "tests": 34,
+        "failures": 11,
+        "errors": 0,
+        "skipped": 0,
+        "passed": false
+      },
+      "computedUsd": 0.6883104600000001,
+      "activations": {
+        "initialMapNotices": 1,
+        "contextToolCalls": 0,
+        "guideIdsShown": [],
+        "unparsedContextPayloads": 0,
+        "finalReviewNotices": 1,
+        "testFocusNotices": 0,
+        "explorationFocusNotices": 1,
+        "readCallsByEffectiveLimit": {
+          "160": 2,
+          "400": 3,
+          "180": 3,
+          "40": 4,
+          "80": 4,
+          "340": 1,
+          "60": 5,
+          "140": 1,
+          "130": 3,
+          "50": 2,
+          "30": 5,
+          "70": 4,
+          "120": 2,
+          "100": 2,
+          "25": 1,
+          "20": 2,
+          "110": 1
+        },
+        "defaultWindowReadCalls": null,
+        "readLimitProvenance": "unknown: saved arguments include host-injected defaults"
+      }
+    },
+    {
+      "dataset": "",
+      "case": "router-candidates",
+      "name": "no-preload",
+      "label": "replication-p6-ablation-no-preload-r1",
+      "commit": "9b7cffd3ff2ca5a5c078321e879c9ee728b9a70c",
+      "effort": "medium",
+      "evaluated": true,
+      "success": true,
+      "completed": true,
+      "completionReason": "completed",
+      "seconds": 99.167,
+      "acceptance": {
+        "exit": 0,
+        "tests": 1,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0,
+        "passed": true
+      },
+      "computedUsd": 0.018963064,
+      "activations": {
+        "initialMapNotices": 0,
+        "contextToolCalls": 1,
+        "guideIdsShown": [
+          "router-resolution-and-request-state"
+        ],
+        "unparsedContextPayloads": 0,
+        "finalReviewNotices": 1,
+        "testFocusNotices": 0,
+        "explorationFocusNotices": 1,
+        "readCallsByEffectiveLimit": {
+          "300": 1,
+          "160": 2,
+          "80": 1,
+          "120": 1,
+          "60": 1,
+          "70": 1,
+          "40": 1,
+          "30": 1
+        },
+        "defaultWindowReadCalls": null,
+        "readLimitProvenance": "unknown: saved arguments include host-injected defaults"
+      }
+    },
+    {
+      "dataset": "",
+      "case": "router-candidates",
+      "name": "no-guides",
+      "label": "replication-p6-ablation-no-guides-r1",
+      "commit": "6d7fbe3e3c5192b6675c2bea2dc0af3913bd1480",
+      "effort": "medium",
+      "evaluated": true,
+      "success": true,
+      "completed": true,
+      "completionReason": "completed",
+      "seconds": 208.796,
+      "acceptance": {
+        "exit": 0,
+        "tests": 1,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0,
+        "passed": true
+      },
+      "computedUsd": 0.028409942,
+      "activations": {
+        "initialMapNotices": 1,
+        "contextToolCalls": 0,
+        "guideIdsShown": [],
+        "unparsedContextPayloads": 0,
+        "finalReviewNotices": 1,
+        "testFocusNotices": 0,
+        "explorationFocusNotices": 1,
+        "readCallsByEffectiveLimit": {
+          "28": 1,
+          "18": 1
+        },
+        "defaultWindowReadCalls": null,
+        "readLimitProvenance": "unknown: saved arguments include host-injected defaults"
+      }
+    },
+    {
+      "dataset": "",
+      "case": "router-candidates",
+      "name": "control",
+      "label": "replication-p6-ablation-control-r1",
+      "commit": "f75ab327c649cec9719ac03847f171854d2e32ae",
+      "effort": "medium",
+      "evaluated": true,
+      "success": true,
+      "completed": true,
+      "completionReason": "completed",
+      "seconds": 175.281,
+      "acceptance": {
+        "exit": 0,
+        "tests": 1,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0,
+        "passed": true
+      },
+      "computedUsd": 0.030563324000000003,
+      "activations": {
+        "initialMapNotices": 1,
+        "contextToolCalls": 3,
+        "guideIdsShown": [
+          "router-resolution-and-request-state"
+        ],
+        "unparsedContextPayloads": 3,
+        "finalReviewNotices": 1,
+        "testFocusNotices": 0,
+        "explorationFocusNotices": 1,
+        "readCallsByEffectiveLimit": {
+          "160": 2,
+          "60": 2,
+          "50": 1,
+          "180": 1,
+          "120": 1,
+          "80": 2,
+          "40": 1,
+          "100": 1,
+          "45": 1,
+          "25": 1
+        },
+        "defaultWindowReadCalls": null,
+        "readLimitProvenance": "unknown: saved arguments include host-injected defaults"
+      }
+    },
+    {
+      "dataset": "",
+      "case": "router-candidates",
+      "name": "no-review",
+      "label": "replication-p6-ablation-no-review-r1",
+      "commit": "33a4ed86b414245c0b87546551b693ff216888e3",
+      "effort": "medium",
+      "evaluated": true,
+      "success": true,
+      "completed": true,
+      "completionReason": "completed",
+      "seconds": 213.242,
+      "acceptance": {
+        "exit": 0,
+        "tests": 1,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0,
+        "passed": true
+      },
+      "computedUsd": 0.030629714000000002,
+      "activations": {
+        "initialMapNotices": 1,
+        "contextToolCalls": 1,
+        "guideIdsShown": [
+          "router-resolution-and-request-state"
+        ],
+        "unparsedContextPayloads": 1,
+        "finalReviewNotices": 0,
+        "testFocusNotices": 0,
+        "explorationFocusNotices": 1,
+        "readCallsByEffectiveLimit": {
+          "200": 1,
+          "120": 2,
+          "160": 1,
+          "220": 1,
+          "180": 1,
+          "80": 2,
+          "60": 3,
+          "45": 1,
+          "30": 1
+        },
+        "defaultWindowReadCalls": null,
+        "readLimitProvenance": "unknown: saved arguments include host-injected defaults"
+      }
+    },
+    {
+      "dataset": "",
+      "case": "router-candidates",
+      "name": "read-480",
+      "label": "replication-p6-ablation-read-480-r1",
+      "commit": "9e4af4bde94625d6eeca72efb0b9436e9d4fb43b",
+      "effort": "medium",
+      "evaluated": true,
+      "success": true,
+      "completed": true,
+      "completionReason": "completed",
+      "seconds": 276.378,
+      "acceptance": {
+        "exit": 0,
+        "tests": 1,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0,
+        "passed": true
+      },
+      "computedUsd": 0.033347552,
+      "activations": {
+        "initialMapNotices": 1,
+        "contextToolCalls": 0,
+        "guideIdsShown": [
+          "router-resolution-and-request-state"
+        ],
+        "unparsedContextPayloads": 0,
+        "finalReviewNotices": 1,
+        "testFocusNotices": 0,
+        "explorationFocusNotices": 1,
+        "readCallsByEffectiveLimit": {
+          "130": 3,
+          "120": 3,
+          "480": 1,
+          "110": 1,
+          "80": 1,
+          "140": 1,
+          "60": 1,
+          "50": 1,
+          "70": 1,
+          "40": 1
+        },
+        "defaultWindowReadCalls": null,
+        "readLimitProvenance": "unknown: saved arguments include host-injected defaults"
+      }
+    },
+    {
+      "dataset": "training2",
+      "case": "mcp-optional-discovery",
+      "name": "control",
+      "label": "replication-p6-ablation-control-r1",
+      "commit": "f75ab327c649cec9719ac03847f171854d2e32ae",
+      "effort": "medium",
+      "evaluated": true,
+      "success": true,
+      "completed": true,
+      "completionReason": "completed",
+      "seconds": 266.014,
+      "acceptance": {
+        "exit": 0,
+        "tests": 29,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0,
+        "passed": true
+      },
+      "computedUsd": 0.090655866,
+      "activations": {
+        "initialMapNotices": 1,
+        "contextToolCalls": 1,
+        "guideIdsShown": [],
+        "unparsedContextPayloads": 1,
+        "finalReviewNotices": 1,
+        "testFocusNotices": 0,
+        "explorationFocusNotices": 1,
+        "readCallsByEffectiveLimit": {
+          "120": 1,
+          "180": 1,
+          "160": 1,
+          "200": 1,
+          "60": 2,
+          "40": 1,
+          "70": 1
+        },
+        "defaultWindowReadCalls": null,
+        "readLimitProvenance": "unknown: saved arguments include host-injected defaults"
+      }
+    },
+    {
+      "dataset": "training2",
+      "case": "mcp-optional-discovery",
+      "name": "read-480",
+      "label": "replication-p6-ablation-read-480-r1",
+      "commit": "9e4af4bde94625d6eeca72efb0b9436e9d4fb43b",
+      "effort": "medium",
+      "evaluated": true,
+      "success": true,
+      "completed": true,
+      "completionReason": "completed",
+      "seconds": 205.15,
+      "acceptance": {
+        "exit": 0,
+        "tests": 29,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0,
+        "passed": true
+      },
+      "computedUsd": 0.064444746,
+      "activations": {
+        "initialMapNotices": 1,
+        "contextToolCalls": 1,
+        "guideIdsShown": [],
+        "unparsedContextPayloads": 1,
+        "finalReviewNotices": 1,
+        "testFocusNotices": 0,
+        "explorationFocusNotices": 1,
+        "readCallsByEffectiveLimit": {
+          "460": 1,
+          "130": 1,
+          "150": 1,
+          "280": 1,
+          "92": 1,
+          "60": 1,
+          "480": 1,
+          "10": 1,
+          "115": 1
+        },
+        "defaultWindowReadCalls": null,
+        "readLimitProvenance": "unknown: saved arguments include host-injected defaults"
+      }
+    },
+    {
+      "dataset": "training2",
+      "case": "mcp-optional-discovery",
+      "name": "no-preload",
+      "label": "replication-p6-ablation-no-preload-r1",
+      "commit": "9b7cffd3ff2ca5a5c078321e879c9ee728b9a70c",
+      "effort": "medium",
+      "evaluated": false
+    },
+    {
+      "dataset": "training2",
+      "case": "mcp-optional-discovery",
+      "name": "no-guides",
+      "label": "replication-p6-ablation-no-guides-r1",
+      "commit": "6d7fbe3e3c5192b6675c2bea2dc0af3913bd1480",
+      "effort": "medium",
+      "evaluated": false
+    },
+    {
+      "dataset": "training2",
+      "case": "mcp-optional-discovery",
+      "name": "no-review",
+      "label": "replication-p6-ablation-no-review-r1",
+      "commit": "33a4ed86b414245c0b87546551b693ff216888e3",
+      "effort": "medium",
+      "evaluated": false
+    },
+    {
+      "dataset": "",
+      "case": "databricks-reasoning",
+      "name": "read-480",
+      "label": "replication-p6-ablation-read-480-r1",
+      "commit": "9e4af4bde94625d6eeca72efb0b9436e9d4fb43b",
+      "effort": "medium",
+      "evaluated": false
+    },
+    {
+      "dataset": "",
+      "case": "databricks-reasoning",
+      "name": "no-review",
+      "label": "replication-p6-ablation-no-review-r1",
+      "commit": "33a4ed86b414245c0b87546551b693ff216888e3",
+      "effort": "medium",
+      "evaluated": false
+    },
+    {
+      "dataset": "",
+      "case": "databricks-reasoning",
+      "name": "control",
+      "label": "replication-p6-ablation-control-r1",
+      "commit": "f75ab327c649cec9719ac03847f171854d2e32ae",
+      "effort": "medium",
+      "evaluated": false
+    },
+    {
+      "dataset": "",
+      "case": "databricks-reasoning",
+      "name": "no-guides",
+      "label": "replication-p6-ablation-no-guides-r1",
+      "commit": "6d7fbe3e3c5192b6675c2bea2dc0af3913bd1480",
+      "effort": "medium",
+      "evaluated": false
+    },
+    {
+      "dataset": "",
+      "case": "databricks-reasoning",
+      "name": "no-preload",
+      "label": "replication-p6-ablation-no-preload-r1",
+      "commit": "9b7cffd3ff2ca5a5c078321e879c9ee728b9a70c",
+      "effort": "medium",
+      "evaluated": false
+    },
+    {
+      "dataset": "",
+      "case": "router-strategy-isolation",
+      "name": "no-guides",
+      "label": "replication-p6-ablation-no-guides-r1",
+      "commit": "6d7fbe3e3c5192b6675c2bea2dc0af3913bd1480",
+      "effort": "medium",
+      "evaluated": false
+    },
+    {
+      "dataset": "",
+      "case": "router-strategy-isolation",
+      "name": "read-480",
+      "label": "replication-p6-ablation-read-480-r1",
+      "commit": "9e4af4bde94625d6eeca72efb0b9436e9d4fb43b",
+      "effort": "medium",
+      "evaluated": false
+    },
+    {
+      "dataset": "",
+      "case": "router-strategy-isolation",
+      "name": "control",
+      "label": "replication-p6-ablation-control-r1",
+      "commit": "f75ab327c649cec9719ac03847f171854d2e32ae",
+      "effort": "medium",
+      "evaluated": false
+    },
+    {
+      "dataset": "",
+      "case": "router-strategy-isolation",
+      "name": "no-review",
+      "label": "replication-p6-ablation-no-review-r1",
+      "commit": "33a4ed86b414245c0b87546551b693ff216888e3",
+      "effort": "medium",
+      "evaluated": false
+    },
+    {
+      "dataset": "",
+      "case": "router-strategy-isolation",
+      "name": "no-preload",
+      "label": "replication-p6-ablation-no-preload-r1",
+      "commit": "9b7cffd3ff2ca5a5c078321e879c9ee728b9a70c",
+      "effort": "medium",
+      "evaluated": false
+    },
+    {
+      "dataset": "training2",
+      "case": "responses-custom-guardrail",
+      "name": "no-review",
+      "label": "replication-p6-ablation-no-review-r1",
+      "commit": "33a4ed86b414245c0b87546551b693ff216888e3",
+      "effort": "medium",
+      "evaluated": false
+    },
+    {
+      "dataset": "training2",
+      "case": "responses-custom-guardrail",
+      "name": "control",
+      "label": "replication-p6-ablation-control-r1",
+      "commit": "f75ab327c649cec9719ac03847f171854d2e32ae",
+      "effort": "medium",
+      "evaluated": false
+    },
+    {
+      "dataset": "training2",
+      "case": "responses-custom-guardrail",
+      "name": "no-guides",
+      "label": "replication-p6-ablation-no-guides-r1",
+      "commit": "6d7fbe3e3c5192b6675c2bea2dc0af3913bd1480",
+      "effort": "medium",
+      "evaluated": false
+    },
+    {
+      "dataset": "training2",
+      "case": "responses-custom-guardrail",
+      "name": "read-480",
+      "label": "replication-p6-ablation-read-480-r1",
+      "commit": "9e4af4bde94625d6eeca72efb0b9436e9d4fb43b",
+      "effort": "medium",
+      "evaluated": false
+    },
+    {
+      "dataset": "training2",
+      "case": "responses-custom-guardrail",
+      "name": "no-preload",
+      "label": "replication-p6-ablation-no-preload-r1",
+      "commit": "9b7cffd3ff2ca5a5c078321e879c9ee728b9a70c",
+      "effort": "medium",
+      "evaluated": false
+    },
+    {
+      "dataset": "",
+      "case": "anthropic-image-guardrail",
+      "name": "no-preload",
+      "label": "replication-p6-ablation-no-preload-r1",
+      "commit": "9b7cffd3ff2ca5a5c078321e879c9ee728b9a70c",
+      "effort": "medium",
+      "evaluated": false
+    },
+    {
+      "dataset": "",
+      "case": "anthropic-image-guardrail",
+      "name": "control",
+      "label": "replication-p6-ablation-control-r1",
+      "commit": "f75ab327c649cec9719ac03847f171854d2e32ae",
+      "effort": "medium",
+      "evaluated": false
+    },
+    {
+      "dataset": "",
+      "case": "anthropic-image-guardrail",
+      "name": "no-review",
+      "label": "replication-p6-ablation-no-review-r1",
+      "commit": "33a4ed86b414245c0b87546551b693ff216888e3",
+      "effort": "medium",
+      "evaluated": false
+    },
+    {
+      "dataset": "",
+      "case": "anthropic-image-guardrail",
+      "name": "no-guides",
+      "label": "replication-p6-ablation-no-guides-r1",
+      "commit": "6d7fbe3e3c5192b6675c2bea2dc0af3913bd1480",
+      "effort": "medium",
+      "evaluated": false
+    },
+    {
+      "dataset": "",
+      "case": "anthropic-image-guardrail",
+      "name": "read-480",
+      "label": "replication-p6-ablation-read-480-r1",
+      "commit": "9e4af4bde94625d6eeca72efb0b9436e9d4fb43b",
+      "effort": "medium",
+      "evaluated": false
+    },
+    {
+      "dataset": "",
+      "case": "empty-choices",
+      "name": "read-480",
+      "label": "replication-p6-ablation-read-480-r1",
+      "commit": "9e4af4bde94625d6eeca72efb0b9436e9d4fb43b",
+      "effort": "medium",
+      "evaluated": false
+    },
+    {
+      "dataset": "",
+      "case": "empty-choices",
+      "name": "no-review",
+      "label": "replication-p6-ablation-no-review-r1",
+      "commit": "33a4ed86b414245c0b87546551b693ff216888e3",
+      "effort": "medium",
+      "evaluated": false
+    },
+    {
+      "dataset": "",
+      "case": "empty-choices",
+      "name": "no-preload",
+      "label": "replication-p6-ablation-no-preload-r1",
+      "commit": "9b7cffd3ff2ca5a5c078321e879c9ee728b9a70c",
+      "effort": "medium",
+      "evaluated": false
+    },
+    {
+      "dataset": "",
+      "case": "empty-choices",
+      "name": "control",
+      "label": "replication-p6-ablation-control-r1",
+      "commit": "f75ab327c649cec9719ac03847f171854d2e32ae",
+      "effort": "medium",
+      "evaluated": false
+    },
+    {
+      "dataset": "",
+      "case": "empty-choices",
+      "name": "no-guides",
+      "label": "replication-p6-ablation-no-guides-r1",
+      "commit": "6d7fbe3e3c5192b6675c2bea2dc0af3913bd1480",
+      "effort": "medium",
+      "evaluated": false
+    },
+    {
+      "dataset": "",
+      "case": "team-member-budget",
+      "name": "no-preload",
+      "label": "replication-p6-ablation-no-preload-r1",
+      "commit": "9b7cffd3ff2ca5a5c078321e879c9ee728b9a70c",
+      "effort": "medium",
+      "evaluated": false
+    },
+    {
+      "dataset": "",
+      "case": "team-member-budget",
+      "name": "control",
+      "label": "replication-p6-ablation-control-r1",
+      "commit": "f75ab327c649cec9719ac03847f171854d2e32ae",
+      "effort": "medium",
+      "evaluated": false
+    },
+    {
+      "dataset": "",
+      "case": "team-member-budget",
+      "name": "read-480",
+      "label": "replication-p6-ablation-read-480-r1",
+      "commit": "9e4af4bde94625d6eeca72efb0b9436e9d4fb43b",
+      "effort": "medium",
+      "evaluated": false
+    },
+    {
+      "dataset": "",
+      "case": "team-member-budget",
+      "name": "no-review",
+      "label": "replication-p6-ablation-no-review-r1",
+      "commit": "33a4ed86b414245c0b87546551b693ff216888e3",
+      "effort": "medium",
+      "evaluated": false
+    },
+    {
+      "dataset": "",
+      "case": "team-member-budget",
+      "name": "no-guides",
+      "label": "replication-p6-ablation-no-guides-r1",
+      "commit": "6d7fbe3e3c5192b6675c2bea2dc0af3913bd1480",
+      "effort": "medium",
+      "evaluated": false
+    },
+    {
+      "dataset": "training2",
+      "case": "mcp-auth-challenge",
+      "name": "control",
+      "label": "replication-p6-ablation-control-r1",
+      "commit": "f75ab327c649cec9719ac03847f171854d2e32ae",
+      "effort": "medium",
+      "evaluated": false
+    },
+    {
+      "dataset": "training2",
+      "case": "mcp-auth-challenge",
+      "name": "no-guides",
+      "label": "replication-p6-ablation-no-guides-r1",
+      "commit": "6d7fbe3e3c5192b6675c2bea2dc0af3913bd1480",
+      "effort": "medium",
+      "evaluated": false
+    },
+    {
+      "dataset": "training2",
+      "case": "mcp-auth-challenge",
+      "name": "no-review",
+      "label": "replication-p6-ablation-no-review-r1",
+      "commit": "33a4ed86b414245c0b87546551b693ff216888e3",
+      "effort": "medium",
+      "evaluated": false
+    },
+    {
+      "dataset": "training2",
+      "case": "mcp-auth-challenge",
+      "name": "read-480",
+      "label": "replication-p6-ablation-read-480-r1",
+      "commit": "9e4af4bde94625d6eeca72efb0b9436e9d4fb43b",
+      "effort": "medium",
+      "evaluated": false
+    },
+    {
+      "dataset": "training2",
+      "case": "mcp-auth-challenge",
+      "name": "no-preload",
+      "label": "replication-p6-ablation-no-preload-r1",
+      "commit": "9b7cffd3ff2ca5a5c078321e879c9ee728b9a70c",
+      "effort": "medium",
+      "evaluated": false
+    },
+    {
+      "dataset": "training2",
+      "case": "mock-input-tokens",
+      "name": "read-480",
+      "label": "replication-p6-ablation-read-480-r1",
+      "commit": "9e4af4bde94625d6eeca72efb0b9436e9d4fb43b",
+      "effort": "medium",
+      "evaluated": false
+    },
+    {
+      "dataset": "training2",
+      "case": "mock-input-tokens",
+      "name": "control",
+      "label": "replication-p6-ablation-control-r1",
+      "commit": "f75ab327c649cec9719ac03847f171854d2e32ae",
+      "effort": "medium",
+      "evaluated": false
+    },
+    {
+      "dataset": "training2",
+      "case": "mock-input-tokens",
+      "name": "no-review",
+      "label": "replication-p6-ablation-no-review-r1",
+      "commit": "33a4ed86b414245c0b87546551b693ff216888e3",
+      "effort": "medium",
+      "evaluated": false
+    },
+    {
+      "dataset": "training2",
+      "case": "mock-input-tokens",
+      "name": "no-guides",
+      "label": "replication-p6-ablation-no-guides-r1",
+      "commit": "6d7fbe3e3c5192b6675c2bea2dc0af3913bd1480",
+      "effort": "medium",
+      "evaluated": false
+    },
+    {
+      "dataset": "training2",
+      "case": "mock-input-tokens",
+      "name": "no-preload",
+      "label": "replication-p6-ablation-no-preload-r1",
+      "commit": "9b7cffd3ff2ca5a5c078321e879c9ee728b9a70c",
+      "effort": "medium",
+      "evaluated": false
+    },
+    {
+      "dataset": "",
+      "case": "anthropic-tool-document",
+      "name": "control",
+      "label": "replication-p6-ablation-control-r1",
+      "commit": "f75ab327c649cec9719ac03847f171854d2e32ae",
+      "effort": "medium",
+      "evaluated": false
+    },
+    {
+      "dataset": "",
+      "case": "anthropic-tool-document",
+      "name": "read-480",
+      "label": "replication-p6-ablation-read-480-r1",
+      "commit": "9e4af4bde94625d6eeca72efb0b9436e9d4fb43b",
+      "effort": "medium",
+      "evaluated": false
+    },
+    {
+      "dataset": "",
+      "case": "anthropic-tool-document",
+      "name": "no-review",
+      "label": "replication-p6-ablation-no-review-r1",
+      "commit": "33a4ed86b414245c0b87546551b693ff216888e3",
+      "effort": "medium",
+      "evaluated": false
+    },
+    {
+      "dataset": "",
+      "case": "anthropic-tool-document",
+      "name": "no-preload",
+      "label": "replication-p6-ablation-no-preload-r1",
+      "commit": "9b7cffd3ff2ca5a5c078321e879c9ee728b9a70c",
+      "effort": "medium",
+      "evaluated": false
+    },
+    {
+      "dataset": "",
+      "case": "anthropic-tool-document",
+      "name": "no-guides",
+      "label": "replication-p6-ablation-no-guides-r1",
+      "commit": "6d7fbe3e3c5192b6675c2bea2dc0af3913bd1480",
+      "effort": "medium",
+      "evaluated": false
+    },
+    {
+      "dataset": "training2",
+      "case": "mcp-optional-discovery",
+      "name": "read-480",
+      "label": "replication-p6-ablation-read-480-r2",
+      "commit": "9e4af4bde94625d6eeca72efb0b9436e9d4fb43b",
+      "effort": "medium",
+      "evaluated": false
+    },
+    {
+      "dataset": "training2",
+      "case": "mcp-optional-discovery",
+      "name": "no-review",
+      "label": "replication-p6-ablation-no-review-r2",
+      "commit": "33a4ed86b414245c0b87546551b693ff216888e3",
+      "effort": "medium",
+      "evaluated": false
+    },
+    {
+      "dataset": "training2",
+      "case": "mcp-optional-discovery",
+      "name": "no-preload",
+      "label": "replication-p6-ablation-no-preload-r2",
+      "commit": "9b7cffd3ff2ca5a5c078321e879c9ee728b9a70c",
+      "effort": "medium",
+      "evaluated": false
+    },
+    {
+      "dataset": "training2",
+      "case": "mcp-optional-discovery",
+      "name": "control",
+      "label": "replication-p6-ablation-control-r2",
+      "commit": "f75ab327c649cec9719ac03847f171854d2e32ae",
+      "effort": "medium",
+      "evaluated": false
+    },
+    {
+      "dataset": "training2",
+      "case": "mcp-optional-discovery",
+      "name": "no-guides",
+      "label": "replication-p6-ablation-no-guides-r2",
+      "commit": "6d7fbe3e3c5192b6675c2bea2dc0af3913bd1480",
+      "effort": "medium",
+      "evaluated": false
+    },
+    {
+      "dataset": "training2",
+      "case": "mcp-auth-challenge",
+      "name": "read-480",
+      "label": "replication-p6-ablation-read-480-r2",
+      "commit": "9e4af4bde94625d6eeca72efb0b9436e9d4fb43b",
+      "effort": "medium",
+      "evaluated": false
+    },
+    {
+      "dataset": "training2",
+      "case": "mcp-auth-challenge",
+      "name": "no-review",
+      "label": "replication-p6-ablation-no-review-r2",
+      "commit": "33a4ed86b414245c0b87546551b693ff216888e3",
+      "effort": "medium",
+      "evaluated": false
+    },
+    {
+      "dataset": "training2",
+      "case": "mcp-auth-challenge",
+      "name": "no-guides",
+      "label": "replication-p6-ablation-no-guides-r2",
+      "commit": "6d7fbe3e3c5192b6675c2bea2dc0af3913bd1480",
+      "effort": "medium",
+      "evaluated": false
+    },
+    {
+      "dataset": "training2",
+      "case": "mcp-auth-challenge",
+      "name": "control",
+      "label": "replication-p6-ablation-control-r2",
+      "commit": "f75ab327c649cec9719ac03847f171854d2e32ae",
+      "effort": "medium",
+      "evaluated": false
+    },
+    {
+      "dataset": "training2",
+      "case": "mcp-auth-challenge",
+      "name": "no-preload",
+      "label": "replication-p6-ablation-no-preload-r2",
+      "commit": "9b7cffd3ff2ca5a5c078321e879c9ee728b9a70c",
+      "effort": "medium",
+      "evaluated": false
+    },
+    {
+      "dataset": "",
+      "case": "anthropic-tool-document",
+      "name": "no-preload",
+      "label": "replication-p6-ablation-no-preload-r2",
+      "commit": "9b7cffd3ff2ca5a5c078321e879c9ee728b9a70c",
+      "effort": "medium",
+      "evaluated": false
+    },
+    {
+      "dataset": "",
+      "case": "anthropic-tool-document",
+      "name": "no-guides",
+      "label": "replication-p6-ablation-no-guides-r2",
+      "commit": "6d7fbe3e3c5192b6675c2bea2dc0af3913bd1480",
+      "effort": "medium",
+      "evaluated": false
+    },
+    {
+      "dataset": "",
+      "case": "anthropic-tool-document",
+      "name": "control",
+      "label": "replication-p6-ablation-control-r2",
+      "commit": "f75ab327c649cec9719ac03847f171854d2e32ae",
+      "effort": "medium",
+      "evaluated": false
+    },
+    {
+      "dataset": "",
+      "case": "anthropic-tool-document",
+      "name": "no-review",
+      "label": "replication-p6-ablation-no-review-r2",
+      "commit": "33a4ed86b414245c0b87546551b693ff216888e3",
+      "effort": "medium",
+      "evaluated": false
+    },
+    {
+      "dataset": "",
+      "case": "anthropic-tool-document",
+      "name": "read-480",
+      "label": "replication-p6-ablation-read-480-r2",
+      "commit": "9e4af4bde94625d6eeca72efb0b9436e9d4fb43b",
+      "effort": "medium",
+      "evaluated": false
+    },
+    {
+      "dataset": "",
+      "case": "empty-choices",
+      "name": "no-preload",
+      "label": "replication-p6-ablation-no-preload-r2",
+      "commit": "9b7cffd3ff2ca5a5c078321e879c9ee728b9a70c",
+      "effort": "medium",
+      "evaluated": false
+    },
+    {
+      "dataset": "",
+      "case": "empty-choices",
+      "name": "no-review",
+      "label": "replication-p6-ablation-no-review-r2",
+      "commit": "33a4ed86b414245c0b87546551b693ff216888e3",
+      "effort": "medium",
+      "evaluated": false
+    },
+    {
+      "dataset": "",
+      "case": "empty-choices",
+      "name": "no-guides",
+      "label": "replication-p6-ablation-no-guides-r2",
+      "commit": "6d7fbe3e3c5192b6675c2bea2dc0af3913bd1480",
+      "effort": "medium",
+      "evaluated": false
+    },
+    {
+      "dataset": "",
+      "case": "empty-choices",
+      "name": "read-480",
+      "label": "replication-p6-ablation-read-480-r2",
+      "commit": "9e4af4bde94625d6eeca72efb0b9436e9d4fb43b",
+      "effort": "medium",
+      "evaluated": false
+    },
+    {
+      "dataset": "",
+      "case": "empty-choices",
+      "name": "control",
+      "label": "replication-p6-ablation-control-r2",
+      "commit": "f75ab327c649cec9719ac03847f171854d2e32ae",
+      "effort": "medium",
+      "evaluated": false
+    },
+    {
+      "dataset": "",
+      "case": "vertex-version-path",
+      "name": "read-480",
+      "label": "replication-p6-ablation-read-480-r2",
+      "commit": "9e4af4bde94625d6eeca72efb0b9436e9d4fb43b",
+      "effort": "medium",
+      "evaluated": false
+    },
+    {
+      "dataset": "",
+      "case": "vertex-version-path",
+      "name": "no-review",
+      "label": "replication-p6-ablation-no-review-r2",
+      "commit": "33a4ed86b414245c0b87546551b693ff216888e3",
+      "effort": "medium",
+      "evaluated": false
+    },
+    {
+      "dataset": "",
+      "case": "vertex-version-path",
+      "name": "no-guides",
+      "label": "replication-p6-ablation-no-guides-r2",
+      "commit": "6d7fbe3e3c5192b6675c2bea2dc0af3913bd1480",
+      "effort": "medium",
+      "evaluated": false
+    },
+    {
+      "dataset": "",
+      "case": "vertex-version-path",
+      "name": "no-preload",
+      "label": "replication-p6-ablation-no-preload-r2",
+      "commit": "9b7cffd3ff2ca5a5c078321e879c9ee728b9a70c",
+      "effort": "medium",
+      "evaluated": false
+    },
+    {
+      "dataset": "",
+      "case": "vertex-version-path",
+      "name": "control",
+      "label": "replication-p6-ablation-control-r2",
+      "commit": "f75ab327c649cec9719ac03847f171854d2e32ae",
+      "effort": "medium",
+      "evaluated": false
+    },
+    {
+      "dataset": "",
+      "case": "databricks-reasoning",
+      "name": "no-preload",
+      "label": "replication-p6-ablation-no-preload-r2",
+      "commit": "9b7cffd3ff2ca5a5c078321e879c9ee728b9a70c",
+      "effort": "medium",
+      "evaluated": false
+    },
+    {
+      "dataset": "",
+      "case": "databricks-reasoning",
+      "name": "control",
+      "label": "replication-p6-ablation-control-r2",
+      "commit": "f75ab327c649cec9719ac03847f171854d2e32ae",
+      "effort": "medium",
+      "evaluated": false
+    },
+    {
+      "dataset": "",
+      "case": "databricks-reasoning",
+      "name": "no-guides",
+      "label": "replication-p6-ablation-no-guides-r2",
+      "commit": "6d7fbe3e3c5192b6675c2bea2dc0af3913bd1480",
+      "effort": "medium",
+      "evaluated": false
+    },
+    {
+      "dataset": "",
+      "case": "databricks-reasoning",
+      "name": "read-480",
+      "label": "replication-p6-ablation-read-480-r2",
+      "commit": "9e4af4bde94625d6eeca72efb0b9436e9d4fb43b",
+      "effort": "medium",
+      "evaluated": false
+    },
+    {
+      "dataset": "",
+      "case": "databricks-reasoning",
+      "name": "no-review",
+      "label": "replication-p6-ablation-no-review-r2",
+      "commit": "33a4ed86b414245c0b87546551b693ff216888e3",
+      "effort": "medium",
+      "evaluated": false
+    },
+    {
+      "dataset": "",
+      "case": "converse-config",
+      "name": "control",
+      "label": "replication-p6-ablation-control-r2",
+      "commit": "f75ab327c649cec9719ac03847f171854d2e32ae",
+      "effort": "medium",
+      "evaluated": false
+    },
+    {
+      "dataset": "",
+      "case": "converse-config",
+      "name": "no-guides",
+      "label": "replication-p6-ablation-no-guides-r2",
+      "commit": "6d7fbe3e3c5192b6675c2bea2dc0af3913bd1480",
+      "effort": "medium",
+      "evaluated": false
+    },
+    {
+      "dataset": "",
+      "case": "converse-config",
+      "name": "no-preload",
+      "label": "replication-p6-ablation-no-preload-r2",
+      "commit": "9b7cffd3ff2ca5a5c078321e879c9ee728b9a70c",
+      "effort": "medium",
+      "evaluated": false
+    },
+    {
+      "dataset": "",
+      "case": "converse-config",
+      "name": "no-review",
+      "label": "replication-p6-ablation-no-review-r2",
+      "commit": "33a4ed86b414245c0b87546551b693ff216888e3",
+      "effort": "medium",
+      "evaluated": false
+    },
+    {
+      "dataset": "",
+      "case": "converse-config",
+      "name": "read-480",
+      "label": "replication-p6-ablation-read-480-r2",
+      "commit": "9e4af4bde94625d6eeca72efb0b9436e9d4fb43b",
+      "effort": "medium",
+      "evaluated": false
+    },
+    {
+      "dataset": "training2",
+      "case": "responses-custom-guardrail",
+      "name": "no-review",
+      "label": "replication-p6-ablation-no-review-r2",
+      "commit": "33a4ed86b414245c0b87546551b693ff216888e3",
+      "effort": "medium",
+      "evaluated": false
+    },
+    {
+      "dataset": "training2",
+      "case": "responses-custom-guardrail",
+      "name": "read-480",
+      "label": "replication-p6-ablation-read-480-r2",
+      "commit": "9e4af4bde94625d6eeca72efb0b9436e9d4fb43b",
+      "effort": "medium",
+      "evaluated": false
+    },
+    {
+      "dataset": "training2",
+      "case": "responses-custom-guardrail",
+      "name": "control",
+      "label": "replication-p6-ablation-control-r2",
+      "commit": "f75ab327c649cec9719ac03847f171854d2e32ae",
+      "effort": "medium",
+      "evaluated": false
+    },
+    {
+      "dataset": "training2",
+      "case": "responses-custom-guardrail",
+      "name": "no-preload",
+      "label": "replication-p6-ablation-no-preload-r2",
+      "commit": "9b7cffd3ff2ca5a5c078321e879c9ee728b9a70c",
+      "effort": "medium",
+      "evaluated": false
+    },
+    {
+      "dataset": "training2",
+      "case": "responses-custom-guardrail",
+      "name": "no-guides",
+      "label": "replication-p6-ablation-no-guides-r2",
+      "commit": "6d7fbe3e3c5192b6675c2bea2dc0af3913bd1480",
+      "effort": "medium",
+      "evaluated": false
+    },
+    {
+      "dataset": "",
+      "case": "dashscope-rerank",
+      "name": "no-preload",
+      "label": "replication-p6-ablation-no-preload-r2",
+      "commit": "9b7cffd3ff2ca5a5c078321e879c9ee728b9a70c",
+      "effort": "medium",
+      "evaluated": false
+    },
+    {
+      "dataset": "",
+      "case": "dashscope-rerank",
+      "name": "control",
+      "label": "replication-p6-ablation-control-r2",
+      "commit": "f75ab327c649cec9719ac03847f171854d2e32ae",
+      "effort": "medium",
+      "evaluated": false
+    },
+    {
+      "dataset": "",
+      "case": "dashscope-rerank",
+      "name": "read-480",
+      "label": "replication-p6-ablation-read-480-r2",
+      "commit": "9e4af4bde94625d6eeca72efb0b9436e9d4fb43b",
+      "effort": "medium",
+      "evaluated": false
+    },
+    {
+      "dataset": "",
+      "case": "dashscope-rerank",
+      "name": "no-review",
+      "label": "replication-p6-ablation-no-review-r2",
+      "commit": "33a4ed86b414245c0b87546551b693ff216888e3",
+      "effort": "medium",
+      "evaluated": false
+    },
+    {
+      "dataset": "",
+      "case": "dashscope-rerank",
+      "name": "no-guides",
+      "label": "replication-p6-ablation-no-guides-r2",
+      "commit": "6d7fbe3e3c5192b6675c2bea2dc0af3913bd1480",
+      "effort": "medium",
+      "evaluated": false
+    },
+    {
+      "dataset": "",
+      "case": "team-member-budget",
+      "name": "no-review",
+      "label": "replication-p6-ablation-no-review-r2",
+      "commit": "33a4ed86b414245c0b87546551b693ff216888e3",
+      "effort": "medium",
+      "evaluated": false
+    },
+    {
+      "dataset": "",
+      "case": "team-member-budget",
+      "name": "no-guides",
+      "label": "replication-p6-ablation-no-guides-r2",
+      "commit": "6d7fbe3e3c5192b6675c2bea2dc0af3913bd1480",
+      "effort": "medium",
+      "evaluated": false
+    },
+    {
+      "dataset": "",
+      "case": "team-member-budget",
+      "name": "control",
+      "label": "replication-p6-ablation-control-r2",
+      "commit": "f75ab327c649cec9719ac03847f171854d2e32ae",
+      "effort": "medium",
+      "evaluated": false
+    },
+    {
+      "dataset": "",
+      "case": "team-member-budget",
+      "name": "no-preload",
+      "label": "replication-p6-ablation-no-preload-r2",
+      "commit": "9b7cffd3ff2ca5a5c078321e879c9ee728b9a70c",
+      "effort": "medium",
+      "evaluated": false
+    },
+    {
+      "dataset": "",
+      "case": "team-member-budget",
+      "name": "read-480",
+      "label": "replication-p6-ablation-read-480-r2",
+      "commit": "9e4af4bde94625d6eeca72efb0b9436e9d4fb43b",
+      "effort": "medium",
+      "evaluated": false
+    },
+    {
+      "dataset": "training2",
+      "case": "langfuse-session-traces",
+      "name": "no-guides",
+      "label": "replication-p6-ablation-no-guides-r2",
+      "commit": "6d7fbe3e3c5192b6675c2bea2dc0af3913bd1480",
+      "effort": "medium",
+      "evaluated": false
+    },
+    {
+      "dataset": "training2",
+      "case": "langfuse-session-traces",
+      "name": "read-480",
+      "label": "replication-p6-ablation-read-480-r2",
+      "commit": "9e4af4bde94625d6eeca72efb0b9436e9d4fb43b",
+      "effort": "medium",
+      "evaluated": false
+    },
+    {
+      "dataset": "training2",
+      "case": "langfuse-session-traces",
+      "name": "no-preload",
+      "label": "replication-p6-ablation-no-preload-r2",
+      "commit": "9b7cffd3ff2ca5a5c078321e879c9ee728b9a70c",
+      "effort": "medium",
+      "evaluated": false
+    },
+    {
+      "dataset": "training2",
+      "case": "langfuse-session-traces",
+      "name": "no-review",
+      "label": "replication-p6-ablation-no-review-r2",
+      "commit": "33a4ed86b414245c0b87546551b693ff216888e3",
+      "effort": "medium",
+      "evaluated": false
+    },
+    {
+      "dataset": "training2",
+      "case": "langfuse-session-traces",
+      "name": "control",
+      "label": "replication-p6-ablation-control-r2",
+      "commit": "f75ab327c649cec9719ac03847f171854d2e32ae",
+      "effort": "medium",
+      "evaluated": false
+    },
+    {
+      "dataset": "",
+      "case": "anthropic-image-guardrail",
+      "name": "no-preload",
+      "label": "replication-p6-ablation-no-preload-r2",
+      "commit": "9b7cffd3ff2ca5a5c078321e879c9ee728b9a70c",
+      "effort": "medium",
+      "evaluated": false
+    },
+    {
+      "dataset": "",
+      "case": "anthropic-image-guardrail",
+      "name": "control",
+      "label": "replication-p6-ablation-control-r2",
+      "commit": "f75ab327c649cec9719ac03847f171854d2e32ae",
+      "effort": "medium",
+      "evaluated": false
+    },
+    {
+      "dataset": "",
+      "case": "anthropic-image-guardrail",
+      "name": "no-review",
+      "label": "replication-p6-ablation-no-review-r2",
+      "commit": "33a4ed86b414245c0b87546551b693ff216888e3",
+      "effort": "medium",
+      "evaluated": false
+    },
+    {
+      "dataset": "",
+      "case": "anthropic-image-guardrail",
+      "name": "read-480",
+      "label": "replication-p6-ablation-read-480-r2",
+      "commit": "9e4af4bde94625d6eeca72efb0b9436e9d4fb43b",
+      "effort": "medium",
+      "evaluated": false
+    },
+    {
+      "dataset": "",
+      "case": "anthropic-image-guardrail",
+      "name": "no-guides",
+      "label": "replication-p6-ablation-no-guides-r2",
+      "commit": "6d7fbe3e3c5192b6675c2bea2dc0af3913bd1480",
+      "effort": "medium",
+      "evaluated": false
+    },
+    {
+      "dataset": "training2",
+      "case": "mock-input-tokens",
+      "name": "no-review",
+      "label": "replication-p6-ablation-no-review-r2",
+      "commit": "33a4ed86b414245c0b87546551b693ff216888e3",
+      "effort": "medium",
+      "evaluated": false
+    },
+    {
+      "dataset": "training2",
+      "case": "mock-input-tokens",
+      "name": "no-guides",
+      "label": "replication-p6-ablation-no-guides-r2",
+      "commit": "6d7fbe3e3c5192b6675c2bea2dc0af3913bd1480",
+      "effort": "medium",
+      "evaluated": false
+    },
+    {
+      "dataset": "training2",
+      "case": "mock-input-tokens",
+      "name": "no-preload",
+      "label": "replication-p6-ablation-no-preload-r2",
+      "commit": "9b7cffd3ff2ca5a5c078321e879c9ee728b9a70c",
+      "effort": "medium",
+      "evaluated": false
+    },
+    {
+      "dataset": "training2",
+      "case": "mock-input-tokens",
+      "name": "control",
+      "label": "replication-p6-ablation-control-r2",
+      "commit": "f75ab327c649cec9719ac03847f171854d2e32ae",
+      "effort": "medium",
+      "evaluated": false
+    },
+    {
+      "dataset": "training2",
+      "case": "mock-input-tokens",
+      "name": "read-480",
+      "label": "replication-p6-ablation-read-480-r2",
+      "commit": "9e4af4bde94625d6eeca72efb0b9436e9d4fb43b",
+      "effort": "medium",
+      "evaluated": false
+    },
+    {
+      "dataset": "",
+      "case": "router-candidates",
+      "name": "no-preload",
+      "label": "replication-p6-ablation-no-preload-r2",
+      "commit": "9b7cffd3ff2ca5a5c078321e879c9ee728b9a70c",
+      "effort": "medium",
+      "evaluated": false
+    },
+    {
+      "dataset": "",
+      "case": "router-candidates",
+      "name": "no-guides",
+      "label": "replication-p6-ablation-no-guides-r2",
+      "commit": "6d7fbe3e3c5192b6675c2bea2dc0af3913bd1480",
+      "effort": "medium",
+      "evaluated": false
+    },
+    {
+      "dataset": "",
+      "case": "router-candidates",
+      "name": "read-480",
+      "label": "replication-p6-ablation-read-480-r2",
+      "commit": "9e4af4bde94625d6eeca72efb0b9436e9d4fb43b",
+      "effort": "medium",
+      "evaluated": false
+    },
+    {
+      "dataset": "",
+      "case": "router-candidates",
+      "name": "no-review",
+      "label": "replication-p6-ablation-no-review-r2",
+      "commit": "33a4ed86b414245c0b87546551b693ff216888e3",
+      "effort": "medium",
+      "evaluated": false
+    },
+    {
+      "dataset": "",
+      "case": "router-candidates",
+      "name": "control",
+      "label": "replication-p6-ablation-control-r2",
+      "commit": "f75ab327c649cec9719ac03847f171854d2e32ae",
+      "effort": "medium",
+      "evaluated": false
+    },
+    {
+      "dataset": "",
+      "case": "router-strategy-isolation",
+      "name": "no-guides",
+      "label": "replication-p6-ablation-no-guides-r2",
+      "commit": "6d7fbe3e3c5192b6675c2bea2dc0af3913bd1480",
+      "effort": "medium",
+      "evaluated": false
+    },
+    {
+      "dataset": "",
+      "case": "router-strategy-isolation",
+      "name": "no-preload",
+      "label": "replication-p6-ablation-no-preload-r2",
+      "commit": "9b7cffd3ff2ca5a5c078321e879c9ee728b9a70c",
+      "effort": "medium",
+      "evaluated": false
+    },
+    {
+      "dataset": "",
+      "case": "router-strategy-isolation",
+      "name": "no-review",
+      "label": "replication-p6-ablation-no-review-r2",
+      "commit": "33a4ed86b414245c0b87546551b693ff216888e3",
+      "effort": "medium",
+      "evaluated": false
+    },
+    {
+      "dataset": "",
+      "case": "router-strategy-isolation",
+      "name": "control",
+      "label": "replication-p6-ablation-control-r2",
+      "commit": "f75ab327c649cec9719ac03847f171854d2e32ae",
+      "effort": "medium",
+      "evaluated": false
+    },
+    {
+      "dataset": "",
+      "case": "router-strategy-isolation",
+      "name": "read-480",
+      "label": "replication-p6-ablation-read-480-r2",
+      "commit": "9e4af4bde94625d6eeca72efb0b9436e9d4fb43b",
+      "effort": "medium",
+      "evaluated": false
+    },
+    {
+      "dataset": "training2",
+      "case": "bedrock-session-tags",
+      "name": "no-review",
+      "label": "replication-p6-ablation-no-review-r2",
+      "commit": "33a4ed86b414245c0b87546551b693ff216888e3",
+      "effort": "medium",
+      "evaluated": false
+    },
+    {
+      "dataset": "training2",
+      "case": "bedrock-session-tags",
+      "name": "control",
+      "label": "replication-p6-ablation-control-r2",
+      "commit": "f75ab327c649cec9719ac03847f171854d2e32ae",
+      "effort": "medium",
+      "evaluated": false
+    },
+    {
+      "dataset": "training2",
+      "case": "bedrock-session-tags",
+      "name": "no-guides",
+      "label": "replication-p6-ablation-no-guides-r2",
+      "commit": "6d7fbe3e3c5192b6675c2bea2dc0af3913bd1480",
+      "effort": "medium",
+      "evaluated": false
+    },
+    {
+      "dataset": "training2",
+      "case": "bedrock-session-tags",
+      "name": "no-preload",
+      "label": "replication-p6-ablation-no-preload-r2",
+      "commit": "9b7cffd3ff2ca5a5c078321e879c9ee728b9a70c",
+      "effort": "medium",
+      "evaluated": false
+    },
+    {
+      "dataset": "training2",
+      "case": "bedrock-session-tags",
+      "name": "read-480",
+      "label": "replication-p6-ablation-read-480-r2",
+      "commit": "9e4af4bde94625d6eeca72efb0b9436e9d4fb43b",
+      "effort": "medium",
+      "evaluated": false
+    }
+  ]
+}

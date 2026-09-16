@@ -1,4 +1,4 @@
-import { readFileSync, writeFileSync, mkdirSync, copyFileSync, realpathSync, existsSync, symlinkSync } from 'node:fs';
+import { readFileSync, writeFileSync, mkdirSync, copyFileSync, realpathSync, existsSync, symlinkSync, readdirSync } from 'node:fs';
 import { resolve, join, dirname } from 'node:path';
 import { execFileSync, spawn } from 'node:child_process';
 import { createHash, randomUUID } from 'node:crypto';
@@ -22,6 +22,7 @@ if(!task)throw new Error('Unknown task.');
 if(task.snapshot_revision!==2)throw new Error('Refresh repository snapshots with prepare.py before running.');
 const validity=JSON.parse(readFileSync(join(root,'cases',id,'validation.json'),'utf8'));
 if(!validity.valid)throw new Error('Task must pass base/reference validation before paid execution.');
+if(readdirSync(join(root,'cases',id,'base'),{recursive:true,encoding:'utf8'}).some(path=>/(^|\/)__pycache__(\/|$)|\.py[co]$/.test(path)))throw new Error('The reusable base contains generated Python bytecode. Restore a clean Git snapshot before paid execution; run host probes through probe_runner.py.');
 const testNodesHash=createHash('sha256').update(JSON.stringify(task.test_nodes)).digest('hex');
 if(validity.snapshotRevision!==task.snapshot_revision||validity.testNodesHash!==testNodesHash)throw new Error('Task validation is stale. Run validate.py after changing the snapshot or acceptance selection.');
 const fixturePlugins:unknown=task.fixture_plugins??[];
@@ -88,6 +89,7 @@ for(const key of Object.keys(process.env))if(!retainedEnvironment.has(key))delet
 process.env.LITELLM_LOCAL_MODEL_COST_MAP='True';process.env.PYTHON_DOTENV_DISABLED='1';
 process.env.PYTEST_DISABLE_PLUGIN_AUTOLOAD='1';
 process.env.TMPDIR=temporaryDirectory;process.env.TMP=temporaryDirectory;process.env.TEMP=temporaryDirectory;
+process.env.PYTHONDONTWRITEBYTECODE='1';process.env.PYTHONPYCACHEPREFIX=join(temporaryDirectory,'python-bytecode');
 Object.assign(process.env,replayGitEnvironment());
 process.env.PATH=executableDirectory+':'+(process.env.PATH??'/usr/bin:/bin');
 const child=spawn('/usr/bin/sandbox-exec',['-f',profile,process.execPath,'--import','tsx',join(import.meta.dirname,'solve.ts'),directory,kind,effort,String(timeoutSeconds),label],{cwd:runtimeRoot,env:process.env,stdio:'inherit',detached:true});

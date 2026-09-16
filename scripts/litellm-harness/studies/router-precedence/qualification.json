@@ -1,180 +1,213 @@
 {
-  "base": {
-    "exit": 0,
-    "rows": [
-      {
-        "case": "unprefixed-global",
-        "expected": [
-          "global-wild"
-        ],
-        "candidates": [],
-        "selected": "global-wild",
-        "pass": false
+  "baseCommit": "b7dad8b44e30e87e6ae174ea6f58054e17cfc8a5",
+  "referenceCommit": "2000642592670baf38c46f4c6e3bcb851c59d79e",
+  "probeSha256": "b46ac56d652559e113bbcd6856cd013ab69b47dc1cb9a294967a7a4d234de219",
+  "oldReferenceDirectoryHasPackage": false,
+  "oldReferenceImportWasLiveCheckout": true,
+  "results": {
+    "base": {
+      "exit": 0,
+      "rows": [
+        {
+          "case": "unprefixed-global",
+          "expected": [
+            "global-wild"
+          ],
+          "candidates": [],
+          "selected": "global-wild",
+          "pass": false
+        },
+        {
+          "case": "direct-group",
+          "expected": [
+            "direct"
+          ],
+          "candidates": [
+            "direct"
+          ],
+          "selected": "direct",
+          "pass": true
+        },
+        {
+          "case": "global-before-team-wildcard",
+          "expected": [
+            "global-wild"
+          ],
+          "candidates": [],
+          "selected": "global-wild",
+          "pass": false
+        },
+        {
+          "case": "named-team-before-global",
+          "expected": [
+            "team-named"
+          ],
+          "candidates": [
+            "team-named"
+          ],
+          "selected": "team-named",
+          "pass": true
+        },
+        {
+          "case": "default",
+          "expected": [
+            "default"
+          ],
+          "candidates": [
+            "default"
+          ],
+          "selected": "default",
+          "pass": true
+        }
+      ],
+      "imports": {
+        "packageOrigin": "litellm/__init__.py",
+        "allLiteLLMModulesWithinWorkspace": true,
+        "moduleCount": 816
       },
-      {
-        "case": "direct-group",
-        "expected": [
-          "direct"
-        ],
-        "candidates": [
-          "direct"
-        ],
-        "selected": "direct",
-        "pass": true
-      },
-      {
-        "case": "global-before-team-wildcard",
-        "expected": [
-          "global-wild"
-        ],
-        "candidates": [],
-        "selected": "global-wild",
-        "pass": false
-      },
-      {
-        "case": "named-team-before-global",
-        "expected": [
-          "team-named"
-        ],
-        "candidates": [
-          "team-named"
-        ],
-        "selected": "team-named",
-        "pass": true
-      },
-      {
-        "case": "default",
-        "expected": [
-          "default"
-        ],
-        "candidates": [
-          "default"
-        ],
-        "selected": "default",
-        "pass": true
+      "sourceHashes": {
+        "litellm/router.py": "8290a1eb02597a0b746f9dd6119e9df07a203887b0f8d4ac4795a8f421a57ce1"
       }
-    ]
+    },
+    "reference": {
+      "exit": 0,
+      "rows": [
+        {
+          "case": "unprefixed-global",
+          "expected": [
+            "global-wild"
+          ],
+          "candidates": [
+            "global-wild"
+          ],
+          "selected": "global-wild",
+          "pass": true
+        },
+        {
+          "case": "direct-group",
+          "expected": [
+            "direct"
+          ],
+          "candidates": [
+            "direct"
+          ],
+          "selected": "direct",
+          "pass": true
+        },
+        {
+          "case": "global-before-team-wildcard",
+          "expected": [
+            "global-wild"
+          ],
+          "candidates": [
+            "global-wild"
+          ],
+          "selected": "global-wild",
+          "pass": true
+        },
+        {
+          "case": "named-team-before-global",
+          "expected": [
+            "team-named"
+          ],
+          "candidates": [
+            "team-named"
+          ],
+          "selected": "team-named",
+          "pass": true
+        },
+        {
+          "case": "default",
+          "expected": [
+            "default"
+          ],
+          "candidates": [
+            "default"
+          ],
+          "selected": "default",
+          "pass": true
+        }
+      ],
+      "imports": {
+        "packageOrigin": "litellm/__init__.py",
+        "allLiteLLMModulesWithinWorkspace": true,
+        "moduleCount": 816
+      },
+      "sourceHashes": {
+        "litellm/router.py": "702bece562bd194770e1a9024a3a3561c47fe5e079b12983fe41bccd14eff5e7"
+      }
+    },
+    "candidate": {
+      "exit": 0,
+      "rows": [
+        {
+          "case": "unprefixed-global",
+          "expected": [
+            "global-wild"
+          ],
+          "candidates": [
+            "global-wild"
+          ],
+          "selected": "global-wild",
+          "pass": true
+        },
+        {
+          "case": "direct-group",
+          "expected": [
+            "direct"
+          ],
+          "candidates": [
+            "direct"
+          ],
+          "selected": "direct",
+          "pass": true
+        },
+        {
+          "case": "global-before-team-wildcard",
+          "expected": [
+            "global-wild"
+          ],
+          "candidates": [
+            "global-wild",
+            "team-wild"
+          ],
+          "selected": "global-wild",
+          "pass": false
+        },
+        {
+          "case": "named-team-before-global",
+          "expected": [
+            "team-named"
+          ],
+          "candidates": [
+            "global-wild",
+            "team-named"
+          ],
+          "selected": "team-named",
+          "pass": false
+        },
+        {
+          "case": "default",
+          "expected": [
+            "default"
+          ],
+          "candidates": [
+            "default"
+          ],
+          "selected": "default",
+          "pass": true
+        }
+      ],
+      "imports": {
+        "packageOrigin": "litellm/__init__.py",
+        "allLiteLLMModulesWithinWorkspace": true,
+        "moduleCount": 816
+      }
+    }
   },
-  "reference": {
-    "exit": 0,
-    "rows": [
-      {
-        "case": "unprefixed-global",
-        "expected": [
-          "global-wild"
-        ],
-        "candidates": [
-          "global-wild"
-        ],
-        "selected": "global-wild",
-        "pass": true
-      },
-      {
-        "case": "direct-group",
-        "expected": [
-          "direct"
-        ],
-        "candidates": [
-          "direct"
-        ],
-        "selected": "direct",
-        "pass": true
-      },
-      {
-        "case": "global-before-team-wildcard",
-        "expected": [
-          "global-wild"
-        ],
-        "candidates": [
-          "global-wild"
-        ],
-        "selected": "global-wild",
-        "pass": true
-      },
-      {
-        "case": "named-team-before-global",
-        "expected": [
-          "team-named"
-        ],
-        "candidates": [
-          "team-named"
-        ],
-        "selected": "team-named",
-        "pass": true
-      },
-      {
-        "case": "default",
-        "expected": [
-          "default"
-        ],
-        "candidates": [
-          "default"
-        ],
-        "selected": "default",
-        "pass": true
-      }
-    ]
-  },
-  "candidate": {
-    "exit": 0,
-    "rows": [
-      {
-        "case": "unprefixed-global",
-        "expected": [
-          "global-wild"
-        ],
-        "candidates": [
-          "global-wild"
-        ],
-        "selected": "global-wild",
-        "pass": true
-      },
-      {
-        "case": "direct-group",
-        "expected": [
-          "direct"
-        ],
-        "candidates": [
-          "direct"
-        ],
-        "selected": "direct",
-        "pass": true
-      },
-      {
-        "case": "global-before-team-wildcard",
-        "expected": [
-          "global-wild"
-        ],
-        "candidates": [
-          "global-wild",
-          "team-wild"
-        ],
-        "selected": "global-wild",
-        "pass": false
-      },
-      {
-        "case": "named-team-before-global",
-        "expected": [
-          "team-named"
-        ],
-        "candidates": [
-          "global-wild",
-          "team-named"
-        ],
-        "selected": "team-named",
-        "pass": false
-      },
-      {
-        "case": "default",
-        "expected": [
-          "default"
-        ],
-        "candidates": [
-          "default"
-        ],
-        "selected": "default",
-        "pass": true
-      }
-    ]
-  }
+  "candidateRun": "replication-p6-ablation-control-r1-router-candidates-976dd133",
+  "qualificationStatus": "Requalified on fresh archives of exact commits; replaces v1 reference attribution. Behavioral outcomes unchanged.",
+  "provenanceCorrection": "The former reference directory contained only tests and importing from it resolves to the live editable checkout. The earlier reference result is not evidence about the recorded commit. This rerun verifies package and all loaded LiteLLM module paths; bytecode reads/writes cannot use adjacent caches.",
+  "method": "Fresh git archives of recorded commits; candidate workspaces unchanged; bytecode reads redirected to an empty private path and writes disabled; all loaded LiteLLM modules asserted inside selected snapshot.",
+  "timestamp": "2026-09-16T02:54:18.352082+00:00"
 }

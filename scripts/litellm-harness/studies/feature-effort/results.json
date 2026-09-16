@@ -1,0 +1,172 @@
+{
+  "status": "interim",
+  "note": "Development selection only. Interim observed-task means can change as slower trials finish. Bootstrap resamples tasks, not attempts; it does not correct adaptive candidate selection or establish future generalization. Token prices exclude requests without usage and do not replace the campaign ledger.",
+  "variants": [
+    {
+      "variant": "high",
+      "evaluated": 0,
+      "expected": 8
+    },
+    {
+      "variant": "medium",
+      "evaluated": 0,
+      "expected": 8
+    }
+  ],
+  "comparisons": [
+    {
+      "variant": "high",
+      "control": "medium",
+      "pairedTasks": 0,
+      "expectedTasks": 4,
+      "complete": false,
+      "pairs": []
+    }
+  ],
+  "trials": [
+    {
+      "dataset": "training5",
+      "case": "stream-tool-rewrite-membership",
+      "name": "high",
+      "label": "replication-v24-features-high-r1",
+      "commit": "c7e6826341989fd6ebf3588b53901087b2fa7a56",
+      "effort": "high",
+      "evaluated": false
+    },
+    {
+      "dataset": "training5",
+      "case": "stream-tool-rewrite-membership",
+      "name": "medium",
+      "label": "replication-v24-features-medium-r1",
+      "commit": "c7e6826341989fd6ebf3588b53901087b2fa7a56",
+      "effort": "medium",
+      "evaluated": false
+    },
+    {
+      "dataset": "training5",
+      "case": "aws-signing-off-loop",
+      "name": "medium",
+      "label": "replication-v24-features-medium-r1",
+      "commit": "c7e6826341989fd6ebf3588b53901087b2fa7a56",
+      "effort": "medium",
+      "evaluated": false
+    },
+    {
+      "dataset": "training5",
+      "case": "aws-signing-off-loop",
+      "name": "high",
+      "label": "replication-v24-features-high-r1",
+      "commit": "c7e6826341989fd6ebf3588b53901087b2fa7a56",
+      "effort": "high",
+      "evaluated": false
+    },
+    {
+      "dataset": "training5",
+      "case": "background-responses-pipeline",
+      "name": "high",
+      "label": "replication-v24-features-high-r1",
+      "commit": "c7e6826341989fd6ebf3588b53901087b2fa7a56",
+      "effort": "high",
+      "evaluated": false
+    },
+    {
+      "dataset": "training5",
+      "case": "background-responses-pipeline",
+      "name": "medium",
+      "label": "replication-v24-features-medium-r1",
+      "commit": "c7e6826341989fd6ebf3588b53901087b2fa7a56",
+      "effort": "medium",
+      "evaluated": false
+    },
+    {
+      "dataset": "training5",
+      "case": "legacy-stream-pipeline",
+      "name": "medium",
+      "label": "replication-v24-features-medium-r1",
+      "commit": "c7e6826341989fd6ebf3588b53901087b2fa7a56",
+      "effort": "medium",
+      "evaluated": false
+    },
+    {
+      "dataset": "training5",
+      "case": "legacy-stream-pipeline",
+      "name": "high",
+      "label": "replication-v24-features-high-r1",
+      "commit": "c7e6826341989fd6ebf3588b53901087b2fa7a56",
+      "effort": "high",
+      "evaluated": false
+    },
+    {
+      "dataset": "training5",
+      "case": "stream-tool-rewrite-membership",
+      "name": "high",
+      "label": "replication-v24-features-high-r2",
+      "commit": "c7e6826341989fd6ebf3588b53901087b2fa7a56",
+      "effort": "high",
+      "evaluated": false
+    },
+    {
+      "dataset": "training5",
+      "case": "stream-tool-rewrite-membership",
+      "name": "medium",
+      "label": "replication-v24-features-medium-r2",
+      "commit": "c7e6826341989fd6ebf3588b53901087b2fa7a56",
+      "effort": "medium",
+      "evaluated": false
+    },
+    {
+      "dataset": "training5",
+      "case": "aws-signing-off-loop",
+      "name": "medium",
+      "label": "replication-v24-features-medium-r2",
+      "commit": "c7e6826341989fd6ebf3588b53901087b2fa7a56",
+      "effort": "medium",
+      "evaluated": false
+    },
+    {
+      "dataset": "training5",
+      "case": "aws-signing-off-loop",
+      "name": "high",
+      "label": "replication-v24-features-high-r2",
+      "commit": "c7e6826341989fd6ebf3588b53901087b2fa7a56",
+      "effort": "high",
+      "evaluated": false
+    },
+    {
+      "dataset": "training5",
+      "case": "background-responses-pipeline",
+      "name": "high",
+      "label": "replication-v24-features-high-r2",
+      "commit": "c7e6826341989fd6ebf3588b53901087b2fa7a56",
+      "effort": "high",
+      "evaluated": false
+    },
+    {
+      "dataset": "training5",
+      "case": "background-responses-pipeline",
+      "name": "medium",
+      "label": "replication-v24-features-medium-r2",
+      "commit": "c7e6826341989fd6ebf3588b53901087b2fa7a56",
+      "effort": "medium",
+      "evaluated": false
+    },
+    {
+      "dataset": "training5",
+      "case": "legacy-stream-pipeline",
+      "name": "medium",
+      "label": "replication-v24-features-medium-r2",
+      "commit": "c7e6826341989fd6ebf3588b53901087b2fa7a56",
+      "effort": "medium",
+      "evaluated": false
+    },
+    {
+      "dataset": "training5",
+      "case": "legacy-stream-pipeline",
+      "name": "high",
+      "label": "replication-v24-features-high-r2",
+      "commit": "c7e6826341989fd6ebf3588b53901087b2fa7a56",
+      "effort": "high",
+      "evaluated": false
+    }
+  ]
+}
