@@ -36,6 +36,19 @@ class ActionUsageTests(unittest.TestCase):
         self.assertEqual(result['groups']['job-poll-or-wait']['requests'], 2)
         self.assertEqual(result['reconciliation']['inputTokens']['difference'], 0)
 
+    def test_wrapped_test_activity_is_visible_without_claiming_a_check_receipt(self):
+        usage = dict(inputTokens=100, outputTokens=5)
+        calls = [{'name': 'bash', 'execution': {'command': 'cd repo && FLAG=yes python -m pytest tests/test_unit.py -q 2>&1 | tail -40'}},
+                 {'name': 'bash', 'execution': {'command': 'python -m pip show pytest-cov'}},
+                 {'name': 'bash', 'execution': {'command': 'npm run checkstyle'}},
+                 {'name': 'bash', 'args': {'command': 'pytest'}, 'status': 'denied'}]
+        result = action_usage([dict(role='assistant', usage=usage, toolCalls=[c]) for c in calls], [{'usage': usage}] * 4)
+        self.assertEqual(result['classificationVersion'], 2)
+        self.assertEqual(result['groups']['shell-mentions-checks']['requests'], 1)
+        self.assertEqual(result['groups']['shell-command']['requests'], 3)
+        self.assertNotIn('check-command', result['groups'])
+        self.assertEqual(result['reconciliation']['inputTokens']['difference'], 0)
+
 
 if __name__ == '__main__':
     unittest.main()

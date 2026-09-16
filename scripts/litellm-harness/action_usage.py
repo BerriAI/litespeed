@@ -6,10 +6,12 @@ fixed token prices provide an estimate; the gateway ledger remains authoritative
 Raw commands, source, arguments and reasoning are never returned here.
 """
 import math
+import re
 
 NAVIGATION = {'read_file', 'grep', 'glob', 'litellm_context', 'list_files'}
 EDITS = {'edit_file', 'write_file', 'apply_patch'}
 POLLING = {'bash_output', 'wait'}
+CHECK_MENTIONS = re.compile(r'(?:^|[;&|(\s])(?:npm\s+test|npx\s+vitest|npx\s+tsc|npx\s+playwright\s+test|npm\s+run\s+(?:test|typecheck|lint|check)|pytest|cargo\s+(?:test|check)|go\s+test|make\s+(?:test|check))(?=$|[;&|)\s])')
 
 
 def number(value):
@@ -37,7 +39,14 @@ def action(call):
     if name in POLLING:
         return 'job-poll-or-wait'
     if name == 'bash':
-        return 'check-command' if call.get('execution', {}).get('checkKey') else 'shell-command'
+        execution = call.get('execution', {})
+        if execution.get('checkKey'):
+            return 'check-command'
+        # Wrapped and compound commands often have no conservative check key.
+        # Match mentions separately; this is never a passing-check receipt.
+        if CHECK_MENTIONS.search(execution.get('command', '')):
+            return 'shell-mentions-checks'
+        return 'shell-command'
     return 'other-tool'
 
 
@@ -72,7 +81,8 @@ def action_usage(messages, breakdown):
         recorded = sum(u[field] for u in units)
         attributed = sum(row[field] for row in groups.values())
         reconciliation[field] = {'recorded': recorded, 'attributed': attributed, 'difference': recorded - attributed}
-    return {'basis': 'complete assistant request grouped by chosen next action; not tool marginal cost',
+    return {'classificationVersion': 2,
+            'basis': 'complete assistant request grouped by chosen next action; not tool marginal cost. shell-mentions-checks matches known checker words in a recorded command without inferring passing checks or adequate coverage.',
             'pricing': {'inputPerMillionUsd': 0.22, 'cachedPerMillionUsd': 0.007, 'outputPerMillionUsd': 0.66},
             'groups': groups, 'assistantMessagesWithoutValidUsage': missing,
             'breakdownRecordsWithoutValidUsage': len(breakdown) - len(units),

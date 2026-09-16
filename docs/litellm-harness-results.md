@@ -1,6 +1,6 @@
 # LiteLLM harness campaign results
 
-Interim snapshot: 2026-09-16T07:26:31.491107+00:00. Current harness: **2026-09-15.34**.
+Interim snapshot: 2026-09-16T07:43:59.802235+00:00. Current harness: **2026-09-15.34**.
 
 **The campaign is still running. It has not established a quality win over Astra/Codex or production replacement readiness.**
 
@@ -8,7 +8,7 @@ The selectable architecture and replay workbench are implemented. The current wo
 
 ## Spending
 
-Confirmed token/header-priced charges: **$37.2162**. Missing receipts retain **$29.7730** across 118 requests; active requests reserve another **$0.2523**. The committed upper bound is **$67.2415** against the authorized **$100.00** ceiling. Reservations are not actual charges. Astra account billing is unavailable.
+Confirmed token/header-priced charges: **$38.4461**. Missing receipts retain **$29.7730** across 118 requests; active requests reserve another **$0.0000**. The committed upper bound is **$68.2192** against the authorized **$100.00** ceiling. Reservations are not actual charges. Astra account billing is unavailable.
 
 ## Controlled development observations
 
@@ -57,7 +57,9 @@ A follow-up activation audit found eight 10–13 second pytest jobs in the secon
 
 A [background-retrieval oracle audit](../scripts/litellm-harness/studies/background-router-oracle/README.md) found a failed assertion coupled to a mock configured for one router lookup method. Replacing only that mock with a real Router reproduces base failure, reference success and candidate success. The original 6/7 score stays unchanged; this candidate does not have a demonstrated retrieval defect from that assertion.
 
-Request-level cost analysis found that completed background jobs repeatedly changed the runtime envelope before the original user message, invalidating reuse of subsequent tool history despite unchanged system/tool hashes. A [chronological job-event candidate](../scripts/litellm-harness/studies/job-events/README.md) and a separate [session-affinity transport pilot](../scripts/litellm-harness/studies/cache-affinity/README.md) are predeclared and unpromoted. Per-action usage assigns the entire model request to its chosen next action, not marginal tool cost; reconciliation gaps remain visible.
+Request-level cost analysis found that completed background jobs repeatedly changed the runtime envelope before the original user message, invalidating reuse of subsequent tool history despite unchanged system/tool hashes. A [chronological job-event candidate](../scripts/litellm-harness/studies/job-events/README.md) is under evaluation. The separate [session-affinity transport pilot](../scripts/litellm-harness/studies/cache-affinity/README.md) completed all six paired scenarios with no useful improvement from a stable user hint; that change is not promoted. Per-action usage assigns the entire model request to its chosen next action, not marginal tool cost; reconciliation gaps remain visible.
+
+A [real streaming-adapter audit](../scripts/litellm-harness/studies/feature-effort/legacy-inheritance/README.md#real-endpoint-check) qualifies 24 hook/stream checks across Chat Completions, Anthropic Messages and Responses. It narrows a critic's diagnosis: two patches handle direct hooks through chat and Messages but fail real Responses behavior differently. An [endpoint-aware guide](../scripts/litellm-harness/studies/streaming-contract/README.md) is now in a separate predeclared development comparison. No held-out result is used to design that guide.
 
 ## Evaluation status
 
