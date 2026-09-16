@@ -90,9 +90,13 @@ def reflect(raw):
         'model': MODEL, 'effort': EFFORT, 'promptSha256': hashlib.sha256(prompt.encode()).hexdigest(),
         'usage': result.get('usage'), 'response': result.get('choices'),
     }, indent=2))
-    answer = result['choices'][0]['message'].get('content')
+    choice = result['choices'][0]
+    answer = choice['message'].get('content')
     if not answer:
         raise RuntimeError('The critic returned no review; raw response is retained.')
+    if choice.get('finish_reason') != 'stop':
+        review.with_suffix('.partial.md').write_text(answer)
+        raise RuntimeError('The critic did not finish normally; partial text and raw response are retained, not a complete review.')
     review.write_text(answer)
     print(json.dumps({'run': directory.name, 'reviewCharacters': len(answer)}), flush=True)
 

@@ -104,7 +104,7 @@ If a solver exits before writing its completion artifact, the launcher preserves
 
 An idle UI status is not sufficient evidence of task completion. The analyzer recognizes explicit host loop/no-progress guard messages and unresolved-work notices in saved final output. It preserves raw acceptance while reporting these as incomplete handoffs. Historical logs lack a structured stop-reason field; this classification uses the host's exact messages and must be extended if their format changes.
 
-`reflect.py RUN_DIRECTORY` sends a qualified train/dev trajectory, its private reference and acceptance output to the metered model for diagnosis. Held-out tasks are rejected. The response is untrusted advice; the script neither edits the harness nor promotes a suggestion. Keep any candidate-selection set separate from the next frozen comparison.
+`reflect.py RUN_DIRECTORY` sends a qualified train/dev trajectory, its private reference and acceptance output to the metered model for diagnosis. Held-out tasks are rejected. The response is untrusted advice; the script neither edits the harness nor promotes a suggestion. Empty output fails explicitly; an output-limit or other abnormal finish preserves text as `reflection.partial.md` and fails instead of presenting it as a complete review. Raw responses remain available. Keep any candidate-selection set separate from the next frozen comparison.
 
 Protocol 6 also isolates Git configuration and resolves the installed Git executable before applying Seatbelt. Ordinary `git diff` and `git status` work without reading the user's global configuration or writing xcrun's shared cache. Earlier protocol-5 trials can contain these infrastructure failures; keep their measurements separate from the final comparison.
 
