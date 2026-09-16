@@ -1,6 +1,8 @@
 # Meta-harnesses: what the evidence supports
 
-Research notes for the LiteLLM-specific Litespeed campaign. Sources checked September 15, 2026. This is a reading guide and an interpretation of the evidence, not a proposed large architecture. Live campaign measurements belong in [the results report](litellm-harness-results.md).
+Research notes for the LiteLLM-specific Litespeed campaign. External sources checked September 15, 2026; campaign findings updated September 16. This is a reading guide and an interpretation of the evidence, not a proposed large architecture. Detailed campaign measurements belong in [the results report](litellm-harness-results.md).
+
+**Current conclusion:** repository specialization is implemented and has produced useful host fixes and narrow task-specific gains. It has not established a reliable replacement for Astra. In the latest billing experiment, explicit conservation guidance succeeds once and fails once; fresh reviewers also miss the remaining bug. The strongest evidence is the executable counterexample, not the model’s positive self-review. Paid testing is now blocked by unresolved billing reservations, not by having spent $100 in confirmed charges.
 
 ## 1. The simple idea
 
@@ -157,7 +159,7 @@ This is the practical meaning of inspecting every tool call: find the first wron
 
 24. **More tests can be a repair mechanism, even in a slow run.** The larger Flash billing attempt spent 21 requests on commands mentioning check tools. Its broader checks caught an introduced optional-field `KeyError`, which it repaired before finishing. The same selection improved from 78 failures to one changed-rate expectation, then passed after that expectation was updated. This does not independently validate all candidate tests, but it refutes calling the entire testing phase wasted overhead. Use traces to distinguish setup errors, actual regressions and redundant repeats before optimizing call count. [Recorded evidence](../scripts/litellm-harness/studies/multi-module-development/flash-r1-trace-observations.json).
 
-25. **Check interactions, not just the new example and old behavior separately.** Both Flash billing patches passed the original realtime example and an isolated public cache-write check. A mixed cached-audio/cache-creation case exposed the same $0.06 synthetic overcharge in both: a new branch bypassed the old shared token-budget calculation. The merged reference and both Astra patches pass all five public-path cases; both Flash patches pass two. A review that accounts for every token bucket exactly once is a concrete training proposal, but adding that instruction has not yet demonstrated better model behavior. [Public billing counterexample](../scripts/litellm-harness/studies/multi-module-development/README.md#public-billing-paths-distinguish-the-remaining-failures).
+25. **Check interactions, not just the new example and old behavior separately.** Both Flash billing patches passed the original realtime example and an isolated public cache-write check. A mixed cached-audio/cache-creation case exposed the same $0.06 synthetic overcharge in both: a new branch bypassed the old shared token-budget calculation. The merged reference and both Astra patches pass all five public-path cases; both Flash patches pass two. A subsequent two-repetition experiment adds that exact conservation instruction before the first request. It delivers one strict success in two attempts, versus zero in two controls; the second candidate repeats the overcharge despite receiving the guide. An independent 48-case arithmetic sweep gives the first candidate and both earlier Astra patches 48/48, but the second candidate and both controls 9/48. These are correlated variations of one known task, not 48 independent PRs. The guide remains unpromoted. [Counterexample](../scripts/litellm-harness/studies/multi-module-development/README.md#public-billing-paths-distinguish-the-remaining-failures), [completed guide comparison](../scripts/litellm-harness/studies/billing-invariants/README.md).
 26. **An experiment's failure policy can consume its usable budget.** After host sleep, the old gateway labeled caught transport exceptions as retryable rate limits. A cascade of 126 unpriced admissions consumed $31.79 in conservative reservations without establishing actual charges. Admission now pauses persistently on missing receipts, including requests still uploading when the pause starts. A billing reconciliation is required before treating those reservations as spend or releasing them. Outage allocations are preserved and explicitly excluded from quality comparisons regardless of patch score. [Incident and tested recovery policy](../scripts/litellm-harness/studies/host-sleep-transport/README.md).
 
 ## 6. Prompting the improving agent
@@ -171,6 +173,8 @@ The following are original working templates distilled from this campaign. They 
 ### Focused review
 
 > Audit this one behavioral requirement against the named entrypoints and supplied code. Trace the relevant paths once. Return only concrete findings with the entrypoint, path condition, missing behavior and supporting source location. Code outside the excerpt is unknown. A finding is a behavioral claim, not a command to apply a particular patch. A passing higher-level wrapper test does not refute a gap at a directly callable lower-level entrypoint. Stop when the requirement has been checked; do not broaden into speculative cleanup.
+
+A focused prompt is still only a hypothesis. In the [billing reviewer pilot](../scripts/litellm-harness/studies/billing-review-pilot/README.md), two Medium reviews each exhaust 8,192 output tokens without a final answer. With reasoning disabled and a smaller allowance, both return answers but no verified task violation. One fallback allegation is disproved by execution; a reference difference on inconsistent token counts remains unspecified by the task. The conservation prompt retraces the supplied example instead of checking cache writes. Changing effort and output cap together prevents a clean causal comparison. Assess completion, useful findings and false allegations separately.
 
 ### Turning a finding into a repair
 
@@ -187,3 +191,16 @@ Cost needs three views: the search investment, the cost of a fresh ordinary task
 Repository specialization is the intended benefit here. The honest boundary is whether the harness can exploit durable repository structure on a later problem, rather than remembering a known answer. A chronological comparison helps, but a small recent sample still cannot establish all of production readiness: long migrations, concurrency bugs, ambiguous requests and incident response may be absent.
 
 The most useful outcome is therefore a measured frontier: which task families the cheap harness handles reliably, what it costs, where it stalls, and whether the remaining failures are repairable. That evidence lets a user decide when to trust it. The target of replacing a stronger general coding setup is an empirical target, not something a budget or a long prompt can guarantee.
+
+### Current campaign readiness
+
+| Requested outcome | Current evidence |
+|---|---|
+| Select a LiteLLM-specific architecture in Litespeed | Implemented in web and terminal; selection, Plan mode, permissions and history have regression and UI coverage. [User guide](litellm-harness.md). |
+| Improve the harness from historical PR traces | Versioned experiments, source patches, usage, failures and independent probes are published. This is code/prompt optimization; it does not train model weights. |
+| A tested full PR | [PR23](https://github.com/BerriAI/litespeed/pull/23) remains draft. The production runtime passed 2,158 tests with one skip, type checking and build; the later gateway correction separately passed 12 focused tests and type checking. |
+| Spend $100 without exceeding it | Incomplete: $52.8393 confirmed charges, $46.9303 unresolved reservations, zero pending requests. Even the smallest new request cannot fit the conservative remaining allowance. Billing reconciliation is required; reservations are not spend. |
+| Beat Astra/Codex while costing less | Unproven. No completed final chronological comparison establishes it, and Astra dollar billing is unavailable. The reserved final corpus has not been used to choose candidates. |
+| Replace Astra for production LiteLLM work | Unproven. Repeated billing failures, added type diagnostics and unreliable independent review remain material gaps. Passing host tests does not prove model-generated patches are production-ready. |
+
+Prepared experimental changes remain separate from the selectable production harness. Referenced repository-guidance delivery passes host tests but has no paid quality comparison; the billing guide’s partial success does not validate that separate change or their combination.

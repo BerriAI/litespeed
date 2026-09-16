@@ -65,7 +65,7 @@ Opening another repository produces a navigation hint instead of fabricated Lite
 
 The campaign runs historical LiteLLM tasks through the actual Litespeed runner, preserving messages, tool calls, patches, usage and timing. Flash produces replay patches and critique proposals. Codex inspects the evidence and implements/version-controls harness changes. This is repository specialization through code and prompts; it does not update model weights or silently rewrite the production harness after a user session.
 
-**The campaign is still running. A quality win over Astra/Codex and production replacement readiness have not been established.** Failed trials, infrastructure changes and tests coupled to a particular reference implementation remain visible. Some early trials read outside their intended snapshots; later filesystem-isolated runs are reported separately.
+**Paid evaluation is currently blocked by unresolved billing reservations. A quality win over Astra/Codex and production replacement readiness have not been established.** Failed trials, infrastructure changes and tests coupled to a particular reference implementation remain visible. Some early trials read outside their intended snapshots; later filesystem-isolated runs are reported separately.
 
 Read the [current results](litellm-harness-results.md), [request cost breakdown](litellm-harness-bottlenecks.md), [research guide](meta-harness-research.md) and [replay workbench instructions](../scripts/litellm-harness/README.md) for the evidence and limitations. The workbench runs the installed Codex CLI with the actual `gpt-6-astra` model for comparisons; its account billing is unavailable and is not counted as zero.
 
