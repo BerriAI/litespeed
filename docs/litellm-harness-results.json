@@ -1,16 +1,16 @@
 {
   "schemaVersion": 3,
   "status": "campaign-in-progress",
-  "generatedAt": "2026-09-16T04:04:28.509231+00:00",
-  "currentHarnessVersion": "2026-09-15.30",
+  "generatedAt": "2026-09-16T04:37:15.806852+00:00",
+  "currentHarnessVersion": "2026-09-15.33",
   "gatewayAccounting": {
     "limitUsd": 100,
-    "knownUsd": 27.114704662,
+    "knownUsd": 28.537199654000002,
     "unknownReservedUsd": 29.268377600000004,
     "unknownRequests": 116,
     "pendingReservedUsd": 0.2523136,
-    "committedUsd": 56.63539586199989,
-    "admittedRequests": 15890,
+    "committedUsd": 58.057890853999886,
+    "admittedRequests": 16541,
     "astraUsd": null
   },
   "runs": [
@@ -292,6 +292,7 @@
         "completedBatchedEditCalls": 0,
         "batchEditsRequested": 0,
         "batchSizes": [],
+        "backgroundCommandNotices": 0,
         "testFocusNotices": 0,
         "explorationFocusNotices": 0,
         "readCallsByEffectiveLimit": {
@@ -460,6 +461,7 @@
         "completedBatchedEditCalls": 0,
         "batchEditsRequested": 0,
         "batchSizes": [],
+        "backgroundCommandNotices": 0,
         "testFocusNotices": 0,
         "explorationFocusNotices": 0,
         "readCallsByEffectiveLimit": {
@@ -643,6 +645,7 @@
         "completedBatchedEditCalls": 0,
         "batchEditsRequested": 0,
         "batchSizes": [],
+        "backgroundCommandNotices": 0,
         "testFocusNotices": 0,
         "explorationFocusNotices": 0,
         "readCallsByEffectiveLimit": {
@@ -811,6 +814,7 @@
         "completedBatchedEditCalls": 0,
         "batchEditsRequested": 0,
         "batchSizes": [],
+        "backgroundCommandNotices": 0,
         "testFocusNotices": 0,
         "explorationFocusNotices": 0,
         "readCallsByEffectiveLimit": {
@@ -1001,6 +1005,7 @@
         "completedBatchedEditCalls": 0,
         "batchEditsRequested": 0,
         "batchSizes": [],
+        "backgroundCommandNotices": 0,
         "testFocusNotices": 0,
         "explorationFocusNotices": 0,
         "readCallsByEffectiveLimit": {
@@ -1171,6 +1176,7 @@
         "completedBatchedEditCalls": 0,
         "batchEditsRequested": 0,
         "batchSizes": [],
+        "backgroundCommandNotices": 0,
         "testFocusNotices": 0,
         "explorationFocusNotices": 0,
         "readCallsByEffectiveLimit": {
@@ -1347,6 +1353,7 @@
         "completedBatchedEditCalls": 0,
         "batchEditsRequested": 0,
         "batchSizes": [],
+        "backgroundCommandNotices": 0,
         "testFocusNotices": 0,
         "explorationFocusNotices": 1,
         "readCallsByEffectiveLimit": {
@@ -1636,6 +1643,7 @@
         "completedBatchedEditCalls": 0,
         "batchEditsRequested": 0,
         "batchSizes": [],
+        "backgroundCommandNotices": 0,
         "testFocusNotices": 0,
         "explorationFocusNotices": 1,
         "readCallsByEffectiveLimit": {
@@ -1991,6 +1999,7 @@
         "completedBatchedEditCalls": 0,
         "batchEditsRequested": 0,
         "batchSizes": [],
+        "backgroundCommandNotices": 0,
         "testFocusNotices": 0,
         "explorationFocusNotices": 1,
         "readCallsByEffectiveLimit": {
@@ -2177,6 +2186,7 @@
         "completedBatchedEditCalls": 0,
         "batchEditsRequested": 0,
         "batchSizes": [],
+        "backgroundCommandNotices": 0,
         "testFocusNotices": 0,
         "explorationFocusNotices": 1,
         "readCallsByEffectiveLimit": {
@@ -2423,6 +2433,7 @@
         "completedBatchedEditCalls": 0,
         "batchEditsRequested": 0,
         "batchSizes": [],
+        "backgroundCommandNotices": 0,
         "testFocusNotices": 0,
         "explorationFocusNotices": 1,
         "readCallsByEffectiveLimit": {
@@ -2658,6 +2669,7 @@
         "completedBatchedEditCalls": 0,
         "batchEditsRequested": 0,
         "batchSizes": [],
+        "backgroundCommandNotices": 0,
         "testFocusNotices": 0,
         "explorationFocusNotices": 1,
         "readCallsByEffectiveLimit": {
@@ -2910,6 +2922,7 @@
         "completedBatchedEditCalls": 0,
         "batchEditsRequested": 0,
         "batchSizes": [],
+        "backgroundCommandNotices": 0,
         "testFocusNotices": 0,
         "explorationFocusNotices": 1,
         "readCallsByEffectiveLimit": {
@@ -3209,6 +3222,7 @@
         "completedBatchedEditCalls": 0,
         "batchEditsRequested": 0,
         "batchSizes": [],
+        "backgroundCommandNotices": 0,
         "testFocusNotices": 0,
         "explorationFocusNotices": 1,
         "readCallsByEffectiveLimit": {
@@ -3453,6 +3467,7 @@
         "completedBatchedEditCalls": 0,
         "batchEditsRequested": 0,
         "batchSizes": [],
+        "backgroundCommandNotices": 0,
         "testFocusNotices": 0,
         "explorationFocusNotices": 1,
         "readCallsByEffectiveLimit": {
@@ -3622,6 +3637,7 @@
         "completedBatchedEditCalls": 0,
         "batchEditsRequested": 0,
         "batchSizes": [],
+        "backgroundCommandNotices": 0,
         "testFocusNotices": 0,
         "explorationFocusNotices": 1,
         "readCallsByEffectiveLimit": {
@@ -3926,6 +3942,7 @@
         "completedBatchedEditCalls": 0,
         "batchEditsRequested": 0,
         "batchSizes": [],
+        "backgroundCommandNotices": 0,
         "testFocusNotices": 0,
         "explorationFocusNotices": 1,
         "readCallsByEffectiveLimit": {
@@ -4177,6 +4194,7 @@
         "completedBatchedEditCalls": 0,
         "batchEditsRequested": 0,
         "batchSizes": [],
+        "backgroundCommandNotices": 0,
         "testFocusNotices": 0,
         "explorationFocusNotices": 1,
         "readCallsByEffectiveLimit": {
@@ -4412,6 +4430,7 @@
         "completedBatchedEditCalls": 0,
         "batchEditsRequested": 0,
         "batchSizes": [],
+        "backgroundCommandNotices": 0,
         "testFocusNotices": 0,
         "explorationFocusNotices": 1,
         "readCallsByEffectiveLimit": {
@@ -4607,6 +4626,7 @@
         "completedBatchedEditCalls": 0,
         "batchEditsRequested": 0,
         "batchSizes": [],
+        "backgroundCommandNotices": 0,
         "testFocusNotices": 0,
         "explorationFocusNotices": 1,
         "readCallsByEffectiveLimit": {
@@ -4844,6 +4864,7 @@
         "completedBatchedEditCalls": 0,
         "batchEditsRequested": 0,
         "batchSizes": [],
+        "backgroundCommandNotices": 0,
         "testFocusNotices": 0,
         "explorationFocusNotices": 1,
         "readCallsByEffectiveLimit": {
@@ -5083,6 +5104,7 @@
         "completedBatchedEditCalls": 0,
         "batchEditsRequested": 0,
         "batchSizes": [],
+        "backgroundCommandNotices": 0,
         "testFocusNotices": 0,
         "explorationFocusNotices": 1,
         "readCallsByEffectiveLimit": {
@@ -5311,6 +5333,7 @@
         "completedBatchedEditCalls": 0,
         "batchEditsRequested": 0,
         "batchSizes": [],
+        "backgroundCommandNotices": 0,
         "testFocusNotices": 0,
         "explorationFocusNotices": 1,
         "readCallsByEffectiveLimit": {
@@ -5618,6 +5641,7 @@
         "completedBatchedEditCalls": 0,
         "batchEditsRequested": 0,
         "batchSizes": [],
+        "backgroundCommandNotices": 0,
         "testFocusNotices": 0,
         "explorationFocusNotices": 1,
         "readCallsByEffectiveLimit": {
@@ -5808,6 +5832,7 @@
         "completedBatchedEditCalls": 0,
         "batchEditsRequested": 0,
         "batchSizes": [],
+        "backgroundCommandNotices": 0,
         "testFocusNotices": 0,
         "explorationFocusNotices": 1,
         "readCallsByEffectiveLimit": {
@@ -6067,6 +6092,7 @@
         "completedBatchedEditCalls": 0,
         "batchEditsRequested": 0,
         "batchSizes": [],
+        "backgroundCommandNotices": 0,
         "testFocusNotices": 0,
         "explorationFocusNotices": 1,
         "readCallsByEffectiveLimit": {
@@ -6308,6 +6334,7 @@
         "completedBatchedEditCalls": 0,
         "batchEditsRequested": 0,
         "batchSizes": [],
+        "backgroundCommandNotices": 0,
         "testFocusNotices": 0,
         "explorationFocusNotices": 1,
         "readCallsByEffectiveLimit": {
@@ -6567,6 +6594,7 @@
         "completedBatchedEditCalls": 0,
         "batchEditsRequested": 0,
         "batchSizes": [],
+        "backgroundCommandNotices": 0,
         "testFocusNotices": 0,
         "explorationFocusNotices": 1,
         "readCallsByEffectiveLimit": {
@@ -6758,6 +6786,7 @@
         "completedBatchedEditCalls": 0,
         "batchEditsRequested": 0,
         "batchSizes": [],
+        "backgroundCommandNotices": 0,
         "testFocusNotices": 0,
         "explorationFocusNotices": 1,
         "readCallsByEffectiveLimit": {
@@ -6933,6 +6962,7 @@
         "completedBatchedEditCalls": 0,
         "batchEditsRequested": 0,
         "batchSizes": [],
+        "backgroundCommandNotices": 0,
         "testFocusNotices": 0,
         "explorationFocusNotices": 1,
         "readCallsByEffectiveLimit": {
@@ -7118,6 +7148,7 @@
         "completedBatchedEditCalls": 0,
         "batchEditsRequested": 0,
         "batchSizes": [],
+        "backgroundCommandNotices": 0,
         "testFocusNotices": 0,
         "explorationFocusNotices": 1,
         "readCallsByEffectiveLimit": {
@@ -7292,6 +7323,7 @@
         "completedBatchedEditCalls": 0,
         "batchEditsRequested": 0,
         "batchSizes": [],
+        "backgroundCommandNotices": 0,
         "testFocusNotices": 0,
         "explorationFocusNotices": 1,
         "readCallsByEffectiveLimit": {
@@ -7471,6 +7503,7 @@
         "completedBatchedEditCalls": 0,
         "batchEditsRequested": 0,
         "batchSizes": [],
+        "backgroundCommandNotices": 0,
         "testFocusNotices": 0,
         "explorationFocusNotices": 1,
         "readCallsByEffectiveLimit": {
@@ -7640,6 +7673,7 @@
         "completedBatchedEditCalls": 0,
         "batchEditsRequested": 0,
         "batchSizes": [],
+        "backgroundCommandNotices": 0,
         "testFocusNotices": 0,
         "explorationFocusNotices": 1,
         "readCallsByEffectiveLimit": {
@@ -7817,6 +7851,7 @@
         "completedBatchedEditCalls": 0,
         "batchEditsRequested": 0,
         "batchSizes": [],
+        "backgroundCommandNotices": 0,
         "testFocusNotices": 0,
         "explorationFocusNotices": 1,
         "readCallsByEffectiveLimit": {
@@ -7995,6 +8030,7 @@
         "completedBatchedEditCalls": 0,
         "batchEditsRequested": 0,
         "batchSizes": [],
+        "backgroundCommandNotices": 0,
         "testFocusNotices": 0,
         "explorationFocusNotices": 0,
         "readCallsByEffectiveLimit": {
@@ -8171,6 +8207,7 @@
         "completedBatchedEditCalls": 0,
         "batchEditsRequested": 0,
         "batchSizes": [],
+        "backgroundCommandNotices": 0,
         "testFocusNotices": 0,
         "explorationFocusNotices": 1,
         "readCallsByEffectiveLimit": {
@@ -8347,6 +8384,7 @@
         "completedBatchedEditCalls": 0,
         "batchEditsRequested": 0,
         "batchSizes": [],
+        "backgroundCommandNotices": 0,
         "testFocusNotices": 0,
         "explorationFocusNotices": 1,
         "readCallsByEffectiveLimit": {
@@ -8506,6 +8544,7 @@
         "completedBatchedEditCalls": 0,
         "batchEditsRequested": 0,
         "batchSizes": [],
+        "backgroundCommandNotices": 0,
         "testFocusNotices": 0,
         "explorationFocusNotices": 1,
         "readCallsByEffectiveLimit": {
@@ -8797,6 +8836,7 @@
         "completedBatchedEditCalls": 0,
         "batchEditsRequested": 0,
         "batchSizes": [],
+        "backgroundCommandNotices": 0,
         "testFocusNotices": 0,
         "explorationFocusNotices": 1,
         "readCallsByEffectiveLimit": {
@@ -8971,6 +9011,7 @@
         "completedBatchedEditCalls": 0,
         "batchEditsRequested": 0,
         "batchSizes": [],
+        "backgroundCommandNotices": 0,
         "testFocusNotices": 0,
         "explorationFocusNotices": 0,
         "readCallsByEffectiveLimit": {
@@ -9129,6 +9170,7 @@
         "completedBatchedEditCalls": 0,
         "batchEditsRequested": 0,
         "batchSizes": [],
+        "backgroundCommandNotices": 0,
         "testFocusNotices": 0,
         "explorationFocusNotices": 0,
         "readCallsByEffectiveLimit": {
@@ -9312,6 +9354,7 @@
         "completedBatchedEditCalls": 0,
         "batchEditsRequested": 0,
         "batchSizes": [],
+        "backgroundCommandNotices": 0,
         "testFocusNotices": 0,
         "explorationFocusNotices": 1,
         "readCallsByEffectiveLimit": {
@@ -9493,6 +9536,7 @@
         "completedBatchedEditCalls": 0,
         "batchEditsRequested": 0,
         "batchSizes": [],
+        "backgroundCommandNotices": 0,
         "testFocusNotices": 0,
         "explorationFocusNotices": 1,
         "readCallsByEffectiveLimit": {
@@ -9696,6 +9740,7 @@
         "completedBatchedEditCalls": 0,
         "batchEditsRequested": 0,
         "batchSizes": [],
+        "backgroundCommandNotices": 0,
         "testFocusNotices": 0,
         "explorationFocusNotices": 1,
         "readCallsByEffectiveLimit": {
@@ -9867,6 +9912,7 @@
         "completedBatchedEditCalls": 0,
         "batchEditsRequested": 0,
         "batchSizes": [],
+        "backgroundCommandNotices": 0,
         "testFocusNotices": 0,
         "explorationFocusNotices": 1,
         "readCallsByEffectiveLimit": {
@@ -10040,6 +10086,7 @@
         "completedBatchedEditCalls": 0,
         "batchEditsRequested": 0,
         "batchSizes": [],
+        "backgroundCommandNotices": 0,
         "testFocusNotices": 0,
         "explorationFocusNotices": 0,
         "readCallsByEffectiveLimit": {
@@ -10231,6 +10278,7 @@
         "completedBatchedEditCalls": 0,
         "batchEditsRequested": 0,
         "batchSizes": [],
+        "backgroundCommandNotices": 0,
         "testFocusNotices": 0,
         "explorationFocusNotices": 0,
         "readCallsByEffectiveLimit": {
@@ -10391,6 +10439,7 @@
         "completedBatchedEditCalls": 0,
         "batchEditsRequested": 0,
         "batchSizes": [],
+        "backgroundCommandNotices": 0,
         "testFocusNotices": 0,
         "explorationFocusNotices": 0,
         "readCallsByEffectiveLimit": {
@@ -10570,6 +10619,7 @@
         "completedBatchedEditCalls": 0,
         "batchEditsRequested": 0,
         "batchSizes": [],
+        "backgroundCommandNotices": 0,
         "testFocusNotices": 0,
         "explorationFocusNotices": 0,
         "readCallsByEffectiveLimit": {
@@ -10739,6 +10789,7 @@
         "completedBatchedEditCalls": 0,
         "batchEditsRequested": 0,
         "batchSizes": [],
+        "backgroundCommandNotices": 0,
         "testFocusNotices": 0,
         "explorationFocusNotices": 1,
         "readCallsByEffectiveLimit": {
@@ -10876,6 +10927,7 @@
         "completedBatchedEditCalls": 0,
         "batchEditsRequested": 0,
         "batchSizes": [],
+        "backgroundCommandNotices": 0,
         "testFocusNotices": 0,
         "explorationFocusNotices": 1,
         "readCallsByEffectiveLimit": {
@@ -11031,6 +11083,7 @@
         "completedBatchedEditCalls": 0,
         "batchEditsRequested": 0,
         "batchSizes": [],
+        "backgroundCommandNotices": 0,
         "testFocusNotices": 0,
         "explorationFocusNotices": 1,
         "readCallsByEffectiveLimit": {
@@ -11226,6 +11279,7 @@
         "completedBatchedEditCalls": 0,
         "batchEditsRequested": 0,
         "batchSizes": [],
+        "backgroundCommandNotices": 0,
         "testFocusNotices": 0,
         "explorationFocusNotices": 1,
         "readCallsByEffectiveLimit": {
@@ -11401,6 +11455,7 @@
         "completedBatchedEditCalls": 0,
         "batchEditsRequested": 0,
         "batchSizes": [],
+        "backgroundCommandNotices": 0,
         "testFocusNotices": 0,
         "explorationFocusNotices": 0,
         "readCallsByEffectiveLimit": {
@@ -11570,6 +11625,7 @@
         "completedBatchedEditCalls": 0,
         "batchEditsRequested": 0,
         "batchSizes": [],
+        "backgroundCommandNotices": 0,
         "testFocusNotices": 0,
         "explorationFocusNotices": 1,
         "readCallsByEffectiveLimit": {
@@ -11727,6 +11783,7 @@
         "completedBatchedEditCalls": 0,
         "batchEditsRequested": 0,
         "batchSizes": [],
+        "backgroundCommandNotices": 0,
         "testFocusNotices": 0,
         "explorationFocusNotices": 1,
         "readCallsByEffectiveLimit": {
@@ -11893,6 +11950,7 @@
         "completedBatchedEditCalls": 0,
         "batchEditsRequested": 0,
         "batchSizes": [],
+        "backgroundCommandNotices": 0,
         "testFocusNotices": 0,
         "explorationFocusNotices": 1,
         "readCallsByEffectiveLimit": {
@@ -11905,6 +11963,177 @@
           "40": 1,
           "100": 1,
           "45": 1,
+          "25": 1
+        },
+        "defaultWindowReadCalls": null,
+        "readLimitProvenance": "unknown: saved arguments include host-injected defaults"
+      },
+      "fixturePlugins": [],
+      "fixtureProfileHash": "643d5437104296e21d906ecb15b2c96ad278f20cfc4af53b12bb6069bd853726",
+      "knownIntegrityIssue": false,
+      "snapshotBytecodeInherited": false,
+      "bytecodeIndependentAcceptanceUnchanged": null
+    },
+    {
+      "dataset": "original",
+      "run": "replication-p6-ablation-control-r1-router-strategy-isolation-ad5bb49e",
+      "id": "router-strategy-isolation",
+      "kind": "litellm-specific",
+      "label": "replication-p6-ablation-control-r1",
+      "promptRevision": 3,
+      "snapshotRevision": 2,
+      "harnessVersion": "2026-09-15.17",
+      "harnessSha256": "5345334fd3857c4066361947afb7c2c10aa106055e396f02e703ded5ac883cbd",
+      "harnessCommit": "f75ab327c649cec9719ac03847f171854d2e32ae",
+      "completed": false,
+      "completionReason": "timeout",
+      "status": "idle",
+      "exit": null,
+      "evaluationProtocol": 6,
+      "isolation": "macOS-seatbelt",
+      "effort": "medium",
+      "timeoutSeconds": 900,
+      "seconds": 901.461,
+      "timedOut": true,
+      "interrupted": null,
+      "recovered": null,
+      "durationIncomplete": null,
+      "repairParent": null,
+      "requests": 77,
+      "reportedRequests": 77,
+      "inputTokens": 4604165,
+      "cachedTokens": 4322970,
+      "outputTokens": 40638,
+      "computedUsd": 0.11894476999999999,
+      "acceptance": {
+        "exit": 1,
+        "tests": 9,
+        "failures": 1,
+        "errors": 0,
+        "skipped": 0,
+        "passed": false
+      },
+      "toolCounts": {
+        "bash": 28,
+        "read_file": 30,
+        "litellm_context": 1,
+        "edit_file": 14,
+        "wait": 2,
+        "bash_output": 2
+      },
+      "exactRepeatedCalls": 0,
+      "toolOutputCharacters": 201470,
+      "toolActiveSeconds": 494.187,
+      "modelSeconds": 378.203,
+      "actionUsage": {
+        "basis": "complete assistant request grouped by chosen next action; not tool marginal cost",
+        "pricing": {
+          "inputPerMillionUsd": 0.22,
+          "cachedPerMillionUsd": 0.007,
+          "outputPerMillionUsd": 0.66
+        },
+        "groups": {
+          "shell-command": {
+            "requests": 28,
+            "inputTokens": 1783967,
+            "cachedTokens": 1737218,
+            "outputTokens": 20251,
+            "estimatedUsd": 0.035810966,
+            "cacheUnreportedRequests": 0,
+            "reportedModelSeconds": 185.84500000000003,
+            "durationUnreportedRequests": 0
+          },
+          "navigation": {
+            "requests": 31,
+            "inputTokens": 1523459,
+            "cachedTokens": 1479882,
+            "outputTokens": 12226,
+            "estimatedUsd": 0.028015273999999996,
+            "cacheUnreportedRequests": 0,
+            "reportedModelSeconds": 123.45199999999996,
+            "durationUnreportedRequests": 0
+          },
+          "structured-edit": {
+            "requests": 14,
+            "inputTokens": 935232,
+            "cachedTokens": 917516,
+            "outputTokens": 7953,
+            "estimatedUsd": 0.015569112,
+            "cacheUnreportedRequests": 0,
+            "reportedModelSeconds": 59.619,
+            "durationUnreportedRequests": 0
+          },
+          "job-poll-or-wait": {
+            "requests": 4,
+            "inputTokens": 361507,
+            "cachedTokens": 188354,
+            "outputTokens": 208,
+            "estimatedUsd": 0.039549418,
+            "cacheUnreportedRequests": 0,
+            "reportedModelSeconds": 9.286999999999999,
+            "durationUnreportedRequests": 0
+          }
+        },
+        "assistantMessagesWithoutValidUsage": 0,
+        "breakdownRecordsWithoutValidUsage": 0,
+        "reconciliation": {
+          "inputTokens": {
+            "recorded": 4604165,
+            "attributed": 4604165,
+            "difference": 0
+          },
+          "cachedTokens": {
+            "recorded": 4322970,
+            "attributed": 4322970,
+            "difference": 0
+          },
+          "outputTokens": {
+            "recorded": 40638,
+            "attributed": 40638,
+            "difference": 0
+          },
+          "estimatedUsd": {
+            "recorded": 0.11894477,
+            "attributed": 0.11894477,
+            "difference": 0.0
+          }
+        }
+      },
+      "timeToFirstEditSeconds": 194.666,
+      "reviewStartedSeconds": null,
+      "reviewModelRequests": null,
+      "activations": {
+        "initialMapNotices": 1,
+        "contextToolCalls": 1,
+        "guideIdsShown": [
+          "router-resolution-and-request-state"
+        ],
+        "unparsedContextPayloads": 0,
+        "finalReviewNotices": 0,
+        "guidedFinalReviewNotices": 0,
+        "finalReviewGuideIdsShown": [],
+        "batchedEditCalls": 0,
+        "completedBatchedEditCalls": 0,
+        "batchEditsRequested": 0,
+        "batchSizes": [],
+        "backgroundCommandNotices": 0,
+        "testFocusNotices": 0,
+        "explorationFocusNotices": 1,
+        "readCallsByEffectiveLimit": {
+          "220": 1,
+          "200": 1,
+          "80": 1,
+          "160": 1,
+          "30": 4,
+          "40": 5,
+          "60": 3,
+          "120": 2,
+          "145": 2,
+          "130": 1,
+          "20": 2,
+          "50": 2,
+          "70": 2,
+          "55": 2,
           "25": 1
         },
         "defaultWindowReadCalls": null,
@@ -12057,6 +12286,7 @@
         "completedBatchedEditCalls": 0,
         "batchEditsRequested": 0,
         "batchSizes": [],
+        "backgroundCommandNotices": 0,
         "testFocusNotices": 0,
         "explorationFocusNotices": 1,
         "readCallsByEffectiveLimit": {
@@ -12229,6 +12459,7 @@
         "completedBatchedEditCalls": 0,
         "batchEditsRequested": 0,
         "batchSizes": [],
+        "backgroundCommandNotices": 0,
         "testFocusNotices": 0,
         "explorationFocusNotices": 0,
         "readCallsByEffectiveLimit": {
@@ -12411,6 +12642,7 @@
         "completedBatchedEditCalls": 0,
         "batchEditsRequested": 0,
         "batchSizes": [],
+        "backgroundCommandNotices": 0,
         "testFocusNotices": 0,
         "explorationFocusNotices": 1,
         "readCallsByEffectiveLimit": {
@@ -12566,6 +12798,7 @@
         "completedBatchedEditCalls": 0,
         "batchEditsRequested": 0,
         "batchSizes": [],
+        "backgroundCommandNotices": 0,
         "testFocusNotices": 0,
         "explorationFocusNotices": 1,
         "readCallsByEffectiveLimit": {
@@ -12728,11 +12961,181 @@
         "completedBatchedEditCalls": 0,
         "batchEditsRequested": 0,
         "batchSizes": [],
+        "backgroundCommandNotices": 0,
         "testFocusNotices": 0,
         "explorationFocusNotices": 1,
         "readCallsByEffectiveLimit": {
           "28": 1,
           "18": 1
+        },
+        "defaultWindowReadCalls": null,
+        "readLimitProvenance": "unknown: saved arguments include host-injected defaults"
+      },
+      "fixturePlugins": [],
+      "fixtureProfileHash": "643d5437104296e21d906ecb15b2c96ad278f20cfc4af53b12bb6069bd853726",
+      "knownIntegrityIssue": false,
+      "snapshotBytecodeInherited": false,
+      "bytecodeIndependentAcceptanceUnchanged": null
+    },
+    {
+      "dataset": "original",
+      "run": "replication-p6-ablation-no-guides-r1-router-strategy-isolation-d5a85676",
+      "id": "router-strategy-isolation",
+      "kind": "litellm-specific",
+      "label": "replication-p6-ablation-no-guides-r1",
+      "promptRevision": 3,
+      "snapshotRevision": 2,
+      "harnessVersion": "2026-09-15.17-ablate-no-guides",
+      "harnessSha256": "81d15381f183df7910fc169021e44c40477618549df43e058ea4cf82af6b1fa1",
+      "harnessCommit": "6d7fbe3e3c5192b6675c2bea2dc0af3913bd1480",
+      "completed": true,
+      "completionReason": "completed",
+      "status": "idle",
+      "exit": null,
+      "evaluationProtocol": 6,
+      "isolation": "macOS-seatbelt",
+      "effort": "medium",
+      "timeoutSeconds": 900,
+      "seconds": 541.619,
+      "timedOut": false,
+      "interrupted": null,
+      "recovered": null,
+      "durationIncomplete": null,
+      "repairParent": null,
+      "requests": 75,
+      "reportedRequests": 75,
+      "inputTokens": 5867414,
+      "cachedTokens": 5737162,
+      "outputTokens": 49314,
+      "computedUsd": 0.101362814,
+      "acceptance": {
+        "exit": 1,
+        "tests": 9,
+        "failures": 4,
+        "errors": 0,
+        "skipped": 0,
+        "passed": false
+      },
+      "toolCounts": {
+        "litellm_context": 8,
+        "grep": 10,
+        "read_file": 23,
+        "bash": 35,
+        "edit_file": 7
+      },
+      "exactRepeatedCalls": 1,
+      "toolOutputCharacters": 253319,
+      "toolActiveSeconds": 64.494,
+      "modelSeconds": 447.859,
+      "actionUsage": {
+        "basis": "complete assistant request grouped by chosen next action; not tool marginal cost",
+        "pricing": {
+          "inputPerMillionUsd": 0.22,
+          "cachedPerMillionUsd": 0.007,
+          "outputPerMillionUsd": 0.66
+        },
+        "groups": {
+          "navigation": {
+            "requests": 31,
+            "inputTokens": 1702596,
+            "cachedTokens": 1622442,
+            "outputTokens": 19456,
+            "estimatedUsd": 0.041831933999999994,
+            "cacheUnreportedRequests": 0,
+            "reportedModelSeconds": 176.90300000000005,
+            "durationUnreportedRequests": 0
+          },
+          "shell-command": {
+            "requests": 35,
+            "inputTokens": 3303192,
+            "cachedTokens": 3263590,
+            "outputTokens": 23019,
+            "estimatedUsd": 0.04675011,
+            "cacheUnreportedRequests": 0,
+            "reportedModelSeconds": 215.722,
+            "durationUnreportedRequests": 0
+          },
+          "structured-edit": {
+            "requests": 7,
+            "inputTokens": 620977,
+            "cachedTokens": 613196,
+            "outputTokens": 5087,
+            "estimatedUsd": 0.009361612000000002,
+            "cacheUnreportedRequests": 0,
+            "reportedModelSeconds": 38.409,
+            "durationUnreportedRequests": 0
+          },
+          "text-only": {
+            "requests": 2,
+            "inputTokens": 240649,
+            "cachedTokens": 237934,
+            "outputTokens": 1752,
+            "estimatedUsd": 0.0034191580000000003,
+            "cacheUnreportedRequests": 0,
+            "reportedModelSeconds": 16.825,
+            "durationUnreportedRequests": 0
+          }
+        },
+        "assistantMessagesWithoutValidUsage": 0,
+        "breakdownRecordsWithoutValidUsage": 0,
+        "reconciliation": {
+          "inputTokens": {
+            "recorded": 5867414,
+            "attributed": 5867414,
+            "difference": 0
+          },
+          "cachedTokens": {
+            "recorded": 5737162,
+            "attributed": 5737162,
+            "difference": 0
+          },
+          "outputTokens": {
+            "recorded": 49314,
+            "attributed": 49314,
+            "difference": 0
+          },
+          "estimatedUsd": {
+            "recorded": 0.10136281400000001,
+            "attributed": 0.101362814,
+            "difference": 1.3877787807814457e-17
+          }
+        }
+      },
+      "timeToFirstEditSeconds": 184.14,
+      "reviewStartedSeconds": 530.5,
+      "reviewModelRequests": 1,
+      "activations": {
+        "initialMapNotices": 1,
+        "contextToolCalls": 8,
+        "guideIdsShown": [],
+        "unparsedContextPayloads": 6,
+        "finalReviewNotices": 1,
+        "guidedFinalReviewNotices": 0,
+        "finalReviewGuideIdsShown": [],
+        "batchedEditCalls": 0,
+        "completedBatchedEditCalls": 0,
+        "batchEditsRequested": 0,
+        "batchSizes": [],
+        "backgroundCommandNotices": 0,
+        "testFocusNotices": 0,
+        "explorationFocusNotices": 1,
+        "readCallsByEffectiveLimit": {
+          "380": 1,
+          "60": 3,
+          "140": 1,
+          "340": 1,
+          "200": 3,
+          "80": 3,
+          "170": 2,
+          "160": 1,
+          "150": 1,
+          "70": 1,
+          "30": 1,
+          "110": 1,
+          "20": 1,
+          "25": 1,
+          "10": 1,
+          "50": 1
         },
         "defaultWindowReadCalls": null,
         "readLimitProvenance": "unknown: saved arguments include host-injected defaults"
@@ -12903,6 +13306,7 @@
         "completedBatchedEditCalls": 0,
         "batchEditsRequested": 0,
         "batchSizes": [],
+        "backgroundCommandNotices": 0,
         "testFocusNotices": 0,
         "explorationFocusNotices": 1,
         "readCallsByEffectiveLimit": {
@@ -13077,6 +13481,7 @@
         "completedBatchedEditCalls": 0,
         "batchEditsRequested": 0,
         "batchSizes": [],
+        "backgroundCommandNotices": 0,
         "testFocusNotices": 0,
         "explorationFocusNotices": 0,
         "readCallsByEffectiveLimit": {
@@ -13248,6 +13653,7 @@
         "completedBatchedEditCalls": 0,
         "batchEditsRequested": 0,
         "batchSizes": [],
+        "backgroundCommandNotices": 0,
         "testFocusNotices": 0,
         "explorationFocusNotices": 1,
         "readCallsByEffectiveLimit": {
@@ -13415,6 +13821,7 @@
         "completedBatchedEditCalls": 0,
         "batchEditsRequested": 0,
         "batchSizes": [],
+        "backgroundCommandNotices": 0,
         "testFocusNotices": 0,
         "explorationFocusNotices": 1,
         "readCallsByEffectiveLimit": {
@@ -13581,6 +13988,7 @@
         "completedBatchedEditCalls": 0,
         "batchEditsRequested": 0,
         "batchSizes": [],
+        "backgroundCommandNotices": 0,
         "testFocusNotices": 0,
         "explorationFocusNotices": 1,
         "readCallsByEffectiveLimit": {
@@ -13744,6 +14152,7 @@
         "completedBatchedEditCalls": 0,
         "batchEditsRequested": 0,
         "batchSizes": [],
+        "backgroundCommandNotices": 0,
         "testFocusNotices": 0,
         "explorationFocusNotices": 1,
         "readCallsByEffectiveLimit": {
@@ -13915,6 +14324,7 @@
         "completedBatchedEditCalls": 0,
         "batchEditsRequested": 0,
         "batchSizes": [],
+        "backgroundCommandNotices": 0,
         "testFocusNotices": 0,
         "explorationFocusNotices": 0,
         "readCallsByEffectiveLimit": {
@@ -14097,6 +14507,7 @@
         "completedBatchedEditCalls": 0,
         "batchEditsRequested": 0,
         "batchSizes": [],
+        "backgroundCommandNotices": 0,
         "testFocusNotices": 0,
         "explorationFocusNotices": 1,
         "readCallsByEffectiveLimit": {
@@ -14262,6 +14673,7 @@
         "completedBatchedEditCalls": 0,
         "batchEditsRequested": 0,
         "batchSizes": [],
+        "backgroundCommandNotices": 0,
         "testFocusNotices": 0,
         "explorationFocusNotices": 1,
         "readCallsByEffectiveLimit": {
@@ -14426,6 +14838,7 @@
         "completedBatchedEditCalls": 0,
         "batchEditsRequested": 0,
         "batchSizes": [],
+        "backgroundCommandNotices": 0,
         "testFocusNotices": 0,
         "explorationFocusNotices": 1,
         "readCallsByEffectiveLimit": {
@@ -14600,6 +15013,7 @@
         "completedBatchedEditCalls": 0,
         "batchEditsRequested": 0,
         "batchSizes": [],
+        "backgroundCommandNotices": 0,
         "testFocusNotices": 0,
         "explorationFocusNotices": 1,
         "readCallsByEffectiveLimit": {
@@ -14763,6 +15177,7 @@
         "completedBatchedEditCalls": 0,
         "batchEditsRequested": 0,
         "batchSizes": [],
+        "backgroundCommandNotices": 0,
         "testFocusNotices": 0,
         "explorationFocusNotices": 0,
         "readCallsByEffectiveLimit": {
@@ -14956,6 +15371,7 @@
         "completedBatchedEditCalls": 0,
         "batchEditsRequested": 0,
         "batchSizes": [],
+        "backgroundCommandNotices": 0,
         "testFocusNotices": 0,
         "explorationFocusNotices": 1,
         "readCallsByEffectiveLimit": {
@@ -15118,6 +15534,7 @@
         "completedBatchedEditCalls": 0,
         "batchEditsRequested": 0,
         "batchSizes": [],
+        "backgroundCommandNotices": 0,
         "testFocusNotices": 0,
         "explorationFocusNotices": 1,
         "readCallsByEffectiveLimit": {
@@ -15292,6 +15709,7 @@
         "completedBatchedEditCalls": 0,
         "batchEditsRequested": 0,
         "batchSizes": [],
+        "backgroundCommandNotices": 0,
         "testFocusNotices": 0,
         "explorationFocusNotices": 1,
         "readCallsByEffectiveLimit": {
@@ -15314,6 +15732,181 @@
       "knownIntegrityIssue": false,
       "snapshotBytecodeInherited": true,
       "bytecodeIndependentAcceptanceUnchanged": true
+    },
+    {
+      "dataset": "original",
+      "run": "replication-p6-ablation-read-480-r1-router-strategy-isolation-0880fcba",
+      "id": "router-strategy-isolation",
+      "kind": "litellm-specific",
+      "label": "replication-p6-ablation-read-480-r1",
+      "promptRevision": 3,
+      "snapshotRevision": 2,
+      "harnessVersion": "2026-09-15.17-ablate-read-480",
+      "harnessSha256": "c07f8ae8dc7877e7a2382178ab5287a6de3fe32eba8c0ca7f2c04513051e686a",
+      "harnessCommit": "9e4af4bde94625d6eeca72efb0b9436e9d4fb43b",
+      "completed": true,
+      "completionReason": "completed",
+      "status": "idle",
+      "exit": null,
+      "evaluationProtocol": 6,
+      "isolation": "macOS-seatbelt",
+      "effort": "medium",
+      "timeoutSeconds": 900,
+      "seconds": 655.797,
+      "timedOut": false,
+      "interrupted": null,
+      "recovered": null,
+      "durationIncomplete": null,
+      "repairParent": null,
+      "requests": 89,
+      "reportedRequests": 89,
+      "inputTokens": 7307433,
+      "cachedTokens": 7171036,
+      "outputTokens": 55847,
+      "computedUsd": 0.117063612,
+      "acceptance": {
+        "exit": 1,
+        "tests": 9,
+        "failures": 1,
+        "errors": 0,
+        "skipped": 0,
+        "passed": false
+      },
+      "toolCounts": {
+        "bash": 62,
+        "grep": 2,
+        "read_file": 15,
+        "edit_file": 20
+      },
+      "exactRepeatedCalls": 2,
+      "toolOutputCharacters": 238977,
+      "toolActiveSeconds": 82.98,
+      "modelSeconds": 521.91,
+      "actionUsage": {
+        "basis": "complete assistant request grouped by chosen next action; not tool marginal cost",
+        "pricing": {
+          "inputPerMillionUsd": 0.22,
+          "cachedPerMillionUsd": 0.007,
+          "outputPerMillionUsd": 0.66
+        },
+        "groups": {
+          "mixed-tools": {
+            "requests": 3,
+            "inputTokens": 81380,
+            "cachedTokens": 64114,
+            "outputTokens": 1607,
+            "estimatedUsd": 0.005307938,
+            "cacheUnreportedRequests": 0,
+            "reportedModelSeconds": 14.585999999999999,
+            "durationUnreportedRequests": 0
+          },
+          "navigation": {
+            "requests": 10,
+            "inputTokens": 484430,
+            "cachedTokens": 466082,
+            "outputTokens": 3096,
+            "estimatedUsd": 0.009342494,
+            "cacheUnreportedRequests": 0,
+            "reportedModelSeconds": 32.707,
+            "durationUnreportedRequests": 0
+          },
+          "shell-command": {
+            "requests": 54,
+            "inputTokens": 4701820,
+            "cachedTokens": 4626692,
+            "outputTokens": 38494,
+            "estimatedUsd": 0.07432104400000006,
+            "cacheUnreportedRequests": 0,
+            "reportedModelSeconds": 361.403,
+            "durationUnreportedRequests": 0
+          },
+          "structured-edit": {
+            "requests": 20,
+            "inputTokens": 1792581,
+            "cachedTokens": 1768258,
+            "outputTokens": 10535,
+            "estimatedUsd": 0.024681966000000003,
+            "cacheUnreportedRequests": 0,
+            "reportedModelSeconds": 95.14999999999999,
+            "durationUnreportedRequests": 0
+          },
+          "text-only": {
+            "requests": 2,
+            "inputTokens": 247222,
+            "cachedTokens": 245890,
+            "outputTokens": 2115,
+            "estimatedUsd": 0.00341017,
+            "cacheUnreportedRequests": 0,
+            "reportedModelSeconds": 18.064,
+            "durationUnreportedRequests": 0
+          }
+        },
+        "assistantMessagesWithoutValidUsage": 0,
+        "breakdownRecordsWithoutValidUsage": 0,
+        "reconciliation": {
+          "inputTokens": {
+            "recorded": 7307433,
+            "attributed": 7307433,
+            "difference": 0
+          },
+          "cachedTokens": {
+            "recorded": 7171036,
+            "attributed": 7171036,
+            "difference": 0
+          },
+          "outputTokens": {
+            "recorded": 55847,
+            "attributed": 55847,
+            "difference": 0
+          },
+          "estimatedUsd": {
+            "recorded": 0.117063612,
+            "attributed": 0.11706361200000007,
+            "difference": -6.938893903907228e-17
+          }
+        }
+      },
+      "timeToFirstEditSeconds": 255.466,
+      "reviewStartedSeconds": 633.535,
+      "reviewModelRequests": 3,
+      "activations": {
+        "initialMapNotices": 1,
+        "contextToolCalls": 0,
+        "guideIdsShown": [
+          "router-resolution-and-request-state"
+        ],
+        "unparsedContextPayloads": 0,
+        "finalReviewNotices": 1,
+        "guidedFinalReviewNotices": 0,
+        "finalReviewGuideIdsShown": [],
+        "batchedEditCalls": 0,
+        "completedBatchedEditCalls": 0,
+        "batchEditsRequested": 0,
+        "batchSizes": [],
+        "backgroundCommandNotices": 0,
+        "testFocusNotices": 0,
+        "explorationFocusNotices": 1,
+        "readCallsByEffectiveLimit": {
+          "400": 1,
+          "160": 3,
+          "140": 2,
+          "150": 2,
+          "50": 1,
+          "80": 1,
+          "130": 1,
+          "215": 1,
+          "480": 1,
+          "30": 1,
+          "20": 1
+        },
+        "defaultWindowReadCalls": null,
+        "readLimitProvenance": "unknown: saved arguments include host-injected defaults"
+      },
+      "fixturePlugins": [],
+      "fixtureProfileHash": "643d5437104296e21d906ecb15b2c96ad278f20cfc4af53b12bb6069bd853726",
+      "knownIntegrityIssue": false,
+      "snapshotBytecodeInherited": false,
+      "bytecodeIndependentAcceptanceUnchanged": null
     },
     {
       "dataset": "original",
@@ -15466,6 +16059,7 @@
         "completedBatchedEditCalls": 0,
         "batchEditsRequested": 0,
         "batchSizes": [],
+        "backgroundCommandNotices": 0,
         "testFocusNotices": 0,
         "explorationFocusNotices": 1,
         "readCallsByEffectiveLimit": {
@@ -15707,6 +16301,7 @@
         "completedBatchedEditCalls": 0,
         "batchEditsRequested": 0,
         "batchSizes": [],
+        "backgroundCommandNotices": 0,
         "testFocusNotices": 0,
         "explorationFocusNotices": 1,
         "readCallsByEffectiveLimit": {
@@ -15892,6 +16487,7 @@
         "completedBatchedEditCalls": 0,
         "batchEditsRequested": 0,
         "batchSizes": [],
+        "backgroundCommandNotices": 0,
         "testFocusNotices": 0,
         "explorationFocusNotices": 1,
         "readCallsByEffectiveLimit": {
@@ -16052,6 +16648,7 @@
         "completedBatchedEditCalls": 0,
         "batchEditsRequested": 0,
         "batchSizes": [],
+        "backgroundCommandNotices": 0,
         "testFocusNotices": 0,
         "explorationFocusNotices": 1,
         "readCallsByEffectiveLimit": {
@@ -16214,6 +16811,7 @@
         "completedBatchedEditCalls": 0,
         "batchEditsRequested": 0,
         "batchSizes": [],
+        "backgroundCommandNotices": 0,
         "testFocusNotices": 0,
         "explorationFocusNotices": 1,
         "readCallsByEffectiveLimit": {
@@ -16408,6 +17006,7 @@
         "completedBatchedEditCalls": 0,
         "batchEditsRequested": 0,
         "batchSizes": [],
+        "backgroundCommandNotices": 0,
         "testFocusNotices": 0,
         "explorationFocusNotices": 1,
         "readCallsByEffectiveLimit": {
@@ -16571,6 +17170,7 @@
         "completedBatchedEditCalls": 0,
         "batchEditsRequested": 0,
         "batchSizes": [],
+        "backgroundCommandNotices": 0,
         "testFocusNotices": 0,
         "explorationFocusNotices": 1,
         "readCallsByEffectiveLimit": {
@@ -16742,6 +17342,7 @@
         "completedBatchedEditCalls": 0,
         "batchEditsRequested": 0,
         "batchSizes": [],
+        "backgroundCommandNotices": 0,
         "testFocusNotices": 0,
         "explorationFocusNotices": 1,
         "readCallsByEffectiveLimit": {
@@ -16933,6 +17534,7 @@
         "completedBatchedEditCalls": 0,
         "batchEditsRequested": 0,
         "batchSizes": [],
+        "backgroundCommandNotices": 0,
         "testFocusNotices": 0,
         "explorationFocusNotices": 1,
         "readCallsByEffectiveLimit": {
@@ -17091,6 +17693,7 @@
         "completedBatchedEditCalls": 0,
         "batchEditsRequested": 0,
         "batchSizes": [],
+        "backgroundCommandNotices": 0,
         "testFocusNotices": 0,
         "explorationFocusNotices": 1,
         "readCallsByEffectiveLimit": {
@@ -17261,6 +17864,7 @@
         "completedBatchedEditCalls": 0,
         "batchEditsRequested": 0,
         "batchSizes": [],
+        "backgroundCommandNotices": 0,
         "testFocusNotices": 0,
         "explorationFocusNotices": 1,
         "readCallsByEffectiveLimit": {
@@ -17450,6 +18054,7 @@
         "completedBatchedEditCalls": 0,
         "batchEditsRequested": 0,
         "batchSizes": [],
+        "backgroundCommandNotices": 0,
         "testFocusNotices": 0,
         "explorationFocusNotices": 1,
         "readCallsByEffectiveLimit": {
@@ -17632,6 +18237,7 @@
         "completedBatchedEditCalls": 0,
         "batchEditsRequested": 0,
         "batchSizes": [],
+        "backgroundCommandNotices": 0,
         "testFocusNotices": 0,
         "explorationFocusNotices": 1,
         "readCallsByEffectiveLimit": {
@@ -17797,6 +18403,7 @@
         "completedBatchedEditCalls": 0,
         "batchEditsRequested": 0,
         "batchSizes": [],
+        "backgroundCommandNotices": 0,
         "testFocusNotices": 0,
         "explorationFocusNotices": 1,
         "readCallsByEffectiveLimit": {
@@ -17984,6 +18591,7 @@
         "completedBatchedEditCalls": 0,
         "batchEditsRequested": 0,
         "batchSizes": [],
+        "backgroundCommandNotices": 0,
         "testFocusNotices": 0,
         "explorationFocusNotices": 1,
         "readCallsByEffectiveLimit": {
@@ -18144,6 +18752,7 @@
         "completedBatchedEditCalls": 0,
         "batchEditsRequested": 0,
         "batchSizes": [],
+        "backgroundCommandNotices": 0,
         "testFocusNotices": 0,
         "explorationFocusNotices": 1,
         "readCallsByEffectiveLimit": {
@@ -18300,6 +18909,7 @@
         "completedBatchedEditCalls": 0,
         "batchEditsRequested": 0,
         "batchSizes": [],
+        "backgroundCommandNotices": 0,
         "testFocusNotices": 0,
         "explorationFocusNotices": 1,
         "readCallsByEffectiveLimit": {},
@@ -18452,6 +19062,7 @@
         "completedBatchedEditCalls": 0,
         "batchEditsRequested": 0,
         "batchSizes": [],
+        "backgroundCommandNotices": 0,
         "testFocusNotices": 0,
         "explorationFocusNotices": 1,
         "readCallsByEffectiveLimit": {
@@ -18634,6 +19245,7 @@
         "completedBatchedEditCalls": 0,
         "batchEditsRequested": 0,
         "batchSizes": [],
+        "backgroundCommandNotices": 0,
         "testFocusNotices": 0,
         "explorationFocusNotices": 1,
         "readCallsByEffectiveLimit": {
@@ -18815,6 +19427,7 @@
         "completedBatchedEditCalls": 0,
         "batchEditsRequested": 0,
         "batchSizes": [],
+        "backgroundCommandNotices": 0,
         "testFocusNotices": 0,
         "explorationFocusNotices": 1,
         "readCallsByEffectiveLimit": {
@@ -18997,6 +19610,7 @@
         "completedBatchedEditCalls": 0,
         "batchEditsRequested": 0,
         "batchSizes": [],
+        "backgroundCommandNotices": 0,
         "testFocusNotices": 0,
         "explorationFocusNotices": 1,
         "readCallsByEffectiveLimit": {
@@ -19170,6 +19784,7 @@
         "completedBatchedEditCalls": 0,
         "batchEditsRequested": 0,
         "batchSizes": [],
+        "backgroundCommandNotices": 0,
         "testFocusNotices": 0,
         "explorationFocusNotices": 1,
         "readCallsByEffectiveLimit": {
@@ -19342,6 +19957,7 @@
         "completedBatchedEditCalls": 0,
         "batchEditsRequested": 0,
         "batchSizes": [],
+        "backgroundCommandNotices": 0,
         "testFocusNotices": 0,
         "explorationFocusNotices": 1,
         "readCallsByEffectiveLimit": {
@@ -19504,6 +20120,7 @@
         "completedBatchedEditCalls": 0,
         "batchEditsRequested": 0,
         "batchSizes": [],
+        "backgroundCommandNotices": 0,
         "testFocusNotices": 0,
         "explorationFocusNotices": 1,
         "readCallsByEffectiveLimit": {
@@ -19682,6 +20299,7 @@
         "completedBatchedEditCalls": 0,
         "batchEditsRequested": 0,
         "batchSizes": [],
+        "backgroundCommandNotices": 0,
         "testFocusNotices": 0,
         "explorationFocusNotices": 1,
         "readCallsByEffectiveLimit": {
@@ -19862,6 +20480,7 @@
         "completedBatchedEditCalls": 0,
         "batchEditsRequested": 0,
         "batchSizes": [],
+        "backgroundCommandNotices": 0,
         "testFocusNotices": 0,
         "explorationFocusNotices": 1,
         "readCallsByEffectiveLimit": {
@@ -20040,6 +20659,7 @@
         "completedBatchedEditCalls": 0,
         "batchEditsRequested": 0,
         "batchSizes": [],
+        "backgroundCommandNotices": 0,
         "testFocusNotices": 0,
         "explorationFocusNotices": 1,
         "readCallsByEffectiveLimit": {
@@ -20220,6 +20840,7 @@
         "completedBatchedEditCalls": 0,
         "batchEditsRequested": 0,
         "batchSizes": [],
+        "backgroundCommandNotices": 0,
         "testFocusNotices": 0,
         "explorationFocusNotices": 1,
         "readCallsByEffectiveLimit": {
@@ -20392,6 +21013,7 @@
         "completedBatchedEditCalls": 0,
         "batchEditsRequested": 0,
         "batchSizes": [],
+        "backgroundCommandNotices": 0,
         "testFocusNotices": 0,
         "explorationFocusNotices": 1,
         "readCallsByEffectiveLimit": {},
@@ -20553,6 +21175,7 @@
         "completedBatchedEditCalls": 0,
         "batchEditsRequested": 0,
         "batchSizes": [],
+        "backgroundCommandNotices": 0,
         "testFocusNotices": 0,
         "explorationFocusNotices": 0,
         "readCallsByEffectiveLimit": {
@@ -20719,6 +21342,7 @@
         "completedBatchedEditCalls": 0,
         "batchEditsRequested": 0,
         "batchSizes": [],
+        "backgroundCommandNotices": 0,
         "testFocusNotices": 0,
         "explorationFocusNotices": 1,
         "readCallsByEffectiveLimit": {
@@ -20892,6 +21516,7 @@
         "completedBatchedEditCalls": 0,
         "batchEditsRequested": 0,
         "batchSizes": [],
+        "backgroundCommandNotices": 0,
         "testFocusNotices": 0,
         "explorationFocusNotices": 0,
         "readCallsByEffectiveLimit": {
@@ -21065,6 +21690,7 @@
         "completedBatchedEditCalls": 0,
         "batchEditsRequested": 0,
         "batchSizes": [],
+        "backgroundCommandNotices": 0,
         "testFocusNotices": 0,
         "explorationFocusNotices": 1,
         "readCallsByEffectiveLimit": {
@@ -21253,6 +21879,7 @@
         "completedBatchedEditCalls": 0,
         "batchEditsRequested": 0,
         "batchSizes": [],
+        "backgroundCommandNotices": 0,
         "testFocusNotices": 0,
         "explorationFocusNotices": 1,
         "readCallsByEffectiveLimit": {
@@ -21435,6 +22062,7 @@
         "completedBatchedEditCalls": 0,
         "batchEditsRequested": 0,
         "batchSizes": [],
+        "backgroundCommandNotices": 0,
         "testFocusNotices": 0,
         "explorationFocusNotices": 1,
         "readCallsByEffectiveLimit": {
@@ -21612,6 +22240,7 @@
         "completedBatchedEditCalls": 0,
         "batchEditsRequested": 0,
         "batchSizes": [],
+        "backgroundCommandNotices": 0,
         "testFocusNotices": 0,
         "explorationFocusNotices": 1,
         "readCallsByEffectiveLimit": {
@@ -21812,6 +22441,7 @@
         "completedBatchedEditCalls": 0,
         "batchEditsRequested": 0,
         "batchSizes": [],
+        "backgroundCommandNotices": 0,
         "testFocusNotices": 0,
         "explorationFocusNotices": 1,
         "readCallsByEffectiveLimit": {
@@ -21973,6 +22603,7 @@
         "completedBatchedEditCalls": 0,
         "batchEditsRequested": 0,
         "batchSizes": [],
+        "backgroundCommandNotices": 0,
         "testFocusNotices": 0,
         "explorationFocusNotices": 1,
         "readCallsByEffectiveLimit": {
@@ -22161,6 +22792,7 @@
         "completedBatchedEditCalls": 0,
         "batchEditsRequested": 0,
         "batchSizes": [],
+        "backgroundCommandNotices": 0,
         "testFocusNotices": 0,
         "explorationFocusNotices": 1,
         "readCallsByEffectiveLimit": {
@@ -22345,6 +22977,7 @@
         "completedBatchedEditCalls": 0,
         "batchEditsRequested": 0,
         "batchSizes": [],
+        "backgroundCommandNotices": 0,
         "testFocusNotices": 0,
         "explorationFocusNotices": 1,
         "readCallsByEffectiveLimit": {
@@ -22538,6 +23171,7 @@
         "completedBatchedEditCalls": 0,
         "batchEditsRequested": 0,
         "batchSizes": [],
+        "backgroundCommandNotices": 0,
         "testFocusNotices": 0,
         "explorationFocusNotices": 1,
         "readCallsByEffectiveLimit": {
@@ -22717,6 +23351,7 @@
         "completedBatchedEditCalls": 0,
         "batchEditsRequested": 0,
         "batchSizes": [],
+        "backgroundCommandNotices": 0,
         "testFocusNotices": 0,
         "explorationFocusNotices": 1,
         "readCallsByEffectiveLimit": {
@@ -22881,6 +23516,7 @@
         "completedBatchedEditCalls": 0,
         "batchEditsRequested": 0,
         "batchSizes": [],
+        "backgroundCommandNotices": 0,
         "testFocusNotices": 0,
         "explorationFocusNotices": 1,
         "readCallsByEffectiveLimit": {
@@ -23065,6 +23701,7 @@
         "completedBatchedEditCalls": 0,
         "batchEditsRequested": 0,
         "batchSizes": [],
+        "backgroundCommandNotices": 0,
         "testFocusNotices": 0,
         "explorationFocusNotices": 1,
         "readCallsByEffectiveLimit": {
@@ -23256,6 +23893,7 @@
         "completedBatchedEditCalls": 0,
         "batchEditsRequested": 0,
         "batchSizes": [],
+        "backgroundCommandNotices": 0,
         "testFocusNotices": 0,
         "explorationFocusNotices": 1,
         "readCallsByEffectiveLimit": {
@@ -23427,6 +24065,7 @@
         "completedBatchedEditCalls": 0,
         "batchEditsRequested": 0,
         "batchSizes": [],
+        "backgroundCommandNotices": 0,
         "testFocusNotices": 0,
         "explorationFocusNotices": 0,
         "readCallsByEffectiveLimit": {
@@ -23601,6 +24240,7 @@
         "completedBatchedEditCalls": 0,
         "batchEditsRequested": 0,
         "batchSizes": [],
+        "backgroundCommandNotices": 0,
         "testFocusNotices": 0,
         "explorationFocusNotices": 1,
         "readCallsByEffectiveLimit": {
@@ -23806,6 +24446,7 @@
         "completedBatchedEditCalls": 0,
         "batchEditsRequested": 0,
         "batchSizes": [],
+        "backgroundCommandNotices": 0,
         "testFocusNotices": 0,
         "explorationFocusNotices": 1,
         "readCallsByEffectiveLimit": {
@@ -23986,6 +24627,7 @@
         "completedBatchedEditCalls": 0,
         "batchEditsRequested": 0,
         "batchSizes": [],
+        "backgroundCommandNotices": 0,
         "testFocusNotices": 0,
         "explorationFocusNotices": 1,
         "readCallsByEffectiveLimit": {
@@ -24167,6 +24809,7 @@
         "completedBatchedEditCalls": 0,
         "batchEditsRequested": 0,
         "batchSizes": [],
+        "backgroundCommandNotices": 0,
         "testFocusNotices": 0,
         "explorationFocusNotices": 0,
         "readCallsByEffectiveLimit": {
@@ -24326,6 +24969,7 @@
         "completedBatchedEditCalls": 0,
         "batchEditsRequested": 0,
         "batchSizes": [],
+        "backgroundCommandNotices": 0,
         "testFocusNotices": 0,
         "explorationFocusNotices": 0,
         "readCallsByEffectiveLimit": {
@@ -24505,6 +25149,7 @@
         "completedBatchedEditCalls": 0,
         "batchEditsRequested": 0,
         "batchSizes": [],
+        "backgroundCommandNotices": 0,
         "testFocusNotices": 0,
         "explorationFocusNotices": 1,
         "readCallsByEffectiveLimit": {
@@ -24687,6 +25332,7 @@
         "completedBatchedEditCalls": 0,
         "batchEditsRequested": 0,
         "batchSizes": [],
+        "backgroundCommandNotices": 0,
         "testFocusNotices": 0,
         "explorationFocusNotices": 1,
         "readCallsByEffectiveLimit": {
@@ -24859,6 +25505,7 @@
         "completedBatchedEditCalls": 0,
         "batchEditsRequested": 0,
         "batchSizes": [],
+        "backgroundCommandNotices": 0,
         "testFocusNotices": 0,
         "explorationFocusNotices": 1,
         "readCallsByEffectiveLimit": {
@@ -25010,6 +25657,7 @@
         "completedBatchedEditCalls": 0,
         "batchEditsRequested": 0,
         "batchSizes": [],
+        "backgroundCommandNotices": 0,
         "testFocusNotices": 0,
         "explorationFocusNotices": 1,
         "readCallsByEffectiveLimit": {
@@ -25185,6 +25833,7 @@
         "completedBatchedEditCalls": 0,
         "batchEditsRequested": 0,
         "batchSizes": [],
+        "backgroundCommandNotices": 0,
         "testFocusNotices": 0,
         "explorationFocusNotices": 1,
         "readCallsByEffectiveLimit": {
@@ -25353,6 +26002,7 @@
         "completedBatchedEditCalls": 0,
         "batchEditsRequested": 0,
         "batchSizes": [],
+        "backgroundCommandNotices": 0,
         "testFocusNotices": 0,
         "explorationFocusNotices": 1,
         "readCallsByEffectiveLimit": {
@@ -25525,6 +26175,7 @@
         "completedBatchedEditCalls": 0,
         "batchEditsRequested": 0,
         "batchSizes": [],
+        "backgroundCommandNotices": 0,
         "testFocusNotices": 0,
         "explorationFocusNotices": 1,
         "readCallsByEffectiveLimit": {
@@ -25693,6 +26344,7 @@
         "completedBatchedEditCalls": 0,
         "batchEditsRequested": 0,
         "batchSizes": [],
+        "backgroundCommandNotices": 0,
         "testFocusNotices": 0,
         "explorationFocusNotices": 0,
         "readCallsByEffectiveLimit": {
@@ -25849,6 +26501,7 @@
         "completedBatchedEditCalls": 0,
         "batchEditsRequested": 0,
         "batchSizes": [],
+        "backgroundCommandNotices": 0,
         "testFocusNotices": 0,
         "explorationFocusNotices": 0,
         "readCallsByEffectiveLimit": {
@@ -26031,6 +26684,7 @@
         "completedBatchedEditCalls": 0,
         "batchEditsRequested": 0,
         "batchSizes": [],
+        "backgroundCommandNotices": 0,
         "testFocusNotices": 0,
         "explorationFocusNotices": 1,
         "readCallsByEffectiveLimit": {
@@ -26177,6 +26831,7 @@
         "completedBatchedEditCalls": 0,
         "batchEditsRequested": 0,
         "batchSizes": [],
+        "backgroundCommandNotices": 0,
         "testFocusNotices": 0,
         "explorationFocusNotices": 1,
         "readCallsByEffectiveLimit": {
@@ -26322,6 +26977,7 @@
         "completedBatchedEditCalls": 0,
         "batchEditsRequested": 0,
         "batchSizes": [],
+        "backgroundCommandNotices": 0,
         "testFocusNotices": 0,
         "explorationFocusNotices": 1,
         "readCallsByEffectiveLimit": {
@@ -26493,6 +27149,7 @@
         "completedBatchedEditCalls": 0,
         "batchEditsRequested": 0,
         "batchSizes": [],
+        "backgroundCommandNotices": 0,
         "testFocusNotices": 0,
         "explorationFocusNotices": 1,
         "readCallsByEffectiveLimit": {
@@ -26678,6 +27335,7 @@
         "completedBatchedEditCalls": 0,
         "batchEditsRequested": 0,
         "batchSizes": [],
+        "backgroundCommandNotices": 0,
         "testFocusNotices": 0,
         "explorationFocusNotices": 0,
         "readCallsByEffectiveLimit": {
@@ -26838,6 +27496,7 @@
         "completedBatchedEditCalls": 0,
         "batchEditsRequested": 0,
         "batchSizes": [],
+        "backgroundCommandNotices": 0,
         "testFocusNotices": 0,
         "explorationFocusNotices": 1,
         "readCallsByEffectiveLimit": {
@@ -27021,6 +27680,7 @@
         "completedBatchedEditCalls": 0,
         "batchEditsRequested": 0,
         "batchSizes": [],
+        "backgroundCommandNotices": 0,
         "testFocusNotices": 0,
         "explorationFocusNotices": 1,
         "readCallsByEffectiveLimit": {
@@ -27180,6 +27840,7 @@
         "completedBatchedEditCalls": 0,
         "batchEditsRequested": 0,
         "batchSizes": [],
+        "backgroundCommandNotices": 0,
         "testFocusNotices": 0,
         "explorationFocusNotices": 0,
         "readCallsByEffectiveLimit": {
@@ -27377,6 +28038,7 @@
         "completedBatchedEditCalls": 0,
         "batchEditsRequested": 0,
         "batchSizes": [],
+        "backgroundCommandNotices": 0,
         "testFocusNotices": 0,
         "explorationFocusNotices": 1,
         "readCallsByEffectiveLimit": {
@@ -27528,6 +28190,7 @@
         "completedBatchedEditCalls": 0,
         "batchEditsRequested": 0,
         "batchSizes": [],
+        "backgroundCommandNotices": 0,
         "testFocusNotices": 0,
         "explorationFocusNotices": 1,
         "readCallsByEffectiveLimit": {
@@ -27682,6 +28345,7 @@
         "completedBatchedEditCalls": 0,
         "batchEditsRequested": 0,
         "batchSizes": [],
+        "backgroundCommandNotices": 0,
         "testFocusNotices": 0,
         "explorationFocusNotices": 1,
         "readCallsByEffectiveLimit": {
@@ -27852,6 +28516,7 @@
         "completedBatchedEditCalls": 0,
         "batchEditsRequested": 0,
         "batchSizes": [],
+        "backgroundCommandNotices": 0,
         "testFocusNotices": 0,
         "explorationFocusNotices": 1,
         "readCallsByEffectiveLimit": {
@@ -28025,6 +28690,7 @@
         "completedBatchedEditCalls": 0,
         "batchEditsRequested": 0,
         "batchSizes": [],
+        "backgroundCommandNotices": 0,
         "testFocusNotices": 0,
         "explorationFocusNotices": 1,
         "readCallsByEffectiveLimit": {
@@ -28226,6 +28892,7 @@
         "completedBatchedEditCalls": 0,
         "batchEditsRequested": 0,
         "batchSizes": [],
+        "backgroundCommandNotices": 0,
         "testFocusNotices": 0,
         "explorationFocusNotices": 1,
         "readCallsByEffectiveLimit": {
@@ -28402,6 +29069,7 @@
         "completedBatchedEditCalls": 0,
         "batchEditsRequested": 0,
         "batchSizes": [],
+        "backgroundCommandNotices": 0,
         "testFocusNotices": 0,
         "explorationFocusNotices": 1,
         "readCallsByEffectiveLimit": {
@@ -28559,6 +29227,7 @@
         "completedBatchedEditCalls": 0,
         "batchEditsRequested": 0,
         "batchSizes": [],
+        "backgroundCommandNotices": 0,
         "testFocusNotices": 0,
         "explorationFocusNotices": 1,
         "readCallsByEffectiveLimit": {
@@ -28721,6 +29390,7 @@
         "completedBatchedEditCalls": 0,
         "batchEditsRequested": 0,
         "batchSizes": [],
+        "backgroundCommandNotices": 0,
         "testFocusNotices": 0,
         "explorationFocusNotices": 1,
         "readCallsByEffectiveLimit": {
@@ -28974,6 +29644,7 @@
         "completedBatchedEditCalls": 0,
         "batchEditsRequested": 0,
         "batchSizes": [],
+        "backgroundCommandNotices": 0,
         "testFocusNotices": 0,
         "explorationFocusNotices": 1,
         "readCallsByEffectiveLimit": {
@@ -29138,6 +29809,7 @@
         "completedBatchedEditCalls": 0,
         "batchEditsRequested": 0,
         "batchSizes": [],
+        "backgroundCommandNotices": 0,
         "testFocusNotices": 0,
         "explorationFocusNotices": 1,
         "readCallsByEffectiveLimit": {
@@ -29307,6 +29979,7 @@
         "completedBatchedEditCalls": 0,
         "batchEditsRequested": 0,
         "batchSizes": [],
+        "backgroundCommandNotices": 0,
         "testFocusNotices": 0,
         "explorationFocusNotices": 1,
         "readCallsByEffectiveLimit": {
@@ -29490,6 +30163,7 @@
         "completedBatchedEditCalls": 0,
         "batchEditsRequested": 0,
         "batchSizes": [],
+        "backgroundCommandNotices": 0,
         "testFocusNotices": 0,
         "explorationFocusNotices": 1,
         "readCallsByEffectiveLimit": {
@@ -29672,6 +30346,7 @@
         "completedBatchedEditCalls": 0,
         "batchEditsRequested": 0,
         "batchSizes": [],
+        "backgroundCommandNotices": 0,
         "testFocusNotices": 0,
         "explorationFocusNotices": 1,
         "readCallsByEffectiveLimit": {
@@ -29866,6 +30541,7 @@
         "completedBatchedEditCalls": 0,
         "batchEditsRequested": 0,
         "batchSizes": [],
+        "backgroundCommandNotices": 0,
         "testFocusNotices": 0,
         "explorationFocusNotices": 1,
         "readCallsByEffectiveLimit": {
@@ -30056,6 +30732,7 @@
         "completedBatchedEditCalls": 0,
         "batchEditsRequested": 0,
         "batchSizes": [],
+        "backgroundCommandNotices": 0,
         "testFocusNotices": 0,
         "explorationFocusNotices": 1,
         "readCallsByEffectiveLimit": {
@@ -30247,6 +30924,7 @@
         "completedBatchedEditCalls": 0,
         "batchEditsRequested": 0,
         "batchSizes": [],
+        "backgroundCommandNotices": 0,
         "testFocusNotices": 0,
         "explorationFocusNotices": 1,
         "readCallsByEffectiveLimit": {
@@ -30419,6 +31097,7 @@
         "completedBatchedEditCalls": 0,
         "batchEditsRequested": 0,
         "batchSizes": [],
+        "backgroundCommandNotices": 0,
         "testFocusNotices": 0,
         "explorationFocusNotices": 1,
         "readCallsByEffectiveLimit": {
@@ -30593,6 +31272,7 @@
         "completedBatchedEditCalls": 0,
         "batchEditsRequested": 0,
         "batchSizes": [],
+        "backgroundCommandNotices": 0,
         "testFocusNotices": 0,
         "explorationFocusNotices": 1,
         "readCallsByEffectiveLimit": {
@@ -30762,6 +31442,7 @@
         "completedBatchedEditCalls": 0,
         "batchEditsRequested": 0,
         "batchSizes": [],
+        "backgroundCommandNotices": 0,
         "testFocusNotices": 0,
         "explorationFocusNotices": 1,
         "readCallsByEffectiveLimit": {
@@ -30947,6 +31628,7 @@
         "completedBatchedEditCalls": 0,
         "batchEditsRequested": 0,
         "batchSizes": [],
+        "backgroundCommandNotices": 0,
         "testFocusNotices": 0,
         "explorationFocusNotices": 1,
         "readCallsByEffectiveLimit": {
@@ -31134,6 +31816,7 @@
         "completedBatchedEditCalls": 0,
         "batchEditsRequested": 0,
         "batchSizes": [],
+        "backgroundCommandNotices": 0,
         "testFocusNotices": 0,
         "explorationFocusNotices": 1,
         "readCallsByEffectiveLimit": {
@@ -31311,6 +31994,7 @@
         "completedBatchedEditCalls": 0,
         "batchEditsRequested": 0,
         "batchSizes": [],
+        "backgroundCommandNotices": 0,
         "testFocusNotices": 0,
         "explorationFocusNotices": 1,
         "readCallsByEffectiveLimit": {
@@ -31484,6 +32168,7 @@
         "completedBatchedEditCalls": 0,
         "batchEditsRequested": 0,
         "batchSizes": [],
+        "backgroundCommandNotices": 0,
         "testFocusNotices": 0,
         "explorationFocusNotices": 1,
         "readCallsByEffectiveLimit": {
@@ -31664,6 +32349,7 @@
         "completedBatchedEditCalls": 0,
         "batchEditsRequested": 0,
         "batchSizes": [],
+        "backgroundCommandNotices": 0,
         "testFocusNotices": 0,
         "explorationFocusNotices": 1,
         "readCallsByEffectiveLimit": {
@@ -31836,6 +32522,7 @@
         "completedBatchedEditCalls": 0,
         "batchEditsRequested": 0,
         "batchSizes": [],
+        "backgroundCommandNotices": 0,
         "testFocusNotices": 0,
         "explorationFocusNotices": 1,
         "readCallsByEffectiveLimit": {
@@ -32003,6 +32690,7 @@
         "completedBatchedEditCalls": 0,
         "batchEditsRequested": 0,
         "batchSizes": [],
+        "backgroundCommandNotices": 0,
         "testFocusNotices": 0,
         "explorationFocusNotices": 1,
         "readCallsByEffectiveLimit": {
@@ -32174,6 +32862,7 @@
         "completedBatchedEditCalls": 0,
         "batchEditsRequested": 0,
         "batchSizes": [],
+        "backgroundCommandNotices": 0,
         "testFocusNotices": 0,
         "explorationFocusNotices": 1,
         "readCallsByEffectiveLimit": {
@@ -32352,6 +33041,7 @@
         "completedBatchedEditCalls": 0,
         "batchEditsRequested": 0,
         "batchSizes": [],
+        "backgroundCommandNotices": 0,
         "testFocusNotices": 0,
         "explorationFocusNotices": 1,
         "readCallsByEffectiveLimit": {
@@ -32539,6 +33229,7 @@
         "completedBatchedEditCalls": 0,
         "batchEditsRequested": 0,
         "batchSizes": [],
+        "backgroundCommandNotices": 0,
         "testFocusNotices": 0,
         "explorationFocusNotices": 1,
         "readCallsByEffectiveLimit": {
@@ -32744,6 +33435,7 @@
         "completedBatchedEditCalls": 0,
         "batchEditsRequested": 0,
         "batchSizes": [],
+        "backgroundCommandNotices": 0,
         "testFocusNotices": 0,
         "explorationFocusNotices": 1,
         "readCallsByEffectiveLimit": {
@@ -32924,6 +33616,7 @@
         "completedBatchedEditCalls": 0,
         "batchEditsRequested": 0,
         "batchSizes": [],
+        "backgroundCommandNotices": 0,
         "testFocusNotices": 0,
         "explorationFocusNotices": 1,
         "readCallsByEffectiveLimit": {
@@ -33108,6 +33801,7 @@
         "completedBatchedEditCalls": 0,
         "batchEditsRequested": 0,
         "batchSizes": [],
+        "backgroundCommandNotices": 0,
         "testFocusNotices": 0,
         "explorationFocusNotices": 1,
         "readCallsByEffectiveLimit": {
@@ -33291,6 +33985,7 @@
         "completedBatchedEditCalls": 0,
         "batchEditsRequested": 0,
         "batchSizes": [],
+        "backgroundCommandNotices": 0,
         "testFocusNotices": 0,
         "explorationFocusNotices": 1,
         "readCallsByEffectiveLimit": {
@@ -33461,6 +34156,7 @@
         "completedBatchedEditCalls": 0,
         "batchEditsRequested": 0,
         "batchSizes": [],
+        "backgroundCommandNotices": 0,
         "testFocusNotices": 0,
         "explorationFocusNotices": 1,
         "readCallsByEffectiveLimit": {
@@ -33639,6 +34335,7 @@
         "completedBatchedEditCalls": 0,
         "batchEditsRequested": 0,
         "batchSizes": [],
+        "backgroundCommandNotices": 0,
         "testFocusNotices": 0,
         "explorationFocusNotices": 1,
         "readCallsByEffectiveLimit": {
@@ -33804,6 +34501,7 @@
         "completedBatchedEditCalls": 0,
         "batchEditsRequested": 0,
         "batchSizes": [],
+        "backgroundCommandNotices": 0,
         "testFocusNotices": 0,
         "explorationFocusNotices": 1,
         "readCallsByEffectiveLimit": {
@@ -33971,6 +34669,7 @@
         "completedBatchedEditCalls": 0,
         "batchEditsRequested": 0,
         "batchSizes": [],
+        "backgroundCommandNotices": 0,
         "testFocusNotices": 0,
         "explorationFocusNotices": 1,
         "readCallsByEffectiveLimit": {
@@ -34148,6 +34847,7 @@
         "completedBatchedEditCalls": 0,
         "batchEditsRequested": 0,
         "batchSizes": [],
+        "backgroundCommandNotices": 0,
         "testFocusNotices": 0,
         "explorationFocusNotices": 1,
         "readCallsByEffectiveLimit": {
@@ -34329,6 +35029,7 @@
         "completedBatchedEditCalls": 0,
         "batchEditsRequested": 0,
         "batchSizes": [],
+        "backgroundCommandNotices": 0,
         "testFocusNotices": 0,
         "explorationFocusNotices": 1,
         "readCallsByEffectiveLimit": {
@@ -34510,6 +35211,7 @@
         "completedBatchedEditCalls": 0,
         "batchEditsRequested": 0,
         "batchSizes": [],
+        "backgroundCommandNotices": 0,
         "testFocusNotices": 0,
         "explorationFocusNotices": 1,
         "readCallsByEffectiveLimit": {
@@ -34679,6 +35381,7 @@
         "completedBatchedEditCalls": 0,
         "batchEditsRequested": 0,
         "batchSizes": [],
+        "backgroundCommandNotices": 0,
         "testFocusNotices": 0,
         "explorationFocusNotices": 1,
         "readCallsByEffectiveLimit": {
@@ -34849,6 +35552,7 @@
         "completedBatchedEditCalls": 0,
         "batchEditsRequested": 0,
         "batchSizes": [],
+        "backgroundCommandNotices": 0,
         "testFocusNotices": 0,
         "explorationFocusNotices": 1,
         "readCallsByEffectiveLimit": {
@@ -35016,6 +35720,7 @@
         "completedBatchedEditCalls": 0,
         "batchEditsRequested": 0,
         "batchSizes": [],
+        "backgroundCommandNotices": 0,
         "testFocusNotices": 0,
         "explorationFocusNotices": 1,
         "readCallsByEffectiveLimit": {
@@ -35190,6 +35895,7 @@
         "completedBatchedEditCalls": 0,
         "batchEditsRequested": 0,
         "batchSizes": [],
+        "backgroundCommandNotices": 0,
         "testFocusNotices": 0,
         "explorationFocusNotices": 1,
         "readCallsByEffectiveLimit": {
@@ -35368,6 +36074,7 @@
         "completedBatchedEditCalls": 0,
         "batchEditsRequested": 0,
         "batchSizes": [],
+        "backgroundCommandNotices": 0,
         "testFocusNotices": 0,
         "explorationFocusNotices": 1,
         "readCallsByEffectiveLimit": {
@@ -35540,6 +36247,7 @@
         "completedBatchedEditCalls": 0,
         "batchEditsRequested": 0,
         "batchSizes": [],
+        "backgroundCommandNotices": 0,
         "testFocusNotices": 0,
         "explorationFocusNotices": 1,
         "readCallsByEffectiveLimit": {
@@ -35719,6 +36427,7 @@
         "completedBatchedEditCalls": 0,
         "batchEditsRequested": 0,
         "batchSizes": [],
+        "backgroundCommandNotices": 0,
         "testFocusNotices": 0,
         "explorationFocusNotices": 1,
         "readCallsByEffectiveLimit": {
@@ -35890,6 +36599,7 @@
         "completedBatchedEditCalls": 0,
         "batchEditsRequested": 0,
         "batchSizes": [],
+        "backgroundCommandNotices": 0,
         "testFocusNotices": 0,
         "explorationFocusNotices": 1,
         "readCallsByEffectiveLimit": {
@@ -36094,6 +36804,7 @@
         "completedBatchedEditCalls": 0,
         "batchEditsRequested": 0,
         "batchSizes": [],
+        "backgroundCommandNotices": 0,
         "testFocusNotices": 0,
         "explorationFocusNotices": 1,
         "readCallsByEffectiveLimit": {
@@ -36285,6 +36996,7 @@
         "completedBatchedEditCalls": 0,
         "batchEditsRequested": 0,
         "batchSizes": [],
+        "backgroundCommandNotices": 0,
         "testFocusNotices": 0,
         "explorationFocusNotices": 1,
         "readCallsByEffectiveLimit": {
@@ -36304,6 +37016,179 @@
           "60": 1,
           "105": 1,
           "80": 2
+        },
+        "defaultWindowReadCalls": null,
+        "readLimitProvenance": "unknown: saved arguments include host-injected defaults"
+      },
+      "fixturePlugins": [],
+      "fixtureProfileHash": "643d5437104296e21d906ecb15b2c96ad278f20cfc4af53b12bb6069bd853726",
+      "knownIntegrityIssue": false,
+      "snapshotBytecodeInherited": false,
+      "bytecodeIndependentAcceptanceUnchanged": null
+    },
+    {
+      "dataset": "original",
+      "run": "replication-v22-effort-high-r2-router-strategy-isolation-467177e7",
+      "id": "router-strategy-isolation",
+      "kind": "litellm-specific",
+      "label": "replication-v22-effort-high-r2",
+      "promptRevision": 3,
+      "snapshotRevision": 2,
+      "harnessVersion": "2026-09-15.22",
+      "harnessSha256": "e17377b5e71b5dd653c2f854fd3aef6a1f09f9c68756731a98231babb9b08948",
+      "harnessCommit": "3fee39e7c56d02575cecf74c87a774ee83b6f1a9",
+      "completed": false,
+      "completionReason": "timeout",
+      "status": "idle",
+      "exit": null,
+      "evaluationProtocol": 6,
+      "isolation": "macOS-seatbelt",
+      "effort": "high",
+      "timeoutSeconds": 900,
+      "seconds": 900.117,
+      "timedOut": true,
+      "interrupted": null,
+      "recovered": null,
+      "durationIncomplete": null,
+      "repairParent": null,
+      "requests": 61,
+      "reportedRequests": 60,
+      "inputTokens": 3921296,
+      "cachedTokens": 3575508,
+      "outputTokens": 38896,
+      "computedUsd": 0.126773276,
+      "acceptance": {
+        "exit": 1,
+        "tests": 9,
+        "failures": 3,
+        "errors": 0,
+        "skipped": 0,
+        "passed": false
+      },
+      "toolCounts": {
+        "bash": 44,
+        "read_file": 12,
+        "edit_file": 11,
+        "bash_output": 6
+      },
+      "exactRepeatedCalls": 3,
+      "toolOutputCharacters": 180353,
+      "toolActiveSeconds": 508.011,
+      "modelSeconds": 342.642,
+      "actionUsage": {
+        "basis": "complete assistant request grouped by chosen next action; not tool marginal cost",
+        "pricing": {
+          "inputPerMillionUsd": 0.22,
+          "cachedPerMillionUsd": 0.007,
+          "outputPerMillionUsd": 0.66
+        },
+        "groups": {
+          "mixed-tools": {
+            "requests": 3,
+            "inputTokens": 98649,
+            "cachedTokens": 84396,
+            "outputTokens": 3060,
+            "estimatedUsd": 0.005746032,
+            "cacheUnreportedRequests": 0,
+            "reportedModelSeconds": 21.181,
+            "durationUnreportedRequests": 0
+          },
+          "navigation": {
+            "requests": 6,
+            "inputTokens": 221225,
+            "cachedTokens": 208806,
+            "outputTokens": 6706,
+            "estimatedUsd": 0.008619782000000001,
+            "cacheUnreportedRequests": 0,
+            "reportedModelSeconds": 52.054,
+            "durationUnreportedRequests": 0
+          },
+          "shell-command": {
+            "requests": 34,
+            "inputTokens": 2368854,
+            "cachedTokens": 2069408,
+            "outputTokens": 18721,
+            "estimatedUsd": 0.09271983600000001,
+            "cacheUnreportedRequests": 0,
+            "reportedModelSeconds": 191.80700000000002,
+            "durationUnreportedRequests": 0
+          },
+          "structured-edit": {
+            "requests": 11,
+            "inputTokens": 725793,
+            "cachedTokens": 708490,
+            "outputTokens": 9627,
+            "estimatedUsd": 0.01511991,
+            "cacheUnreportedRequests": 0,
+            "reportedModelSeconds": 64.535,
+            "durationUnreportedRequests": 0
+          },
+          "job-poll-or-wait": {
+            "requests": 6,
+            "inputTokens": 506775,
+            "cachedTokens": 504408,
+            "outputTokens": 782,
+            "estimatedUsd": 0.004567716,
+            "cacheUnreportedRequests": 0,
+            "reportedModelSeconds": 13.064999999999998,
+            "durationUnreportedRequests": 0
+          }
+        },
+        "assistantMessagesWithoutValidUsage": 1,
+        "breakdownRecordsWithoutValidUsage": 1,
+        "reconciliation": {
+          "inputTokens": {
+            "recorded": 3921296,
+            "attributed": 3921296,
+            "difference": 0
+          },
+          "cachedTokens": {
+            "recorded": 3575508,
+            "attributed": 3575508,
+            "difference": 0
+          },
+          "outputTokens": {
+            "recorded": 38896,
+            "attributed": 38896,
+            "difference": 0
+          },
+          "estimatedUsd": {
+            "recorded": 0.126773276,
+            "attributed": 0.12677327600000002,
+            "difference": -2.7755575615628914e-17
+          }
+        }
+      },
+      "timeToFirstEditSeconds": 187.931,
+      "reviewStartedSeconds": null,
+      "reviewModelRequests": null,
+      "activations": {
+        "initialMapNotices": 1,
+        "contextToolCalls": 0,
+        "guideIdsShown": [
+          "router-resolution-and-request-state"
+        ],
+        "unparsedContextPayloads": 0,
+        "finalReviewNotices": 0,
+        "guidedFinalReviewNotices": 0,
+        "finalReviewGuideIdsShown": [],
+        "batchedEditCalls": 0,
+        "completedBatchedEditCalls": 0,
+        "batchEditsRequested": 0,
+        "batchSizes": [],
+        "backgroundCommandNotices": 0,
+        "testFocusNotices": 0,
+        "explorationFocusNotices": 1,
+        "readCallsByEffectiveLimit": {
+          "280": 1,
+          "200": 1,
+          "65": 1,
+          "80": 1,
+          "180": 2,
+          "140": 3,
+          "160": 1,
+          "120": 1,
+          "30": 1
         },
         "defaultWindowReadCalls": null,
         "readLimitProvenance": "unknown: saved arguments include host-injected defaults"
@@ -36453,6 +37338,7 @@
         "completedBatchedEditCalls": 0,
         "batchEditsRequested": 0,
         "batchSizes": [],
+        "backgroundCommandNotices": 0,
         "testFocusNotices": 0,
         "explorationFocusNotices": 1,
         "readCallsByEffectiveLimit": {
@@ -36621,6 +37507,7 @@
         "completedBatchedEditCalls": 0,
         "batchEditsRequested": 0,
         "batchSizes": [],
+        "backgroundCommandNotices": 0,
         "testFocusNotices": 0,
         "explorationFocusNotices": 1,
         "readCallsByEffectiveLimit": {
@@ -36794,6 +37681,7 @@
         "completedBatchedEditCalls": 0,
         "batchEditsRequested": 0,
         "batchSizes": [],
+        "backgroundCommandNotices": 0,
         "testFocusNotices": 1,
         "explorationFocusNotices": 1,
         "readCallsByEffectiveLimit": {
@@ -36973,6 +37861,7 @@
         "completedBatchedEditCalls": 0,
         "batchEditsRequested": 0,
         "batchSizes": [],
+        "backgroundCommandNotices": 0,
         "testFocusNotices": 0,
         "explorationFocusNotices": 1,
         "readCallsByEffectiveLimit": {
@@ -37150,6 +38039,7 @@
         "completedBatchedEditCalls": 0,
         "batchEditsRequested": 0,
         "batchSizes": [],
+        "backgroundCommandNotices": 0,
         "testFocusNotices": 1,
         "explorationFocusNotices": 1,
         "readCallsByEffectiveLimit": {
@@ -37307,6 +38197,7 @@
         "completedBatchedEditCalls": 0,
         "batchEditsRequested": 0,
         "batchSizes": [],
+        "backgroundCommandNotices": 0,
         "testFocusNotices": 1,
         "explorationFocusNotices": 1,
         "readCallsByEffectiveLimit": {
@@ -37471,6 +38362,7 @@
         "completedBatchedEditCalls": 0,
         "batchEditsRequested": 0,
         "batchSizes": [],
+        "backgroundCommandNotices": 0,
         "testFocusNotices": 1,
         "explorationFocusNotices": 1,
         "readCallsByEffectiveLimit": {
@@ -37642,6 +38534,7 @@
         "completedBatchedEditCalls": 0,
         "batchEditsRequested": 0,
         "batchSizes": [],
+        "backgroundCommandNotices": 0,
         "testFocusNotices": 1,
         "explorationFocusNotices": 1,
         "readCallsByEffectiveLimit": {
@@ -37806,6 +38699,7 @@
         "completedBatchedEditCalls": 0,
         "batchEditsRequested": 0,
         "batchSizes": [],
+        "backgroundCommandNotices": 0,
         "testFocusNotices": 1,
         "explorationFocusNotices": 0,
         "readCallsByEffectiveLimit": {
@@ -37978,6 +38872,7 @@
         "completedBatchedEditCalls": 0,
         "batchEditsRequested": 0,
         "batchSizes": [],
+        "backgroundCommandNotices": 0,
         "testFocusNotices": 1,
         "explorationFocusNotices": 1,
         "readCallsByEffectiveLimit": {
@@ -38000,6 +38895,188 @@
           "12": 1,
           "16": 1,
           "14": 1
+        },
+        "defaultWindowReadCalls": null,
+        "readLimitProvenance": "unknown: saved arguments include host-injected defaults"
+      },
+      "fixturePlugins": [],
+      "fixtureProfileHash": "643d5437104296e21d906ecb15b2c96ad278f20cfc4af53b12bb6069bd853726",
+      "knownIntegrityIssue": false,
+      "snapshotBytecodeInherited": false,
+      "bytecodeIndependentAcceptanceUnchanged": null
+    },
+    {
+      "dataset": "original",
+      "run": "replication-v27-review-guided-review-r1-router-candidates-f9913f75",
+      "id": "router-candidates",
+      "kind": "litellm-specific",
+      "label": "replication-v27-review-guided-review-r1",
+      "promptRevision": 3,
+      "snapshotRevision": 2,
+      "harnessVersion": "2026-09-15.27",
+      "harnessSha256": "3f2e3ddf94642d091001f4a4349ed3e533c33dd126a6e1ef727720ddc54d96d9",
+      "harnessCommit": "39085680fcc0cb3807eeae69d888245c3adcab6c",
+      "completed": true,
+      "completionReason": "completed",
+      "status": "idle",
+      "exit": null,
+      "evaluationProtocol": 6,
+      "isolation": "macOS-seatbelt",
+      "effort": "medium",
+      "timeoutSeconds": 900,
+      "seconds": 196.556,
+      "timedOut": false,
+      "interrupted": null,
+      "recovered": null,
+      "durationIncomplete": null,
+      "repairParent": null,
+      "requests": 31,
+      "reportedRequests": 31,
+      "inputTokens": 1167197,
+      "cachedTokens": 1062296,
+      "outputTokens": 15373,
+      "computedUsd": 0.040660471999999996,
+      "acceptance": {
+        "exit": 0,
+        "tests": 1,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0,
+        "passed": true
+      },
+      "toolCounts": {
+        "bash": 14,
+        "read_file": 13,
+        "grep": 5,
+        "edit_file": 2,
+        "bash_output": 1
+      },
+      "exactRepeatedCalls": 0,
+      "toolOutputCharacters": 117051,
+      "toolActiveSeconds": 50.077,
+      "modelSeconds": 131.877,
+      "actionUsage": {
+        "basis": "complete assistant request grouped by chosen next action; not tool marginal cost",
+        "pricing": {
+          "inputPerMillionUsd": 0.22,
+          "cachedPerMillionUsd": 0.007,
+          "outputPerMillionUsd": 0.66
+        },
+        "groups": {
+          "mixed-tools": {
+            "requests": 2,
+            "inputTokens": 41009,
+            "cachedTokens": 31610,
+            "outputTokens": 1602,
+            "estimatedUsd": 0.00334637,
+            "cacheUnreportedRequests": 0,
+            "reportedModelSeconds": 10.797,
+            "durationUnreportedRequests": 0
+          },
+          "navigation": {
+            "requests": 12,
+            "inputTokens": 334738,
+            "cachedTokens": 304928,
+            "outputTokens": 3327,
+            "estimatedUsd": 0.010888515999999999,
+            "cacheUnreportedRequests": 0,
+            "reportedModelSeconds": 36.107,
+            "durationUnreportedRequests": 0
+          },
+          "shell-command": {
+            "requests": 12,
+            "inputTokens": 557402,
+            "cachedTokens": 496314,
+            "outputTokens": 5939,
+            "estimatedUsd": 0.020833298,
+            "cacheUnreportedRequests": 0,
+            "reportedModelSeconds": 53.357,
+            "durationUnreportedRequests": 0
+          },
+          "structured-edit": {
+            "requests": 2,
+            "inputTokens": 76071,
+            "cachedTokens": 74206,
+            "outputTokens": 3066,
+            "estimatedUsd": 0.002953302,
+            "cacheUnreportedRequests": 0,
+            "reportedModelSeconds": 19.433,
+            "durationUnreportedRequests": 0
+          },
+          "job-poll-or-wait": {
+            "requests": 1,
+            "inputTokens": 50511,
+            "cachedTokens": 49096,
+            "outputTokens": 60,
+            "estimatedUsd": 0.000694572,
+            "cacheUnreportedRequests": 0,
+            "reportedModelSeconds": 1.154,
+            "durationUnreportedRequests": 0
+          },
+          "text-only": {
+            "requests": 2,
+            "inputTokens": 107466,
+            "cachedTokens": 106142,
+            "outputTokens": 1379,
+            "estimatedUsd": 0.0019444140000000002,
+            "cacheUnreportedRequests": 0,
+            "reportedModelSeconds": 11.029,
+            "durationUnreportedRequests": 0
+          }
+        },
+        "assistantMessagesWithoutValidUsage": 0,
+        "breakdownRecordsWithoutValidUsage": 0,
+        "reconciliation": {
+          "inputTokens": {
+            "recorded": 1167197,
+            "attributed": 1167197,
+            "difference": 0
+          },
+          "cachedTokens": {
+            "recorded": 1062296,
+            "attributed": 1062296,
+            "difference": 0
+          },
+          "outputTokens": {
+            "recorded": 15373,
+            "attributed": 15373,
+            "difference": 0
+          },
+          "estimatedUsd": {
+            "recorded": 0.040660471999999996,
+            "attributed": 0.040660471999999996,
+            "difference": 0.0
+          }
+        }
+      },
+      "timeToFirstEditSeconds": 61.867,
+      "reviewStartedSeconds": 186.795,
+      "reviewModelRequests": 2,
+      "activations": {
+        "initialMapNotices": 1,
+        "contextToolCalls": 0,
+        "guideIdsShown": [
+          "router-resolution-and-request-state"
+        ],
+        "unparsedContextPayloads": 0,
+        "finalReviewNotices": 1,
+        "guidedFinalReviewNotices": 0,
+        "finalReviewGuideIdsShown": [],
+        "batchedEditCalls": 0,
+        "completedBatchedEditCalls": 0,
+        "batchEditsRequested": 0,
+        "batchSizes": [],
+        "backgroundCommandNotices": 0,
+        "testFocusNotices": 1,
+        "explorationFocusNotices": 1,
+        "readCallsByEffectiveLimit": {
+          "160": 3,
+          "180": 3,
+          "80": 3,
+          "200": 1,
+          "60": 1,
+          "70": 1,
+          "130": 1
         },
         "defaultWindowReadCalls": null,
         "readLimitProvenance": "unknown: saved arguments include host-injected defaults"
@@ -38153,6 +39230,7 @@
         "completedBatchedEditCalls": 0,
         "batchEditsRequested": 0,
         "batchSizes": [],
+        "backgroundCommandNotices": 0,
         "testFocusNotices": 1,
         "explorationFocusNotices": 1,
         "readCallsByEffectiveLimit": {
@@ -38323,6 +39401,7 @@
         "completedBatchedEditCalls": 0,
         "batchEditsRequested": 0,
         "batchSizes": [],
+        "backgroundCommandNotices": 0,
         "testFocusNotices": 0,
         "explorationFocusNotices": 0,
         "readCallsByEffectiveLimit": {
@@ -38507,6 +39586,7 @@
         "completedBatchedEditCalls": 0,
         "batchEditsRequested": 0,
         "batchSizes": [],
+        "backgroundCommandNotices": 0,
         "testFocusNotices": 0,
         "explorationFocusNotices": 0,
         "readCallsByEffectiveLimit": {
@@ -38661,6 +39741,7 @@
         "completedBatchedEditCalls": 0,
         "batchEditsRequested": 0,
         "batchSizes": [],
+        "backgroundCommandNotices": 0,
         "testFocusNotices": 0,
         "explorationFocusNotices": 0,
         "readCallsByEffectiveLimit": {
@@ -38852,6 +39933,7 @@
         "completedBatchedEditCalls": 0,
         "batchEditsRequested": 0,
         "batchSizes": [],
+        "backgroundCommandNotices": 0,
         "testFocusNotices": 0,
         "explorationFocusNotices": 0,
         "readCallsByEffectiveLimit": {
@@ -39058,6 +40140,7 @@
         "completedBatchedEditCalls": 0,
         "batchEditsRequested": 0,
         "batchSizes": [],
+        "backgroundCommandNotices": 0,
         "testFocusNotices": 0,
         "explorationFocusNotices": 0,
         "readCallsByEffectiveLimit": {
@@ -39220,6 +40303,7 @@
         "completedBatchedEditCalls": 0,
         "batchEditsRequested": 0,
         "batchSizes": [],
+        "backgroundCommandNotices": 0,
         "testFocusNotices": 0,
         "explorationFocusNotices": 0,
         "readCallsByEffectiveLimit": {
@@ -39391,6 +40475,7 @@
         "completedBatchedEditCalls": 0,
         "batchEditsRequested": 0,
         "batchSizes": [],
+        "backgroundCommandNotices": 0,
         "testFocusNotices": 0,
         "explorationFocusNotices": 0,
         "readCallsByEffectiveLimit": {
@@ -39588,6 +40673,7 @@
         "completedBatchedEditCalls": 0,
         "batchEditsRequested": 0,
         "batchSizes": [],
+        "backgroundCommandNotices": 0,
         "testFocusNotices": 0,
         "explorationFocusNotices": 1,
         "readCallsByEffectiveLimit": {
@@ -39780,6 +40866,7 @@
         "completedBatchedEditCalls": 0,
         "batchEditsRequested": 0,
         "batchSizes": [],
+        "backgroundCommandNotices": 0,
         "testFocusNotices": 0,
         "explorationFocusNotices": 1,
         "readCallsByEffectiveLimit": {
@@ -39932,6 +41019,7 @@
         "completedBatchedEditCalls": 0,
         "batchEditsRequested": 0,
         "batchSizes": [],
+        "backgroundCommandNotices": 0,
         "testFocusNotices": 0,
         "explorationFocusNotices": 1,
         "readCallsByEffectiveLimit": {
@@ -40124,6 +41212,7 @@
         "completedBatchedEditCalls": 0,
         "batchEditsRequested": 0,
         "batchSizes": [],
+        "backgroundCommandNotices": 0,
         "testFocusNotices": 0,
         "explorationFocusNotices": 1,
         "readCallsByEffectiveLimit": {
@@ -40295,6 +41384,7 @@
         "completedBatchedEditCalls": 0,
         "batchEditsRequested": 0,
         "batchSizes": [],
+        "backgroundCommandNotices": 0,
         "testFocusNotices": 0,
         "explorationFocusNotices": 1,
         "readCallsByEffectiveLimit": {
@@ -40489,6 +41579,7 @@
         "completedBatchedEditCalls": 0,
         "batchEditsRequested": 0,
         "batchSizes": [],
+        "backgroundCommandNotices": 0,
         "testFocusNotices": 0,
         "explorationFocusNotices": 1,
         "readCallsByEffectiveLimit": {
@@ -40668,6 +41759,7 @@
         "completedBatchedEditCalls": 0,
         "batchEditsRequested": 0,
         "batchSizes": [],
+        "backgroundCommandNotices": 0,
         "testFocusNotices": 0,
         "explorationFocusNotices": 1,
         "readCallsByEffectiveLimit": {
@@ -40853,6 +41945,7 @@
         "completedBatchedEditCalls": 0,
         "batchEditsRequested": 0,
         "batchSizes": [],
+        "backgroundCommandNotices": 0,
         "testFocusNotices": 0,
         "explorationFocusNotices": 1,
         "readCallsByEffectiveLimit": {
@@ -41044,6 +42137,7 @@
         "completedBatchedEditCalls": 0,
         "batchEditsRequested": 0,
         "batchSizes": [],
+        "backgroundCommandNotices": 0,
         "testFocusNotices": 0,
         "explorationFocusNotices": 1,
         "readCallsByEffectiveLimit": {
@@ -41245,6 +42339,7 @@
         "completedBatchedEditCalls": 0,
         "batchEditsRequested": 0,
         "batchSizes": [],
+        "backgroundCommandNotices": 0,
         "testFocusNotices": 0,
         "explorationFocusNotices": 1,
         "readCallsByEffectiveLimit": {
@@ -41418,6 +42513,7 @@
         "completedBatchedEditCalls": 0,
         "batchEditsRequested": 0,
         "batchSizes": [],
+        "backgroundCommandNotices": 0,
         "testFocusNotices": 0,
         "explorationFocusNotices": 1,
         "readCallsByEffectiveLimit": {
@@ -41610,6 +42706,7 @@
         "completedBatchedEditCalls": 0,
         "batchEditsRequested": 0,
         "batchSizes": [],
+        "backgroundCommandNotices": 0,
         "testFocusNotices": 0,
         "explorationFocusNotices": 1,
         "readCallsByEffectiveLimit": {
@@ -41791,6 +42888,7 @@
         "completedBatchedEditCalls": 0,
         "batchEditsRequested": 0,
         "batchSizes": [],
+        "backgroundCommandNotices": 0,
         "testFocusNotices": 0,
         "explorationFocusNotices": 1,
         "readCallsByEffectiveLimit": {
@@ -41978,6 +43076,7 @@
         "completedBatchedEditCalls": 0,
         "batchEditsRequested": 0,
         "batchSizes": [],
+        "backgroundCommandNotices": 0,
         "testFocusNotices": 0,
         "explorationFocusNotices": 1,
         "readCallsByEffectiveLimit": {
@@ -42172,6 +43271,7 @@
         "completedBatchedEditCalls": 0,
         "batchEditsRequested": 0,
         "batchSizes": [],
+        "backgroundCommandNotices": 0,
         "testFocusNotices": 0,
         "explorationFocusNotices": 1,
         "readCallsByEffectiveLimit": {
@@ -42363,6 +43463,7 @@
         "completedBatchedEditCalls": 0,
         "batchEditsRequested": 0,
         "batchSizes": [],
+        "backgroundCommandNotices": 0,
         "testFocusNotices": 0,
         "explorationFocusNotices": 1,
         "readCallsByEffectiveLimit": {
@@ -42550,6 +43651,7 @@
         "completedBatchedEditCalls": 0,
         "batchEditsRequested": 0,
         "batchSizes": [],
+        "backgroundCommandNotices": 0,
         "testFocusNotices": 0,
         "explorationFocusNotices": 1,
         "readCallsByEffectiveLimit": {
@@ -42730,6 +43832,7 @@
         "completedBatchedEditCalls": 0,
         "batchEditsRequested": 0,
         "batchSizes": [],
+        "backgroundCommandNotices": 0,
         "testFocusNotices": 0,
         "explorationFocusNotices": 1,
         "readCallsByEffectiveLimit": {
@@ -42917,6 +44020,7 @@
         "completedBatchedEditCalls": 0,
         "batchEditsRequested": 0,
         "batchSizes": [],
+        "backgroundCommandNotices": 0,
         "testFocusNotices": 0,
         "explorationFocusNotices": 1,
         "readCallsByEffectiveLimit": {
@@ -43103,6 +44207,7 @@
         "completedBatchedEditCalls": 0,
         "batchEditsRequested": 0,
         "batchSizes": [],
+        "backgroundCommandNotices": 0,
         "testFocusNotices": 0,
         "explorationFocusNotices": 1,
         "readCallsByEffectiveLimit": {
@@ -43273,6 +44378,7 @@
         "completedBatchedEditCalls": 0,
         "batchEditsRequested": 0,
         "batchSizes": [],
+        "backgroundCommandNotices": 0,
         "testFocusNotices": 0,
         "explorationFocusNotices": 1,
         "readCallsByEffectiveLimit": {
@@ -43439,6 +44545,7 @@
         "completedBatchedEditCalls": 0,
         "batchEditsRequested": 0,
         "batchSizes": [],
+        "backgroundCommandNotices": 0,
         "testFocusNotices": 0,
         "explorationFocusNotices": 1,
         "readCallsByEffectiveLimit": {
@@ -43624,6 +44731,7 @@
         "completedBatchedEditCalls": 0,
         "batchEditsRequested": 0,
         "batchSizes": [],
+        "backgroundCommandNotices": 0,
         "testFocusNotices": 0,
         "explorationFocusNotices": 1,
         "readCallsByEffectiveLimit": {
@@ -43808,6 +44916,7 @@
         "completedBatchedEditCalls": 0,
         "batchEditsRequested": 0,
         "batchSizes": [],
+        "backgroundCommandNotices": 0,
         "testFocusNotices": 0,
         "explorationFocusNotices": 1,
         "readCallsByEffectiveLimit": {
@@ -43971,6 +45080,7 @@
         "completedBatchedEditCalls": 0,
         "batchEditsRequested": 0,
         "batchSizes": [],
+        "backgroundCommandNotices": 0,
         "testFocusNotices": 0,
         "explorationFocusNotices": 1,
         "readCallsByEffectiveLimit": {
@@ -44137,6 +45247,7 @@
         "completedBatchedEditCalls": 0,
         "batchEditsRequested": 0,
         "batchSizes": [],
+        "backgroundCommandNotices": 0,
         "testFocusNotices": 0,
         "explorationFocusNotices": 0,
         "readCallsByEffectiveLimit": {
@@ -44315,6 +45426,7 @@
         "completedBatchedEditCalls": 0,
         "batchEditsRequested": 0,
         "batchSizes": [],
+        "backgroundCommandNotices": 0,
         "testFocusNotices": 0,
         "explorationFocusNotices": 0,
         "readCallsByEffectiveLimit": {
@@ -44489,6 +45601,7 @@
         "completedBatchedEditCalls": 0,
         "batchEditsRequested": 0,
         "batchSizes": [],
+        "backgroundCommandNotices": 0,
         "testFocusNotices": 0,
         "explorationFocusNotices": 1,
         "readCallsByEffectiveLimit": {
@@ -44653,6 +45766,7 @@
         "completedBatchedEditCalls": 0,
         "batchEditsRequested": 0,
         "batchSizes": [],
+        "backgroundCommandNotices": 0,
         "testFocusNotices": 0,
         "explorationFocusNotices": 1,
         "readCallsByEffectiveLimit": {
@@ -44815,6 +45929,7 @@
         "completedBatchedEditCalls": 0,
         "batchEditsRequested": 0,
         "batchSizes": [],
+        "backgroundCommandNotices": 0,
         "testFocusNotices": 0,
         "explorationFocusNotices": 1,
         "readCallsByEffectiveLimit": {
@@ -44993,6 +46108,7 @@
         "completedBatchedEditCalls": 0,
         "batchEditsRequested": 0,
         "batchSizes": [],
+        "backgroundCommandNotices": 0,
         "testFocusNotices": 0,
         "explorationFocusNotices": 1,
         "readCallsByEffectiveLimit": {
@@ -45180,6 +46296,7 @@
         "completedBatchedEditCalls": 0,
         "batchEditsRequested": 0,
         "batchSizes": [],
+        "backgroundCommandNotices": 0,
         "testFocusNotices": 0,
         "explorationFocusNotices": 1,
         "readCallsByEffectiveLimit": {
@@ -45349,6 +46466,7 @@
         "completedBatchedEditCalls": 0,
         "batchEditsRequested": 0,
         "batchSizes": [],
+        "backgroundCommandNotices": 0,
         "testFocusNotices": 0,
         "explorationFocusNotices": 1,
         "readCallsByEffectiveLimit": {
@@ -45528,6 +46646,7 @@
         "completedBatchedEditCalls": 0,
         "batchEditsRequested": 0,
         "batchSizes": [],
+        "backgroundCommandNotices": 0,
         "testFocusNotices": 0,
         "explorationFocusNotices": 1,
         "readCallsByEffectiveLimit": {
@@ -45721,6 +46840,7 @@
         "completedBatchedEditCalls": 0,
         "batchEditsRequested": 0,
         "batchSizes": [],
+        "backgroundCommandNotices": 0,
         "testFocusNotices": 0,
         "explorationFocusNotices": 1,
         "readCallsByEffectiveLimit": {
@@ -45903,6 +47023,7 @@
         "completedBatchedEditCalls": 0,
         "batchEditsRequested": 0,
         "batchSizes": [],
+        "backgroundCommandNotices": 0,
         "testFocusNotices": 0,
         "explorationFocusNotices": 1,
         "readCallsByEffectiveLimit": {
@@ -46088,6 +47209,7 @@
         "completedBatchedEditCalls": 0,
         "batchEditsRequested": 0,
         "batchSizes": [],
+        "backgroundCommandNotices": 0,
         "testFocusNotices": 0,
         "explorationFocusNotices": 1,
         "readCallsByEffectiveLimit": {
@@ -46245,6 +47367,7 @@
         "completedBatchedEditCalls": 0,
         "batchEditsRequested": 0,
         "batchSizes": [],
+        "backgroundCommandNotices": 0,
         "testFocusNotices": 0,
         "explorationFocusNotices": 1,
         "readCallsByEffectiveLimit": {
@@ -46425,6 +47548,7 @@
         "completedBatchedEditCalls": 0,
         "batchEditsRequested": 0,
         "batchSizes": [],
+        "backgroundCommandNotices": 0,
         "testFocusNotices": 0,
         "explorationFocusNotices": 1,
         "readCallsByEffectiveLimit": {
@@ -46617,6 +47741,7 @@
         "completedBatchedEditCalls": 0,
         "batchEditsRequested": 0,
         "batchSizes": [],
+        "backgroundCommandNotices": 0,
         "testFocusNotices": 0,
         "explorationFocusNotices": 1,
         "readCallsByEffectiveLimit": {
@@ -46807,6 +47932,7 @@
         "completedBatchedEditCalls": 0,
         "batchEditsRequested": 0,
         "batchSizes": [],
+        "backgroundCommandNotices": 0,
         "testFocusNotices": 0,
         "explorationFocusNotices": 1,
         "readCallsByEffectiveLimit": {
@@ -46985,6 +48111,7 @@
         "completedBatchedEditCalls": 0,
         "batchEditsRequested": 0,
         "batchSizes": [],
+        "backgroundCommandNotices": 0,
         "testFocusNotices": 0,
         "explorationFocusNotices": 1,
         "readCallsByEffectiveLimit": {
@@ -47175,6 +48302,7 @@
         "completedBatchedEditCalls": 0,
         "batchEditsRequested": 0,
         "batchSizes": [],
+        "backgroundCommandNotices": 0,
         "testFocusNotices": 0,
         "explorationFocusNotices": 1,
         "readCallsByEffectiveLimit": {
@@ -47365,6 +48493,7 @@
         "completedBatchedEditCalls": 0,
         "batchEditsRequested": 0,
         "batchSizes": [],
+        "backgroundCommandNotices": 0,
         "testFocusNotices": 0,
         "explorationFocusNotices": 1,
         "readCallsByEffectiveLimit": {
@@ -47532,6 +48661,7 @@
         "completedBatchedEditCalls": 0,
         "batchEditsRequested": 0,
         "batchSizes": [],
+        "backgroundCommandNotices": 0,
         "testFocusNotices": 0,
         "explorationFocusNotices": 1,
         "readCallsByEffectiveLimit": {
@@ -47729,6 +48859,7 @@
         "completedBatchedEditCalls": 0,
         "batchEditsRequested": 0,
         "batchSizes": [],
+        "backgroundCommandNotices": 0,
         "testFocusNotices": 0,
         "explorationFocusNotices": 1,
         "readCallsByEffectiveLimit": {
@@ -47904,6 +49035,7 @@
         "completedBatchedEditCalls": 0,
         "batchEditsRequested": 0,
         "batchSizes": [],
+        "backgroundCommandNotices": 0,
         "testFocusNotices": 0,
         "explorationFocusNotices": 1,
         "readCallsByEffectiveLimit": {
@@ -48088,6 +49220,7 @@
         "completedBatchedEditCalls": 0,
         "batchEditsRequested": 0,
         "batchSizes": [],
+        "backgroundCommandNotices": 0,
         "testFocusNotices": 1,
         "explorationFocusNotices": 1,
         "readCallsByEffectiveLimit": {
@@ -48272,6 +49405,7 @@
         "completedBatchedEditCalls": 0,
         "batchEditsRequested": 0,
         "batchSizes": [],
+        "backgroundCommandNotices": 0,
         "testFocusNotices": 0,
         "explorationFocusNotices": 1,
         "readCallsByEffectiveLimit": {
@@ -48471,6 +49605,7 @@
         "completedBatchedEditCalls": 0,
         "batchEditsRequested": 0,
         "batchSizes": [],
+        "backgroundCommandNotices": 0,
         "testFocusNotices": 1,
         "explorationFocusNotices": 1,
         "readCallsByEffectiveLimit": {
@@ -48652,6 +49787,7 @@
         "completedBatchedEditCalls": 0,
         "batchEditsRequested": 0,
         "batchSizes": [],
+        "backgroundCommandNotices": 0,
         "testFocusNotices": 1,
         "explorationFocusNotices": 1,
         "readCallsByEffectiveLimit": {
@@ -48838,6 +49974,7 @@
         "completedBatchedEditCalls": 0,
         "batchEditsRequested": 0,
         "batchSizes": [],
+        "backgroundCommandNotices": 0,
         "testFocusNotices": 0,
         "explorationFocusNotices": 1,
         "readCallsByEffectiveLimit": {
@@ -49026,6 +50163,7 @@
         "completedBatchedEditCalls": 0,
         "batchEditsRequested": 0,
         "batchSizes": [],
+        "backgroundCommandNotices": 0,
         "testFocusNotices": 1,
         "explorationFocusNotices": 1,
         "readCallsByEffectiveLimit": {
@@ -49051,6 +50189,375 @@
       },
       "fixturePlugins": [],
       "fixtureProfileHash": "643d5437104296e21d906ecb15b2c96ad278f20cfc4af53b12bb6069bd853726",
+      "knownIntegrityIssue": false,
+      "snapshotBytecodeInherited": false,
+      "bytecodeIndependentAcceptanceUnchanged": null
+    },
+    {
+      "dataset": "training5",
+      "run": "replication-v24-features-medium-r1-background-responses-pipeline-17f57e85",
+      "id": "background-responses-pipeline",
+      "kind": "litellm-specific",
+      "label": "replication-v24-features-medium-r1",
+      "promptRevision": 3,
+      "snapshotRevision": 2,
+      "harnessVersion": "2026-09-15.24",
+      "harnessSha256": "f618c4d3bc5bab610b9f1129bf33d59c9ccb427e864cca7551a66d26ecb329f0",
+      "harnessCommit": "c7e6826341989fd6ebf3588b53901087b2fa7a56",
+      "completed": false,
+      "completionReason": "timeout",
+      "status": "idle",
+      "exit": null,
+      "evaluationProtocol": 6,
+      "isolation": "macOS-seatbelt",
+      "effort": "medium",
+      "timeoutSeconds": 900,
+      "seconds": 900.185,
+      "timedOut": true,
+      "interrupted": null,
+      "recovered": null,
+      "durationIncomplete": null,
+      "repairParent": null,
+      "requests": 123,
+      "reportedRequests": 122,
+      "inputTokens": 11952947,
+      "cachedTokens": 11767280,
+      "outputTokens": 54355,
+      "computedUsd": 0.159092,
+      "acceptance": {
+        "exit": 1,
+        "tests": 7,
+        "failures": 1,
+        "errors": 0,
+        "skipped": 0,
+        "passed": false
+      },
+      "toolCounts": {
+        "read_file": 40,
+        "bash": 67,
+        "edit_file": 18
+      },
+      "exactRepeatedCalls": 0,
+      "toolOutputCharacters": 414188,
+      "toolActiveSeconds": 367.094,
+      "modelSeconds": 477.553,
+      "actionUsage": {
+        "basis": "complete assistant request grouped by chosen next action; not tool marginal cost",
+        "pricing": {
+          "inputPerMillionUsd": 0.22,
+          "cachedPerMillionUsd": 0.007,
+          "outputPerMillionUsd": 0.66
+        },
+        "groups": {
+          "mixed-tools": {
+            "requests": 1,
+            "inputTokens": 8375,
+            "cachedTokens": 154,
+            "outputTokens": 225,
+            "estimatedUsd": 0.001958198,
+            "cacheUnreportedRequests": 0,
+            "reportedModelSeconds": 1.578,
+            "durationUnreportedRequests": 0
+          },
+          "shell-command": {
+            "requests": 66,
+            "inputTokens": 6870244,
+            "cachedTokens": 6770104,
+            "outputTokens": 35378,
+            "estimatedUsd": 0.09277100799999997,
+            "cacheUnreportedRequests": 0,
+            "reportedModelSeconds": 316.231,
+            "durationUnreportedRequests": 0
+          },
+          "navigation": {
+            "requests": 37,
+            "inputTokens": 2845016,
+            "cachedTokens": 2789882,
+            "outputTokens": 8063,
+            "estimatedUsd": 0.036980233999999994,
+            "cacheUnreportedRequests": 0,
+            "reportedModelSeconds": 85.95300000000002,
+            "durationUnreportedRequests": 0
+          },
+          "structured-edit": {
+            "requests": 18,
+            "inputTokens": 2229312,
+            "cachedTokens": 2207140,
+            "outputTokens": 10689,
+            "estimatedUsd": 0.027382560000000004,
+            "cacheUnreportedRequests": 0,
+            "reportedModelSeconds": 73.79100000000001,
+            "durationUnreportedRequests": 0
+          }
+        },
+        "assistantMessagesWithoutValidUsage": 1,
+        "breakdownRecordsWithoutValidUsage": 1,
+        "reconciliation": {
+          "inputTokens": {
+            "recorded": 11952947,
+            "attributed": 11952947,
+            "difference": 0
+          },
+          "cachedTokens": {
+            "recorded": 11767280,
+            "attributed": 11767280,
+            "difference": 0
+          },
+          "outputTokens": {
+            "recorded": 54355,
+            "attributed": 54355,
+            "difference": 0
+          },
+          "estimatedUsd": {
+            "recorded": 0.159092,
+            "attributed": 0.15909199999999998,
+            "difference": 2.7755575615628914e-17
+          }
+        }
+      },
+      "timeToFirstEditSeconds": 306.135,
+      "reviewStartedSeconds": null,
+      "reviewModelRequests": null,
+      "activations": {
+        "initialMapNotices": 1,
+        "contextToolCalls": 0,
+        "guideIdsShown": [
+          "router-resolution-and-request-state"
+        ],
+        "unparsedContextPayloads": 0,
+        "finalReviewNotices": 0,
+        "guidedFinalReviewNotices": 0,
+        "finalReviewGuideIdsShown": [],
+        "batchedEditCalls": 0,
+        "completedBatchedEditCalls": 0,
+        "batchEditsRequested": 0,
+        "batchSizes": [],
+        "backgroundCommandNotices": 0,
+        "testFocusNotices": 1,
+        "explorationFocusNotices": 1,
+        "readCallsByEffectiveLimit": {
+          "160": 4,
+          "420": 1,
+          "240": 1,
+          "200": 2,
+          "190": 1,
+          "80": 3,
+          "120": 5,
+          "40": 1,
+          "45": 2,
+          "300": 3,
+          "320": 1,
+          "70": 2,
+          "60": 2,
+          "180": 1,
+          "220": 1,
+          "30": 2,
+          "140": 2,
+          "20": 2,
+          "50": 1,
+          "15": 2,
+          "16": 1
+        },
+        "defaultWindowReadCalls": null,
+        "readLimitProvenance": "unknown: saved arguments include host-injected defaults"
+      },
+      "fixturePlugins": [
+        "tests.test_litellm.proxy.utils.proxy_logging.conftest"
+      ],
+      "fixtureProfileHash": "48cbe23f784dbc7962c6a86d6de79c008db26e4bb0ce56b8f0266d41f4bd4aa2",
+      "knownIntegrityIssue": false,
+      "snapshotBytecodeInherited": false,
+      "bytecodeIndependentAcceptanceUnchanged": null
+    },
+    {
+      "dataset": "training5",
+      "run": "replication-v24-features-medium-r1-legacy-stream-pipeline-78c8c634",
+      "id": "legacy-stream-pipeline",
+      "kind": "litellm-specific",
+      "label": "replication-v24-features-medium-r1",
+      "promptRevision": 3,
+      "snapshotRevision": 2,
+      "harnessVersion": "2026-09-15.24",
+      "harnessSha256": "f618c4d3bc5bab610b9f1129bf33d59c9ccb427e864cca7551a66d26ecb329f0",
+      "harnessCommit": "c7e6826341989fd6ebf3588b53901087b2fa7a56",
+      "completed": false,
+      "completionReason": "timeout",
+      "status": "idle",
+      "exit": null,
+      "evaluationProtocol": 6,
+      "isolation": "macOS-seatbelt",
+      "effort": "medium",
+      "timeoutSeconds": 900,
+      "seconds": 904.47,
+      "timedOut": true,
+      "interrupted": null,
+      "recovered": null,
+      "durationIncomplete": null,
+      "repairParent": null,
+      "requests": 124,
+      "reportedRequests": 124,
+      "inputTokens": 12640377,
+      "cachedTokens": 12281962,
+      "outputTokens": 71050,
+      "computedUsd": 0.211718034,
+      "acceptance": {
+        "exit": 1,
+        "tests": 16,
+        "failures": 6,
+        "errors": 0,
+        "skipped": 0,
+        "passed": false
+      },
+      "toolCounts": {
+        "bash": 55,
+        "read_file": 44,
+        "litellm_context": 1,
+        "todo_write": 1,
+        "edit_file": 21,
+        "bash_output": 3
+      },
+      "exactRepeatedCalls": 1,
+      "toolOutputCharacters": 361162,
+      "toolActiveSeconds": 236.142,
+      "modelSeconds": 616.75,
+      "actionUsage": {
+        "basis": "complete assistant request grouped by chosen next action; not tool marginal cost",
+        "pricing": {
+          "inputPerMillionUsd": 0.22,
+          "cachedPerMillionUsd": 0.007,
+          "outputPerMillionUsd": 0.66
+        },
+        "groups": {
+          "mixed-tools": {
+            "requests": 1,
+            "inputTokens": 8320,
+            "cachedTokens": 152,
+            "outputTokens": 228,
+            "estimatedUsd": 0.0019485040000000002,
+            "cacheUnreportedRequests": 0,
+            "reportedModelSeconds": 2.019,
+            "durationUnreportedRequests": 0
+          },
+          "navigation": {
+            "requests": 44,
+            "inputTokens": 3434520,
+            "cachedTokens": 3363622,
+            "outputTokens": 23687,
+            "estimatedUsd": 0.054776334,
+            "cacheUnreportedRequests": 0,
+            "reportedModelSeconds": 210.65400000000002,
+            "durationUnreportedRequests": 0
+          },
+          "shell-command": {
+            "requests": 54,
+            "inputTokens": 5584221,
+            "cachedTokens": 5505346,
+            "outputTokens": 25989,
+            "estimatedUsd": 0.07304266200000001,
+            "cacheUnreportedRequests": 0,
+            "reportedModelSeconds": 252.34,
+            "durationUnreportedRequests": 0
+          },
+          "other-tool": {
+            "requests": 1,
+            "inputTokens": 113703,
+            "cachedTokens": 112850,
+            "outputTokens": 1595,
+            "estimatedUsd": 0.00203031,
+            "cacheUnreportedRequests": 0,
+            "reportedModelSeconds": 9.805,
+            "durationUnreportedRequests": 0
+          },
+          "structured-edit": {
+            "requests": 21,
+            "inputTokens": 2979589,
+            "cachedTokens": 2950088,
+            "outputTokens": 19371,
+            "estimatedUsd": 0.039925696000000004,
+            "cacheUnreportedRequests": 0,
+            "reportedModelSeconds": 132.627,
+            "durationUnreportedRequests": 0
+          },
+          "job-poll-or-wait": {
+            "requests": 3,
+            "inputTokens": 520024,
+            "cachedTokens": 349904,
+            "outputTokens": 180,
+            "estimatedUsd": 0.039994527999999994,
+            "cacheUnreportedRequests": 0,
+            "reportedModelSeconds": 9.305,
+            "durationUnreportedRequests": 0
+          }
+        },
+        "assistantMessagesWithoutValidUsage": 0,
+        "breakdownRecordsWithoutValidUsage": 0,
+        "reconciliation": {
+          "inputTokens": {
+            "recorded": 12640377,
+            "attributed": 12640377,
+            "difference": 0
+          },
+          "cachedTokens": {
+            "recorded": 12281962,
+            "attributed": 12281962,
+            "difference": 0
+          },
+          "outputTokens": {
+            "recorded": 71050,
+            "attributed": 71050,
+            "difference": 0
+          },
+          "estimatedUsd": {
+            "recorded": 0.211718034,
+            "attributed": 0.211718034,
+            "difference": 0.0
+          }
+        }
+      },
+      "timeToFirstEditSeconds": 428.39,
+      "reviewStartedSeconds": null,
+      "reviewModelRequests": null,
+      "activations": {
+        "initialMapNotices": 1,
+        "contextToolCalls": 1,
+        "guideIdsShown": [],
+        "unparsedContextPayloads": 0,
+        "finalReviewNotices": 0,
+        "guidedFinalReviewNotices": 0,
+        "finalReviewGuideIdsShown": [],
+        "batchedEditCalls": 0,
+        "completedBatchedEditCalls": 0,
+        "batchEditsRequested": 0,
+        "batchSizes": [],
+        "backgroundCommandNotices": 0,
+        "testFocusNotices": 1,
+        "explorationFocusNotices": 1,
+        "readCallsByEffectiveLimit": {
+          "160": 2,
+          "340": 1,
+          "110": 3,
+          "200": 3,
+          "120": 5,
+          "300": 1,
+          "400": 1,
+          "60": 6,
+          "80": 1,
+          "70": 6,
+          "100": 4,
+          "90": 1,
+          "50": 3,
+          "40": 3,
+          "20": 1,
+          "22": 1,
+          "45": 2
+        },
+        "defaultWindowReadCalls": null,
+        "readLimitProvenance": "unknown: saved arguments include host-injected defaults"
+      },
+      "fixturePlugins": [
+        "tests.test_litellm.proxy.utils.proxy_logging.conftest"
+      ],
+      "fixtureProfileHash": "48cbe23f784dbc7962c6a86d6de79c008db26e4bb0ce56b8f0266d41f4bd4aa2",
       "knownIntegrityIssue": false,
       "snapshotBytecodeInherited": false,
       "bytecodeIndependentAcceptanceUnchanged": null
@@ -49216,6 +50723,7 @@
         "completedBatchedEditCalls": 0,
         "batchEditsRequested": 0,
         "batchSizes": [],
+        "backgroundCommandNotices": 0,
         "testFocusNotices": 0,
         "explorationFocusNotices": 1,
         "readCallsByEffectiveLimit": {
@@ -49400,6 +50908,7 @@
           2,
           1
         ],
+        "backgroundCommandNotices": 0,
         "testFocusNotices": 1,
         "explorationFocusNotices": 1,
         "readCallsByEffectiveLimit": {
@@ -49581,6 +51090,7 @@
         "completedBatchedEditCalls": 0,
         "batchEditsRequested": 0,
         "batchSizes": [],
+        "backgroundCommandNotices": 0,
         "testFocusNotices": 1,
         "explorationFocusNotices": 1,
         "readCallsByEffectiveLimit": {

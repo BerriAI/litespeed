@@ -13,11 +13,11 @@
     },
     {
       "variant": "guided-review",
-      "evaluated": 1,
+      "evaluated": 2,
       "expected": 4,
       "successes": 0,
-      "meanSeconds": 247.46,
-      "tokenPricedUsd": 0.031596426000000004,
+      "meanSeconds": 222.008,
+      "tokenPricedUsd": 0.072256898,
       "trialsWithoutTokenPrice": 0
     }
   ],
@@ -69,6 +69,7 @@
         "completedBatchedEditCalls": 0,
         "batchEditsRequested": 0,
         "batchSizes": [],
+        "backgroundCommandNotices": 0,
         "testFocusNotices": 1,
         "explorationFocusNotices": 1,
         "readCallsByEffectiveLimit": {
@@ -129,6 +130,7 @@
         "completedBatchedEditCalls": 0,
         "batchEditsRequested": 0,
         "batchSizes": [],
+        "backgroundCommandNotices": 0,
         "testFocusNotices": 1,
         "explorationFocusNotices": 1,
         "readCallsByEffectiveLimit": {
@@ -191,6 +193,7 @@
         "completedBatchedEditCalls": 0,
         "batchEditsRequested": 0,
         "batchSizes": [],
+        "backgroundCommandNotices": 0,
         "testFocusNotices": 1,
         "explorationFocusNotices": 0,
         "readCallsByEffectiveLimit": {
@@ -224,7 +227,58 @@
       "label": "replication-v27-review-guided-review-r1",
       "commit": "39085680fcc0cb3807eeae69d888245c3adcab6c",
       "effort": "medium",
-      "evaluated": false
+      "evaluated": true,
+      "success": false,
+      "completed": true,
+      "completionReason": "completed",
+      "seconds": 196.556,
+      "acceptance": {
+        "exit": 0,
+        "tests": 1,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0,
+        "passed": true
+      },
+      "computedUsd": 0.040660471999999996,
+      "activations": {
+        "initialMapNotices": 1,
+        "contextToolCalls": 0,
+        "guideIdsShown": [
+          "router-resolution-and-request-state"
+        ],
+        "unparsedContextPayloads": 0,
+        "finalReviewNotices": 1,
+        "guidedFinalReviewNotices": 0,
+        "finalReviewGuideIdsShown": [],
+        "batchedEditCalls": 0,
+        "completedBatchedEditCalls": 0,
+        "batchEditsRequested": 0,
+        "batchSizes": [],
+        "backgroundCommandNotices": 0,
+        "testFocusNotices": 1,
+        "explorationFocusNotices": 1,
+        "readCallsByEffectiveLimit": {
+          "160": 3,
+          "180": 3,
+          "80": 3,
+          "200": 1,
+          "60": 1,
+          "70": 1,
+          "130": 1
+        },
+        "defaultWindowReadCalls": null,
+        "readLimitProvenance": "unknown: saved arguments include host-injected defaults"
+      },
+      "originalSuccess": true,
+      "supplemental": {
+        "artifact": "routing-probe-guarded.json",
+        "checks": 5,
+        "expectedChecks": 5,
+        "checksPassed": 3,
+        "exit": 0,
+        "passed": false
+      }
     },
     {
       "dataset": "",

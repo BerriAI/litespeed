@@ -44,6 +44,10 @@ do not overwrite the original plan or mix new runs into its results.
   metadata for audit; those wording failures are not six semantic defects.
 - The router-strategy oracle includes a test calling a new private helper by
   name. Keep that coupling separate from direct-entrypoint behavior failures.
+  Its frozen generic metadata incorrectly says new private-helper tests were
+  excluded; the recorded node list actually retains this check. Future catalog
+  generation no longer makes that unsupported default claim. Frozen inputs and
+  scores remain unchanged.
 - Removing a guide is a test of these particular learned guides, not proof
   that repository memory in general helps or hurts.
 - Mid-study, the public batch scheduler gained FIFO admission after its older

@@ -1,6 +1,6 @@
 # LiteLLM harness campaign results
 
-Interim snapshot: 2026-09-16T04:04:28.509231+00:00. Current harness: **2026-09-15.30**.
+Interim snapshot: 2026-09-16T04:37:15.806852+00:00. Current harness: **2026-09-15.33**.
 
 **The campaign is still running. It has not established a quality win over Astra/Codex or production replacement readiness.**
 
@@ -8,7 +8,7 @@ The selectable architecture and replay workbench are implemented. The current wo
 
 ## Spending
 
-Confirmed token/header-priced charges: **$27.1147**. Missing receipts retain **$29.2684** across 116 requests; active requests reserve another **$0.2523**. The committed upper bound is **$56.6354** against the authorized **$100.00** ceiling. Reservations are not actual charges. Astra account billing is unavailable.
+Confirmed token/header-priced charges: **$28.5372**. Missing receipts retain **$29.2684** across 116 requests; active requests reserve another **$0.2523**. The committed upper bound is **$58.0579** against the authorized **$100.00** ceiling. Reservations are not actual charges. Astra account billing is unavailable.
 
 ## Controlled development observations
 
@@ -38,6 +38,8 @@ The following are training/development trials under protocol 5, after enforcing 
 - Per-batch concurrency limits collectively overloaded the host. All datasets now share three solver slots and one grader. Interrupted runs and unknown charges are preserved.
 
 - An MCP-auth patch passed its reference checks, but repeated 600 ms job polling triggered the host loop guard. Earlier reporting treated every idle session as completed. The analyzer now separates explicit host guard stops from normal completion, even when the patch passes.
+
+A [large-repository command-history audit](../scripts/litellm-harness/studies/command-history/README.md) reproduced a host defect: bounded snapshots omitted an already edited adapter, so legitimate shell writes caused later structured edits to fail. Version 33 prioritizes tracked paths within the same limits and preserves Undo/Redo and external-change guards. The deterministic regression and full suite pass; frozen solver studies retain their original code and scores.
 
 A [supplemental Langfuse training probe](../scripts/litellm-harness/studies/identity-precedence/README.md) confirmed a missed, explicitly requested keep condition in a candidate that passed all 60 original cases: the candidate satisfies 4/6 new checks, the base 2/6 and the human reference 6/6. Original study scores remain unchanged.
 

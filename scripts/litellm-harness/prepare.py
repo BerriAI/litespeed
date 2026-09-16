@@ -143,7 +143,7 @@ for name, split, rev, prompt in CASES:
         return not coupled(node) and (include is None or node.split('::')[-1] in include) and node.split('::')[-1] not in exclude
     record['excluded_reference_nodes']=[n for n in original if not selected(n)]
     record['test_nodes']=[n for n in original if selected(n)]
-    record['oracle_note']=selection.get('oracle_note', 'Tests directly calling newly introduced helper names are excluded; alternate implementations may satisfy the public behavior.')
+    record['oracle_note']=selection.get('oracle_note', 'Reference tests are selected by the catalog or changed-test discovery. Qualification does not prove implementation independence; inspect newly introduced private-helper and diagnostic assertions separately.')
     (directory/'manifest.json').write_text(json.dumps(record,indent=2))
     manifest.append(record)
     for resource in git('ls-tree','-r','--name-only',base,'--','litellm/litellm_core_utils/tokenizers','litellm/proxy/swagger').decode().splitlines():

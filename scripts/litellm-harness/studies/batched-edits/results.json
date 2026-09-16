@@ -75,6 +75,7 @@
           2,
           1
         ],
+        "backgroundCommandNotices": 0,
         "testFocusNotices": 1,
         "explorationFocusNotices": 1,
         "readCallsByEffectiveLimit": {
@@ -133,6 +134,7 @@
         "completedBatchedEditCalls": 0,
         "batchEditsRequested": 0,
         "batchSizes": [],
+        "backgroundCommandNotices": 0,
         "testFocusNotices": 1,
         "explorationFocusNotices": 1,
         "readCallsByEffectiveLimit": {

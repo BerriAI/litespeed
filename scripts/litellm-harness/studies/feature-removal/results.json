@@ -4,20 +4,20 @@
   "variants": [
     {
       "variant": "control",
-      "evaluated": 8,
+      "evaluated": 9,
       "expected": 32,
       "successes": 6,
-      "meanSeconds": 279.714375,
-      "tokenPricedUsd": 0.5410917980000001,
+      "meanSeconds": 348.79733333333337,
+      "tokenPricedUsd": 0.660036568,
       "trialsWithoutTokenPrice": 0
     },
     {
       "variant": "no-guides",
-      "evaluated": 8,
+      "evaluated": 9,
       "expected": 32,
       "successes": 6,
-      "meanSeconds": 301.08925,
-      "tokenPricedUsd": 1.0054105740000001,
+      "meanSeconds": 327.8147777777778,
+      "tokenPricedUsd": 1.1067733880000001,
       "trialsWithoutTokenPrice": 0
     },
     {
@@ -40,11 +40,11 @@
     },
     {
       "variant": "read-480",
-      "evaluated": 8,
+      "evaluated": 9,
       "expected": 32,
       "successes": 7,
-      "meanSeconds": 289.304625,
-      "tokenPricedUsd": 0.48675752,
+      "meanSeconds": 330.026,
+      "tokenPricedUsd": 0.603821132,
       "trialsWithoutTokenPrice": 0
     }
   ],
@@ -116,6 +116,7 @@
         "completedBatchedEditCalls": 0,
         "batchEditsRequested": 0,
         "batchSizes": [],
+        "backgroundCommandNotices": 0,
         "testFocusNotices": 0,
         "explorationFocusNotices": 1,
         "readCallsByEffectiveLimit": {
@@ -171,6 +172,7 @@
         "completedBatchedEditCalls": 0,
         "batchEditsRequested": 0,
         "batchSizes": [],
+        "backgroundCommandNotices": 0,
         "testFocusNotices": 0,
         "explorationFocusNotices": 1,
         "readCallsByEffectiveLimit": {
@@ -223,6 +225,7 @@
         "completedBatchedEditCalls": 0,
         "batchEditsRequested": 0,
         "batchSizes": [],
+        "backgroundCommandNotices": 0,
         "testFocusNotices": 0,
         "explorationFocusNotices": 1,
         "readCallsByEffectiveLimit": {
@@ -278,6 +281,7 @@
         "completedBatchedEditCalls": 0,
         "batchEditsRequested": 0,
         "batchSizes": [],
+        "backgroundCommandNotices": 0,
         "testFocusNotices": 0,
         "explorationFocusNotices": 1,
         "readCallsByEffectiveLimit": {
@@ -332,6 +336,7 @@
         "completedBatchedEditCalls": 0,
         "batchEditsRequested": 0,
         "batchSizes": [],
+        "backgroundCommandNotices": 0,
         "testFocusNotices": 0,
         "explorationFocusNotices": 1,
         "readCallsByEffectiveLimit": {
@@ -382,6 +387,7 @@
         "completedBatchedEditCalls": 0,
         "batchEditsRequested": 0,
         "batchSizes": [],
+        "backgroundCommandNotices": 0,
         "testFocusNotices": 0,
         "explorationFocusNotices": 1,
         "readCallsByEffectiveLimit": {
@@ -434,6 +440,7 @@
         "completedBatchedEditCalls": 0,
         "batchEditsRequested": 0,
         "batchSizes": [],
+        "backgroundCommandNotices": 0,
         "testFocusNotices": 0,
         "explorationFocusNotices": 1,
         "readCallsByEffectiveLimit": {
@@ -487,6 +494,7 @@
         "completedBatchedEditCalls": 0,
         "batchEditsRequested": 0,
         "batchSizes": [],
+        "backgroundCommandNotices": 0,
         "testFocusNotices": 0,
         "explorationFocusNotices": 1,
         "readCallsByEffectiveLimit": {
@@ -539,6 +547,7 @@
         "completedBatchedEditCalls": 0,
         "batchEditsRequested": 0,
         "batchSizes": [],
+        "backgroundCommandNotices": 0,
         "testFocusNotices": 0,
         "explorationFocusNotices": 1,
         "readCallsByEffectiveLimit": {
@@ -593,6 +602,7 @@
         "completedBatchedEditCalls": 0,
         "batchEditsRequested": 0,
         "batchSizes": [],
+        "backgroundCommandNotices": 0,
         "testFocusNotices": 0,
         "explorationFocusNotices": 1,
         "readCallsByEffectiveLimit": {
@@ -648,6 +658,7 @@
         "completedBatchedEditCalls": 0,
         "batchEditsRequested": 0,
         "batchSizes": [],
+        "backgroundCommandNotices": 0,
         "testFocusNotices": 0,
         "explorationFocusNotices": 0,
         "readCallsByEffectiveLimit": {
@@ -697,6 +708,7 @@
         "completedBatchedEditCalls": 0,
         "batchEditsRequested": 0,
         "batchSizes": [],
+        "backgroundCommandNotices": 0,
         "testFocusNotices": 0,
         "explorationFocusNotices": 0,
         "readCallsByEffectiveLimit": {
@@ -745,6 +757,7 @@
         "completedBatchedEditCalls": 0,
         "batchEditsRequested": 0,
         "batchSizes": [],
+        "backgroundCommandNotices": 0,
         "testFocusNotices": 0,
         "explorationFocusNotices": 0,
         "readCallsByEffectiveLimit": {
@@ -793,6 +806,7 @@
         "completedBatchedEditCalls": 0,
         "batchEditsRequested": 0,
         "batchSizes": [],
+        "backgroundCommandNotices": 0,
         "testFocusNotices": 0,
         "explorationFocusNotices": 0,
         "readCallsByEffectiveLimit": {
@@ -841,6 +855,7 @@
         "completedBatchedEditCalls": 0,
         "batchEditsRequested": 0,
         "batchSizes": [],
+        "backgroundCommandNotices": 0,
         "testFocusNotices": 0,
         "explorationFocusNotices": 0,
         "readCallsByEffectiveLimit": {
@@ -890,6 +905,7 @@
         "completedBatchedEditCalls": 0,
         "batchEditsRequested": 0,
         "batchSizes": [],
+        "backgroundCommandNotices": 0,
         "testFocusNotices": 0,
         "explorationFocusNotices": 1,
         "readCallsByEffectiveLimit": {
@@ -938,6 +954,7 @@
         "completedBatchedEditCalls": 0,
         "batchEditsRequested": 0,
         "batchSizes": [],
+        "backgroundCommandNotices": 0,
         "testFocusNotices": 0,
         "explorationFocusNotices": 1,
         "readCallsByEffectiveLimit": {
@@ -985,6 +1002,7 @@
         "completedBatchedEditCalls": 0,
         "batchEditsRequested": 0,
         "batchSizes": [],
+        "backgroundCommandNotices": 0,
         "testFocusNotices": 0,
         "explorationFocusNotices": 1,
         "readCallsByEffectiveLimit": {
@@ -1032,6 +1050,7 @@
         "completedBatchedEditCalls": 0,
         "batchEditsRequested": 0,
         "batchSizes": [],
+        "backgroundCommandNotices": 0,
         "testFocusNotices": 0,
         "explorationFocusNotices": 1,
         "readCallsByEffectiveLimit": {
@@ -1080,6 +1099,7 @@
         "completedBatchedEditCalls": 0,
         "batchEditsRequested": 0,
         "batchSizes": [],
+        "backgroundCommandNotices": 0,
         "testFocusNotices": 0,
         "explorationFocusNotices": 1,
         "readCallsByEffectiveLimit": {
@@ -1133,6 +1153,7 @@
         "completedBatchedEditCalls": 0,
         "batchEditsRequested": 0,
         "batchSizes": [],
+        "backgroundCommandNotices": 0,
         "testFocusNotices": 0,
         "explorationFocusNotices": 1,
         "readCallsByEffectiveLimit": {
@@ -1191,6 +1212,7 @@
         "completedBatchedEditCalls": 0,
         "batchEditsRequested": 0,
         "batchSizes": [],
+        "backgroundCommandNotices": 0,
         "testFocusNotices": 0,
         "explorationFocusNotices": 1,
         "readCallsByEffectiveLimit": {
@@ -1253,6 +1275,7 @@
         "completedBatchedEditCalls": 0,
         "batchEditsRequested": 0,
         "batchSizes": [],
+        "backgroundCommandNotices": 0,
         "testFocusNotices": 0,
         "explorationFocusNotices": 1,
         "readCallsByEffectiveLimit": {
@@ -1314,6 +1337,7 @@
         "completedBatchedEditCalls": 0,
         "batchEditsRequested": 0,
         "batchSizes": [],
+        "backgroundCommandNotices": 0,
         "testFocusNotices": 0,
         "explorationFocusNotices": 1,
         "readCallsByEffectiveLimit": {
@@ -1369,6 +1393,7 @@
         "completedBatchedEditCalls": 0,
         "batchEditsRequested": 0,
         "batchSizes": [],
+        "backgroundCommandNotices": 0,
         "testFocusNotices": 0,
         "explorationFocusNotices": 1,
         "readCallsByEffectiveLimit": {
@@ -1429,6 +1454,7 @@
         "completedBatchedEditCalls": 0,
         "batchEditsRequested": 0,
         "batchSizes": [],
+        "backgroundCommandNotices": 0,
         "testFocusNotices": 0,
         "explorationFocusNotices": 1,
         "readCallsByEffectiveLimit": {
@@ -1478,6 +1504,7 @@
         "completedBatchedEditCalls": 0,
         "batchEditsRequested": 0,
         "batchSizes": [],
+        "backgroundCommandNotices": 0,
         "testFocusNotices": 0,
         "explorationFocusNotices": 1,
         "readCallsByEffectiveLimit": {
@@ -1523,6 +1550,7 @@
         "completedBatchedEditCalls": 0,
         "batchEditsRequested": 0,
         "batchSizes": [],
+        "backgroundCommandNotices": 0,
         "testFocusNotices": 0,
         "explorationFocusNotices": 1,
         "readCallsByEffectiveLimit": {
@@ -1576,6 +1604,7 @@
         "completedBatchedEditCalls": 0,
         "batchEditsRequested": 0,
         "batchSizes": [],
+        "backgroundCommandNotices": 0,
         "testFocusNotices": 0,
         "explorationFocusNotices": 1,
         "readCallsByEffectiveLimit": {
@@ -1628,6 +1657,7 @@
         "completedBatchedEditCalls": 0,
         "batchEditsRequested": 0,
         "batchSizes": [],
+        "backgroundCommandNotices": 0,
         "testFocusNotices": 0,
         "explorationFocusNotices": 1,
         "readCallsByEffectiveLimit": {
@@ -1679,6 +1709,7 @@
         "completedBatchedEditCalls": 0,
         "batchEditsRequested": 0,
         "batchSizes": [],
+        "backgroundCommandNotices": 0,
         "testFocusNotices": 0,
         "explorationFocusNotices": 1,
         "readCallsByEffectiveLimit": {
@@ -1727,6 +1758,7 @@
         "completedBatchedEditCalls": 0,
         "batchEditsRequested": 0,
         "batchSizes": [],
+        "backgroundCommandNotices": 0,
         "testFocusNotices": 0,
         "explorationFocusNotices": 1,
         "readCallsByEffectiveLimit": {
@@ -1777,6 +1809,7 @@
         "completedBatchedEditCalls": 0,
         "batchEditsRequested": 0,
         "batchSizes": [],
+        "backgroundCommandNotices": 0,
         "testFocusNotices": 0,
         "explorationFocusNotices": 1,
         "readCallsByEffectiveLimit": {
@@ -1825,6 +1858,7 @@
         "completedBatchedEditCalls": 0,
         "batchEditsRequested": 0,
         "batchSizes": [],
+        "backgroundCommandNotices": 0,
         "testFocusNotices": 0,
         "explorationFocusNotices": 1,
         "readCallsByEffectiveLimit": {
@@ -1873,6 +1907,7 @@
         "completedBatchedEditCalls": 0,
         "batchEditsRequested": 0,
         "batchSizes": [],
+        "backgroundCommandNotices": 0,
         "testFocusNotices": 0,
         "explorationFocusNotices": 1,
         "readCallsByEffectiveLimit": {
@@ -1920,6 +1955,7 @@
         "completedBatchedEditCalls": 0,
         "batchEditsRequested": 0,
         "batchSizes": [],
+        "backgroundCommandNotices": 0,
         "testFocusNotices": 0,
         "explorationFocusNotices": 1,
         "readCallsByEffectiveLimit": {
@@ -1970,6 +2006,7 @@
         "completedBatchedEditCalls": 0,
         "batchEditsRequested": 0,
         "batchSizes": [],
+        "backgroundCommandNotices": 0,
         "testFocusNotices": 0,
         "explorationFocusNotices": 1,
         "readCallsByEffectiveLimit": {
@@ -2021,6 +2058,7 @@
         "completedBatchedEditCalls": 0,
         "batchEditsRequested": 0,
         "batchSizes": [],
+        "backgroundCommandNotices": 0,
         "testFocusNotices": 0,
         "explorationFocusNotices": 1,
         "readCallsByEffectiveLimit": {
@@ -2074,6 +2112,7 @@
         "completedBatchedEditCalls": 0,
         "batchEditsRequested": 0,
         "batchSizes": [],
+        "backgroundCommandNotices": 0,
         "testFocusNotices": 0,
         "explorationFocusNotices": 1,
         "readCallsByEffectiveLimit": {
@@ -2126,6 +2165,7 @@
         "completedBatchedEditCalls": 0,
         "batchEditsRequested": 0,
         "batchSizes": [],
+        "backgroundCommandNotices": 0,
         "testFocusNotices": 0,
         "explorationFocusNotices": 1,
         "readCallsByEffectiveLimit": {
@@ -2153,7 +2193,56 @@
       "label": "replication-p6-ablation-no-guides-r1",
       "commit": "6d7fbe3e3c5192b6675c2bea2dc0af3913bd1480",
       "effort": "medium",
-      "evaluated": false
+      "evaluated": true,
+      "success": false,
+      "completed": true,
+      "completionReason": "completed",
+      "seconds": 541.619,
+      "acceptance": {
+        "exit": 1,
+        "tests": 9,
+        "failures": 4,
+        "errors": 0,
+        "skipped": 0,
+        "passed": false
+      },
+      "computedUsd": 0.101362814,
+      "activations": {
+        "initialMapNotices": 1,
+        "contextToolCalls": 8,
+        "guideIdsShown": [],
+        "unparsedContextPayloads": 6,
+        "finalReviewNotices": 1,
+        "guidedFinalReviewNotices": 0,
+        "finalReviewGuideIdsShown": [],
+        "batchedEditCalls": 0,
+        "completedBatchedEditCalls": 0,
+        "batchEditsRequested": 0,
+        "batchSizes": [],
+        "backgroundCommandNotices": 0,
+        "testFocusNotices": 0,
+        "explorationFocusNotices": 1,
+        "readCallsByEffectiveLimit": {
+          "380": 1,
+          "60": 3,
+          "140": 1,
+          "340": 1,
+          "200": 3,
+          "80": 3,
+          "170": 2,
+          "160": 1,
+          "150": 1,
+          "70": 1,
+          "30": 1,
+          "110": 1,
+          "20": 1,
+          "25": 1,
+          "10": 1,
+          "50": 1
+        },
+        "defaultWindowReadCalls": null,
+        "readLimitProvenance": "unknown: saved arguments include host-injected defaults"
+      }
     },
     {
       "dataset": "",
@@ -2162,7 +2251,53 @@
       "label": "replication-p6-ablation-read-480-r1",
       "commit": "9e4af4bde94625d6eeca72efb0b9436e9d4fb43b",
       "effort": "medium",
-      "evaluated": false
+      "evaluated": true,
+      "success": false,
+      "completed": true,
+      "completionReason": "completed",
+      "seconds": 655.797,
+      "acceptance": {
+        "exit": 1,
+        "tests": 9,
+        "failures": 1,
+        "errors": 0,
+        "skipped": 0,
+        "passed": false
+      },
+      "computedUsd": 0.117063612,
+      "activations": {
+        "initialMapNotices": 1,
+        "contextToolCalls": 0,
+        "guideIdsShown": [
+          "router-resolution-and-request-state"
+        ],
+        "unparsedContextPayloads": 0,
+        "finalReviewNotices": 1,
+        "guidedFinalReviewNotices": 0,
+        "finalReviewGuideIdsShown": [],
+        "batchedEditCalls": 0,
+        "completedBatchedEditCalls": 0,
+        "batchEditsRequested": 0,
+        "batchSizes": [],
+        "backgroundCommandNotices": 0,
+        "testFocusNotices": 0,
+        "explorationFocusNotices": 1,
+        "readCallsByEffectiveLimit": {
+          "400": 1,
+          "160": 3,
+          "140": 2,
+          "150": 2,
+          "50": 1,
+          "80": 1,
+          "130": 1,
+          "215": 1,
+          "480": 1,
+          "30": 1,
+          "20": 1
+        },
+        "defaultWindowReadCalls": null,
+        "readLimitProvenance": "unknown: saved arguments include host-injected defaults"
+      }
     },
     {
       "dataset": "",
@@ -2171,7 +2306,57 @@
       "label": "replication-p6-ablation-control-r1",
       "commit": "f75ab327c649cec9719ac03847f171854d2e32ae",
       "effort": "medium",
-      "evaluated": false
+      "evaluated": true,
+      "success": false,
+      "completed": false,
+      "completionReason": "timeout",
+      "seconds": 901.461,
+      "acceptance": {
+        "exit": 1,
+        "tests": 9,
+        "failures": 1,
+        "errors": 0,
+        "skipped": 0,
+        "passed": false
+      },
+      "computedUsd": 0.11894476999999999,
+      "activations": {
+        "initialMapNotices": 1,
+        "contextToolCalls": 1,
+        "guideIdsShown": [
+          "router-resolution-and-request-state"
+        ],
+        "unparsedContextPayloads": 0,
+        "finalReviewNotices": 0,
+        "guidedFinalReviewNotices": 0,
+        "finalReviewGuideIdsShown": [],
+        "batchedEditCalls": 0,
+        "completedBatchedEditCalls": 0,
+        "batchEditsRequested": 0,
+        "batchSizes": [],
+        "backgroundCommandNotices": 0,
+        "testFocusNotices": 0,
+        "explorationFocusNotices": 1,
+        "readCallsByEffectiveLimit": {
+          "220": 1,
+          "200": 1,
+          "80": 1,
+          "160": 1,
+          "30": 4,
+          "40": 5,
+          "60": 3,
+          "120": 2,
+          "145": 2,
+          "130": 1,
+          "20": 2,
+          "50": 2,
+          "70": 2,
+          "55": 2,
+          "25": 1
+        },
+        "defaultWindowReadCalls": null,
+        "readLimitProvenance": "unknown: saved arguments include host-injected defaults"
+      }
     },
     {
       "dataset": "",
