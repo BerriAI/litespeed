@@ -1,6 +1,6 @@
 # LiteLLM harness campaign results
 
-Interim snapshot: 2026-09-16T06:37:55.057780+00:00. Current harness: **2026-09-15.34**.
+Interim snapshot: 2026-09-16T07:10:27.490279+00:00. Current harness: **2026-09-15.34**.
 
 **The campaign is still running. It has not established a quality win over Astra/Codex or production replacement readiness.**
 
@@ -8,7 +8,7 @@ The selectable architecture and replay workbench are implemented. The current wo
 
 ## Spending
 
-Confirmed token/header-priced charges: **$34.1820**. Missing receipts retain **$29.7730** across 118 requests; active requests reserve another **$0.7569**. The committed upper bound is **$64.7120** against the authorized **$100.00** ceiling. Reservations are not actual charges. Astra account billing is unavailable.
+Confirmed token/header-priced charges: **$36.6381**. Missing receipts retain **$29.7730** across 118 requests; active requests reserve another **$0.7569**. The committed upper bound is **$67.1681** against the authorized **$100.00** ceiling. Reservations are not actual charges. Astra account billing is unavailable.
 
 ## Controlled development observations
 

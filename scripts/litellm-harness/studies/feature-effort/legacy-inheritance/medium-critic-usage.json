@@ -1,0 +1,305 @@
+{
+  "sourceRun": "replication-v24-features-medium-r1-legacy-stream-pipeline-78c8c634",
+  "scope": "Reference-aware training critique. Suggestions untested; original acceptance and completion unchanged. Initial unadmitted outage marker preserved in original attempt directory.",
+  "requests": 14,
+  "inputTokens": 237579,
+  "cachedTokens": 900,
+  "outputTokens": 27082,
+  "tokenPricedUsd": 0.0699498,
+  "receipts": [
+    {
+      "file": "synthesis.json",
+      "model": "fireworks_ai/deepseek-v4p1-flash",
+      "effort": "medium",
+      "finishReason": "stop",
+      "usage": {
+        "completion_tokens": 4147,
+        "prompt_tokens": 64880,
+        "total_tokens": 69027,
+        "completion_tokens_details": {
+          "reasoning_tokens": 3237
+        },
+        "prompt_tokens_details": {
+          "cached_tokens": 0
+        },
+        "output_tokens_details": {
+          "reasoning_tokens": 3237
+        }
+      },
+      "complete": true
+    },
+    {
+      "file": "window-001.json",
+      "model": "fireworks_ai/deepseek-v4p1-flash",
+      "effort": "medium",
+      "finishReason": "stop",
+      "usage": {
+        "completion_tokens": 1330,
+        "prompt_tokens": 15988,
+        "total_tokens": 17318,
+        "completion_tokens_details": {
+          "reasoning_tokens": 802
+        },
+        "prompt_tokens_details": {
+          "cached_tokens": 0
+        },
+        "output_tokens_details": {
+          "reasoning_tokens": 802
+        }
+      },
+      "complete": true
+    },
+    {
+      "file": "window-002.json",
+      "model": "fireworks_ai/deepseek-v4p1-flash",
+      "effort": "medium",
+      "finishReason": "stop",
+      "usage": {
+        "completion_tokens": 1241,
+        "prompt_tokens": 14027,
+        "total_tokens": 15268,
+        "completion_tokens_details": {
+          "reasoning_tokens": 762
+        },
+        "prompt_tokens_details": {
+          "cached_tokens": 0
+        },
+        "output_tokens_details": {
+          "reasoning_tokens": 762
+        }
+      },
+      "complete": true
+    },
+    {
+      "file": "window-003.json",
+      "model": "fireworks_ai/deepseek-v4p1-flash",
+      "effort": "medium",
+      "finishReason": "stop",
+      "usage": {
+        "completion_tokens": 2042,
+        "prompt_tokens": 15546,
+        "total_tokens": 17588,
+        "completion_tokens_details": {
+          "reasoning_tokens": 1543
+        },
+        "prompt_tokens_details": {
+          "cached_tokens": 0
+        },
+        "output_tokens_details": {
+          "reasoning_tokens": 1543
+        }
+      },
+      "complete": true
+    },
+    {
+      "file": "window-004.json",
+      "model": "fireworks_ai/deepseek-v4p1-flash",
+      "effort": "medium",
+      "finishReason": "stop",
+      "usage": {
+        "completion_tokens": 940,
+        "prompt_tokens": 15640,
+        "total_tokens": 16580,
+        "completion_tokens_details": {
+          "reasoning_tokens": 378
+        },
+        "prompt_tokens_details": {
+          "cached_tokens": 0
+        },
+        "output_tokens_details": {
+          "reasoning_tokens": 378
+        }
+      },
+      "complete": true
+    },
+    {
+      "file": "window-005.json",
+      "model": "fireworks_ai/deepseek-v4p1-flash",
+      "effort": "medium",
+      "finishReason": "stop",
+      "usage": {
+        "completion_tokens": 1741,
+        "prompt_tokens": 10810,
+        "total_tokens": 12551,
+        "completion_tokens_details": {
+          "reasoning_tokens": 1208
+        },
+        "prompt_tokens_details": {
+          "cached_tokens": 0
+        },
+        "output_tokens_details": {
+          "reasoning_tokens": 1208
+        }
+      },
+      "complete": true
+    },
+    {
+      "file": "window-006.json",
+      "model": "fireworks_ai/deepseek-v4p1-flash",
+      "effort": "medium",
+      "finishReason": "stop",
+      "usage": {
+        "completion_tokens": 1693,
+        "prompt_tokens": 14964,
+        "total_tokens": 16657,
+        "completion_tokens_details": {
+          "reasoning_tokens": 1213
+        },
+        "prompt_tokens_details": {
+          "cached_tokens": 20
+        },
+        "output_tokens_details": {
+          "reasoning_tokens": 1213
+        }
+      },
+      "complete": true
+    },
+    {
+      "file": "window-007.json",
+      "model": "fireworks_ai/deepseek-v4p1-flash",
+      "effort": "medium",
+      "finishReason": "stop",
+      "usage": {
+        "completion_tokens": 1792,
+        "prompt_tokens": 13668,
+        "total_tokens": 15460,
+        "completion_tokens_details": {
+          "reasoning_tokens": 1265
+        },
+        "prompt_tokens_details": {
+          "cached_tokens": 0
+        },
+        "output_tokens_details": {
+          "reasoning_tokens": 1265
+        }
+      },
+      "complete": true
+    },
+    {
+      "file": "window-008.json",
+      "model": "fireworks_ai/deepseek-v4p1-flash",
+      "effort": "medium",
+      "finishReason": "stop",
+      "usage": {
+        "completion_tokens": 1592,
+        "prompt_tokens": 15396,
+        "total_tokens": 16988,
+        "completion_tokens_details": {
+          "reasoning_tokens": 1096
+        },
+        "prompt_tokens_details": {
+          "cached_tokens": 20
+        },
+        "output_tokens_details": {
+          "reasoning_tokens": 1096
+        }
+      },
+      "complete": true
+    },
+    {
+      "file": "window-009.json",
+      "model": "fireworks_ai/deepseek-v4p1-flash",
+      "effort": "medium",
+      "finishReason": "stop",
+      "usage": {
+        "completion_tokens": 3160,
+        "prompt_tokens": 13527,
+        "total_tokens": 16687,
+        "completion_tokens_details": {
+          "reasoning_tokens": 2780
+        },
+        "prompt_tokens_details": {
+          "cached_tokens": 20
+        },
+        "output_tokens_details": {
+          "reasoning_tokens": 2780
+        }
+      },
+      "complete": true
+    },
+    {
+      "file": "window-010.json",
+      "model": "fireworks_ai/deepseek-v4p1-flash",
+      "effort": "medium",
+      "finishReason": "stop",
+      "usage": {
+        "completion_tokens": 2015,
+        "prompt_tokens": 15678,
+        "total_tokens": 17693,
+        "completion_tokens_details": {
+          "reasoning_tokens": 1515
+        },
+        "prompt_tokens_details": {
+          "cached_tokens": 20
+        },
+        "output_tokens_details": {
+          "reasoning_tokens": 1515
+        }
+      },
+      "complete": true
+    },
+    {
+      "file": "window-011.json",
+      "model": "fireworks_ai/deepseek-v4p1-flash",
+      "effort": "medium",
+      "finishReason": "stop",
+      "usage": {
+        "completion_tokens": 2064,
+        "prompt_tokens": 14718,
+        "total_tokens": 16782,
+        "completion_tokens_details": {
+          "reasoning_tokens": 1671
+        },
+        "prompt_tokens_details": {
+          "cached_tokens": 410
+        },
+        "output_tokens_details": {
+          "reasoning_tokens": 1671
+        }
+      },
+      "complete": true
+    },
+    {
+      "file": "window-012.json",
+      "model": "fireworks_ai/deepseek-v4p1-flash",
+      "effort": "medium",
+      "finishReason": "stop",
+      "usage": {
+        "completion_tokens": 1760,
+        "prompt_tokens": 11263,
+        "total_tokens": 13023,
+        "completion_tokens_details": {
+          "reasoning_tokens": 1402
+        },
+        "prompt_tokens_details": {
+          "cached_tokens": 410
+        },
+        "output_tokens_details": {
+          "reasoning_tokens": 1402
+        }
+      },
+      "complete": true
+    },
+    {
+      "file": "window-013.json",
+      "model": "fireworks_ai/deepseek-v4p1-flash",
+      "effort": "medium",
+      "finishReason": "stop",
+      "usage": {
+        "completion_tokens": 1565,
+        "prompt_tokens": 1474,
+        "total_tokens": 3039,
+        "completion_tokens_details": {
+          "reasoning_tokens": 1273
+        },
+        "prompt_tokens_details": {
+          "cached_tokens": 0
+        },
+        "output_tokens_details": {
+          "reasoning_tokens": 1273
+        }
+      },
+      "complete": true
+    }
+  ]
+}

@@ -1,0 +1,1705 @@
+{
+  "provenance": {
+    "base": "08b60c409a0b556efb6bbe6470402a4530666870",
+    "reference": "c6f5763443504501e88113e783d2e1ec88b9264d",
+    "referenceProductionPathsVerified": [
+      "litellm/llms/anthropic/chat/guardrail_translation/handler.py",
+      "litellm/llms/base_llm/guardrail_translation/base_translation.py",
+      "litellm/proxy/common_request_processing.py",
+      "litellm/proxy/policy_engine/pipeline_executor.py",
+      "litellm/proxy/utils.py"
+    ],
+    "probeSha256": "cefbc0b3d63bc05414f20b3357dc06a26e4b6eb30808f8636a820f46d3a86f7b",
+    "qualificationCorrection": "Initial chat-only probe retained response references and misreported shape after later in-place writeback. Fixed by snapshotting at hook entry before base/reference qualification. Original scratch outputs remain private. Messages fixture now supplies bytes, as the real passthrough endpoint and existing stream-end detector require; strings were not a valid ended-stream fixture.",
+    "scopeExpansion": "After chat/Messages diagnostics, added the actual Responses adapter to test the manual assembler across another documented endpoint. Posthoc development diagnosis; no original score replacement.",
+    "sourceRuns": {
+      "medium-r1": "replication-v24-features-medium-r1-legacy-stream-pipeline-78c8c634",
+      "high-r2": "replication-v24-features-high-r2-legacy-stream-pipeline-23506304"
+    },
+    "scope": "Posthoc host-authored diagnosis on inspected training tasks. Does not replace original acceptance, completion status or provide held-out evidence. Fixed snapshots change only the inherited-hook predicate.",
+    "fixedOriginalAcceptance": [
+      {
+        "exit": 1,
+        "tests": 16,
+        "failures": 5,
+        "errors": 0,
+        "skipped": 0,
+        "change": {
+          "old": "return \"async_post_call_success_hook\" in type(callback).__dict__",
+          "new": "return type(callback).async_post_call_success_hook is not CustomGuardrail.async_post_call_success_hook"
+        },
+        "sourceRun": "replication-v24-features-medium-r1-legacy-stream-pipeline-78c8c634"
+      },
+      {
+        "exit": 1,
+        "tests": 16,
+        "failures": 2,
+        "errors": 0,
+        "skipped": 0,
+        "change": {
+          "old": "return \"async_post_call_success_hook\" in type(callback).__dict__",
+          "new": "return type(callback).async_post_call_success_hook is not CustomGuardrail.async_post_call_success_hook"
+        },
+        "sourceRun": "replication-v24-features-high-r2-legacy-stream-pipeline-23506304"
+      }
+    ]
+  },
+  "snapshots": [
+    {
+      "snapshot": "base",
+      "rows": [
+        {
+          "name": "chat:LegacyHook:rewrite",
+          "pass": false,
+          "hookCalls": 0,
+          "nativeShape": false,
+          "text": "hello world",
+          "terminalAction": "block",
+          "outcomes": [
+            "error"
+          ]
+        },
+        {
+          "name": "chat:LegacyHook:none",
+          "pass": false,
+          "hookCalls": 0,
+          "nativeShape": false,
+          "text": "hello world",
+          "terminalAction": "block",
+          "outcomes": [
+            "error"
+          ]
+        },
+        {
+          "name": "chat:LegacyHook:block",
+          "pass": false,
+          "hookCalls": 0,
+          "nativeShape": false,
+          "text": "hello world",
+          "terminalAction": "block",
+          "outcomes": [
+            "error"
+          ]
+        },
+        {
+          "name": "chat:LegacyHook:error",
+          "pass": false,
+          "hookCalls": 0,
+          "nativeShape": false,
+          "text": "hello world",
+          "terminalAction": "block",
+          "outcomes": [
+            "error"
+          ]
+        },
+        {
+          "name": "chat:InheritedNativeHook:rewrite",
+          "pass": false,
+          "hookCalls": 0,
+          "nativeShape": false,
+          "text": "hello world",
+          "terminalAction": "block",
+          "outcomes": [
+            "error"
+          ]
+        },
+        {
+          "name": "chat:InheritedNativeHook:none",
+          "pass": false,
+          "hookCalls": 0,
+          "nativeShape": false,
+          "text": "hello world",
+          "terminalAction": "block",
+          "outcomes": [
+            "error"
+          ]
+        },
+        {
+          "name": "chat:InheritedNativeHook:block",
+          "pass": false,
+          "hookCalls": 0,
+          "nativeShape": false,
+          "text": "hello world",
+          "terminalAction": "block",
+          "outcomes": [
+            "error"
+          ]
+        },
+        {
+          "name": "chat:InheritedNativeHook:error",
+          "pass": false,
+          "hookCalls": 0,
+          "nativeShape": false,
+          "text": "hello world",
+          "terminalAction": "block",
+          "outcomes": [
+            "error"
+          ]
+        },
+        {
+          "name": "messages:LegacyHook:rewrite",
+          "pass": false,
+          "hookCalls": 0,
+          "nativeShape": false,
+          "text": "hello world",
+          "terminalAction": "block",
+          "outcomes": [
+            "error"
+          ]
+        },
+        {
+          "name": "messages:LegacyHook:none",
+          "pass": false,
+          "hookCalls": 0,
+          "nativeShape": false,
+          "text": "hello world",
+          "terminalAction": "block",
+          "outcomes": [
+            "error"
+          ]
+        },
+        {
+          "name": "messages:LegacyHook:block",
+          "pass": false,
+          "hookCalls": 0,
+          "nativeShape": false,
+          "text": "hello world",
+          "terminalAction": "block",
+          "outcomes": [
+            "error"
+          ]
+        },
+        {
+          "name": "messages:LegacyHook:error",
+          "pass": false,
+          "hookCalls": 0,
+          "nativeShape": false,
+          "text": "hello world",
+          "terminalAction": "block",
+          "outcomes": [
+            "error"
+          ]
+        },
+        {
+          "name": "messages:InheritedNativeHook:rewrite",
+          "pass": false,
+          "hookCalls": 0,
+          "nativeShape": false,
+          "text": "hello world",
+          "terminalAction": "block",
+          "outcomes": [
+            "error"
+          ]
+        },
+        {
+          "name": "messages:InheritedNativeHook:none",
+          "pass": false,
+          "hookCalls": 0,
+          "nativeShape": false,
+          "text": "hello world",
+          "terminalAction": "block",
+          "outcomes": [
+            "error"
+          ]
+        },
+        {
+          "name": "messages:InheritedNativeHook:block",
+          "pass": false,
+          "hookCalls": 0,
+          "nativeShape": false,
+          "text": "hello world",
+          "terminalAction": "block",
+          "outcomes": [
+            "error"
+          ]
+        },
+        {
+          "name": "messages:InheritedNativeHook:error",
+          "pass": false,
+          "hookCalls": 0,
+          "nativeShape": false,
+          "text": "hello world",
+          "terminalAction": "block",
+          "outcomes": [
+            "error"
+          ]
+        },
+        {
+          "name": "responses:LegacyHook:rewrite",
+          "pass": false,
+          "hookCalls": 0,
+          "nativeShape": false,
+          "text": "hello world",
+          "terminalAction": "block",
+          "outcomes": [
+            "error"
+          ]
+        },
+        {
+          "name": "responses:LegacyHook:none",
+          "pass": false,
+          "hookCalls": 0,
+          "nativeShape": false,
+          "text": "hello world",
+          "terminalAction": "block",
+          "outcomes": [
+            "error"
+          ]
+        },
+        {
+          "name": "responses:LegacyHook:block",
+          "pass": false,
+          "hookCalls": 0,
+          "nativeShape": false,
+          "text": "hello world",
+          "terminalAction": "block",
+          "outcomes": [
+            "error"
+          ]
+        },
+        {
+          "name": "responses:LegacyHook:error",
+          "pass": false,
+          "hookCalls": 0,
+          "nativeShape": false,
+          "text": "hello world",
+          "terminalAction": "block",
+          "outcomes": [
+            "error"
+          ]
+        },
+        {
+          "name": "responses:InheritedNativeHook:rewrite",
+          "pass": false,
+          "hookCalls": 0,
+          "nativeShape": false,
+          "text": "hello world",
+          "terminalAction": "block",
+          "outcomes": [
+            "error"
+          ]
+        },
+        {
+          "name": "responses:InheritedNativeHook:none",
+          "pass": false,
+          "hookCalls": 0,
+          "nativeShape": false,
+          "text": "hello world",
+          "terminalAction": "block",
+          "outcomes": [
+            "error"
+          ]
+        },
+        {
+          "name": "responses:InheritedNativeHook:block",
+          "pass": false,
+          "hookCalls": 0,
+          "nativeShape": false,
+          "text": "hello world",
+          "terminalAction": "block",
+          "outcomes": [
+            "error"
+          ]
+        },
+        {
+          "name": "responses:InheritedNativeHook:error",
+          "pass": false,
+          "hookCalls": 0,
+          "nativeShape": false,
+          "text": "hello world",
+          "terminalAction": "block",
+          "outcomes": [
+            "error"
+          ]
+        }
+      ],
+      "passed": false,
+      "imports": {
+        "packageOrigin": "litellm/__init__.py",
+        "allLiteLLMModulesWithinWorkspace": true,
+        "moduleCount": 841
+      },
+      "bytecodePolicy": "fresh cache path; reads from adjacent caches and all writes disabled"
+    },
+    {
+      "snapshot": "reference",
+      "rows": [
+        {
+          "name": "chat:LegacyHook:rewrite",
+          "pass": true,
+          "hookCalls": 1,
+          "nativeShape": true,
+          "text": "rewritten",
+          "terminalAction": "allow",
+          "outcomes": [
+            "pass"
+          ]
+        },
+        {
+          "name": "chat:LegacyHook:none",
+          "pass": true,
+          "hookCalls": 1,
+          "nativeShape": true,
+          "text": "hello world",
+          "terminalAction": "allow",
+          "outcomes": [
+            "pass"
+          ]
+        },
+        {
+          "name": "chat:LegacyHook:block",
+          "pass": true,
+          "hookCalls": 1,
+          "nativeShape": true,
+          "text": "hello world",
+          "terminalAction": "block",
+          "outcomes": [
+            "fail"
+          ]
+        },
+        {
+          "name": "chat:LegacyHook:error",
+          "pass": true,
+          "hookCalls": 1,
+          "nativeShape": true,
+          "text": "hello world",
+          "terminalAction": "block",
+          "outcomes": [
+            "error"
+          ]
+        },
+        {
+          "name": "chat:InheritedNativeHook:rewrite",
+          "pass": true,
+          "hookCalls": 1,
+          "nativeShape": true,
+          "text": "rewritten",
+          "terminalAction": "allow",
+          "outcomes": [
+            "pass"
+          ]
+        },
+        {
+          "name": "chat:InheritedNativeHook:none",
+          "pass": true,
+          "hookCalls": 1,
+          "nativeShape": true,
+          "text": "hello world",
+          "terminalAction": "allow",
+          "outcomes": [
+            "pass"
+          ]
+        },
+        {
+          "name": "chat:InheritedNativeHook:block",
+          "pass": true,
+          "hookCalls": 1,
+          "nativeShape": true,
+          "text": "hello world",
+          "terminalAction": "block",
+          "outcomes": [
+            "fail"
+          ]
+        },
+        {
+          "name": "chat:InheritedNativeHook:error",
+          "pass": true,
+          "hookCalls": 1,
+          "nativeShape": true,
+          "text": "hello world",
+          "terminalAction": "block",
+          "outcomes": [
+            "error"
+          ]
+        },
+        {
+          "name": "messages:LegacyHook:rewrite",
+          "pass": true,
+          "hookCalls": 1,
+          "nativeShape": true,
+          "text": "rewritten",
+          "terminalAction": "allow",
+          "outcomes": [
+            "pass"
+          ]
+        },
+        {
+          "name": "messages:LegacyHook:none",
+          "pass": true,
+          "hookCalls": 1,
+          "nativeShape": true,
+          "text": "hello world",
+          "terminalAction": "allow",
+          "outcomes": [
+            "pass"
+          ]
+        },
+        {
+          "name": "messages:LegacyHook:block",
+          "pass": true,
+          "hookCalls": 1,
+          "nativeShape": true,
+          "text": "hello world",
+          "terminalAction": "block",
+          "outcomes": [
+            "fail"
+          ]
+        },
+        {
+          "name": "messages:LegacyHook:error",
+          "pass": true,
+          "hookCalls": 1,
+          "nativeShape": true,
+          "text": "hello world",
+          "terminalAction": "block",
+          "outcomes": [
+            "error"
+          ]
+        },
+        {
+          "name": "messages:InheritedNativeHook:rewrite",
+          "pass": true,
+          "hookCalls": 1,
+          "nativeShape": true,
+          "text": "rewritten",
+          "terminalAction": "allow",
+          "outcomes": [
+            "pass"
+          ]
+        },
+        {
+          "name": "messages:InheritedNativeHook:none",
+          "pass": true,
+          "hookCalls": 1,
+          "nativeShape": true,
+          "text": "hello world",
+          "terminalAction": "allow",
+          "outcomes": [
+            "pass"
+          ]
+        },
+        {
+          "name": "messages:InheritedNativeHook:block",
+          "pass": true,
+          "hookCalls": 1,
+          "nativeShape": true,
+          "text": "hello world",
+          "terminalAction": "block",
+          "outcomes": [
+            "fail"
+          ]
+        },
+        {
+          "name": "messages:InheritedNativeHook:error",
+          "pass": true,
+          "hookCalls": 1,
+          "nativeShape": true,
+          "text": "hello world",
+          "terminalAction": "block",
+          "outcomes": [
+            "error"
+          ]
+        },
+        {
+          "name": "responses:LegacyHook:rewrite",
+          "pass": true,
+          "hookCalls": 1,
+          "nativeShape": true,
+          "text": "rewritten",
+          "terminalAction": "allow",
+          "outcomes": [
+            "pass"
+          ]
+        },
+        {
+          "name": "responses:LegacyHook:none",
+          "pass": true,
+          "hookCalls": 1,
+          "nativeShape": true,
+          "text": "hello world",
+          "terminalAction": "allow",
+          "outcomes": [
+            "pass"
+          ]
+        },
+        {
+          "name": "responses:LegacyHook:block",
+          "pass": true,
+          "hookCalls": 1,
+          "nativeShape": true,
+          "text": "hello world",
+          "terminalAction": "block",
+          "outcomes": [
+            "fail"
+          ]
+        },
+        {
+          "name": "responses:LegacyHook:error",
+          "pass": true,
+          "hookCalls": 1,
+          "nativeShape": true,
+          "text": "hello world",
+          "terminalAction": "block",
+          "outcomes": [
+            "error"
+          ]
+        },
+        {
+          "name": "responses:InheritedNativeHook:rewrite",
+          "pass": true,
+          "hookCalls": 1,
+          "nativeShape": true,
+          "text": "rewritten",
+          "terminalAction": "allow",
+          "outcomes": [
+            "pass"
+          ]
+        },
+        {
+          "name": "responses:InheritedNativeHook:none",
+          "pass": true,
+          "hookCalls": 1,
+          "nativeShape": true,
+          "text": "hello world",
+          "terminalAction": "allow",
+          "outcomes": [
+            "pass"
+          ]
+        },
+        {
+          "name": "responses:InheritedNativeHook:block",
+          "pass": true,
+          "hookCalls": 1,
+          "nativeShape": true,
+          "text": "hello world",
+          "terminalAction": "block",
+          "outcomes": [
+            "fail"
+          ]
+        },
+        {
+          "name": "responses:InheritedNativeHook:error",
+          "pass": true,
+          "hookCalls": 1,
+          "nativeShape": true,
+          "text": "hello world",
+          "terminalAction": "block",
+          "outcomes": [
+            "error"
+          ]
+        }
+      ],
+      "passed": true,
+      "imports": {
+        "packageOrigin": "litellm/__init__.py",
+        "allLiteLLMModulesWithinWorkspace": true,
+        "moduleCount": 843
+      },
+      "bytecodePolicy": "fresh cache path; reads from adjacent caches and all writes disabled"
+    },
+    {
+      "snapshot": "medium-r1",
+      "rows": [
+        {
+          "name": "chat:LegacyHook:rewrite",
+          "pass": true,
+          "hookCalls": 1,
+          "nativeShape": true,
+          "text": "rewritten",
+          "terminalAction": "allow",
+          "outcomes": [
+            "pass"
+          ]
+        },
+        {
+          "name": "chat:LegacyHook:none",
+          "pass": true,
+          "hookCalls": 1,
+          "nativeShape": true,
+          "text": "hello world",
+          "terminalAction": "allow",
+          "outcomes": [
+            "pass"
+          ]
+        },
+        {
+          "name": "chat:LegacyHook:block",
+          "pass": true,
+          "hookCalls": 1,
+          "nativeShape": true,
+          "text": "hello world",
+          "terminalAction": "block",
+          "outcomes": [
+            "fail"
+          ]
+        },
+        {
+          "name": "chat:LegacyHook:error",
+          "pass": true,
+          "hookCalls": 1,
+          "nativeShape": true,
+          "text": "hello world",
+          "terminalAction": "block",
+          "outcomes": [
+            "error"
+          ]
+        },
+        {
+          "name": "chat:InheritedNativeHook:rewrite",
+          "pass": false,
+          "hookCalls": 0,
+          "nativeShape": false,
+          "text": "hello world",
+          "terminalAction": "block",
+          "outcomes": [
+            "error"
+          ]
+        },
+        {
+          "name": "chat:InheritedNativeHook:none",
+          "pass": false,
+          "hookCalls": 0,
+          "nativeShape": false,
+          "text": "hello world",
+          "terminalAction": "block",
+          "outcomes": [
+            "error"
+          ]
+        },
+        {
+          "name": "chat:InheritedNativeHook:block",
+          "pass": false,
+          "hookCalls": 0,
+          "nativeShape": false,
+          "text": "hello world",
+          "terminalAction": "block",
+          "outcomes": [
+            "error"
+          ]
+        },
+        {
+          "name": "chat:InheritedNativeHook:error",
+          "pass": false,
+          "hookCalls": 0,
+          "nativeShape": false,
+          "text": "hello world",
+          "terminalAction": "block",
+          "outcomes": [
+            "error"
+          ]
+        },
+        {
+          "name": "messages:LegacyHook:rewrite",
+          "pass": true,
+          "hookCalls": 1,
+          "nativeShape": true,
+          "text": "rewritten",
+          "terminalAction": "allow",
+          "outcomes": [
+            "pass"
+          ]
+        },
+        {
+          "name": "messages:LegacyHook:none",
+          "pass": true,
+          "hookCalls": 1,
+          "nativeShape": true,
+          "text": "hello world",
+          "terminalAction": "allow",
+          "outcomes": [
+            "pass"
+          ]
+        },
+        {
+          "name": "messages:LegacyHook:block",
+          "pass": true,
+          "hookCalls": 1,
+          "nativeShape": true,
+          "text": "hello world",
+          "terminalAction": "block",
+          "outcomes": [
+            "fail"
+          ]
+        },
+        {
+          "name": "messages:LegacyHook:error",
+          "pass": true,
+          "hookCalls": 1,
+          "nativeShape": true,
+          "text": "hello world",
+          "terminalAction": "block",
+          "outcomes": [
+            "error"
+          ]
+        },
+        {
+          "name": "messages:InheritedNativeHook:rewrite",
+          "pass": false,
+          "hookCalls": 0,
+          "nativeShape": false,
+          "text": "hello world",
+          "terminalAction": "block",
+          "outcomes": [
+            "error"
+          ]
+        },
+        {
+          "name": "messages:InheritedNativeHook:none",
+          "pass": false,
+          "hookCalls": 0,
+          "nativeShape": false,
+          "text": "hello world",
+          "terminalAction": "block",
+          "outcomes": [
+            "error"
+          ]
+        },
+        {
+          "name": "messages:InheritedNativeHook:block",
+          "pass": false,
+          "hookCalls": 0,
+          "nativeShape": false,
+          "text": "hello world",
+          "terminalAction": "block",
+          "outcomes": [
+            "error"
+          ]
+        },
+        {
+          "name": "messages:InheritedNativeHook:error",
+          "pass": false,
+          "hookCalls": 0,
+          "nativeShape": false,
+          "text": "hello world",
+          "terminalAction": "block",
+          "outcomes": [
+            "error"
+          ]
+        },
+        {
+          "name": "responses:LegacyHook:rewrite",
+          "pass": false,
+          "hookCalls": 0,
+          "nativeShape": false,
+          "text": "hello world",
+          "terminalAction": "allow",
+          "outcomes": [
+            "pass"
+          ]
+        },
+        {
+          "name": "responses:LegacyHook:none",
+          "pass": false,
+          "hookCalls": 0,
+          "nativeShape": false,
+          "text": "hello world",
+          "terminalAction": "allow",
+          "outcomes": [
+            "pass"
+          ]
+        },
+        {
+          "name": "responses:LegacyHook:block",
+          "pass": false,
+          "hookCalls": 0,
+          "nativeShape": false,
+          "text": "hello world",
+          "terminalAction": "allow",
+          "outcomes": [
+            "pass"
+          ]
+        },
+        {
+          "name": "responses:LegacyHook:error",
+          "pass": false,
+          "hookCalls": 0,
+          "nativeShape": false,
+          "text": "hello world",
+          "terminalAction": "allow",
+          "outcomes": [
+            "pass"
+          ]
+        },
+        {
+          "name": "responses:InheritedNativeHook:rewrite",
+          "pass": false,
+          "hookCalls": 0,
+          "nativeShape": false,
+          "text": "hello world",
+          "terminalAction": "block",
+          "outcomes": [
+            "error"
+          ]
+        },
+        {
+          "name": "responses:InheritedNativeHook:none",
+          "pass": false,
+          "hookCalls": 0,
+          "nativeShape": false,
+          "text": "hello world",
+          "terminalAction": "block",
+          "outcomes": [
+            "error"
+          ]
+        },
+        {
+          "name": "responses:InheritedNativeHook:block",
+          "pass": false,
+          "hookCalls": 0,
+          "nativeShape": false,
+          "text": "hello world",
+          "terminalAction": "block",
+          "outcomes": [
+            "error"
+          ]
+        },
+        {
+          "name": "responses:InheritedNativeHook:error",
+          "pass": false,
+          "hookCalls": 0,
+          "nativeShape": false,
+          "text": "hello world",
+          "terminalAction": "block",
+          "outcomes": [
+            "error"
+          ]
+        }
+      ],
+      "passed": false,
+      "imports": {
+        "packageOrigin": "litellm/__init__.py",
+        "allLiteLLMModulesWithinWorkspace": true,
+        "moduleCount": 844
+      },
+      "bytecodePolicy": "fresh cache path; reads from adjacent caches and all writes disabled"
+    },
+    {
+      "snapshot": "high-r2",
+      "rows": [
+        {
+          "name": "chat:LegacyHook:rewrite",
+          "pass": true,
+          "hookCalls": 1,
+          "nativeShape": true,
+          "text": "rewritten",
+          "terminalAction": "allow",
+          "outcomes": [
+            "pass"
+          ]
+        },
+        {
+          "name": "chat:LegacyHook:none",
+          "pass": true,
+          "hookCalls": 1,
+          "nativeShape": true,
+          "text": "hello world",
+          "terminalAction": "allow",
+          "outcomes": [
+            "pass"
+          ]
+        },
+        {
+          "name": "chat:LegacyHook:block",
+          "pass": true,
+          "hookCalls": 1,
+          "nativeShape": true,
+          "text": "hello world",
+          "terminalAction": "block",
+          "outcomes": [
+            "fail"
+          ]
+        },
+        {
+          "name": "chat:LegacyHook:error",
+          "pass": true,
+          "hookCalls": 1,
+          "nativeShape": true,
+          "text": "hello world",
+          "terminalAction": "block",
+          "outcomes": [
+            "error"
+          ]
+        },
+        {
+          "name": "chat:InheritedNativeHook:rewrite",
+          "pass": false,
+          "hookCalls": 0,
+          "nativeShape": false,
+          "text": "hello world",
+          "terminalAction": "block",
+          "outcomes": [
+            "error"
+          ]
+        },
+        {
+          "name": "chat:InheritedNativeHook:none",
+          "pass": false,
+          "hookCalls": 0,
+          "nativeShape": false,
+          "text": "hello world",
+          "terminalAction": "block",
+          "outcomes": [
+            "error"
+          ]
+        },
+        {
+          "name": "chat:InheritedNativeHook:block",
+          "pass": false,
+          "hookCalls": 0,
+          "nativeShape": false,
+          "text": "hello world",
+          "terminalAction": "block",
+          "outcomes": [
+            "error"
+          ]
+        },
+        {
+          "name": "chat:InheritedNativeHook:error",
+          "pass": false,
+          "hookCalls": 0,
+          "nativeShape": false,
+          "text": "hello world",
+          "terminalAction": "block",
+          "outcomes": [
+            "error"
+          ]
+        },
+        {
+          "name": "messages:LegacyHook:rewrite",
+          "pass": true,
+          "hookCalls": 1,
+          "nativeShape": true,
+          "text": "rewritten",
+          "terminalAction": "allow",
+          "outcomes": [
+            "pass"
+          ]
+        },
+        {
+          "name": "messages:LegacyHook:none",
+          "pass": true,
+          "hookCalls": 1,
+          "nativeShape": true,
+          "text": "hello world",
+          "terminalAction": "allow",
+          "outcomes": [
+            "pass"
+          ]
+        },
+        {
+          "name": "messages:LegacyHook:block",
+          "pass": true,
+          "hookCalls": 1,
+          "nativeShape": true,
+          "text": "hello world",
+          "terminalAction": "block",
+          "outcomes": [
+            "fail"
+          ]
+        },
+        {
+          "name": "messages:LegacyHook:error",
+          "pass": true,
+          "hookCalls": 1,
+          "nativeShape": true,
+          "text": "hello world",
+          "terminalAction": "block",
+          "outcomes": [
+            "error"
+          ]
+        },
+        {
+          "name": "messages:InheritedNativeHook:rewrite",
+          "pass": false,
+          "hookCalls": 0,
+          "nativeShape": false,
+          "text": "hello world",
+          "terminalAction": "block",
+          "outcomes": [
+            "error"
+          ]
+        },
+        {
+          "name": "messages:InheritedNativeHook:none",
+          "pass": false,
+          "hookCalls": 0,
+          "nativeShape": false,
+          "text": "hello world",
+          "terminalAction": "block",
+          "outcomes": [
+            "error"
+          ]
+        },
+        {
+          "name": "messages:InheritedNativeHook:block",
+          "pass": false,
+          "hookCalls": 0,
+          "nativeShape": false,
+          "text": "hello world",
+          "terminalAction": "block",
+          "outcomes": [
+            "error"
+          ]
+        },
+        {
+          "name": "messages:InheritedNativeHook:error",
+          "pass": false,
+          "hookCalls": 0,
+          "nativeShape": false,
+          "text": "hello world",
+          "terminalAction": "block",
+          "outcomes": [
+            "error"
+          ]
+        },
+        {
+          "name": "responses:LegacyHook:rewrite",
+          "pass": false,
+          "hookCalls": 1,
+          "nativeShape": true,
+          "text": "hello world",
+          "terminalAction": "allow",
+          "outcomes": [
+            "pass"
+          ]
+        },
+        {
+          "name": "responses:LegacyHook:none",
+          "pass": true,
+          "hookCalls": 1,
+          "nativeShape": true,
+          "text": "hello world",
+          "terminalAction": "allow",
+          "outcomes": [
+            "pass"
+          ]
+        },
+        {
+          "name": "responses:LegacyHook:block",
+          "pass": true,
+          "hookCalls": 1,
+          "nativeShape": true,
+          "text": "hello world",
+          "terminalAction": "block",
+          "outcomes": [
+            "fail"
+          ]
+        },
+        {
+          "name": "responses:LegacyHook:error",
+          "pass": true,
+          "hookCalls": 1,
+          "nativeShape": true,
+          "text": "hello world",
+          "terminalAction": "block",
+          "outcomes": [
+            "error"
+          ]
+        },
+        {
+          "name": "responses:InheritedNativeHook:rewrite",
+          "pass": false,
+          "hookCalls": 0,
+          "nativeShape": false,
+          "text": "hello world",
+          "terminalAction": "block",
+          "outcomes": [
+            "error"
+          ]
+        },
+        {
+          "name": "responses:InheritedNativeHook:none",
+          "pass": false,
+          "hookCalls": 0,
+          "nativeShape": false,
+          "text": "hello world",
+          "terminalAction": "block",
+          "outcomes": [
+            "error"
+          ]
+        },
+        {
+          "name": "responses:InheritedNativeHook:block",
+          "pass": false,
+          "hookCalls": 0,
+          "nativeShape": false,
+          "text": "hello world",
+          "terminalAction": "block",
+          "outcomes": [
+            "error"
+          ]
+        },
+        {
+          "name": "responses:InheritedNativeHook:error",
+          "pass": false,
+          "hookCalls": 0,
+          "nativeShape": false,
+          "text": "hello world",
+          "terminalAction": "block",
+          "outcomes": [
+            "error"
+          ]
+        }
+      ],
+      "passed": false,
+      "imports": {
+        "packageOrigin": "litellm/__init__.py",
+        "allLiteLLMModulesWithinWorkspace": true,
+        "moduleCount": 843
+      },
+      "bytecodePolicy": "fresh cache path; reads from adjacent caches and all writes disabled"
+    },
+    {
+      "snapshot": "medium-r1-fixed",
+      "rows": [
+        {
+          "name": "chat:LegacyHook:rewrite",
+          "pass": true,
+          "hookCalls": 1,
+          "nativeShape": true,
+          "text": "rewritten",
+          "terminalAction": "allow",
+          "outcomes": [
+            "pass"
+          ]
+        },
+        {
+          "name": "chat:LegacyHook:none",
+          "pass": true,
+          "hookCalls": 1,
+          "nativeShape": true,
+          "text": "hello world",
+          "terminalAction": "allow",
+          "outcomes": [
+            "pass"
+          ]
+        },
+        {
+          "name": "chat:LegacyHook:block",
+          "pass": true,
+          "hookCalls": 1,
+          "nativeShape": true,
+          "text": "hello world",
+          "terminalAction": "block",
+          "outcomes": [
+            "fail"
+          ]
+        },
+        {
+          "name": "chat:LegacyHook:error",
+          "pass": true,
+          "hookCalls": 1,
+          "nativeShape": true,
+          "text": "hello world",
+          "terminalAction": "block",
+          "outcomes": [
+            "error"
+          ]
+        },
+        {
+          "name": "chat:InheritedNativeHook:rewrite",
+          "pass": true,
+          "hookCalls": 1,
+          "nativeShape": true,
+          "text": "rewritten",
+          "terminalAction": "allow",
+          "outcomes": [
+            "pass"
+          ]
+        },
+        {
+          "name": "chat:InheritedNativeHook:none",
+          "pass": true,
+          "hookCalls": 1,
+          "nativeShape": true,
+          "text": "hello world",
+          "terminalAction": "allow",
+          "outcomes": [
+            "pass"
+          ]
+        },
+        {
+          "name": "chat:InheritedNativeHook:block",
+          "pass": true,
+          "hookCalls": 1,
+          "nativeShape": true,
+          "text": "hello world",
+          "terminalAction": "block",
+          "outcomes": [
+            "fail"
+          ]
+        },
+        {
+          "name": "chat:InheritedNativeHook:error",
+          "pass": true,
+          "hookCalls": 1,
+          "nativeShape": true,
+          "text": "hello world",
+          "terminalAction": "block",
+          "outcomes": [
+            "error"
+          ]
+        },
+        {
+          "name": "messages:LegacyHook:rewrite",
+          "pass": true,
+          "hookCalls": 1,
+          "nativeShape": true,
+          "text": "rewritten",
+          "terminalAction": "allow",
+          "outcomes": [
+            "pass"
+          ]
+        },
+        {
+          "name": "messages:LegacyHook:none",
+          "pass": true,
+          "hookCalls": 1,
+          "nativeShape": true,
+          "text": "hello world",
+          "terminalAction": "allow",
+          "outcomes": [
+            "pass"
+          ]
+        },
+        {
+          "name": "messages:LegacyHook:block",
+          "pass": true,
+          "hookCalls": 1,
+          "nativeShape": true,
+          "text": "hello world",
+          "terminalAction": "block",
+          "outcomes": [
+            "fail"
+          ]
+        },
+        {
+          "name": "messages:LegacyHook:error",
+          "pass": true,
+          "hookCalls": 1,
+          "nativeShape": true,
+          "text": "hello world",
+          "terminalAction": "block",
+          "outcomes": [
+            "error"
+          ]
+        },
+        {
+          "name": "messages:InheritedNativeHook:rewrite",
+          "pass": true,
+          "hookCalls": 1,
+          "nativeShape": true,
+          "text": "rewritten",
+          "terminalAction": "allow",
+          "outcomes": [
+            "pass"
+          ]
+        },
+        {
+          "name": "messages:InheritedNativeHook:none",
+          "pass": true,
+          "hookCalls": 1,
+          "nativeShape": true,
+          "text": "hello world",
+          "terminalAction": "allow",
+          "outcomes": [
+            "pass"
+          ]
+        },
+        {
+          "name": "messages:InheritedNativeHook:block",
+          "pass": true,
+          "hookCalls": 1,
+          "nativeShape": true,
+          "text": "hello world",
+          "terminalAction": "block",
+          "outcomes": [
+            "fail"
+          ]
+        },
+        {
+          "name": "messages:InheritedNativeHook:error",
+          "pass": true,
+          "hookCalls": 1,
+          "nativeShape": true,
+          "text": "hello world",
+          "terminalAction": "block",
+          "outcomes": [
+            "error"
+          ]
+        },
+        {
+          "name": "responses:LegacyHook:rewrite",
+          "pass": false,
+          "hookCalls": 0,
+          "nativeShape": false,
+          "text": "hello world",
+          "terminalAction": "allow",
+          "outcomes": [
+            "pass"
+          ]
+        },
+        {
+          "name": "responses:LegacyHook:none",
+          "pass": false,
+          "hookCalls": 0,
+          "nativeShape": false,
+          "text": "hello world",
+          "terminalAction": "allow",
+          "outcomes": [
+            "pass"
+          ]
+        },
+        {
+          "name": "responses:LegacyHook:block",
+          "pass": false,
+          "hookCalls": 0,
+          "nativeShape": false,
+          "text": "hello world",
+          "terminalAction": "allow",
+          "outcomes": [
+            "pass"
+          ]
+        },
+        {
+          "name": "responses:LegacyHook:error",
+          "pass": false,
+          "hookCalls": 0,
+          "nativeShape": false,
+          "text": "hello world",
+          "terminalAction": "allow",
+          "outcomes": [
+            "pass"
+          ]
+        },
+        {
+          "name": "responses:InheritedNativeHook:rewrite",
+          "pass": false,
+          "hookCalls": 0,
+          "nativeShape": false,
+          "text": "hello world",
+          "terminalAction": "allow",
+          "outcomes": [
+            "pass"
+          ]
+        },
+        {
+          "name": "responses:InheritedNativeHook:none",
+          "pass": false,
+          "hookCalls": 0,
+          "nativeShape": false,
+          "text": "hello world",
+          "terminalAction": "allow",
+          "outcomes": [
+            "pass"
+          ]
+        },
+        {
+          "name": "responses:InheritedNativeHook:block",
+          "pass": false,
+          "hookCalls": 0,
+          "nativeShape": false,
+          "text": "hello world",
+          "terminalAction": "allow",
+          "outcomes": [
+            "pass"
+          ]
+        },
+        {
+          "name": "responses:InheritedNativeHook:error",
+          "pass": false,
+          "hookCalls": 0,
+          "nativeShape": false,
+          "text": "hello world",
+          "terminalAction": "allow",
+          "outcomes": [
+            "pass"
+          ]
+        }
+      ],
+      "passed": false,
+      "imports": {
+        "packageOrigin": "litellm/__init__.py",
+        "allLiteLLMModulesWithinWorkspace": true,
+        "moduleCount": 844
+      },
+      "bytecodePolicy": "fresh cache path; reads from adjacent caches and all writes disabled"
+    },
+    {
+      "snapshot": "high-r2-fixed",
+      "rows": [
+        {
+          "name": "chat:LegacyHook:rewrite",
+          "pass": true,
+          "hookCalls": 1,
+          "nativeShape": true,
+          "text": "rewritten",
+          "terminalAction": "allow",
+          "outcomes": [
+            "pass"
+          ]
+        },
+        {
+          "name": "chat:LegacyHook:none",
+          "pass": true,
+          "hookCalls": 1,
+          "nativeShape": true,
+          "text": "hello world",
+          "terminalAction": "allow",
+          "outcomes": [
+            "pass"
+          ]
+        },
+        {
+          "name": "chat:LegacyHook:block",
+          "pass": true,
+          "hookCalls": 1,
+          "nativeShape": true,
+          "text": "hello world",
+          "terminalAction": "block",
+          "outcomes": [
+            "fail"
+          ]
+        },
+        {
+          "name": "chat:LegacyHook:error",
+          "pass": true,
+          "hookCalls": 1,
+          "nativeShape": true,
+          "text": "hello world",
+          "terminalAction": "block",
+          "outcomes": [
+            "error"
+          ]
+        },
+        {
+          "name": "chat:InheritedNativeHook:rewrite",
+          "pass": true,
+          "hookCalls": 1,
+          "nativeShape": true,
+          "text": "rewritten",
+          "terminalAction": "allow",
+          "outcomes": [
+            "pass"
+          ]
+        },
+        {
+          "name": "chat:InheritedNativeHook:none",
+          "pass": true,
+          "hookCalls": 1,
+          "nativeShape": true,
+          "text": "hello world",
+          "terminalAction": "allow",
+          "outcomes": [
+            "pass"
+          ]
+        },
+        {
+          "name": "chat:InheritedNativeHook:block",
+          "pass": true,
+          "hookCalls": 1,
+          "nativeShape": true,
+          "text": "hello world",
+          "terminalAction": "block",
+          "outcomes": [
+            "fail"
+          ]
+        },
+        {
+          "name": "chat:InheritedNativeHook:error",
+          "pass": true,
+          "hookCalls": 1,
+          "nativeShape": true,
+          "text": "hello world",
+          "terminalAction": "block",
+          "outcomes": [
+            "error"
+          ]
+        },
+        {
+          "name": "messages:LegacyHook:rewrite",
+          "pass": true,
+          "hookCalls": 1,
+          "nativeShape": true,
+          "text": "rewritten",
+          "terminalAction": "allow",
+          "outcomes": [
+            "pass"
+          ]
+        },
+        {
+          "name": "messages:LegacyHook:none",
+          "pass": true,
+          "hookCalls": 1,
+          "nativeShape": true,
+          "text": "hello world",
+          "terminalAction": "allow",
+          "outcomes": [
+            "pass"
+          ]
+        },
+        {
+          "name": "messages:LegacyHook:block",
+          "pass": true,
+          "hookCalls": 1,
+          "nativeShape": true,
+          "text": "hello world",
+          "terminalAction": "block",
+          "outcomes": [
+            "fail"
+          ]
+        },
+        {
+          "name": "messages:LegacyHook:error",
+          "pass": true,
+          "hookCalls": 1,
+          "nativeShape": true,
+          "text": "hello world",
+          "terminalAction": "block",
+          "outcomes": [
+            "error"
+          ]
+        },
+        {
+          "name": "messages:InheritedNativeHook:rewrite",
+          "pass": true,
+          "hookCalls": 1,
+          "nativeShape": true,
+          "text": "rewritten",
+          "terminalAction": "allow",
+          "outcomes": [
+            "pass"
+          ]
+        },
+        {
+          "name": "messages:InheritedNativeHook:none",
+          "pass": true,
+          "hookCalls": 1,
+          "nativeShape": true,
+          "text": "hello world",
+          "terminalAction": "allow",
+          "outcomes": [
+            "pass"
+          ]
+        },
+        {
+          "name": "messages:InheritedNativeHook:block",
+          "pass": true,
+          "hookCalls": 1,
+          "nativeShape": true,
+          "text": "hello world",
+          "terminalAction": "block",
+          "outcomes": [
+            "fail"
+          ]
+        },
+        {
+          "name": "messages:InheritedNativeHook:error",
+          "pass": true,
+          "hookCalls": 1,
+          "nativeShape": true,
+          "text": "hello world",
+          "terminalAction": "block",
+          "outcomes": [
+            "error"
+          ]
+        },
+        {
+          "name": "responses:LegacyHook:rewrite",
+          "pass": false,
+          "hookCalls": 1,
+          "nativeShape": true,
+          "text": "hello world",
+          "terminalAction": "allow",
+          "outcomes": [
+            "pass"
+          ]
+        },
+        {
+          "name": "responses:LegacyHook:none",
+          "pass": true,
+          "hookCalls": 1,
+          "nativeShape": true,
+          "text": "hello world",
+          "terminalAction": "allow",
+          "outcomes": [
+            "pass"
+          ]
+        },
+        {
+          "name": "responses:LegacyHook:block",
+          "pass": true,
+          "hookCalls": 1,
+          "nativeShape": true,
+          "text": "hello world",
+          "terminalAction": "block",
+          "outcomes": [
+            "fail"
+          ]
+        },
+        {
+          "name": "responses:LegacyHook:error",
+          "pass": true,
+          "hookCalls": 1,
+          "nativeShape": true,
+          "text": "hello world",
+          "terminalAction": "block",
+          "outcomes": [
+            "error"
+          ]
+        },
+        {
+          "name": "responses:InheritedNativeHook:rewrite",
+          "pass": false,
+          "hookCalls": 1,
+          "nativeShape": true,
+          "text": "hello world",
+          "terminalAction": "allow",
+          "outcomes": [
+            "pass"
+          ]
+        },
+        {
+          "name": "responses:InheritedNativeHook:none",
+          "pass": true,
+          "hookCalls": 1,
+          "nativeShape": true,
+          "text": "hello world",
+          "terminalAction": "allow",
+          "outcomes": [
+            "pass"
+          ]
+        },
+        {
+          "name": "responses:InheritedNativeHook:block",
+          "pass": true,
+          "hookCalls": 1,
+          "nativeShape": true,
+          "text": "hello world",
+          "terminalAction": "block",
+          "outcomes": [
+            "fail"
+          ]
+        },
+        {
+          "name": "responses:InheritedNativeHook:error",
+          "pass": true,
+          "hookCalls": 1,
+          "nativeShape": true,
+          "text": "hello world",
+          "terminalAction": "block",
+          "outcomes": [
+            "error"
+          ]
+        }
+      ],
+      "passed": false,
+      "imports": {
+        "packageOrigin": "litellm/__init__.py",
+        "allLiteLLMModulesWithinWorkspace": true,
+        "moduleCount": 843
+      },
+      "bytecodePolicy": "fresh cache path; reads from adjacent caches and all writes disabled"
+    }
+  ]
+}
