@@ -56,9 +56,11 @@ def paired_summary(rows, repetitions, control='control'):
             rng = random.Random(17062026)
             # Resample tasks, keeping repeated attempts together. This remains
             # descriptive on a small development set, not a promotion test.
-            samples = sorted(mean(rng.choices(deltas, k=len(deltas))) for _ in range(10000))
+            samples = sorted(mean(rng.choices(deltas, k=len(deltas))) for _ in range(10000)) if len(pairs) > 1 else []
             entry.update(successDelta=mean(deltas), secondsDelta=mean(p['secondsDelta'] for p in pairs),
-                         taskBootstrap95=[samples[249], samples[9749]])
+                         taskBootstrap95=[samples[249], samples[9749]] if samples else None)
+            if not samples:
+                entry['uncertaintyNote'] = 'One task cannot estimate variation between tasks; no bootstrap interval is reported.'
         comparisons.append(entry)
     return comparisons
 

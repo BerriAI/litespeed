@@ -64,6 +64,7 @@ class StudyTests(unittest.TestCase):
         result = paired_summary(rows, 2)[0]
         self.assertFalse(result['complete'])
         self.assertEqual(result['pairedTasks'], 1)
+        self.assertIsNone(result['taskBootstrap95'])
 
 
 if __name__ == '__main__':

@@ -4,10 +4,19 @@ import path from 'node:path';
 import fg from 'fast-glob';
 import type { ToolDefinition } from '../shared/types.js';
 
-export const LITELLM_HARNESS_VERSION='2026-09-15.24';
+export const LITELLM_HARNESS_VERSION='2026-09-15.26';
 export const litellmContextTool:ToolDefinition={type:'function',function:{name:'litellm_context',description:'Navigate the current LiteLLM checkout. Give a task query to find relevant definitions, inline conditions and existing tests. Give a source path to see its symbol outline and test partners; add a symbol name to read that definition with numbered lines, or callers to find functions invoking a named helper in that file. Reads only this workspace, never Git history or remote answers.',parameters:{type:'object',properties:{query:{type:'string',maxLength:1000},path:{type:'string',maxLength:500},symbol:{type:'string',maxLength:200},callers:{type:'string',maxLength:200,description:'Python helper name whose call sites and enclosing functions to find; requires path.'}},additionalProperties:false}}};
 
 const playbooks = [
+  {
+    id: 'langfuse-trace-session-precedence',
+    matches: (query:string) => /langfuse/i.test(query) && /(?:trace|session)/i.test(query),
+    paths: ['litellm/integrations/langfuse/langfuse.py'],
+    lessons: [
+      'Use distinct trace ID, session ID and call ID in logging probes. Cases where trace ID equals session ID cannot verify an exception that applies when they differ. Enumerate the requested keep-versus-rewrite conditions and their precedence; a matching session-header value alone need not authorize rewriting the trace ID. Preserve an explicit keep condition even when the common alias path makes it seem redundant.',
+      'Trace metadata and header normalization through the public logging entrypoint before deciding which values a predicate needs. Check both the ID sent to Langfuse and the returned ID, at DEFAULT and ERROR levels. Verify hypotheses in the current code and task; do not introduce new trace semantics merely because this guide names a counterexample.',
+    ],
+  },
   {
     id: 'vertex-version-url-components',
     matches: (query:string) => /vertex/i.test(query) && /(?:base|url|path|version)/i.test(query),

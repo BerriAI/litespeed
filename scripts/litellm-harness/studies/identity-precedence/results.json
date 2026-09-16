@@ -1,23 +1,23 @@
 {
-  "status": "interim",
+  "status": "complete",
   "note": "Development selection only. Interim observed-task means can change as slower trials finish. Bootstrap resamples tasks, not attempts; it does not correct adaptive candidate selection or establish future generalization. Token prices exclude requests without usage and do not replace the campaign ledger.",
   "variants": [
     {
       "variant": "control",
-      "evaluated": 1,
+      "evaluated": 2,
       "expected": 2,
-      "successes": 0,
-      "meanSeconds": 317.155,
-      "tokenPricedUsd": 0.0989978,
+      "successes": 1,
+      "meanSeconds": 384.7265,
+      "tokenPricedUsd": 0.17285984599999998,
       "trialsWithoutTokenPrice": 0
     },
     {
       "variant": "identity-guide",
-      "evaluated": 1,
+      "evaluated": 2,
       "expected": 2,
-      "successes": 1,
-      "meanSeconds": 470.398,
-      "tokenPricedUsd": 0.098014346,
+      "successes": 2,
+      "meanSeconds": 391.0665,
+      "tokenPricedUsd": 0.144370728,
       "trialsWithoutTokenPrice": 0
     }
   ],
@@ -25,10 +25,21 @@
     {
       "variant": "identity-guide",
       "control": "control",
-      "pairedTasks": 0,
+      "pairedTasks": 1,
       "expectedTasks": 1,
-      "complete": false,
-      "pairs": []
+      "complete": true,
+      "pairs": [
+        {
+          "dataset": "training2",
+          "case": "langfuse-session-traces",
+          "successDelta": 0.5,
+          "secondsDelta": 6.340000000000032
+        }
+      ],
+      "successDelta": 0.5,
+      "secondsDelta": 6.340000000000032,
+      "taskBootstrap95": null,
+      "uncertaintyNote": "One task cannot estimate variation between tasks; no bootstrap interval is reported."
     }
   ],
   "trials": [
@@ -157,7 +168,56 @@
       "label": "replication-v23-identity-identity-guide-r2",
       "commit": "ff767bd749c6ddb50a6938e9ea1f194719bf7ba5",
       "effort": "medium",
-      "evaluated": false
+      "evaluated": true,
+      "success": true,
+      "completed": true,
+      "completionReason": "completed",
+      "seconds": 311.735,
+      "acceptance": {
+        "exit": 0,
+        "tests": 60,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0,
+        "passed": true
+      },
+      "computedUsd": 0.046356382,
+      "activations": {
+        "initialMapNotices": 1,
+        "contextToolCalls": 0,
+        "guideIdsShown": [
+          "langfuse-trace-session-precedence"
+        ],
+        "unparsedContextPayloads": 0,
+        "finalReviewNotices": 1,
+        "testFocusNotices": 0,
+        "explorationFocusNotices": 1,
+        "readCallsByEffectiveLimit": {
+          "200": 1,
+          "80": 3,
+          "130": 1,
+          "50": 1,
+          "30": 2,
+          "220": 1,
+          "120": 2,
+          "60": 1,
+          "40": 3,
+          "180": 1,
+          "145": 1,
+          "20": 1
+        },
+        "defaultWindowReadCalls": null,
+        "readLimitProvenance": "unknown: saved arguments include host-injected defaults"
+      },
+      "originalSuccess": true,
+      "supplemental": {
+        "artifact": "identity-probe.json",
+        "checks": 6,
+        "expectedChecks": 6,
+        "checksPassed": 6,
+        "exit": 0,
+        "passed": true
+      }
     },
     {
       "dataset": "training2",
@@ -166,7 +226,54 @@
       "label": "replication-v23-identity-control-r2",
       "commit": "3fee39e7c56d02575cecf74c87a774ee83b6f1a9",
       "effort": "medium",
-      "evaluated": false
+      "evaluated": true,
+      "success": true,
+      "completed": true,
+      "completionReason": "completed",
+      "seconds": 452.298,
+      "acceptance": {
+        "exit": 0,
+        "tests": 60,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0,
+        "passed": true
+      },
+      "computedUsd": 0.073862046,
+      "activations": {
+        "initialMapNotices": 1,
+        "contextToolCalls": 0,
+        "guideIdsShown": [],
+        "unparsedContextPayloads": 0,
+        "finalReviewNotices": 1,
+        "testFocusNotices": 0,
+        "explorationFocusNotices": 1,
+        "readCallsByEffectiveLimit": {
+          "160": 2,
+          "70": 2,
+          "220": 1,
+          "50": 2,
+          "120": 3,
+          "60": 4,
+          "45": 2,
+          "40": 1,
+          "240": 1,
+          "140": 1,
+          "80": 1,
+          "30": 1
+        },
+        "defaultWindowReadCalls": null,
+        "readLimitProvenance": "unknown: saved arguments include host-injected defaults"
+      },
+      "originalSuccess": true,
+      "supplemental": {
+        "artifact": "identity-probe.json",
+        "checks": 6,
+        "expectedChecks": 6,
+        "checksPassed": 6,
+        "exit": 0,
+        "passed": true
+      }
     }
   ]
 }

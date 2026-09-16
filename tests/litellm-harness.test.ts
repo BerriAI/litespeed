@@ -56,6 +56,10 @@ describe('LiteLLM repository navigation',()=>{
     expect(related.playbooks[0].paths).toEqual(['litellm/proxy/auth/user_api_key_auth.py']);
     expect(related.playbooks[0].provenance).toContain('Verify against this checkout');
     expect(JSON.parse(await litellmContext(root,{query:'openai schema pattern'},signal)).playbooks).toEqual([]);
+    expect(JSON.parse(await litellmContext(root,{query:'Langfuse trace session'},signal)).playbooks).toEqual([]);
+    await put('litellm/integrations/langfuse/langfuse.py','def log_event(): pass\n');
+    expect(JSON.parse(await litellmContext(root,{query:'Langfuse trace session'},signal)).playbooks).toHaveLength(1);
+    expect(JSON.parse(await litellmContext(root,{query:'Langsmith trace session'},signal)).playbooks).toEqual([]);
   });
   it('searches every relevant area for mixed provider, proxy and router queries',async()=>{
     await put('litellm/router.py','def resolve_team_router_name():\n    pass\n');
