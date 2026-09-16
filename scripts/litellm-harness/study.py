@@ -12,6 +12,25 @@ from statistics import mean
 import sys
 
 
+def supplemental_result(directory, specification):
+    """Recompute host probe verdicts; never trust its process exit alone."""
+    filename = specification['artifact']
+    expected = specification['expectedChecks']
+    if not isinstance(filename, str) or Path(filename).name != filename or filename in {'.', '..'}:
+        raise ValueError('Supplemental artifact must be a filename inside the run directory.')
+    if not isinstance(expected, int) or isinstance(expected, bool) or expected < 1:
+        raise ValueError('Supplemental checks must have a positive expected count.')
+    source = directory / filename
+    if not source.exists():
+        return None
+    data = json.loads(source.read_text())
+    checks = data.get('rows', [])
+    passed = sum(row.get('pass') is True for row in checks)
+    return {'artifact': filename, 'checks': len(checks), 'expectedChecks': expected,
+            'checksPassed': passed, 'exit': data.get('exit'),
+            'passed': data.get('exit') == 0 and len(checks) == expected and passed == expected}
+
+
 def paired_summary(rows, repetitions, control='control'):
     groups = defaultdict(list)
     for row in rows:
@@ -77,6 +96,15 @@ def main():
                            completed=result['completed'], completionReason=result.get('completionReason'),
                            seconds=result['seconds'], acceptance=acceptance,
                            computedUsd=result.get('computedUsd'), activations=result.get('activations'))
+                if plan.get('supplemental'):
+                    row['originalSuccess'] = row['success']
+                    directory = (dataset / 'runs' / result['run']).resolve()
+                    if directory.parent != (dataset / 'runs').resolve():
+                        raise ValueError('Result must identify one run directory.')
+                    extra = supplemental_result(directory, plan['supplemental'])
+                    row['supplemental'] = extra
+                    row['evaluated'] = extra is not None
+                    row['success'] = bool(row['originalSuccess'] and extra and extra['passed'])
         rows.append(row)
     summaries = []
     for name in sorted({r['name'] for r in rows}):
@@ -89,7 +117,7 @@ def main():
         summaries.append(summary)
     result = {'status': 'complete' if all(r['evaluated'] for r in rows) else 'interim',
               'note': 'Development selection only. Interim observed-task means can change as slower trials finish. Bootstrap resamples tasks, not attempts; it does not correct adaptive candidate selection or establish future generalization. Token prices exclude requests without usage and do not replace the campaign ledger.',
-              'variants': summaries, 'comparisons': paired_summary(rows, plan['repetitions']), 'trials': rows}
+              'variants': summaries, 'comparisons': paired_summary(rows, plan['repetitions'], plan.get('control', 'control')), 'trials': rows}
     output.write_text(json.dumps(result, indent=2) + '\n')
     print(json.dumps({'status': result['status'], 'variants': summaries,
                       'comparisons': [{k: v for k, v in p.items() if k != 'pairs'} for p in result['comparisons']]}))

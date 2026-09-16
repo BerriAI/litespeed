@@ -1,10 +1,29 @@
 import unittest
-from study import paired_summary
+import json
+from pathlib import Path
+from tempfile import TemporaryDirectory
+from study import paired_summary, supplemental_result
 from trace_metrics import activations
 from completion import completion_reason
 
 
 class StudyTests(unittest.TestCase):
+    def test_supplemental_probe_requires_every_declared_check(self):
+        with TemporaryDirectory() as temporary:
+            root = Path(temporary)
+            spec = {'artifact': 'probe.json', 'expectedChecks': 2}
+            self.assertIsNone(supplemental_result(root, spec))
+            source = root / 'probe.json'
+            # A successful process and claimed success cannot hide a failed case.
+            source.write_text(json.dumps({'exit': 0, 'passed': True, 'rows': [{'pass': True}, {'pass': False}]}))
+            self.assertFalse(supplemental_result(root, spec)['passed'])
+            source.write_text(json.dumps({'exit': 0, 'rows': [{'pass': True}]}))
+            self.assertFalse(supplemental_result(root, spec)['passed'])
+            source.write_text(json.dumps({'exit': 0, 'rows': [{'pass': True}, {'pass': True}]}))
+            self.assertTrue(supplemental_result(root, spec)['passed'])
+            with self.assertRaises(ValueError):
+                supplemental_result(root, {'artifact': '../probe.json', 'expectedChecks': 2})
+
     def test_idle_guard_stop_is_not_a_completed_task(self):
         result = {'kind': 'litellm-specific', 'status': 'idle', 'acceptance': {'passed': True},
                   'final': 'I stopped because the model requested the same tools three times in a row. The third batch was not executed.'}

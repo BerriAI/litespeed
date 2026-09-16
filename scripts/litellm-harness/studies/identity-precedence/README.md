@@ -17,3 +17,7 @@ A DeepSeek windowed critic proposed this gap. The six-case [probe](probe.py) con
 [Task metadata](task.json) contains the base/reference commits and original acceptance selection. In an isolated checkout with the LiteLLM test dependencies installed, run `probe.py` with `PYTHONPATH` set to that checkout, `LITELLM_LOCAL_MODEL_COST_MAP=True`, and `PYTHON_DOTENV_DISABLED=1`. Apply [the recorded candidate patch](observed-candidate.patch) to a separate base checkout to reproduce its result. The probe prints per-case `pass` booleans; its process exit indicates execution errors, not whether every case passed.
 
 No actual Langfuse requests are made. IDs are synthetic. This directory contains no private model traces, gateway configuration or credentials.
+
+## Subsequent guide experiment
+
+[The predeclared plan](plan.json) compares the v22 control with [one guide addition](identity-guide.patch), twice each. Both the original acceptance and all six supplemental checks must pass, with a normal completed response. The guide derives from training failures; this experiment is development selection. The public copy removes local worktree paths and adds the reporting schema; it retains the original trial identities, commits and order. Run `study.py` with this plan after `analyze.py`; missing supplemental artifacts leave a trial unevaluated. The probe's zero exit alone is insufficient.

@@ -1,0 +1,21 @@
+{
+  "id": "router-candidates",
+  "split": "train",
+  "base": "b7dad8b44e30e87e6ae174ea6f58054e17cfc8a5",
+  "reference": "2000642592670baf38c46f4c6e3bcb851c59d79e",
+  "prompt": "Router candidate deployment IDs must resolve unprefixed model names against provider-qualified wildcard deployments. Use the router's existing resolution semantics, preserving direct group names and team-scoped resolution.",
+  "input_provenance": "Retrospective requirements curated from the public change and acceptance behavior, not an original pre-merge issue. The same requirements go to every solver; reference code and tests are withheld.",
+  "source_paths": [
+    "litellm/router.py"
+  ],
+  "test_nodes": [
+    "tests/test_litellm/test_router.py::test_get_candidate_model_ids_for_route_covers_model_name_and_pattern"
+  ],
+  "prompt_revision": 3,
+  "reference_test_nodes": [
+    "tests/test_litellm/test_router.py::test_get_candidate_model_ids_for_route_covers_model_name_and_pattern"
+  ],
+  "excluded_reference_nodes": [],
+  "oracle_note": "Tests directly calling newly introduced helper names are excluded; alternate implementations may satisfy the public behavior.",
+  "snapshot_revision": 2
+}

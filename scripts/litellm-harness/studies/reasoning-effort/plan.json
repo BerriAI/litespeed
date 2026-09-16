@@ -1,0 +1,145 @@
+{
+  "createdAt": "2026-09-15T18:43:41.249707-07:00",
+  "protocol": 6,
+  "model": "fireworks_ai/deepseek-v4p1-flash",
+  "repetitions": 2,
+  "seed": 22160926,
+  "purpose": "Matched reasoning-effort comparison on four harder qualified training tasks; v22 harness fixed, shared concurrency 3, 900-second limit. No held-out claims.",
+  "selectionRule": "Use completed behavior-correct patches first; retain private-helper-coupled raw scores separately, and report paired task cost and elapsed time. No change based on an unfinished pair.",
+  "runs": [
+    {
+      "dataset": "training2",
+      "case": "mcp-auth-challenge",
+      "commit": "3fee39e7c56d02575cecf74c87a774ee83b6f1a9",
+      "name": "medium",
+      "effort": "medium",
+      "label": "replication-v22-effort-medium-r1"
+    },
+    {
+      "dataset": "training2",
+      "case": "mcp-auth-challenge",
+      "commit": "3fee39e7c56d02575cecf74c87a774ee83b6f1a9",
+      "name": "high",
+      "effort": "high",
+      "label": "replication-v22-effort-high-r1"
+    },
+    {
+      "dataset": "training2",
+      "case": "responses-custom-guardrail",
+      "commit": "3fee39e7c56d02575cecf74c87a774ee83b6f1a9",
+      "name": "high",
+      "effort": "high",
+      "label": "replication-v22-effort-high-r1"
+    },
+    {
+      "dataset": "training2",
+      "case": "responses-custom-guardrail",
+      "commit": "3fee39e7c56d02575cecf74c87a774ee83b6f1a9",
+      "name": "medium",
+      "effort": "medium",
+      "label": "replication-v22-effort-medium-r1"
+    },
+    {
+      "dataset": "",
+      "case": "team-member-budget",
+      "commit": "3fee39e7c56d02575cecf74c87a774ee83b6f1a9",
+      "name": "medium",
+      "effort": "medium",
+      "label": "replication-v22-effort-medium-r1"
+    },
+    {
+      "dataset": "",
+      "case": "team-member-budget",
+      "commit": "3fee39e7c56d02575cecf74c87a774ee83b6f1a9",
+      "name": "high",
+      "effort": "high",
+      "label": "replication-v22-effort-high-r1"
+    },
+    {
+      "dataset": "",
+      "case": "router-strategy-isolation",
+      "commit": "3fee39e7c56d02575cecf74c87a774ee83b6f1a9",
+      "name": "medium",
+      "effort": "medium",
+      "label": "replication-v22-effort-medium-r1"
+    },
+    {
+      "dataset": "",
+      "case": "router-strategy-isolation",
+      "commit": "3fee39e7c56d02575cecf74c87a774ee83b6f1a9",
+      "name": "high",
+      "effort": "high",
+      "label": "replication-v22-effort-high-r1"
+    },
+    {
+      "dataset": "training2",
+      "case": "responses-custom-guardrail",
+      "commit": "3fee39e7c56d02575cecf74c87a774ee83b6f1a9",
+      "name": "medium",
+      "effort": "medium",
+      "label": "replication-v22-effort-medium-r2"
+    },
+    {
+      "dataset": "training2",
+      "case": "responses-custom-guardrail",
+      "commit": "3fee39e7c56d02575cecf74c87a774ee83b6f1a9",
+      "name": "high",
+      "effort": "high",
+      "label": "replication-v22-effort-high-r2"
+    },
+    {
+      "dataset": "",
+      "case": "router-strategy-isolation",
+      "commit": "3fee39e7c56d02575cecf74c87a774ee83b6f1a9",
+      "name": "high",
+      "effort": "high",
+      "label": "replication-v22-effort-high-r2"
+    },
+    {
+      "dataset": "",
+      "case": "router-strategy-isolation",
+      "commit": "3fee39e7c56d02575cecf74c87a774ee83b6f1a9",
+      "name": "medium",
+      "effort": "medium",
+      "label": "replication-v22-effort-medium-r2"
+    },
+    {
+      "dataset": "",
+      "case": "team-member-budget",
+      "commit": "3fee39e7c56d02575cecf74c87a774ee83b6f1a9",
+      "name": "high",
+      "effort": "high",
+      "label": "replication-v22-effort-high-r2"
+    },
+    {
+      "dataset": "",
+      "case": "team-member-budget",
+      "commit": "3fee39e7c56d02575cecf74c87a774ee83b6f1a9",
+      "name": "medium",
+      "effort": "medium",
+      "label": "replication-v22-effort-medium-r2"
+    },
+    {
+      "dataset": "training2",
+      "case": "mcp-auth-challenge",
+      "commit": "3fee39e7c56d02575cecf74c87a774ee83b6f1a9",
+      "name": "medium",
+      "effort": "medium",
+      "label": "replication-v22-effort-medium-r2"
+    },
+    {
+      "dataset": "training2",
+      "case": "mcp-auth-challenge",
+      "commit": "3fee39e7c56d02575cecf74c87a774ee83b6f1a9",
+      "name": "high",
+      "effort": "high",
+      "label": "replication-v22-effort-high-r2"
+    }
+  ],
+  "control": "medium",
+  "execution": {
+    "timeoutSeconds": 900,
+    "sharedSolverConcurrency": 3,
+    "protocol": 6
+  }
+}

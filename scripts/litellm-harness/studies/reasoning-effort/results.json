@@ -1,0 +1,264 @@
+{
+  "status": "interim",
+  "note": "Development selection only. Interim observed-task means can change as slower trials finish. Bootstrap resamples tasks, not attempts; it does not correct adaptive candidate selection or establish future generalization. Token prices exclude requests without usage and do not replace the campaign ledger.",
+  "variants": [
+    {
+      "variant": "high",
+      "evaluated": 1,
+      "expected": 8,
+      "successes": 1,
+      "meanSeconds": 513.199,
+      "tokenPricedUsd": 0.113707336,
+      "trialsWithoutTokenPrice": 0
+    },
+    {
+      "variant": "medium",
+      "evaluated": 1,
+      "expected": 8,
+      "successes": 1,
+      "meanSeconds": 453.706,
+      "tokenPricedUsd": 0.23396181800000002,
+      "trialsWithoutTokenPrice": 0
+    }
+  ],
+  "comparisons": [
+    {
+      "variant": "high",
+      "control": "medium",
+      "pairedTasks": 0,
+      "expectedTasks": 4,
+      "complete": false,
+      "pairs": []
+    }
+  ],
+  "trials": [
+    {
+      "dataset": "training2",
+      "case": "mcp-auth-challenge",
+      "name": "medium",
+      "label": "replication-v22-effort-medium-r1",
+      "commit": "3fee39e7c56d02575cecf74c87a774ee83b6f1a9",
+      "effort": "medium",
+      "evaluated": true,
+      "success": true,
+      "completed": true,
+      "completionReason": "completed",
+      "seconds": 453.706,
+      "acceptance": {
+        "exit": 0,
+        "tests": 52,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0,
+        "passed": true
+      },
+      "computedUsd": 0.23396181800000002,
+      "activations": {
+        "initialMapNotices": 1,
+        "contextToolCalls": 0,
+        "guideIdsShown": [],
+        "unparsedContextPayloads": 0,
+        "finalReviewNotices": 1,
+        "testFocusNotices": 0,
+        "explorationFocusNotices": 1,
+        "readCallsByEffectiveLimit": {
+          "180": 1,
+          "200": 3,
+          "220": 1,
+          "90": 2,
+          "340": 1,
+          "120": 2,
+          "130": 2,
+          "80": 4,
+          "40": 3,
+          "60": 4,
+          "30": 2,
+          "160": 3,
+          "45": 2,
+          "50": 2,
+          "140": 1
+        },
+        "defaultWindowReadCalls": null,
+        "readLimitProvenance": "unknown: saved arguments include host-injected defaults"
+      }
+    },
+    {
+      "dataset": "training2",
+      "case": "mcp-auth-challenge",
+      "name": "high",
+      "label": "replication-v22-effort-high-r1",
+      "commit": "3fee39e7c56d02575cecf74c87a774ee83b6f1a9",
+      "effort": "high",
+      "evaluated": true,
+      "success": true,
+      "completed": true,
+      "completionReason": "completed",
+      "seconds": 513.199,
+      "acceptance": {
+        "exit": 0,
+        "tests": 52,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0,
+        "passed": true
+      },
+      "computedUsd": 0.113707336,
+      "activations": {
+        "initialMapNotices": 1,
+        "contextToolCalls": 1,
+        "guideIdsShown": [],
+        "unparsedContextPayloads": 0,
+        "finalReviewNotices": 1,
+        "testFocusNotices": 0,
+        "explorationFocusNotices": 1,
+        "readCallsByEffectiveLimit": {
+          "200": 2,
+          "330": 2,
+          "180": 3,
+          "70": 2,
+          "260": 1,
+          "160": 2,
+          "60": 3,
+          "140": 2,
+          "150": 1,
+          "130": 3,
+          "90": 1,
+          "80": 2,
+          "30": 3,
+          "120": 1,
+          "40": 1,
+          "50": 2,
+          "55": 1
+        },
+        "defaultWindowReadCalls": null,
+        "readLimitProvenance": "unknown: saved arguments include host-injected defaults"
+      }
+    },
+    {
+      "dataset": "training2",
+      "case": "responses-custom-guardrail",
+      "name": "high",
+      "label": "replication-v22-effort-high-r1",
+      "commit": "3fee39e7c56d02575cecf74c87a774ee83b6f1a9",
+      "effort": "high",
+      "evaluated": false
+    },
+    {
+      "dataset": "training2",
+      "case": "responses-custom-guardrail",
+      "name": "medium",
+      "label": "replication-v22-effort-medium-r1",
+      "commit": "3fee39e7c56d02575cecf74c87a774ee83b6f1a9",
+      "effort": "medium",
+      "evaluated": false
+    },
+    {
+      "dataset": "",
+      "case": "team-member-budget",
+      "name": "medium",
+      "label": "replication-v22-effort-medium-r1",
+      "commit": "3fee39e7c56d02575cecf74c87a774ee83b6f1a9",
+      "effort": "medium",
+      "evaluated": false
+    },
+    {
+      "dataset": "",
+      "case": "team-member-budget",
+      "name": "high",
+      "label": "replication-v22-effort-high-r1",
+      "commit": "3fee39e7c56d02575cecf74c87a774ee83b6f1a9",
+      "effort": "high",
+      "evaluated": false
+    },
+    {
+      "dataset": "",
+      "case": "router-strategy-isolation",
+      "name": "medium",
+      "label": "replication-v22-effort-medium-r1",
+      "commit": "3fee39e7c56d02575cecf74c87a774ee83b6f1a9",
+      "effort": "medium",
+      "evaluated": false
+    },
+    {
+      "dataset": "",
+      "case": "router-strategy-isolation",
+      "name": "high",
+      "label": "replication-v22-effort-high-r1",
+      "commit": "3fee39e7c56d02575cecf74c87a774ee83b6f1a9",
+      "effort": "high",
+      "evaluated": false
+    },
+    {
+      "dataset": "training2",
+      "case": "responses-custom-guardrail",
+      "name": "medium",
+      "label": "replication-v22-effort-medium-r2",
+      "commit": "3fee39e7c56d02575cecf74c87a774ee83b6f1a9",
+      "effort": "medium",
+      "evaluated": false
+    },
+    {
+      "dataset": "training2",
+      "case": "responses-custom-guardrail",
+      "name": "high",
+      "label": "replication-v22-effort-high-r2",
+      "commit": "3fee39e7c56d02575cecf74c87a774ee83b6f1a9",
+      "effort": "high",
+      "evaluated": false
+    },
+    {
+      "dataset": "",
+      "case": "router-strategy-isolation",
+      "name": "high",
+      "label": "replication-v22-effort-high-r2",
+      "commit": "3fee39e7c56d02575cecf74c87a774ee83b6f1a9",
+      "effort": "high",
+      "evaluated": false
+    },
+    {
+      "dataset": "",
+      "case": "router-strategy-isolation",
+      "name": "medium",
+      "label": "replication-v22-effort-medium-r2",
+      "commit": "3fee39e7c56d02575cecf74c87a774ee83b6f1a9",
+      "effort": "medium",
+      "evaluated": false
+    },
+    {
+      "dataset": "",
+      "case": "team-member-budget",
+      "name": "high",
+      "label": "replication-v22-effort-high-r2",
+      "commit": "3fee39e7c56d02575cecf74c87a774ee83b6f1a9",
+      "effort": "high",
+      "evaluated": false
+    },
+    {
+      "dataset": "",
+      "case": "team-member-budget",
+      "name": "medium",
+      "label": "replication-v22-effort-medium-r2",
+      "commit": "3fee39e7c56d02575cecf74c87a774ee83b6f1a9",
+      "effort": "medium",
+      "evaluated": false
+    },
+    {
+      "dataset": "training2",
+      "case": "mcp-auth-challenge",
+      "name": "medium",
+      "label": "replication-v22-effort-medium-r2",
+      "commit": "3fee39e7c56d02575cecf74c87a774ee83b6f1a9",
+      "effort": "medium",
+      "evaluated": false
+    },
+    {
+      "dataset": "training2",
+      "case": "mcp-auth-challenge",
+      "name": "high",
+      "label": "replication-v22-effort-high-r2",
+      "commit": "3fee39e7c56d02575cecf74c87a774ee83b6f1a9",
+      "effort": "high",
+      "evaluated": false
+    }
+  ]
+}
