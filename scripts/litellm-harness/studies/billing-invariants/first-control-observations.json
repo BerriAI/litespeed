@@ -292,10 +292,7 @@
     "combinedUsd": 0.07262254600000001,
     "fractionOfRunCost": 0.2515776068472604,
     "interpretation": "Two background-job updates alter message1 before the long transcript; tools and main system prompt remain equal. Both subsequent requests retain only about4.7k cached tokens. This identifies observed prefix churn and measured charges, not a measured counterfactual saving or general speed effect.",
-    "existingExperiment": [
-      "../job-events/README.md",
-      "../critic-job-evidence/README.md"
-    ]
+    "existingExperiment": "../job-events/README.md"
   },
   "staticDiagnostic": {
     "scope": "Posthoc one cost utility, same installed basedpyright1.39.7/environment as prior diagnostic. Not a whole-repository CI gate verdict; no functional score change.",
