@@ -1,6 +1,6 @@
 # Focused fresh-review pilot
 
-Four Flash calls reviewed two candidate patches using the task and selected source functions. They did not receive the human patch, hidden tests, acceptance results, previous critiques or the solver conversation. Function selection used known training failures, so this is a focused diagnostic, not a blind-review benchmark. Each case ran once with no reasoning and once with Medium reasoning, with a 16,384-token ceiling and no retries.
+Four Flash calls reviewed two candidate patches using the task and selected source functions. They did not receive the merged patch, hidden tests, acceptance results, previous critiques or the solver conversation. Function selection used known training failures, so this is a focused diagnostic, not a blind-review benchmark. Each case ran once with no reasoning and once with Medium reasoning, with a 16,384-token ceiling and no retries.
 
 | Candidate | Effort | Delivered result | Verified finding |
 |---|---|---|---|
@@ -9,7 +9,7 @@ Four Flash calls reviewed two candidate patches using the task and selected sour
 | Router candidate IDs | None | Normal, 774 completion tokens | No; one conditional allegation and one contradicted by actual routing |
 | Router candidate IDs | Medium | Normal, 10,880 completion tokens | Named-team precedence violation, plus one false allegation |
 
-The verified router finding is concrete: with a named team deployment and a global `openai/*` wildcard, the candidate reports both deployment IDs, but the router selects the team deployment and the exact human reference reports only that ID. This reproduces a known training counterexample without giving its expected outcome to the reviewer.
+The verified router finding is concrete: with a named team deployment and a global `openai/*` wildcard, the candidate reports both deployment IDs, but the router selects the team deployment and the exact merged reference reports only that ID. This reproduces a known training counterexample without giving its expected outcome to the reviewer.
 
 Both router reviews also suggested that `get_deployments_by_pattern` could return `None`, based on defensive callers. The omitted implementation explicitly returns a list or `[]`; the supposed missing guard is not a defect. The no-reasoning review's other-team witness likewise disagrees with both candidate and reference request selection. Witness results preserve these failed allegations, rather than counting them as additional defects.
 

@@ -4,20 +4,20 @@
   "variants": [
     {
       "variant": "plain",
-      "evaluated": 1,
+      "evaluated": 2,
       "expected": 17,
-      "successes": 1,
-      "meanSeconds": 775.106,
-      "tokenPricedUsd": 0.239552274,
+      "successes": 2,
+      "meanSeconds": 612.0705,
+      "tokenPricedUsd": 0.303676298,
       "trialsWithoutTokenPrice": 0
     },
     {
       "variant": "specialized",
-      "evaluated": 1,
+      "evaluated": 2,
       "expected": 17,
-      "successes": 1,
-      "meanSeconds": 394.102,
-      "tokenPricedUsd": 0.065284544,
+      "successes": 2,
+      "meanSeconds": 249.30349999999999,
+      "tokenPricedUsd": 0.08088672599999999,
       "trialsWithoutTokenPrice": 0
     }
   ],
@@ -25,7 +25,7 @@
     {
       "variant": "specialized",
       "control": "plain",
-      "pairedTasks": 1,
+      "pairedTasks": 2,
       "expectedTasks": 17,
       "complete": false,
       "pairs": [
@@ -34,12 +34,20 @@
           "case": "correlation-logging-cost",
           "successDelta": 0,
           "secondsDelta": -381.004
+        },
+        {
+          "dataset": "training6",
+          "case": "proxy-call-id-header",
+          "successDelta": 0,
+          "secondsDelta": -344.53000000000003
         }
       ],
       "successDelta": 0,
-      "secondsDelta": -381.004,
-      "taskBootstrap95": null,
-      "uncertaintyNote": "One task cannot estimate variation between tasks; no bootstrap interval is reported."
+      "secondsDelta": -362.76700000000005,
+      "taskBootstrap95": [
+        0,
+        0
+      ]
     }
   ],
   "trials": [
@@ -51,6 +59,7 @@
       "commit": "370f6fc500002b3e35ea7ac474107b2bb2a693b9",
       "effort": "medium",
       "kind": "litellm-specific",
+      "timeoutSeconds": 900,
       "evaluated": true,
       "success": true,
       "completed": true,
@@ -117,6 +126,7 @@
       "commit": "370f6fc500002b3e35ea7ac474107b2bb2a693b9",
       "effort": "medium",
       "kind": "single",
+      "timeoutSeconds": 900,
       "evaluated": true,
       "success": true,
       "completed": true,
@@ -183,7 +193,48 @@
       "commit": "370f6fc500002b3e35ea7ac474107b2bb2a693b9",
       "effort": "medium",
       "kind": "litellm-specific",
-      "evaluated": false
+      "timeoutSeconds": 900,
+      "evaluated": true,
+      "success": true,
+      "completed": true,
+      "completionReason": "completed",
+      "seconds": 104.505,
+      "acceptance": {
+        "exit": 0,
+        "tests": 5,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0,
+        "passed": true
+      },
+      "computedUsd": 0.015602182,
+      "activations": {
+        "initialMapNotices": 1,
+        "contextToolCalls": 1,
+        "guideIdsShown": [],
+        "unparsedContextPayloads": 1,
+        "finalReviewNotices": 1,
+        "guidedFinalReviewNotices": 0,
+        "finalReviewGuideIdsShown": [],
+        "batchedEditCalls": 0,
+        "completedBatchedEditCalls": 0,
+        "batchEditsRequested": 0,
+        "batchSizes": [],
+        "backgroundCommandNotices": 1,
+        "testFocusNotices": 0,
+        "explorationFocusNotices": 1,
+        "readCallsByEffectiveLimit": {
+          "120": 1,
+          "80": 1,
+          "100": 1,
+          "70": 1,
+          "110": 1,
+          "50": 1,
+          "12": 1
+        },
+        "defaultWindowReadCalls": null,
+        "readLimitProvenance": "unknown: saved arguments include host-injected defaults"
+      }
     },
     {
       "dataset": "training6",
@@ -193,7 +244,53 @@
       "commit": "370f6fc500002b3e35ea7ac474107b2bb2a693b9",
       "effort": "medium",
       "kind": "single",
-      "evaluated": false
+      "timeoutSeconds": 900,
+      "evaluated": true,
+      "success": true,
+      "completed": true,
+      "completionReason": "completed",
+      "seconds": 449.035,
+      "acceptance": {
+        "exit": 0,
+        "tests": 5,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0,
+        "passed": true
+      },
+      "computedUsd": 0.064124024,
+      "activations": {
+        "initialMapNotices": 0,
+        "contextToolCalls": 0,
+        "guideIdsShown": [],
+        "unparsedContextPayloads": 0,
+        "finalReviewNotices": 0,
+        "guidedFinalReviewNotices": 0,
+        "finalReviewGuideIdsShown": [],
+        "batchedEditCalls": 0,
+        "completedBatchedEditCalls": 0,
+        "batchEditsRequested": 0,
+        "batchSizes": [],
+        "backgroundCommandNotices": 0,
+        "testFocusNotices": 0,
+        "explorationFocusNotices": 0,
+        "readCallsByEffectiveLimit": {
+          "240": 1,
+          "160": 1,
+          "120": 2,
+          "80": 1,
+          "35": 1,
+          "60": 1,
+          "20": 2,
+          "70": 1,
+          "48": 1,
+          "75": 1,
+          "28": 1,
+          "18": 1
+        },
+        "defaultWindowReadCalls": null,
+        "readLimitProvenance": "unknown: saved arguments include host-injected defaults"
+      }
     },
     {
       "dataset": "training6",
@@ -203,6 +300,7 @@
       "commit": "370f6fc500002b3e35ea7ac474107b2bb2a693b9",
       "effort": "medium",
       "kind": "litellm-specific",
+      "timeoutSeconds": 900,
       "evaluated": false
     },
     {
@@ -213,6 +311,7 @@
       "commit": "370f6fc500002b3e35ea7ac474107b2bb2a693b9",
       "effort": "medium",
       "kind": "single",
+      "timeoutSeconds": 900,
       "evaluated": false
     },
     {
@@ -223,6 +322,7 @@
       "commit": "370f6fc500002b3e35ea7ac474107b2bb2a693b9",
       "effort": "medium",
       "kind": "litellm-specific",
+      "timeoutSeconds": 900,
       "evaluated": false
     },
     {
@@ -233,6 +333,7 @@
       "commit": "370f6fc500002b3e35ea7ac474107b2bb2a693b9",
       "effort": "medium",
       "kind": "single",
+      "timeoutSeconds": 900,
       "evaluated": false
     },
     {
@@ -243,6 +344,7 @@
       "commit": "370f6fc500002b3e35ea7ac474107b2bb2a693b9",
       "effort": "medium",
       "kind": "single",
+      "timeoutSeconds": 900,
       "evaluated": false
     },
     {
@@ -253,6 +355,7 @@
       "commit": "370f6fc500002b3e35ea7ac474107b2bb2a693b9",
       "effort": "medium",
       "kind": "litellm-specific",
+      "timeoutSeconds": 900,
       "evaluated": false
     },
     {
@@ -263,6 +366,7 @@
       "commit": "370f6fc500002b3e35ea7ac474107b2bb2a693b9",
       "effort": "medium",
       "kind": "litellm-specific",
+      "timeoutSeconds": 900,
       "evaluated": false
     },
     {
@@ -273,6 +377,7 @@
       "commit": "370f6fc500002b3e35ea7ac474107b2bb2a693b9",
       "effort": "medium",
       "kind": "single",
+      "timeoutSeconds": 900,
       "evaluated": false
     },
     {
@@ -283,6 +388,7 @@
       "commit": "370f6fc500002b3e35ea7ac474107b2bb2a693b9",
       "effort": "medium",
       "kind": "single",
+      "timeoutSeconds": 900,
       "evaluated": false
     },
     {
@@ -293,6 +399,7 @@
       "commit": "370f6fc500002b3e35ea7ac474107b2bb2a693b9",
       "effort": "medium",
       "kind": "litellm-specific",
+      "timeoutSeconds": 900,
       "evaluated": false
     },
     {
@@ -303,6 +410,7 @@
       "commit": "370f6fc500002b3e35ea7ac474107b2bb2a693b9",
       "effort": "medium",
       "kind": "single",
+      "timeoutSeconds": 900,
       "evaluated": false
     },
     {
@@ -313,6 +421,7 @@
       "commit": "370f6fc500002b3e35ea7ac474107b2bb2a693b9",
       "effort": "medium",
       "kind": "litellm-specific",
+      "timeoutSeconds": 900,
       "evaluated": false
     },
     {
@@ -323,6 +432,7 @@
       "commit": "370f6fc500002b3e35ea7ac474107b2bb2a693b9",
       "effort": "medium",
       "kind": "litellm-specific",
+      "timeoutSeconds": 900,
       "evaluated": false
     },
     {
@@ -333,6 +443,7 @@
       "commit": "370f6fc500002b3e35ea7ac474107b2bb2a693b9",
       "effort": "medium",
       "kind": "single",
+      "timeoutSeconds": 900,
       "evaluated": false
     },
     {
@@ -343,6 +454,7 @@
       "commit": "370f6fc500002b3e35ea7ac474107b2bb2a693b9",
       "effort": "medium",
       "kind": "single",
+      "timeoutSeconds": 900,
       "evaluated": false
     },
     {
@@ -353,6 +465,7 @@
       "commit": "370f6fc500002b3e35ea7ac474107b2bb2a693b9",
       "effort": "medium",
       "kind": "litellm-specific",
+      "timeoutSeconds": 900,
       "evaluated": false
     },
     {
@@ -363,6 +476,7 @@
       "commit": "370f6fc500002b3e35ea7ac474107b2bb2a693b9",
       "effort": "medium",
       "kind": "single",
+      "timeoutSeconds": 900,
       "evaluated": false
     },
     {
@@ -373,6 +487,7 @@
       "commit": "370f6fc500002b3e35ea7ac474107b2bb2a693b9",
       "effort": "medium",
       "kind": "litellm-specific",
+      "timeoutSeconds": 900,
       "evaluated": false
     },
     {
@@ -383,6 +498,7 @@
       "commit": "370f6fc500002b3e35ea7ac474107b2bb2a693b9",
       "effort": "medium",
       "kind": "litellm-specific",
+      "timeoutSeconds": 900,
       "evaluated": false
     },
     {
@@ -393,6 +509,7 @@
       "commit": "370f6fc500002b3e35ea7ac474107b2bb2a693b9",
       "effort": "medium",
       "kind": "single",
+      "timeoutSeconds": 900,
       "evaluated": false
     },
     {
@@ -403,6 +520,7 @@
       "commit": "370f6fc500002b3e35ea7ac474107b2bb2a693b9",
       "effort": "medium",
       "kind": "litellm-specific",
+      "timeoutSeconds": 900,
       "evaluated": false
     },
     {
@@ -413,6 +531,7 @@
       "commit": "370f6fc500002b3e35ea7ac474107b2bb2a693b9",
       "effort": "medium",
       "kind": "single",
+      "timeoutSeconds": 900,
       "evaluated": false
     },
     {
@@ -423,6 +542,7 @@
       "commit": "370f6fc500002b3e35ea7ac474107b2bb2a693b9",
       "effort": "medium",
       "kind": "litellm-specific",
+      "timeoutSeconds": 900,
       "evaluated": false
     },
     {
@@ -433,6 +553,7 @@
       "commit": "370f6fc500002b3e35ea7ac474107b2bb2a693b9",
       "effort": "medium",
       "kind": "single",
+      "timeoutSeconds": 900,
       "evaluated": false
     },
     {
@@ -443,6 +564,7 @@
       "commit": "370f6fc500002b3e35ea7ac474107b2bb2a693b9",
       "effort": "medium",
       "kind": "single",
+      "timeoutSeconds": 900,
       "evaluated": false
     },
     {
@@ -453,6 +575,7 @@
       "commit": "370f6fc500002b3e35ea7ac474107b2bb2a693b9",
       "effort": "medium",
       "kind": "litellm-specific",
+      "timeoutSeconds": 900,
       "evaluated": false
     },
     {
@@ -463,6 +586,7 @@
       "commit": "370f6fc500002b3e35ea7ac474107b2bb2a693b9",
       "effort": "medium",
       "kind": "single",
+      "timeoutSeconds": 900,
       "evaluated": false
     },
     {
@@ -473,6 +597,7 @@
       "commit": "370f6fc500002b3e35ea7ac474107b2bb2a693b9",
       "effort": "medium",
       "kind": "litellm-specific",
+      "timeoutSeconds": 900,
       "evaluated": false
     },
     {
@@ -483,6 +608,7 @@
       "commit": "370f6fc500002b3e35ea7ac474107b2bb2a693b9",
       "effort": "medium",
       "kind": "single",
+      "timeoutSeconds": 900,
       "evaluated": false
     },
     {
@@ -493,6 +619,7 @@
       "commit": "370f6fc500002b3e35ea7ac474107b2bb2a693b9",
       "effort": "medium",
       "kind": "litellm-specific",
+      "timeoutSeconds": 900,
       "evaluated": false
     }
   ]

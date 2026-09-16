@@ -9,9 +9,9 @@ The [diagnostic](probe.py) sends unsorted tags through direct, external-ID, IRSA
 | Snapshot | Tag values/credentials | STS tuple | Sent key order |
 |---|---:|---|---|
 | Pre-fix base | 0/4 | Parameter unsupported | — |
-| Exact human reference | 4/4 | Yes | `team, env` |
+| Exact merged reference | 4/4 | Yes | `team, env` |
 | Candidate | 4/4 | Yes | `env, team` |
 
-[Qualification](qualification.json) records exact base/reference commits, guarded module origins, fresh bytecode policy and candidate status. This confirms a contradiction between the curated task and the reference oracle. It does not turn the diagnostic into a replacement 34-check score or establish a completed solution. The narrower tag-value check intentionally does not pretend that the human reference satisfies the prompt's stronger sorting requirement at these direct helper boundaries.
+[Qualification](qualification.json) records exact base/reference commits, guarded module origins, fresh bytecode policy and candidate status. This confirms a contradiction between the curated task and the reference oracle. It does not turn the diagnostic into a replacement 34-check score or establish a completed solution. The narrower tag-value check intentionally does not pretend that the merged reference satisfies the prompt's stronger sorting requirement at these direct helper boundaries.
 
 Frozen study requirements and tests are retained for audit. Do not teach a production harness to preserve a particular mock's tag order merely to improve these raw scores. Future benchmark curation must state where canonical ordering is required and where forwarding caller order is allowed, then qualify that stated contract against the reference.

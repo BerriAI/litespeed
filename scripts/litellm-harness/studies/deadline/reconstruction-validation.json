@@ -1,0 +1,39 @@
+{
+  "at": "2026-09-16T11:09:08.669259+00:00",
+  "publicBase": "7faf6883c01fb0191412e03d1e60a2736ae93f39",
+  "patches": [
+    {
+      "path": "scripts/litellm-harness/studies/combined-candidate/integration-v46.patch",
+      "sha256": "e9fcb2438e94531e4c28ea3d50b6b78b714ed2019a41ad89ba4379ef35428a8e"
+    },
+    {
+      "path": "scripts/litellm-harness/studies/deadline/replay-config.patch",
+      "sha256": "cca60d78c60d55b85e772271239989ea223fc97c069404e7fb7b605d5f655ca9"
+    }
+  ],
+  "targetExperimentCommit": "8e0a6d40d66f13f73f6174073836ff43919c4282",
+  "method": "Fresh git archive of public base; git apply --check then apply each patch in order; byte-compare every target file in declared application/test directories and exact replay files. No dependency installation or model call.",
+  "directories": [
+    "server",
+    "shared",
+    "client",
+    "tui",
+    "tests"
+  ],
+  "exactFiles": [
+    "package.json",
+    "package-lock.json",
+    "tsconfig.json",
+    "scripts/litellm-harness/run.ts",
+    "scripts/litellm-harness/solve.ts",
+    "scripts/litellm-harness/isolation.ts",
+    "scripts/litellm-harness/preflight.ts",
+    "scripts/litellm-harness/budget.ts",
+    "scripts/litellm-harness/score.py",
+    "scripts/litellm-harness/fixtures.py",
+    "scripts/litellm-harness/recover.py"
+  ],
+  "filesCompared": 335,
+  "allComparedFilesEqual": true,
+  "excludedDifferences": "Historical reporting scripts, study archives and documentation differ between the original private v46 branch and the later public base. They are not needed by the isolated solver. Use the current main workbench for report export, as the study instructions specify."
+}

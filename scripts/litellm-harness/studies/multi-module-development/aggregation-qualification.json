@@ -1,0 +1,164 @@
+{
+  "base": {
+    "rows": [
+      {
+        "name": "two-splits",
+        "pass": false,
+        "observed": {
+          "prompt": 433,
+          "total": 433,
+          "cached": 292,
+          "cachedText": null,
+          "cachedAudio": null,
+          "cachedImage": null
+        },
+        "expected": {
+          "prompt": 433,
+          "total": 433,
+          "cached": 292,
+          "cachedText": 64,
+          "cachedAudio": 228,
+          "cachedImage": null
+        },
+        "inputsUnchanged": true
+      },
+      {
+        "name": "split-then-absent",
+        "pass": false,
+        "observed": {
+          "prompt": 433,
+          "total": 433,
+          "cached": 292,
+          "cachedText": null,
+          "cachedAudio": null,
+          "cachedImage": null
+        },
+        "expected": {
+          "prompt": 433,
+          "total": 433,
+          "cached": 292,
+          "cachedText": 64,
+          "cachedAudio": 128,
+          "cachedImage": null
+        },
+        "inputsUnchanged": true
+      },
+      {
+        "name": "absent-then-split",
+        "pass": false,
+        "observed": {
+          "prompt": 433,
+          "total": 433,
+          "cached": 292,
+          "cachedText": null,
+          "cachedAudio": null,
+          "cachedImage": null
+        },
+        "expected": {
+          "prompt": 433,
+          "total": 433,
+          "cached": 292,
+          "cachedText": 64,
+          "cachedAudio": 128,
+          "cachedImage": null
+        },
+        "inputsUnchanged": true
+      },
+      {
+        "name": "absent-split-serialization",
+        "pass": true,
+        "omittedFromDict": true,
+        "omittedFromJson": true
+      }
+    ],
+    "passed": false,
+    "imports": {
+      "packageOrigin": "litellm/__init__.py",
+      "allLiteLLMModulesWithinWorkspace": true,
+      "moduleCount": 813
+    },
+    "bytecodePolicy": "fresh cache path; reads from adjacent caches and all writes disabled",
+    "exit": 0
+  },
+  "reference": {
+    "rows": [
+      {
+        "name": "two-splits",
+        "pass": true,
+        "observed": {
+          "prompt": 433,
+          "total": 433,
+          "cached": 292,
+          "cachedText": 64,
+          "cachedAudio": 228,
+          "cachedImage": null
+        },
+        "expected": {
+          "prompt": 433,
+          "total": 433,
+          "cached": 292,
+          "cachedText": 64,
+          "cachedAudio": 228,
+          "cachedImage": null
+        },
+        "inputsUnchanged": true
+      },
+      {
+        "name": "split-then-absent",
+        "pass": true,
+        "observed": {
+          "prompt": 433,
+          "total": 433,
+          "cached": 292,
+          "cachedText": 64,
+          "cachedAudio": 128,
+          "cachedImage": null
+        },
+        "expected": {
+          "prompt": 433,
+          "total": 433,
+          "cached": 292,
+          "cachedText": 64,
+          "cachedAudio": 128,
+          "cachedImage": null
+        },
+        "inputsUnchanged": true
+      },
+      {
+        "name": "absent-then-split",
+        "pass": true,
+        "observed": {
+          "prompt": 433,
+          "total": 433,
+          "cached": 292,
+          "cachedText": 64,
+          "cachedAudio": 128,
+          "cachedImage": null
+        },
+        "expected": {
+          "prompt": 433,
+          "total": 433,
+          "cached": 292,
+          "cachedText": 64,
+          "cachedAudio": 128,
+          "cachedImage": null
+        },
+        "inputsUnchanged": true
+      },
+      {
+        "name": "absent-split-serialization",
+        "pass": true,
+        "omittedFromDict": true,
+        "omittedFromJson": true
+      }
+    ],
+    "passed": true,
+    "imports": {
+      "packageOrigin": "litellm/__init__.py",
+      "allLiteLLMModulesWithinWorkspace": true,
+      "moduleCount": 813
+    },
+    "bytecodePolicy": "fresh cache path; reads from adjacent caches and all writes disabled",
+    "exit": 0
+  }
+}

@@ -1,0 +1,72 @@
+{
+  "status": "interim",
+  "note": "Development selection only. Interim observed-task means can change as slower trials finish. Bootstrap resamples tasks, not attempts; it does not correct adaptive candidate selection or establish future generalization. Token prices exclude requests without usage and do not replace the campaign ledger.",
+  "variants": [
+    {
+      "variant": "astra",
+      "evaluated": 0,
+      "expected": 2
+    },
+    {
+      "variant": "flash",
+      "evaluated": 0,
+      "expected": 2
+    }
+  ],
+  "comparisons": [
+    {
+      "variant": "flash",
+      "control": "astra",
+      "pairedTasks": 0,
+      "expectedTasks": 1,
+      "complete": false,
+      "pairs": []
+    }
+  ],
+  "trials": [
+    {
+      "dataset": "training7",
+      "case": "realtime-cached-audio-cost",
+      "name": "astra",
+      "label": "replication-v50-larger-astra-r1",
+      "commit": "8e0a6d40d66f13f73f6174073836ff43919c4282",
+      "effort": "high",
+      "kind": "codex",
+      "timeoutSeconds": 1800,
+      "evaluated": false
+    },
+    {
+      "dataset": "training7",
+      "case": "realtime-cached-audio-cost",
+      "name": "flash",
+      "label": "replication-v50-larger-flash-r1",
+      "commit": "8e0a6d40d66f13f73f6174073836ff43919c4282",
+      "effort": "medium",
+      "kind": "litellm-specific",
+      "timeoutSeconds": 1800,
+      "evaluated": false
+    },
+    {
+      "dataset": "training7",
+      "case": "realtime-cached-audio-cost",
+      "name": "flash",
+      "label": "replication-v50-larger-flash-r2",
+      "commit": "8e0a6d40d66f13f73f6174073836ff43919c4282",
+      "effort": "medium",
+      "kind": "litellm-specific",
+      "timeoutSeconds": 1800,
+      "evaluated": false
+    },
+    {
+      "dataset": "training7",
+      "case": "realtime-cached-audio-cost",
+      "name": "astra",
+      "label": "replication-v50-larger-astra-r2",
+      "commit": "8e0a6d40d66f13f73f6174073836ff43919c4282",
+      "effort": "high",
+      "kind": "codex",
+      "timeoutSeconds": 1800,
+      "evaluated": false
+    }
+  ]
+}

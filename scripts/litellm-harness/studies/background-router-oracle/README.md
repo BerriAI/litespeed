@@ -20,7 +20,7 @@ The [qualification record](qualification.json) identifies exact source revisions
 
 The Medium-reasoning attempt `17f57e85` also had a 6/7 raw score, but replacing only the router mock still failed. Its patch chose the metadata field through the existing request-route helper. The human test left both the request's ASGI scope and URL path unconfigured, so the mocked route did not identify a Responses endpoint.
 
-A [second diagnostic](test_real_router_and_request.py) adds a concrete GET `/v1/responses/{id}` scope and URL to the request double, together with the real Router; it keeps the original entrypoint and assertions. The starting code fails, the human reference passes, and all three inspected candidate patches pass (High `4c64c9b6`, Medium `17f57e85`, grouped edits `3080a797`). [Recorded outcomes](request-path-diagnostic.json).
+A [second diagnostic](test_real_router_and_request.py) adds a concrete GET `/v1/responses/{id}` scope and URL to the request double, together with the real Router; it keeps the original entrypoint and assertions. The starting code fails, the merged reference passes, and all three inspected candidate patches pass (High `4c64c9b6`, Medium `17f57e85`, grouped edits `3080a797`). [Recorded outcomes](request-path-diagnostic.json).
 
 **The Medium attempt still timed out at 900 seconds and does not count as a completed solution.** Neither diagnostic upgrades its completion status or changes the original 6/7 score. These checks demonstrate how two different incomplete test doubles can reject valid implementation choices; they do not certify the rest of an unfinished patch.
 

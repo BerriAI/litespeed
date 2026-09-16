@@ -1,6 +1,6 @@
 # Navigation query breadth: rejected local probes
 
-These read-only development probes used 20 previously inspected training cases, each at its recorded pre-merge checkout. The query was the first 1,000 characters of the curated task. We compared surfaced source paths with the human reference's changed source paths and suggested tests with the original selected test files. Those are descriptive overlap counts, not required-file recall: reference changes can add new files absent from the starting checkout, alternative fixes can touch different files, and the selected tests are not exhaustive. Counts neither establish solver correctness nor held-out generalization.
+These read-only development probes used 20 previously inspected training cases, each at its recorded pre-merge checkout. The query was the first 1,000 characters of the curated task. We compared surfaced source paths with the merged reference's changed source paths and suggested tests with the original selected test files. Those are descriptive overlap counts, not required-file recall: reference changes can add new files absent from the starting checkout, alternative fixes can touch different files, and the selected tests are not exhaustive. Counts neither establish solver correctness nor held-out generalization.
 
 The baseline is production v34. Four uncommitted experimental variants were tried sequentially on the same desktop:
 

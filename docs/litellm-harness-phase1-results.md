@@ -38,7 +38,7 @@ The [review](../scripts/litellm-harness/integrity-review.json) records each affe
 ## What the reference checks miss or overconstrain
 
 - **MAI image parameters:** several reference checks prescribe an exception subclass and exact prose, whereas the task asks for HTTP 400. The separate post-hoc probe below checks the stated status-code contract. It does not replace the frozen scores.
-- **Router request tags:** one of two checks imports `ROUTING_REQUEST_TAGS_METADATA_KEY`, a constant introduced by the human patch. An implementation can preserve caller tags using a different private representation. The other check exercises actual retry selection and logging metadata.
+- **Router request tags:** one of two checks imports `ROUTING_REQUEST_TAGS_METADATA_KEY`, a constant introduced by the merged patch. An implementation can preserve caller tags using a different private representation. The other check exercises actual retry selection and logging metadata.
 - **Team router names:** several checks call private helpers using newly introduced argument names. Other failures exercise real compression ordering or tagged deployment selection. A raw failing row does not identify which kind occurred.
 - **Router retry deployment:** missed async adapter and batch entrypoints are real behavior gaps, not merely naming or diagnostic differences.
 
@@ -46,7 +46,7 @@ Base/reference qualification catches broken environments but does not make a ref
 
 ### Separate MAI HTTP-status probe
 
-The [probe](../scripts/litellm-harness/probes/mai_http_errors.py) checks 15 invalid size/count inputs for HTTP 400, without requiring an exception subclass or phrase. It fails on the base and passes on the human reference. This is a post-hoc diagnostic, not a replacement benchmark.
+The [probe](../scripts/litellm-harness/probes/mai_http_errors.py) checks 15 invalid size/count inputs for HTTP 400, without requiring an exception subclass or phrase. It fails on the base and passes on the merged reference. This is a post-hoc diagnostic, not a replacement benchmark.
 
 | Snapshot/run | HTTP checks passed |
 |---|---:|
