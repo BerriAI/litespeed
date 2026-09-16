@@ -159,7 +159,7 @@ export class Jobs {
 
   /** bash_output: return new output since the last read, advancing the cursor.
    * Optionally block up to wait_ms for a change. */
-  async output(sessionId: string, jobId: string, waitMs: number): Promise<string> {
+  async output(sessionId: string, jobId: string, waitMs: number, onRead?: (job: JobView) => void): Promise<string> {
     let job = this.find(sessionId, jobId);
     if (!job) return RESTART_NOTE;
     if (waitMs > 0 && job.cursor >= job.output.length && job.status === 'running') await this.waitChange(job, waitMs);
@@ -170,6 +170,7 @@ export class Jobs {
     const header = this.statusLine(job);
     const trimNote = dropped > 0 || (job.truncated && job.cursor === 0) ? `\n[${dropped > 0 ? `${dropped} earlier byte(s) dropped from the 64 KiB rolling buffer.` : 'Output buffer trimmed to the last 64 KiB.'}]` : '';
     const body = slice.length ? slice.toString('utf8') : '[No new output.]';
+    onRead?.(this.view(job));
     return `${header}${trimNote}\n${body}`;
   }
 
@@ -251,8 +252,8 @@ function optionalMs(args: Record<string, unknown>, key: string, fallback: number
 
 /** bash_output execution, dispatched by the runner (mirrors executeToolOutputPage).
  * async so invalid arguments surface as a rejected promise, not a sync throw. */
-export async function executeBashOutput(jobs: Jobs, sessionId: string, args: Record<string, unknown>): Promise<string> {
-  return jobs.output(sessionId, requireJobId(args), optionalMs(args, 'wait_ms', 0, 0, 30_000));
+export async function executeBashOutput(jobs: Jobs, sessionId: string, args: Record<string, unknown>, onRead?: (job: JobView) => void): Promise<string> {
+  return jobs.output(sessionId, requireJobId(args), optionalMs(args, 'wait_ms', 0, 0, 30_000), onRead);
 }
 /** kill_shell execution, dispatched by the runner. */
 export async function executeKillShell(jobs: Jobs, sessionId: string, args: Record<string, unknown>): Promise<string> {

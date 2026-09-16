@@ -1,6 +1,6 @@
 # Prepared combined candidate
 
-**Not promoted.** A separately frozen 16-trial development comparison is queued; production remains v34 while the component and integration comparisons finish.
+**Not promoted.** A separately frozen 16-trial development comparison is queued; the feature combination remains experimental while component and integration comparisons finish.
 
 The [patch](candidate.patch) combines grouped edits with chronological background-job notices. It includes the provider gate required for Anthropic and Codex compatibility. It does not add the experimental inspection preference or streaming guide. Browser summaries show the number of edits, and host command notices are collapsed with their full text available in web and terminal.
 
@@ -14,4 +14,4 @@ The [plan](plan.json) fixes two repetitions per arm on Databricks reasoning, MCP
 
 ## Isolation amendment before allocation
 
-The [original protocol-6 plan](plan-v1.json) allocated no trials. The [amendment](protocol7-amendment.json) pins both arms to the corrected runtime-artifact boundary, keeping all tasks and comparison conditions unchanged. The original feature patch and preparation record remain historical. Both actual model routes must pass the [isolation smoke](../runtime-artifact-isolation/README.md) before this comparison starts.
+The [original protocol-6 plan](plan-v1.json) allocated no trials. The [amendment](protocol7-amendment.json) pins both arms to the corrected runtime-artifact boundary, keeping all tasks and comparison conditions unchanged. The original feature patch and preparation record remain historical. Production subsequently receives the independent v45 final-output delivery correction; the study preserves its frozen v34-based control and candidate, which both precede that correction. Both actual model routes must pass the [isolation smoke](../runtime-artifact-isolation/README.md) before this comparison starts.

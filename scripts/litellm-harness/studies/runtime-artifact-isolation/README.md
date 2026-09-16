@@ -7,3 +7,7 @@ A [trace audit](trace-audit.json) scanned 13,290 recorded tool/command arguments
 Protocol 7 blocks runtime `docs`, `tests`, `scripts` and the Git pointer, with exact exceptions for `solve.ts` and `budget.ts`. Application source and dependency imports remain usable. macOS regression checks exercise direct reads, subprocess reads, symlinks and attempted hardlinks. An actual isolated application import succeeds while the existing runtime report is denied. The navigator's learned instructions remain intentionally available as part of the architecture.
 
 No combined-candidate trial had allocated when new admissions were paused. Its original plan is retained; both arms are rebuilt with the same protocol-7 boundary. The [smoke plan](smoke-plan.json) requires one known training task to finish correctly through each actual model route before the combined comparison can begin. Previously frozen training studies continue under their declared protocol6 and remain labeled. Future chronological evaluation must use protocol7 or stronger. Network access for inference remains available; this is not a complete adversarial isolation claim.
+
+## Actual route smoke results
+
+Both Flash and Astra complete the known training task normally and pass 2/2 acceptance checks under protocol 7. [Results](smoke-results.json). This releases the combined study gate; it is startup validation, not a quality comparison.

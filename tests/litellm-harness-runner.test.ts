@@ -117,6 +117,7 @@ describe('LiteLLM-specific runner integration',()=>{
     expect(calls.filter(call=>call.name==='bash_output').every(call=>!call.execution)).toBe(true);
     expect(calls.filter(call=>call.name==='bash').map(call=>call.execution?.status)).toEqual(['exited','exited','exited','exited']);
     expect(messages.filter(message=>message.content.startsWith('LiteLLM verification checkpoint:'))).toHaveLength(1);
-    expect(requests).toHaveLength(14);
+    expect(requests).toHaveLength(13); // Twelve tool rounds and one answer; final outputs were already read.
+    expect(messages.some(message=>message.content.startsWith('Previously yielded commands'))).toBe(false);
   });
 });

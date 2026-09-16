@@ -74,7 +74,7 @@ type ActiveRun = { discoveryError?:string; unavailableRoutes?:Map<string,string>
    * land between steps, never inside a tool execution; steeringDelivered marks
    * how many were already drained. In-memory only: cancellation or any run end
    * discards undelivered notes with the run. */
-  commandJobs?: Map<string, { snapshot: string; message: Message; call: ToolCall }>;
+  commandJobs?: Map<string, { snapshot: string; message: Message; call: ToolCall; finalOutputDelivered?: boolean }>;
   /** Explicit interrupt may advance the queue only after cancellation and history sealing finish. */
   advanceQueue?: boolean;
   verificationNote?: string; commandProgress?: () => void;
@@ -1747,11 +1747,14 @@ export class Runner {
       if (!message.toolCalls?.length && (run.steering?.length??0)>(run.steeringDelivered??0))continue;
       if(!message.toolCalls?.length&&run.scheduler?.pending()&&run.scheduler.canProgress()){message.activity='Waiting for task results';this.save(message);await run.scheduler.wait();message.activity='';this.save(message);this.deliverTaskEvents(id,run);continue;}
       if (!message.toolCalls?.length && run.commandJobs?.size) {
+        const needsOutput=[...run.commandJobs.values()].some(pending=>!pending.finalOutputDelivered);
         message.activity = 'Waiting for the running command to finish.'; this.save(message);
         await this.finishCommandJobs(id,run,signal);
         message.activity = ''; this.save(message);
-        this.save({ id:randomUUID(),sessionId:id,role:'system',content:'Previously yielded commands have finished. Read their output with bash_output before reporting verification results.',createdAt:Date.now() });
-        continue;
+        if(needsOutput) {
+          this.save({ id:randomUUID(),sessionId:id,role:'system',content:'Previously yielded commands have finished. Read their output with bash_output before reporting verification results.',createdAt:Date.now() });
+          continue;
+        }
       }
       if (!message.toolCalls?.length) {
         if(run.scheduler&&!run.scheduler.canProgress()&&this.tasks.list(id).some(task=>task.turnId===run.turnId&&task.status==='queued')){run.blocked=true;message.content+='\n\n[Some tasks are waiting on unresolved prerequisites. Review the task queue before continuing.]';}
@@ -1795,6 +1798,7 @@ export class Runner {
       let parallel:ParallelWorkers|undefined;
       const executeCall=async(call:ToolCall) => {
         let output = '', questionStarted = false, executed = false, deferredForSteering=false, commandSnapshot: string | undefined;
+        let readFinishedJob:string|undefined;
         // view_image delivery (5.5): images a tool offers for THIS call, placed
         // on the persisted tool-result message so providerMessages can project
         // them as image parts. Attach only on routes whose adapter actually
@@ -1952,7 +1956,7 @@ export class Runner {
               if(!repairOf||!run.unresolvedWorkers?.has(repairOf))throw conflict('Specify the unresolved invocationId for this takeover.');
               run.takeover={remaining:3,files:files as string[],repairOf};
             }
-            output = call.name==='takeover' ? 'Bounded driver takeover recorded: up to three file edits on the listed paths. Run verification afterward.' : call.name==='update_goal' ? this.executeUpdateGoal(id,run,call.args) : call.name==='history_search' ? this.executeHistorySearch(id,call.args) : call.name==='tool_output_page' ? executeToolOutputPage(this.store,id,call.args) : call.name==='bash_output' ? await executeBashOutput(this.jobs,id,call.args) : call.name==='kill_shell' ? await executeKillShell(this.jobs,id,call.args) : call.name==='wait' ? await executeWait(this.jobs,id,call.args) : call.name.startsWith('memory_') ? this.executeMemory(session.workspace,call.name,call.args) : call.name==='capability' ? await this.executeCapability(id,run,message,call,content=>hookNotices.push(content)) : call.name.startsWith('mcp_') ? await run.external!.execute(call.name,call.args,signal) : await executeTool(call.name==='verify'?'bash':call.name,call.name==='verify'?verificationCommand(call.args):call.args,{
+            output = call.name==='takeover' ? 'Bounded driver takeover recorded: up to three file edits on the listed paths. Run verification afterward.' : call.name==='update_goal' ? this.executeUpdateGoal(id,run,call.args) : call.name==='history_search' ? this.executeHistorySearch(id,call.args) : call.name==='tool_output_page' ? executeToolOutputPage(this.store,id,call.args) : call.name==='bash_output' ? await executeBashOutput(this.jobs,id,call.args,job=>{if(job.status!=='running')readFinishedJob=job.id;}) : call.name==='kill_shell' ? await executeKillShell(this.jobs,id,call.args) : call.name==='wait' ? await executeWait(this.jobs,id,call.args) : call.name.startsWith('memory_') ? this.executeMemory(session.workspace,call.name,call.args) : call.name==='capability' ? await this.executeCapability(id,run,message,call,content=>hookNotices.push(content)) : call.name.startsWith('mcp_') ? await run.external!.execute(call.name,call.args,signal) : await executeTool(call.name==='verify'?'bash':call.name,call.name==='verify'?verificationCommand(call.args):call.args,{
               workspace:session.workspace,sessionId:id,signal,fileAccess:this.approvedPaths.get(call),
               executeShell: (command, cwd, waitMs) => this.executeCommand(id, run, message, call, command, cwd, waitMs),
               onExecution: execution => { call.execution = execution; },
@@ -2020,6 +2024,12 @@ export class Runner {
         // Attachments ride ONLY a completed result: an errored call must not
         // deliver an image its own output no longer describes.
         this.save({id:randomUUID(),sessionId:id,role:'tool',content:output,toolCallId:call.id,createdAt:Date.now(),...(call.status==='completed'&&toolAttachments.length?{attachments:toolAttachments}:{})});
+        // Only an actually delivered model tool result acknowledges final output.
+        // Direct registry reads, waits and polls that returned a running status do not.
+        if(call.status==='completed'&&readFinishedJob) {
+          const pending=run.commandJobs?.get(readFinishedJob);
+          if(pending)pending.finalOutputDelivered=true;
+        }
         // Deferred hook notices land AFTER the tool result row so the
         // assistant tool_call / tool result adjacency stays intact.
         flushHookNotices();

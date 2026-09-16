@@ -77,6 +77,39 @@ describe('background shell jobs in the Runner', () => {
     expect(prompts(s.id)).toEqual([]);
   });
 
+  it.each([undefined, {kind:'litellm-specific'}])('does not request another answer after the model reads a yielded command at exit (%j)', async architecture => {
+    const actions=[
+      {name:'bash',args:{command:'sleep 0.15; echo completed > result.txt; echo FINAL_OUTPUT',timeout_ms:1}},
+      {name:'wait',args:{job_ids:['job-1'],timeout_ms:2000}},
+      {name:'bash_output',args:{job_id:'job-1',wait_ms:0}},
+    ];
+    respond=(_body,res)=>{const action=actions.shift();action?tools(res,[action]):text(res,'Read the completed output.');};
+    const session=await create({permissionMode:'auto',architecture});await run(session.id);
+    expect(toolCalls(session.id).find(call=>call.name==='bash_output')?.output).toContain('Status: exited (code 0)');
+    expect(calls).toHaveLength(architecture?5:4); // Changed LiteLLM turns still get their final review.
+    expect(store.messages(session.id).some(message=>message.content.startsWith('Previously yielded commands'))).toBe(false);
+    expect(toolCalls(session.id).find(call=>call.name==='bash')?.changes?.map(change=>change.path)).toContain('result.txt');
+    expect(await readFile(join(directory,'result.txt'),'utf8')).toBe('completed\n');
+    await runner.exclusive(session.id,()=>runner.history.undo(session.id,runner.history.state(session.id).undoId!));
+    await expect(readFile(join(directory,'result.txt'),'utf8')).rejects.toMatchObject({code:'ENOENT'});
+  });
+
+  it.each(['wait-only','direct-read','partial-read'])('still requests final output when only %s happened', async mode => {
+    let step=0;
+    respond=(_body,res)=>{
+      if(step++===0)return tools(res,[{name:'bash',args:{command:'sleep 0.25; echo LATE_OUTPUT',timeout_ms:1}}]);
+      if(step===2)return tools(res,[mode==='partial-read'
+        ?{name:'bash_output',args:{job_id:'job-1',wait_ms:0}}
+        :{name:'wait',args:{job_ids:['job-1'],timeout_ms:2000}}]);
+      if(mode==='direct-read'&&step===3){void runner.jobs.output(session.id,'job-1',0).then(()=>text(res,'Finished.'));return;}
+      text(res,'Finished.');
+    };
+    const session=await create({permissionMode:'auto'});await run(session.id);
+    if(mode==='partial-read')expect(toolCalls(session.id).find(call=>call.name==='bash_output')?.output).toContain('Status: running');
+    expect(calls).toHaveLength(4);
+    expect(store.messages(session.id).filter(message=>message.content.startsWith('Previously yielded commands'))).toHaveLength(1);
+  });
+
   it('waits for a yielded foreground command before sealing and records its complete file changes for Undo', async () => {
     let step=0;
     respond=(_body,res)=>step++===0?tools(res,[{name:'bash',args:{command:'sleep 0.15; echo completed > result.txt',timeout_ms:5}}]):text(res,'The command has completed.');
