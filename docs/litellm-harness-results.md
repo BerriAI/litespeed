@@ -1,6 +1,6 @@
 # LiteLLM harness campaign results
 
-Interim snapshot: 2026-09-16T21:21:08.351459+00:00. Current harness: **2026-09-16.52**.
+Interim snapshot: 2026-09-16T21:35:12.682223+00:00. Current harness: **2026-09-16.52**.
 
 **The campaign is still running. It has not established a quality win over Astra/Codex or production replacement readiness.**
 
@@ -8,7 +8,7 @@ The selectable architecture and replay workbench are implemented. The current wo
 
 ## Spending
 
-Confirmed token/header-priced charges: **$52.5279**. Missing receipts retain **$46.9303** across 186 requests; active requests reserve another **$0.2523**. The committed upper bound is **$99.7106** against the authorized **$100.00** ceiling. Reservations are not actual charges. Astra account billing is unavailable.
+Confirmed token/header-priced charges: **$52.6831**. Missing receipts retain **$46.9303** across 186 requests; active requests reserve another **$0.2523**. The committed upper bound is **$99.8658** against the authorized **$100.00** ceiling. Reservations are not actual charges. Astra account billing is unavailable.
 
 An [offline receipt reconciliation](../scripts/litellm-harness/studies/runner-receipt-recovery/README.md) subsequently matched 58 missing gateway records to independently persisted runner usage. Exact round binding agreed with 3,359 known receipts. It restored $0.07678 in token-priced charges and released $14.55740 in excess reservations; unmatched requests remain reserved. The original ledger and per-request reservation history are preserved.
 

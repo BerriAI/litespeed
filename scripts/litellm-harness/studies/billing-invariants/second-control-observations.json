@@ -1,0 +1,255 @@
+{
+  "generatedAt": "2026-09-16T21:35:12.582636+00:00",
+  "status": "second control complete; final candidate remains pending",
+  "run": "replication-v55-billing-control-r1-realtime-cached-audio-cost-f0df5960",
+  "variant": "control",
+  "harnessCommit": "f658678e104aa9a7b1f2a9ea5c415979c38b5aaf",
+  "completed": true,
+  "completionReason": "completed",
+  "seconds": 927.307,
+  "computedUsd": 0.177881918,
+  "requests": 132,
+  "acceptance": {
+    "exit": 1,
+    "tests": 17,
+    "failures": 1,
+    "errors": 0,
+    "skipped": 0,
+    "passed": false
+  },
+  "toolCounts": {
+    "read_file": 47,
+    "grep": 34,
+    "bash": 44,
+    "glob": 1,
+    "todo_write": 2,
+    "edit_file": 39,
+    "write_file": 1
+  },
+  "timeToFirstEditSeconds": 266.473,
+  "modelSeconds": 710.21,
+  "toolActiveSeconds": 167.473,
+  "reviewStartedSeconds": 914.912,
+  "reviewModelRequests": 1,
+  "actionUsage": {
+    "classificationVersion": 2,
+    "basis": "complete assistant request grouped by chosen next action; not tool marginal cost. shell-mentions-checks matches known checker words in a recorded command without inferring passing checks or adequate coverage.",
+    "pricing": {
+      "inputPerMillionUsd": 0.22,
+      "cachedPerMillionUsd": 0.007,
+      "outputPerMillionUsd": 0.66
+    },
+    "groups": {
+      "navigation": {
+        "requests": 48,
+        "inputTokens": 3346683,
+        "cachedTokens": 3254134,
+        "outputTokens": 21632,
+        "estimatedUsd": 0.057416838,
+        "cacheUnreportedRequests": 0,
+        "reportedModelSeconds": 236.281,
+        "durationUnreportedRequests": 0
+      },
+      "mixed-tools": {
+        "requests": 5,
+        "inputTokens": 314533,
+        "cachedTokens": 306074,
+        "outputTokens": 1845,
+        "estimatedUsd": 0.005221198,
+        "cacheUnreportedRequests": 0,
+        "reportedModelSeconds": 21.089,
+        "durationUnreportedRequests": 0
+      },
+      "shell-command": {
+        "requests": 23,
+        "inputTokens": 3052247,
+        "cachedTokens": 3028122,
+        "outputTokens": 14067,
+        "estimatedUsd": 0.035788574,
+        "cacheUnreportedRequests": 0,
+        "reportedModelSeconds": 165.952,
+        "durationUnreportedRequests": 0
+      },
+      "other-tool": {
+        "requests": 2,
+        "inputTokens": 250998,
+        "cachedTokens": 247270,
+        "outputTokens": 800,
+        "estimatedUsd": 0.0030790500000000003,
+        "cacheUnreportedRequests": 0,
+        "reportedModelSeconds": 8.227,
+        "durationUnreportedRequests": 0
+      },
+      "structured-edit": {
+        "requests": 38,
+        "inputTokens": 4105069,
+        "cachedTokens": 4065326,
+        "outputTokens": 19279,
+        "estimatedUsd": 0.04992488200000001,
+        "cacheUnreportedRequests": 0,
+        "reportedModelSeconds": 180.78000000000003,
+        "durationUnreportedRequests": 0
+      },
+      "shell-mentions-checks": {
+        "requests": 14,
+        "inputTokens": 2019749,
+        "cachedTokens": 2004336,
+        "outputTokens": 6691,
+        "estimatedUsd": 0.021837272000000005,
+        "cacheUnreportedRequests": 0,
+        "reportedModelSeconds": 78.399,
+        "durationUnreportedRequests": 0
+      },
+      "text-only": {
+        "requests": 2,
+        "inputTokens": 339305,
+        "cachedTokens": 335412,
+        "outputTokens": 2136,
+        "estimatedUsd": 0.004614104000000001,
+        "cacheUnreportedRequests": 0,
+        "reportedModelSeconds": 19.482,
+        "durationUnreportedRequests": 0
+      }
+    },
+    "assistantMessagesWithoutValidUsage": 0,
+    "breakdownRecordsWithoutValidUsage": 0,
+    "reconciliation": {
+      "inputTokens": {
+        "recorded": 13428584,
+        "attributed": 13428584,
+        "difference": 0
+      },
+      "cachedTokens": {
+        "recorded": 13240674,
+        "attributed": 13240674,
+        "difference": 0
+      },
+      "outputTokens": {
+        "recorded": 66450,
+        "attributed": 66450,
+        "difference": 0
+      },
+      "estimatedUsd": {
+        "recorded": 0.177881918,
+        "attributed": 0.177881918,
+        "difference": 0.0
+      }
+    }
+  },
+  "patchSha256": "f4abd9c9e9b6392d40796d35ca8fb2c15a53a5952f8d0ffaf05c288b0bd32e96",
+  "supplemental": {
+    "checks": 12,
+    "checksPassed": 9,
+    "exit": 0,
+    "rows": [
+      {
+        "name": "representation/billing-cached-image-absent",
+        "pass": true,
+        "actualCost": 0.0015328,
+        "expectedCost": 0.0015328
+      },
+      {
+        "name": "representation/billing-cached-image-zero",
+        "pass": true,
+        "actualCost": 0.0015328,
+        "expectedCost": 0.0015328
+      },
+      {
+        "name": "representation/aggregate-token-values",
+        "pass": true,
+        "observed": {
+          "text_tokens": 64,
+          "audio_tokens": 228,
+          "image_tokens": null
+        },
+        "inputsUnchanged": true
+      },
+      {
+        "name": "representation/aggregate-input-billing",
+        "pass": true,
+        "actualCost": 0.0017728,
+        "expectedCost": 0.0017728
+      },
+      {
+        "name": "representation/partial-split-first",
+        "pass": true,
+        "observed": {
+          "text_tokens": 64,
+          "audio_tokens": 128,
+          "image_tokens": null
+        },
+        "inputsUnchanged": true
+      },
+      {
+        "name": "representation/partial-split-last",
+        "pass": true,
+        "observed": {
+          "text_tokens": 64,
+          "audio_tokens": 128,
+          "image_tokens": null
+        },
+        "inputsUnchanged": true
+      },
+      {
+        "name": "representation/explicit-cached-image-sum",
+        "pass": true,
+        "cachedImage": 3,
+        "inputsUnchanged": true
+      },
+      {
+        "name": "public-path/text-only",
+        "pass": true,
+        "inputCost": 0.435,
+        "expectedInputCost": 0.435,
+        "cacheReadCost": 0.12,
+        "expectedCacheReadCost": 0.12,
+        "reportedCachedAudioRate": null
+      },
+      {
+        "name": "public-path/audio-fallback",
+        "pass": false,
+        "inputCost": 1.015,
+        "expectedInputCost": 0.955,
+        "cacheReadCost": 0.12,
+        "expectedCacheReadCost": 0.12,
+        "reportedCachedAudioRate": null
+      },
+      {
+        "name": "public-path/audio-free",
+        "pass": false,
+        "inputCost": 0.967,
+        "expectedInputCost": 0.9069999999999999,
+        "cacheReadCost": 0.072,
+        "expectedCacheReadCost": 0.072,
+        "reportedCachedAudioRate": 0.0
+      },
+      {
+        "name": "public-path/audio-explicit",
+        "pass": false,
+        "inputCost": 0.999,
+        "expectedInputCost": 0.939,
+        "cacheReadCost": 0.104,
+        "expectedCacheReadCost": 0.104,
+        "reportedCachedAudioRate": 4e-07
+      },
+      {
+        "name": "public-path/ephemeral-creation-public-path",
+        "pass": true,
+        "inputCost": 0.001575,
+        "creationCost": 0.001575,
+        "expectedCost": 0.001575
+      }
+    ],
+    "imports": {
+      "packageOrigin": "litellm/__init__.py",
+      "allLiteLLMModulesWithinWorkspace": true,
+      "moduleCount": 813
+    },
+    "bytecodePolicy": "fresh cache path; reads from adjacent caches and all writes disabled"
+  },
+  "referenceFailure": {
+    "node": "test_billed_token_rates_follow_the_token_tier_the_breakdown_bills_at",
+    "detail": "Reported cached-audio fallback rate is None rather than6e-7. The public probe separates this metadata from the mixed-bucket arithmetic failure."
+  },
+  "interpretation": "Both controls reproduce the three0.06USD mixed-cache overcharges. This control finishes faster and costs less than the first candidate, while failing its functional checks. A final candidate is still needed for the predeclared comparison."
+}

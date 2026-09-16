@@ -1,0 +1,3890 @@
+{
+  "generatedAt": "2026-09-16T21:35:12.588467+00:00",
+  "status": "posthoc diagnostic; final candidate remains unobserved",
+  "probeSha256": "932bb3110e9c40ba6786d6ed11ecc09b27e792ba7e4ce6ffc499cc13cc35d521",
+  "seed": 56160926,
+  "cases": [
+    {
+      "name": "partition-0-fallback",
+      "case": 0,
+      "audioRate": "fallback",
+      "input": {
+        "text": 1000,
+        "audio": 0,
+        "cachedText": 300,
+        "cachedAudio": 0,
+        "writes": 200
+      },
+      "highContextTier": false,
+      "expectedInputCost": 0.00234,
+      "expectedCacheReadCost": 8.999999999999999e-05
+    },
+    {
+      "name": "partition-0-zero",
+      "case": 0,
+      "audioRate": "zero",
+      "input": {
+        "text": 1000,
+        "audio": 0,
+        "cachedText": 300,
+        "cachedAudio": 0,
+        "writes": 200
+      },
+      "highContextTier": false,
+      "expectedInputCost": 0.00234,
+      "expectedCacheReadCost": 8.999999999999999e-05
+    },
+    {
+      "name": "partition-0-explicit",
+      "case": 0,
+      "audioRate": "explicit",
+      "input": {
+        "text": 1000,
+        "audio": 0,
+        "cachedText": 300,
+        "cachedAudio": 0,
+        "writes": 200
+      },
+      "highContextTier": false,
+      "expectedInputCost": 0.00234,
+      "expectedCacheReadCost": 8.999999999999999e-05
+    },
+    {
+      "name": "partition-1-fallback",
+      "case": 1,
+      "audioRate": "fallback",
+      "input": {
+        "text": 0,
+        "audio": 1000,
+        "cachedText": 0,
+        "cachedAudio": 500,
+        "writes": 0
+      },
+      "highContextTier": false,
+      "expectedInputCost": 0.01615,
+      "expectedCacheReadCost": 0.00015
+    },
+    {
+      "name": "partition-1-zero",
+      "case": 1,
+      "audioRate": "zero",
+      "input": {
+        "text": 0,
+        "audio": 1000,
+        "cachedText": 0,
+        "cachedAudio": 500,
+        "writes": 0
+      },
+      "highContextTier": false,
+      "expectedInputCost": 0.016,
+      "expectedCacheReadCost": 0.0
+    },
+    {
+      "name": "partition-1-explicit",
+      "case": 1,
+      "audioRate": "explicit",
+      "input": {
+        "text": 0,
+        "audio": 1000,
+        "cachedText": 0,
+        "cachedAudio": 500,
+        "writes": 0
+      },
+      "highContextTier": false,
+      "expectedInputCost": 0.0162,
+      "expectedCacheReadCost": 0.00019999999999999998
+    },
+    {
+      "name": "partition-2-fallback",
+      "case": 2,
+      "audioRate": "fallback",
+      "input": {
+        "text": 1000,
+        "audio": 1000,
+        "cachedText": 0,
+        "cachedAudio": 0,
+        "writes": 200
+      },
+      "highContextTier": false,
+      "expectedInputCost": 0.03515,
+      "expectedCacheReadCost": 0.0
+    },
+    {
+      "name": "partition-2-zero",
+      "case": 2,
+      "audioRate": "zero",
+      "input": {
+        "text": 1000,
+        "audio": 1000,
+        "cachedText": 0,
+        "cachedAudio": 0,
+        "writes": 200
+      },
+      "highContextTier": false,
+      "expectedInputCost": 0.03515,
+      "expectedCacheReadCost": 0.0
+    },
+    {
+      "name": "partition-2-explicit",
+      "case": 2,
+      "audioRate": "explicit",
+      "input": {
+        "text": 1000,
+        "audio": 1000,
+        "cachedText": 0,
+        "cachedAudio": 0,
+        "writes": 200
+      },
+      "highContextTier": false,
+      "expectedInputCost": 0.03515,
+      "expectedCacheReadCost": 0.0
+    },
+    {
+      "name": "partition-3-fallback",
+      "case": 3,
+      "audioRate": "fallback",
+      "input": {
+        "text": 1000,
+        "audio": 1000,
+        "cachedText": 400,
+        "cachedAudio": 600,
+        "writes": 0
+      },
+      "highContextTier": false,
+      "expectedInputCost": 0.014899999999999998,
+      "expectedCacheReadCost": 0.0003
+    },
+    {
+      "name": "partition-3-zero",
+      "case": 3,
+      "audioRate": "zero",
+      "input": {
+        "text": 1000,
+        "audio": 1000,
+        "cachedText": 400,
+        "cachedAudio": 600,
+        "writes": 0
+      },
+      "highContextTier": false,
+      "expectedInputCost": 0.014719999999999999,
+      "expectedCacheReadCost": 0.00011999999999999999
+    },
+    {
+      "name": "partition-3-explicit",
+      "case": 3,
+      "audioRate": "explicit",
+      "input": {
+        "text": 1000,
+        "audio": 1000,
+        "cachedText": 400,
+        "cachedAudio": 600,
+        "writes": 0
+      },
+      "highContextTier": false,
+      "expectedInputCost": 0.014959999999999998,
+      "expectedCacheReadCost": 0.00035999999999999997
+    },
+    {
+      "name": "partition-4-fallback",
+      "case": 4,
+      "audioRate": "fallback",
+      "input": {
+        "text": 115118,
+        "audio": 56161,
+        "cachedText": 54650,
+        "cachedAudio": 26786,
+        "writes": 20202
+      },
+      "highContextTier": false,
+      "expectedInputCost": 1.1609862999999998,
+      "expectedCacheReadCost": 0.0244308
+    },
+    {
+      "name": "partition-4-zero",
+      "case": 4,
+      "audioRate": "zero",
+      "input": {
+        "text": 115118,
+        "audio": 56161,
+        "cachedText": 54650,
+        "cachedAudio": 26786,
+        "writes": 20202
+      },
+      "highContextTier": false,
+      "expectedInputCost": 1.1529504999999998,
+      "expectedCacheReadCost": 0.016395
+    },
+    {
+      "name": "partition-4-explicit",
+      "case": 4,
+      "audioRate": "explicit",
+      "input": {
+        "text": 115118,
+        "audio": 56161,
+        "cachedText": 54650,
+        "cachedAudio": 26786,
+        "writes": 20202
+      },
+      "highContextTier": false,
+      "expectedInputCost": 1.1636649,
+      "expectedCacheReadCost": 0.0271094
+    },
+    {
+      "name": "partition-5-fallback",
+      "case": 5,
+      "audioRate": "fallback",
+      "input": {
+        "text": 42627,
+        "audio": 155444,
+        "cachedText": 32724,
+        "cachedAudio": 101898,
+        "writes": 188
+      },
+      "highContextTier": false,
+      "expectedInputCost": 1.7837085999999998,
+      "expectedCacheReadCost": 0.0403866
+    },
+    {
+      "name": "partition-5-zero",
+      "case": 5,
+      "audioRate": "zero",
+      "input": {
+        "text": 42627,
+        "audio": 155444,
+        "cachedText": 32724,
+        "cachedAudio": 101898,
+        "writes": 188
+      },
+      "highContextTier": false,
+      "expectedInputCost": 1.7531392,
+      "expectedCacheReadCost": 0.0098172
+    },
+    {
+      "name": "partition-5-explicit",
+      "case": 5,
+      "audioRate": "explicit",
+      "input": {
+        "text": 42627,
+        "audio": 155444,
+        "cachedText": 32724,
+        "cachedAudio": 101898,
+        "writes": 188
+      },
+      "highContextTier": false,
+      "expectedInputCost": 1.7938983999999998,
+      "expectedCacheReadCost": 0.050576399999999994
+    },
+    {
+      "name": "partition-6-fallback",
+      "case": 6,
+      "audioRate": "fallback",
+      "input": {
+        "text": 133067,
+        "audio": 106884,
+        "cachedText": 33205,
+        "cachedAudio": 16675,
+        "writes": 69053
+      },
+      "highContextTier": true,
+      "expectedInputCost": 3.6193675,
+      "expectedCacheReadCost": 0.029928
+    },
+    {
+      "name": "partition-6-zero",
+      "case": 6,
+      "audioRate": "zero",
+      "input": {
+        "text": 133067,
+        "audio": 106884,
+        "cachedText": 33205,
+        "cachedAudio": 16675,
+        "writes": 69053
+      },
+      "highContextTier": true,
+      "expectedInputCost": 3.6093625,
+      "expectedCacheReadCost": 0.019923
+    },
+    {
+      "name": "partition-6-explicit",
+      "case": 6,
+      "audioRate": "explicit",
+      "input": {
+        "text": 133067,
+        "audio": 106884,
+        "cachedText": 33205,
+        "cachedAudio": 16675,
+        "writes": 69053
+      },
+      "highContextTier": true,
+      "expectedInputCost": 3.6160325,
+      "expectedCacheReadCost": 0.026593
+    },
+    {
+      "name": "partition-7-fallback",
+      "case": 7,
+      "audioRate": "fallback",
+      "input": {
+        "text": 122988,
+        "audio": 3678,
+        "cachedText": 107026,
+        "cachedAudio": 155,
+        "writes": 491
+      },
+      "highContextTier": false,
+      "expectedInputCost": 0.19314454999999997,
+      "expectedCacheReadCost": 0.0321543
+    },
+    {
+      "name": "partition-7-zero",
+      "case": 7,
+      "audioRate": "zero",
+      "input": {
+        "text": 122988,
+        "audio": 3678,
+        "cachedText": 107026,
+        "cachedAudio": 155,
+        "writes": 491
+      },
+      "highContextTier": false,
+      "expectedInputCost": 0.19309804999999997,
+      "expectedCacheReadCost": 0.0321078
+    },
+    {
+      "name": "partition-7-explicit",
+      "case": 7,
+      "audioRate": "explicit",
+      "input": {
+        "text": 122988,
+        "audio": 3678,
+        "cachedText": 107026,
+        "cachedAudio": 155,
+        "writes": 491
+      },
+      "highContextTier": false,
+      "expectedInputCost": 0.19316004999999997,
+      "expectedCacheReadCost": 0.0321698
+    },
+    {
+      "name": "partition-8-fallback",
+      "case": 8,
+      "audioRate": "fallback",
+      "input": {
+        "text": 92142,
+        "audio": 18534,
+        "cachedText": 37419,
+        "cachedAudio": 5701,
+        "writes": 45975
+      },
+      "highContextTier": false,
+      "expectedInputCost": 0.62224225,
+      "expectedCacheReadCost": 0.012936
+    },
+    {
+      "name": "partition-8-zero",
+      "case": 8,
+      "audioRate": "zero",
+      "input": {
+        "text": 92142,
+        "audio": 18534,
+        "cachedText": 37419,
+        "cachedAudio": 5701,
+        "writes": 45975
+      },
+      "highContextTier": false,
+      "expectedInputCost": 0.6205319499999999,
+      "expectedCacheReadCost": 0.0112257
+    },
+    {
+      "name": "partition-8-explicit",
+      "case": 8,
+      "audioRate": "explicit",
+      "input": {
+        "text": 92142,
+        "audio": 18534,
+        "cachedText": 37419,
+        "cachedAudio": 5701,
+        "writes": 45975
+      },
+      "highContextTier": false,
+      "expectedInputCost": 0.62281235,
+      "expectedCacheReadCost": 0.0135061
+    },
+    {
+      "name": "partition-9-fallback",
+      "case": 9,
+      "audioRate": "fallback",
+      "input": {
+        "text": 118376,
+        "audio": 108002,
+        "cachedText": 90427,
+        "cachedAudio": 4504,
+        "writes": 8893
+      },
+      "highContextTier": true,
+      "expectedInputCost": 3.5499281000000003,
+      "expectedCacheReadCost": 0.0569586
+    },
+    {
+      "name": "partition-9-zero",
+      "case": 9,
+      "audioRate": "zero",
+      "input": {
+        "text": 118376,
+        "audio": 108002,
+        "cachedText": 90427,
+        "cachedAudio": 4504,
+        "writes": 8893
+      },
+      "highContextTier": true,
+      "expectedInputCost": 3.5472257000000003,
+      "expectedCacheReadCost": 0.0542562
+    },
+    {
+      "name": "partition-9-explicit",
+      "case": 9,
+      "audioRate": "explicit",
+      "input": {
+        "text": 118376,
+        "audio": 108002,
+        "cachedText": 90427,
+        "cachedAudio": 4504,
+        "writes": 8893
+      },
+      "highContextTier": true,
+      "expectedInputCost": 3.5490273,
+      "expectedCacheReadCost": 0.0560578
+    },
+    {
+      "name": "partition-10-fallback",
+      "case": 10,
+      "audioRate": "fallback",
+      "input": {
+        "text": 36293,
+        "audio": 38186,
+        "cachedText": 8173,
+        "cachedAudio": 29772,
+        "writes": 6533
+      },
+      "highContextTier": false,
+      "expectedInputCost": 0.36989125,
+      "expectedCacheReadCost": 0.0113835
+    },
+    {
+      "name": "partition-10-zero",
+      "case": 10,
+      "audioRate": "zero",
+      "input": {
+        "text": 36293,
+        "audio": 38186,
+        "cachedText": 8173,
+        "cachedAudio": 29772,
+        "writes": 6533
+      },
+      "highContextTier": false,
+      "expectedInputCost": 0.36095965,
+      "expectedCacheReadCost": 0.0024519
+    },
+    {
+      "name": "partition-10-explicit",
+      "case": 10,
+      "audioRate": "explicit",
+      "input": {
+        "text": 36293,
+        "audio": 38186,
+        "cachedText": 8173,
+        "cachedAudio": 29772,
+        "writes": 6533
+      },
+      "highContextTier": false,
+      "expectedInputCost": 0.37286845,
+      "expectedCacheReadCost": 0.014360699999999999
+    },
+    {
+      "name": "partition-11-fallback",
+      "case": 11,
+      "audioRate": "fallback",
+      "input": {
+        "text": 77703,
+        "audio": 127137,
+        "cachedText": 34446,
+        "cachedAudio": 82286,
+        "writes": 42500
+      },
+      "highContextTier": true,
+      "expectedInputCost": 1.8285632,
+      "expectedCacheReadCost": 0.0700392
+    },
+    {
+      "name": "partition-11-zero",
+      "case": 11,
+      "audioRate": "zero",
+      "input": {
+        "text": 77703,
+        "audio": 127137,
+        "cachedText": 34446,
+        "cachedAudio": 82286,
+        "writes": 42500
+      },
+      "highContextTier": true,
+      "expectedInputCost": 1.7791915999999999,
+      "expectedCacheReadCost": 0.020667599999999998
+    },
+    {
+      "name": "partition-11-explicit",
+      "case": 11,
+      "audioRate": "explicit",
+      "input": {
+        "text": 77703,
+        "audio": 127137,
+        "cachedText": 34446,
+        "cachedAudio": 82286,
+        "writes": 42500
+      },
+      "highContextTier": true,
+      "expectedInputCost": 1.812106,
+      "expectedCacheReadCost": 0.05358199999999999
+    },
+    {
+      "name": "partition-12-fallback",
+      "case": 12,
+      "audioRate": "fallback",
+      "input": {
+        "text": 125357,
+        "audio": 3238,
+        "cachedText": 110448,
+        "cachedAudio": 313,
+        "writes": 4043
+      },
+      "highContextTier": false,
+      "expectedInputCost": 0.17458755000000004,
+      "expectedCacheReadCost": 0.0332283
+    },
+    {
+      "name": "partition-12-zero",
+      "case": 12,
+      "audioRate": "zero",
+      "input": {
+        "text": 125357,
+        "audio": 3238,
+        "cachedText": 110448,
+        "cachedAudio": 313,
+        "writes": 4043
+      },
+      "highContextTier": false,
+      "expectedInputCost": 0.17449365,
+      "expectedCacheReadCost": 0.0331344
+    },
+    {
+      "name": "partition-12-explicit",
+      "case": 12,
+      "audioRate": "explicit",
+      "input": {
+        "text": 125357,
+        "audio": 3238,
+        "cachedText": 110448,
+        "cachedAudio": 313,
+        "writes": 4043
+      },
+      "highContextTier": false,
+      "expectedInputCost": 0.17461885,
+      "expectedCacheReadCost": 0.0332596
+    },
+    {
+      "name": "partition-13-fallback",
+      "case": 13,
+      "audioRate": "fallback",
+      "input": {
+        "text": 18827,
+        "audio": 177838,
+        "cachedText": 6769,
+        "cachedAudio": 148111,
+        "writes": 6215
+      },
+      "highContextTier": false,
+      "expectedInputCost": 1.0385632500000002,
+      "expectedCacheReadCost": 0.04646399999999999
+    },
+    {
+      "name": "partition-13-zero",
+      "case": 13,
+      "audioRate": "zero",
+      "input": {
+        "text": 18827,
+        "audio": 177838,
+        "cachedText": 6769,
+        "cachedAudio": 148111,
+        "writes": 6215
+      },
+      "highContextTier": false,
+      "expectedInputCost": 0.99412995,
+      "expectedCacheReadCost": 0.0020307
+    },
+    {
+      "name": "partition-13-explicit",
+      "case": 13,
+      "audioRate": "explicit",
+      "input": {
+        "text": 18827,
+        "audio": 177838,
+        "cachedText": 6769,
+        "cachedAudio": 148111,
+        "writes": 6215
+      },
+      "highContextTier": false,
+      "expectedInputCost": 1.0533743500000001,
+      "expectedCacheReadCost": 0.0612751
+    },
+    {
+      "name": "partition-14-fallback",
+      "case": 14,
+      "audioRate": "fallback",
+      "input": {
+        "text": 101354,
+        "audio": 170064,
+        "cachedText": 64847,
+        "cachedAudio": 49631,
+        "writes": 3182
+      },
+      "highContextTier": true,
+      "expectedInputCost": 4.1463578,
+      "expectedCacheReadCost": 0.06868679999999999
+    },
+    {
+      "name": "partition-14-zero",
+      "case": 14,
+      "audioRate": "zero",
+      "input": {
+        "text": 101354,
+        "audio": 170064,
+        "cachedText": 64847,
+        "cachedAudio": 49631,
+        "writes": 3182
+      },
+      "highContextTier": true,
+      "expectedInputCost": 4.116579199999999,
+      "expectedCacheReadCost": 0.0389082
+    },
+    {
+      "name": "partition-14-explicit",
+      "case": 14,
+      "audioRate": "explicit",
+      "input": {
+        "text": 101354,
+        "audio": 170064,
+        "cachedText": 64847,
+        "cachedAudio": 49631,
+        "writes": 3182
+      },
+      "highContextTier": true,
+      "expectedInputCost": 4.1364316,
+      "expectedCacheReadCost": 0.058760599999999996
+    },
+    {
+      "name": "partition-15-fallback",
+      "case": 15,
+      "audioRate": "fallback",
+      "input": {
+        "text": 131588,
+        "audio": 77757,
+        "cachedText": 94847,
+        "cachedAudio": 9053,
+        "writes": 9587
+      },
+      "highContextTier": true,
+      "expectedInputCost": 2.4956945,
+      "expectedCacheReadCost": 0.06234
+    },
+    {
+      "name": "partition-15-zero",
+      "case": 15,
+      "audioRate": "zero",
+      "input": {
+        "text": 131588,
+        "audio": 77757,
+        "cachedText": 94847,
+        "cachedAudio": 9053,
+        "writes": 9587
+      },
+      "highContextTier": true,
+      "expectedInputCost": 2.4902627,
+      "expectedCacheReadCost": 0.0569082
+    },
+    {
+      "name": "partition-15-explicit",
+      "case": 15,
+      "audioRate": "explicit",
+      "input": {
+        "text": 131588,
+        "audio": 77757,
+        "cachedText": 94847,
+        "cachedAudio": 9053,
+        "writes": 9587
+      },
+      "highContextTier": true,
+      "expectedInputCost": 2.4938839,
+      "expectedCacheReadCost": 0.0605294
+    }
+  ],
+  "variants": [
+    {
+      "variant": "base",
+      "checks": 48,
+      "passed": 7,
+      "exit": 0,
+      "sourceSha256": "861c3b229f98d9a277791c074909901840cac7a92cb86f3eecc6ede986597587",
+      "imports": {
+        "packageOrigin": "litellm/__init__.py",
+        "allLiteLLMModulesWithinWorkspace": true,
+        "moduleCount": 813
+      },
+      "bytecodePolicy": "fresh cache path; reads from adjacent caches and all writes disabled",
+      "outcomes": [
+        {
+          "name": "partition-0-fallback",
+          "pass": true,
+          "inputCost": 0.00234,
+          "cacheReadCost": 8.999999999999999e-05,
+          "inputsUnchanged": true
+        },
+        {
+          "name": "partition-0-zero",
+          "pass": true,
+          "inputCost": 0.00234,
+          "cacheReadCost": 8.999999999999999e-05,
+          "inputsUnchanged": true
+        },
+        {
+          "name": "partition-0-explicit",
+          "pass": true,
+          "inputCost": 0.00234,
+          "cacheReadCost": 8.999999999999999e-05,
+          "inputsUnchanged": true
+        },
+        {
+          "name": "partition-1-fallback",
+          "pass": true,
+          "inputCost": 0.01615,
+          "cacheReadCost": 0.00015,
+          "inputsUnchanged": true
+        },
+        {
+          "name": "partition-1-zero",
+          "pass": false,
+          "inputCost": 0.01615,
+          "cacheReadCost": 0.00015,
+          "inputsUnchanged": true
+        },
+        {
+          "name": "partition-1-explicit",
+          "pass": false,
+          "inputCost": 0.01615,
+          "cacheReadCost": 0.00015,
+          "inputsUnchanged": true
+        },
+        {
+          "name": "partition-2-fallback",
+          "pass": true,
+          "inputCost": 0.03515,
+          "cacheReadCost": 0.0,
+          "inputsUnchanged": true
+        },
+        {
+          "name": "partition-2-zero",
+          "pass": true,
+          "inputCost": 0.03515,
+          "cacheReadCost": 0.0,
+          "inputsUnchanged": true
+        },
+        {
+          "name": "partition-2-explicit",
+          "pass": true,
+          "inputCost": 0.03515,
+          "cacheReadCost": 0.0,
+          "inputsUnchanged": true
+        },
+        {
+          "name": "partition-3-fallback",
+          "pass": false,
+          "inputCost": 0.0323,
+          "cacheReadCost": 0.0003,
+          "inputsUnchanged": true
+        },
+        {
+          "name": "partition-3-zero",
+          "pass": false,
+          "inputCost": 0.0323,
+          "cacheReadCost": 0.0003,
+          "inputsUnchanged": true
+        },
+        {
+          "name": "partition-3-explicit",
+          "pass": false,
+          "inputCost": 0.0323,
+          "cacheReadCost": 0.0003,
+          "inputsUnchanged": true
+        },
+        {
+          "name": "partition-4-fallback",
+          "pass": false,
+          "inputCost": 1.9377802999999998,
+          "cacheReadCost": 0.0244308,
+          "inputsUnchanged": true
+        },
+        {
+          "name": "partition-4-zero",
+          "pass": false,
+          "inputCost": 1.9377802999999998,
+          "cacheReadCost": 0.0244308,
+          "inputsUnchanged": true
+        },
+        {
+          "name": "partition-4-explicit",
+          "pass": false,
+          "inputCost": 1.9377802999999998,
+          "cacheReadCost": 0.0244308,
+          "inputsUnchanged": true
+        },
+        {
+          "name": "partition-5-fallback",
+          "pass": false,
+          "inputCost": 2.0654436,
+          "cacheReadCost": 0.040386599999999995,
+          "inputsUnchanged": true
+        },
+        {
+          "name": "partition-5-zero",
+          "pass": false,
+          "inputCost": 2.0654436,
+          "cacheReadCost": 0.040386599999999995,
+          "inputsUnchanged": true
+        },
+        {
+          "name": "partition-5-explicit",
+          "pass": false,
+          "inputCost": 2.0654436,
+          "cacheReadCost": 0.040386599999999995,
+          "inputsUnchanged": true
+        },
+        {
+          "name": "partition-6-fallback",
+          "pass": false,
+          "inputCost": 4.0529174999999995,
+          "cacheReadCost": 0.029928,
+          "inputsUnchanged": true
+        },
+        {
+          "name": "partition-6-zero",
+          "pass": false,
+          "inputCost": 4.0529174999999995,
+          "cacheReadCost": 0.029928,
+          "inputsUnchanged": true
+        },
+        {
+          "name": "partition-6-explicit",
+          "pass": false,
+          "inputCost": 4.0529174999999995,
+          "cacheReadCost": 0.029928,
+          "inputsUnchanged": true
+        },
+        {
+          "name": "partition-7-fallback",
+          "pass": false,
+          "inputCost": 0.19763954999999997,
+          "cacheReadCost": 0.0321543,
+          "inputsUnchanged": true
+        },
+        {
+          "name": "partition-7-zero",
+          "pass": false,
+          "inputCost": 0.19763954999999997,
+          "cacheReadCost": 0.0321543,
+          "inputsUnchanged": true
+        },
+        {
+          "name": "partition-7-explicit",
+          "pass": false,
+          "inputCost": 0.19763954999999997,
+          "cacheReadCost": 0.0321543,
+          "inputsUnchanged": true
+        },
+        {
+          "name": "partition-8-fallback",
+          "pass": false,
+          "inputCost": 0.78757125,
+          "cacheReadCost": 0.012936,
+          "inputsUnchanged": true
+        },
+        {
+          "name": "partition-8-zero",
+          "pass": false,
+          "inputCost": 0.78757125,
+          "cacheReadCost": 0.012936,
+          "inputsUnchanged": true
+        },
+        {
+          "name": "partition-8-explicit",
+          "pass": false,
+          "inputCost": 0.78757125,
+          "cacheReadCost": 0.012936,
+          "inputsUnchanged": true
+        },
+        {
+          "name": "partition-9-fallback",
+          "pass": false,
+          "inputCost": 3.6670321,
+          "cacheReadCost": 0.0569586,
+          "inputsUnchanged": true
+        },
+        {
+          "name": "partition-9-zero",
+          "pass": false,
+          "inputCost": 3.6670321,
+          "cacheReadCost": 0.0569586,
+          "inputsUnchanged": true
+        },
+        {
+          "name": "partition-9-explicit",
+          "pass": false,
+          "inputCost": 3.6670321,
+          "cacheReadCost": 0.0569586,
+          "inputsUnchanged": true
+        },
+        {
+          "name": "partition-10-fallback",
+          "pass": false,
+          "inputCost": 0.99591425,
+          "cacheReadCost": 0.0113835,
+          "inputsUnchanged": true
+        },
+        {
+          "name": "partition-10-zero",
+          "pass": false,
+          "inputCost": 0.99591425,
+          "cacheReadCost": 0.0113835,
+          "inputsUnchanged": true
+        },
+        {
+          "name": "partition-10-explicit",
+          "pass": false,
+          "inputCost": 0.99591425,
+          "cacheReadCost": 0.0113835,
+          "inputsUnchanged": true
+        },
+        {
+          "name": "partition-11-fallback",
+          "pass": false,
+          "inputCost": 1.8482452,
+          "cacheReadCost": 0.0700392,
+          "inputsUnchanged": true
+        },
+        {
+          "name": "partition-11-zero",
+          "pass": false,
+          "inputCost": 1.8482452,
+          "cacheReadCost": 0.0700392,
+          "inputsUnchanged": true
+        },
+        {
+          "name": "partition-11-explicit",
+          "pass": false,
+          "inputCost": 1.8482452,
+          "cacheReadCost": 0.0700392,
+          "inputsUnchanged": true
+        },
+        {
+          "name": "partition-12-fallback",
+          "pass": false,
+          "inputCost": 0.18366454999999998,
+          "cacheReadCost": 0.033228299999999995,
+          "inputsUnchanged": true
+        },
+        {
+          "name": "partition-12-zero",
+          "pass": false,
+          "inputCost": 0.18366454999999998,
+          "cacheReadCost": 0.033228299999999995,
+          "inputsUnchanged": true
+        },
+        {
+          "name": "partition-12-explicit",
+          "pass": false,
+          "inputCost": 0.18366454999999998,
+          "cacheReadCost": 0.033228299999999995,
+          "inputsUnchanged": true
+        },
+        {
+          "name": "partition-13-fallback",
+          "pass": false,
+          "inputCost": 1.20801025,
+          "cacheReadCost": 0.046464,
+          "inputsUnchanged": true
+        },
+        {
+          "name": "partition-13-zero",
+          "pass": false,
+          "inputCost": 1.20801025,
+          "cacheReadCost": 0.046464,
+          "inputsUnchanged": true
+        },
+        {
+          "name": "partition-13-explicit",
+          "pass": false,
+          "inputCost": 1.20801025,
+          "cacheReadCost": 0.046464,
+          "inputsUnchanged": true
+        },
+        {
+          "name": "partition-14-fallback",
+          "pass": false,
+          "inputCost": 5.0128078,
+          "cacheReadCost": 0.06868679999999999,
+          "inputsUnchanged": true
+        },
+        {
+          "name": "partition-14-zero",
+          "pass": false,
+          "inputCost": 5.0128078,
+          "cacheReadCost": 0.06868679999999999,
+          "inputsUnchanged": true
+        },
+        {
+          "name": "partition-14-explicit",
+          "pass": false,
+          "inputCost": 5.0128078,
+          "cacheReadCost": 0.06868679999999999,
+          "inputsUnchanged": true
+        },
+        {
+          "name": "partition-15-fallback",
+          "pass": false,
+          "inputCost": 2.7310725,
+          "cacheReadCost": 0.06234,
+          "inputsUnchanged": true
+        },
+        {
+          "name": "partition-15-zero",
+          "pass": false,
+          "inputCost": 2.7310725,
+          "cacheReadCost": 0.06234,
+          "inputsUnchanged": true
+        },
+        {
+          "name": "partition-15-explicit",
+          "pass": false,
+          "inputCost": 2.7310725,
+          "cacheReadCost": 0.06234,
+          "inputsUnchanged": true
+        }
+      ]
+    },
+    {
+      "variant": "reference",
+      "checks": 48,
+      "passed": 48,
+      "exit": 0,
+      "sourceSha256": "8a17c63632d282fe6a6a600b96f6ef54c6e03b3b15f5161aae24b2abaa73b207",
+      "imports": {
+        "packageOrigin": "litellm/__init__.py",
+        "allLiteLLMModulesWithinWorkspace": true,
+        "moduleCount": 813
+      },
+      "bytecodePolicy": "fresh cache path; reads from adjacent caches and all writes disabled",
+      "outcomes": [
+        {
+          "name": "partition-0-fallback",
+          "pass": true,
+          "inputCost": 0.00234,
+          "cacheReadCost": 8.999999999999999e-05,
+          "inputsUnchanged": true
+        },
+        {
+          "name": "partition-0-zero",
+          "pass": true,
+          "inputCost": 0.00234,
+          "cacheReadCost": 8.999999999999999e-05,
+          "inputsUnchanged": true
+        },
+        {
+          "name": "partition-0-explicit",
+          "pass": true,
+          "inputCost": 0.00234,
+          "cacheReadCost": 8.999999999999999e-05,
+          "inputsUnchanged": true
+        },
+        {
+          "name": "partition-1-fallback",
+          "pass": true,
+          "inputCost": 0.01615,
+          "cacheReadCost": 0.00015,
+          "inputsUnchanged": true
+        },
+        {
+          "name": "partition-1-zero",
+          "pass": true,
+          "inputCost": 0.016,
+          "cacheReadCost": 0.0,
+          "inputsUnchanged": true
+        },
+        {
+          "name": "partition-1-explicit",
+          "pass": true,
+          "inputCost": 0.0162,
+          "cacheReadCost": 0.00019999999999999998,
+          "inputsUnchanged": true
+        },
+        {
+          "name": "partition-2-fallback",
+          "pass": true,
+          "inputCost": 0.03515,
+          "cacheReadCost": 0.0,
+          "inputsUnchanged": true
+        },
+        {
+          "name": "partition-2-zero",
+          "pass": true,
+          "inputCost": 0.03515,
+          "cacheReadCost": 0.0,
+          "inputsUnchanged": true
+        },
+        {
+          "name": "partition-2-explicit",
+          "pass": true,
+          "inputCost": 0.03515,
+          "cacheReadCost": 0.0,
+          "inputsUnchanged": true
+        },
+        {
+          "name": "partition-3-fallback",
+          "pass": true,
+          "inputCost": 0.014899999999999998,
+          "cacheReadCost": 0.0003,
+          "inputsUnchanged": true
+        },
+        {
+          "name": "partition-3-zero",
+          "pass": true,
+          "inputCost": 0.014719999999999999,
+          "cacheReadCost": 0.00011999999999999999,
+          "inputsUnchanged": true
+        },
+        {
+          "name": "partition-3-explicit",
+          "pass": true,
+          "inputCost": 0.014959999999999998,
+          "cacheReadCost": 0.00035999999999999997,
+          "inputsUnchanged": true
+        },
+        {
+          "name": "partition-4-fallback",
+          "pass": true,
+          "inputCost": 1.1609862999999998,
+          "cacheReadCost": 0.0244308,
+          "inputsUnchanged": true
+        },
+        {
+          "name": "partition-4-zero",
+          "pass": true,
+          "inputCost": 1.1529504999999998,
+          "cacheReadCost": 0.016395,
+          "inputsUnchanged": true
+        },
+        {
+          "name": "partition-4-explicit",
+          "pass": true,
+          "inputCost": 1.1636649,
+          "cacheReadCost": 0.0271094,
+          "inputsUnchanged": true
+        },
+        {
+          "name": "partition-5-fallback",
+          "pass": true,
+          "inputCost": 1.7837085999999998,
+          "cacheReadCost": 0.0403866,
+          "inputsUnchanged": true
+        },
+        {
+          "name": "partition-5-zero",
+          "pass": true,
+          "inputCost": 1.7531392,
+          "cacheReadCost": 0.0098172,
+          "inputsUnchanged": true
+        },
+        {
+          "name": "partition-5-explicit",
+          "pass": true,
+          "inputCost": 1.7938983999999998,
+          "cacheReadCost": 0.050576399999999994,
+          "inputsUnchanged": true
+        },
+        {
+          "name": "partition-6-fallback",
+          "pass": true,
+          "inputCost": 3.6193675,
+          "cacheReadCost": 0.029928,
+          "inputsUnchanged": true
+        },
+        {
+          "name": "partition-6-zero",
+          "pass": true,
+          "inputCost": 3.6093625,
+          "cacheReadCost": 0.019923,
+          "inputsUnchanged": true
+        },
+        {
+          "name": "partition-6-explicit",
+          "pass": true,
+          "inputCost": 3.6160325,
+          "cacheReadCost": 0.026593,
+          "inputsUnchanged": true
+        },
+        {
+          "name": "partition-7-fallback",
+          "pass": true,
+          "inputCost": 0.19314455,
+          "cacheReadCost": 0.0321543,
+          "inputsUnchanged": true
+        },
+        {
+          "name": "partition-7-zero",
+          "pass": true,
+          "inputCost": 0.19309805,
+          "cacheReadCost": 0.0321078,
+          "inputsUnchanged": true
+        },
+        {
+          "name": "partition-7-explicit",
+          "pass": true,
+          "inputCost": 0.19316005,
+          "cacheReadCost": 0.0321698,
+          "inputsUnchanged": true
+        },
+        {
+          "name": "partition-8-fallback",
+          "pass": true,
+          "inputCost": 0.62224225,
+          "cacheReadCost": 0.012936,
+          "inputsUnchanged": true
+        },
+        {
+          "name": "partition-8-zero",
+          "pass": true,
+          "inputCost": 0.6205319499999999,
+          "cacheReadCost": 0.0112257,
+          "inputsUnchanged": true
+        },
+        {
+          "name": "partition-8-explicit",
+          "pass": true,
+          "inputCost": 0.62281235,
+          "cacheReadCost": 0.0135061,
+          "inputsUnchanged": true
+        },
+        {
+          "name": "partition-9-fallback",
+          "pass": true,
+          "inputCost": 3.5499281,
+          "cacheReadCost": 0.0569586,
+          "inputsUnchanged": true
+        },
+        {
+          "name": "partition-9-zero",
+          "pass": true,
+          "inputCost": 3.5472257,
+          "cacheReadCost": 0.0542562,
+          "inputsUnchanged": true
+        },
+        {
+          "name": "partition-9-explicit",
+          "pass": true,
+          "inputCost": 3.5490272999999997,
+          "cacheReadCost": 0.0560578,
+          "inputsUnchanged": true
+        },
+        {
+          "name": "partition-10-fallback",
+          "pass": true,
+          "inputCost": 0.36989125,
+          "cacheReadCost": 0.0113835,
+          "inputsUnchanged": true
+        },
+        {
+          "name": "partition-10-zero",
+          "pass": true,
+          "inputCost": 0.36095964999999997,
+          "cacheReadCost": 0.0024519,
+          "inputsUnchanged": true
+        },
+        {
+          "name": "partition-10-explicit",
+          "pass": true,
+          "inputCost": 0.37286845,
+          "cacheReadCost": 0.014360699999999999,
+          "inputsUnchanged": true
+        },
+        {
+          "name": "partition-11-fallback",
+          "pass": true,
+          "inputCost": 1.8285631999999998,
+          "cacheReadCost": 0.0700392,
+          "inputsUnchanged": true
+        },
+        {
+          "name": "partition-11-zero",
+          "pass": true,
+          "inputCost": 1.7791915999999999,
+          "cacheReadCost": 0.020667599999999998,
+          "inputsUnchanged": true
+        },
+        {
+          "name": "partition-11-explicit",
+          "pass": true,
+          "inputCost": 1.812106,
+          "cacheReadCost": 0.05358199999999999,
+          "inputsUnchanged": true
+        },
+        {
+          "name": "partition-12-fallback",
+          "pass": true,
+          "inputCost": 0.17458754999999998,
+          "cacheReadCost": 0.0332283,
+          "inputsUnchanged": true
+        },
+        {
+          "name": "partition-12-zero",
+          "pass": true,
+          "inputCost": 0.17449365,
+          "cacheReadCost": 0.0331344,
+          "inputsUnchanged": true
+        },
+        {
+          "name": "partition-12-explicit",
+          "pass": true,
+          "inputCost": 0.17461885,
+          "cacheReadCost": 0.0332596,
+          "inputsUnchanged": true
+        },
+        {
+          "name": "partition-13-fallback",
+          "pass": true,
+          "inputCost": 1.0385632500000002,
+          "cacheReadCost": 0.04646399999999999,
+          "inputsUnchanged": true
+        },
+        {
+          "name": "partition-13-zero",
+          "pass": true,
+          "inputCost": 0.9941299499999999,
+          "cacheReadCost": 0.0020307,
+          "inputsUnchanged": true
+        },
+        {
+          "name": "partition-13-explicit",
+          "pass": true,
+          "inputCost": 1.0533743500000001,
+          "cacheReadCost": 0.0612751,
+          "inputsUnchanged": true
+        },
+        {
+          "name": "partition-14-fallback",
+          "pass": true,
+          "inputCost": 4.1463578,
+          "cacheReadCost": 0.06868679999999999,
+          "inputsUnchanged": true
+        },
+        {
+          "name": "partition-14-zero",
+          "pass": true,
+          "inputCost": 4.116579199999999,
+          "cacheReadCost": 0.0389082,
+          "inputsUnchanged": true
+        },
+        {
+          "name": "partition-14-explicit",
+          "pass": true,
+          "inputCost": 4.1364316,
+          "cacheReadCost": 0.058760599999999996,
+          "inputsUnchanged": true
+        },
+        {
+          "name": "partition-15-fallback",
+          "pass": true,
+          "inputCost": 2.4956945000000004,
+          "cacheReadCost": 0.06234,
+          "inputsUnchanged": true
+        },
+        {
+          "name": "partition-15-zero",
+          "pass": true,
+          "inputCost": 2.4902627,
+          "cacheReadCost": 0.0569082,
+          "inputsUnchanged": true
+        },
+        {
+          "name": "partition-15-explicit",
+          "pass": true,
+          "inputCost": 2.4938839,
+          "cacheReadCost": 0.0605294,
+          "inputsUnchanged": true
+        }
+      ]
+    },
+    {
+      "variant": "astra-r1",
+      "checks": 48,
+      "passed": 48,
+      "exit": 0,
+      "sourceSha256": "87f9a049bebb15a64c93d202cd4a441d789ac08489a2181d5673a7f94a312889",
+      "imports": {
+        "packageOrigin": "litellm/__init__.py",
+        "allLiteLLMModulesWithinWorkspace": true,
+        "moduleCount": 813
+      },
+      "bytecodePolicy": "fresh cache path; reads from adjacent caches and all writes disabled",
+      "outcomes": [
+        {
+          "name": "partition-0-fallback",
+          "pass": true,
+          "inputCost": 0.00234,
+          "cacheReadCost": 8.999999999999999e-05,
+          "inputsUnchanged": true
+        },
+        {
+          "name": "partition-0-zero",
+          "pass": true,
+          "inputCost": 0.00234,
+          "cacheReadCost": 8.999999999999999e-05,
+          "inputsUnchanged": true
+        },
+        {
+          "name": "partition-0-explicit",
+          "pass": true,
+          "inputCost": 0.00234,
+          "cacheReadCost": 8.999999999999999e-05,
+          "inputsUnchanged": true
+        },
+        {
+          "name": "partition-1-fallback",
+          "pass": true,
+          "inputCost": 0.01615,
+          "cacheReadCost": 0.00015,
+          "inputsUnchanged": true
+        },
+        {
+          "name": "partition-1-zero",
+          "pass": true,
+          "inputCost": 0.016,
+          "cacheReadCost": 0.0,
+          "inputsUnchanged": true
+        },
+        {
+          "name": "partition-1-explicit",
+          "pass": true,
+          "inputCost": 0.0162,
+          "cacheReadCost": 0.00019999999999999998,
+          "inputsUnchanged": true
+        },
+        {
+          "name": "partition-2-fallback",
+          "pass": true,
+          "inputCost": 0.03515,
+          "cacheReadCost": 0.0,
+          "inputsUnchanged": true
+        },
+        {
+          "name": "partition-2-zero",
+          "pass": true,
+          "inputCost": 0.03515,
+          "cacheReadCost": 0.0,
+          "inputsUnchanged": true
+        },
+        {
+          "name": "partition-2-explicit",
+          "pass": true,
+          "inputCost": 0.03515,
+          "cacheReadCost": 0.0,
+          "inputsUnchanged": true
+        },
+        {
+          "name": "partition-3-fallback",
+          "pass": true,
+          "inputCost": 0.014899999999999998,
+          "cacheReadCost": 0.0003,
+          "inputsUnchanged": true
+        },
+        {
+          "name": "partition-3-zero",
+          "pass": true,
+          "inputCost": 0.014719999999999999,
+          "cacheReadCost": 0.00011999999999999999,
+          "inputsUnchanged": true
+        },
+        {
+          "name": "partition-3-explicit",
+          "pass": true,
+          "inputCost": 0.014959999999999998,
+          "cacheReadCost": 0.00035999999999999997,
+          "inputsUnchanged": true
+        },
+        {
+          "name": "partition-4-fallback",
+          "pass": true,
+          "inputCost": 1.1609862999999998,
+          "cacheReadCost": 0.0244308,
+          "inputsUnchanged": true
+        },
+        {
+          "name": "partition-4-zero",
+          "pass": true,
+          "inputCost": 1.1529504999999998,
+          "cacheReadCost": 0.016395,
+          "inputsUnchanged": true
+        },
+        {
+          "name": "partition-4-explicit",
+          "pass": true,
+          "inputCost": 1.1636649,
+          "cacheReadCost": 0.0271094,
+          "inputsUnchanged": true
+        },
+        {
+          "name": "partition-5-fallback",
+          "pass": true,
+          "inputCost": 1.7837085999999998,
+          "cacheReadCost": 0.0403866,
+          "inputsUnchanged": true
+        },
+        {
+          "name": "partition-5-zero",
+          "pass": true,
+          "inputCost": 1.7531392,
+          "cacheReadCost": 0.0098172,
+          "inputsUnchanged": true
+        },
+        {
+          "name": "partition-5-explicit",
+          "pass": true,
+          "inputCost": 1.7938983999999998,
+          "cacheReadCost": 0.050576399999999994,
+          "inputsUnchanged": true
+        },
+        {
+          "name": "partition-6-fallback",
+          "pass": true,
+          "inputCost": 3.6193675,
+          "cacheReadCost": 0.029928,
+          "inputsUnchanged": true
+        },
+        {
+          "name": "partition-6-zero",
+          "pass": true,
+          "inputCost": 3.6093625,
+          "cacheReadCost": 0.019923,
+          "inputsUnchanged": true
+        },
+        {
+          "name": "partition-6-explicit",
+          "pass": true,
+          "inputCost": 3.6160325,
+          "cacheReadCost": 0.026593,
+          "inputsUnchanged": true
+        },
+        {
+          "name": "partition-7-fallback",
+          "pass": true,
+          "inputCost": 0.19314455,
+          "cacheReadCost": 0.0321543,
+          "inputsUnchanged": true
+        },
+        {
+          "name": "partition-7-zero",
+          "pass": true,
+          "inputCost": 0.19309805,
+          "cacheReadCost": 0.0321078,
+          "inputsUnchanged": true
+        },
+        {
+          "name": "partition-7-explicit",
+          "pass": true,
+          "inputCost": 0.19316005,
+          "cacheReadCost": 0.0321698,
+          "inputsUnchanged": true
+        },
+        {
+          "name": "partition-8-fallback",
+          "pass": true,
+          "inputCost": 0.62224225,
+          "cacheReadCost": 0.012936,
+          "inputsUnchanged": true
+        },
+        {
+          "name": "partition-8-zero",
+          "pass": true,
+          "inputCost": 0.6205319499999999,
+          "cacheReadCost": 0.0112257,
+          "inputsUnchanged": true
+        },
+        {
+          "name": "partition-8-explicit",
+          "pass": true,
+          "inputCost": 0.62281235,
+          "cacheReadCost": 0.0135061,
+          "inputsUnchanged": true
+        },
+        {
+          "name": "partition-9-fallback",
+          "pass": true,
+          "inputCost": 3.5499281,
+          "cacheReadCost": 0.0569586,
+          "inputsUnchanged": true
+        },
+        {
+          "name": "partition-9-zero",
+          "pass": true,
+          "inputCost": 3.5472257,
+          "cacheReadCost": 0.0542562,
+          "inputsUnchanged": true
+        },
+        {
+          "name": "partition-9-explicit",
+          "pass": true,
+          "inputCost": 3.5490272999999997,
+          "cacheReadCost": 0.0560578,
+          "inputsUnchanged": true
+        },
+        {
+          "name": "partition-10-fallback",
+          "pass": true,
+          "inputCost": 0.36989125,
+          "cacheReadCost": 0.0113835,
+          "inputsUnchanged": true
+        },
+        {
+          "name": "partition-10-zero",
+          "pass": true,
+          "inputCost": 0.36095964999999997,
+          "cacheReadCost": 0.0024519,
+          "inputsUnchanged": true
+        },
+        {
+          "name": "partition-10-explicit",
+          "pass": true,
+          "inputCost": 0.37286845,
+          "cacheReadCost": 0.014360699999999999,
+          "inputsUnchanged": true
+        },
+        {
+          "name": "partition-11-fallback",
+          "pass": true,
+          "inputCost": 1.8285631999999998,
+          "cacheReadCost": 0.0700392,
+          "inputsUnchanged": true
+        },
+        {
+          "name": "partition-11-zero",
+          "pass": true,
+          "inputCost": 1.7791915999999999,
+          "cacheReadCost": 0.020667599999999998,
+          "inputsUnchanged": true
+        },
+        {
+          "name": "partition-11-explicit",
+          "pass": true,
+          "inputCost": 1.812106,
+          "cacheReadCost": 0.05358199999999999,
+          "inputsUnchanged": true
+        },
+        {
+          "name": "partition-12-fallback",
+          "pass": true,
+          "inputCost": 0.17458754999999998,
+          "cacheReadCost": 0.0332283,
+          "inputsUnchanged": true
+        },
+        {
+          "name": "partition-12-zero",
+          "pass": true,
+          "inputCost": 0.17449365,
+          "cacheReadCost": 0.0331344,
+          "inputsUnchanged": true
+        },
+        {
+          "name": "partition-12-explicit",
+          "pass": true,
+          "inputCost": 0.17461885,
+          "cacheReadCost": 0.0332596,
+          "inputsUnchanged": true
+        },
+        {
+          "name": "partition-13-fallback",
+          "pass": true,
+          "inputCost": 1.0385632500000002,
+          "cacheReadCost": 0.04646399999999999,
+          "inputsUnchanged": true
+        },
+        {
+          "name": "partition-13-zero",
+          "pass": true,
+          "inputCost": 0.9941299499999999,
+          "cacheReadCost": 0.0020307,
+          "inputsUnchanged": true
+        },
+        {
+          "name": "partition-13-explicit",
+          "pass": true,
+          "inputCost": 1.0533743500000001,
+          "cacheReadCost": 0.0612751,
+          "inputsUnchanged": true
+        },
+        {
+          "name": "partition-14-fallback",
+          "pass": true,
+          "inputCost": 4.1463578,
+          "cacheReadCost": 0.06868679999999999,
+          "inputsUnchanged": true
+        },
+        {
+          "name": "partition-14-zero",
+          "pass": true,
+          "inputCost": 4.116579199999999,
+          "cacheReadCost": 0.0389082,
+          "inputsUnchanged": true
+        },
+        {
+          "name": "partition-14-explicit",
+          "pass": true,
+          "inputCost": 4.1364316,
+          "cacheReadCost": 0.058760599999999996,
+          "inputsUnchanged": true
+        },
+        {
+          "name": "partition-15-fallback",
+          "pass": true,
+          "inputCost": 2.4956945000000004,
+          "cacheReadCost": 0.06234,
+          "inputsUnchanged": true
+        },
+        {
+          "name": "partition-15-zero",
+          "pass": true,
+          "inputCost": 2.4902627,
+          "cacheReadCost": 0.0569082,
+          "inputsUnchanged": true
+        },
+        {
+          "name": "partition-15-explicit",
+          "pass": true,
+          "inputCost": 2.4938839,
+          "cacheReadCost": 0.0605294,
+          "inputsUnchanged": true
+        }
+      ]
+    },
+    {
+      "variant": "astra-r2",
+      "checks": 48,
+      "passed": 48,
+      "exit": 0,
+      "sourceSha256": "3a942ad3a9c671fc6fcb77aa5cdfa254a93bbb6f44b0366b2df037805815855a",
+      "imports": {
+        "packageOrigin": "litellm/__init__.py",
+        "allLiteLLMModulesWithinWorkspace": true,
+        "moduleCount": 813
+      },
+      "bytecodePolicy": "fresh cache path; reads from adjacent caches and all writes disabled",
+      "outcomes": [
+        {
+          "name": "partition-0-fallback",
+          "pass": true,
+          "inputCost": 0.00234,
+          "cacheReadCost": 8.999999999999999e-05,
+          "inputsUnchanged": true
+        },
+        {
+          "name": "partition-0-zero",
+          "pass": true,
+          "inputCost": 0.00234,
+          "cacheReadCost": 8.999999999999999e-05,
+          "inputsUnchanged": true
+        },
+        {
+          "name": "partition-0-explicit",
+          "pass": true,
+          "inputCost": 0.00234,
+          "cacheReadCost": 8.999999999999999e-05,
+          "inputsUnchanged": true
+        },
+        {
+          "name": "partition-1-fallback",
+          "pass": true,
+          "inputCost": 0.01615,
+          "cacheReadCost": 0.00015,
+          "inputsUnchanged": true
+        },
+        {
+          "name": "partition-1-zero",
+          "pass": true,
+          "inputCost": 0.016,
+          "cacheReadCost": 0.0,
+          "inputsUnchanged": true
+        },
+        {
+          "name": "partition-1-explicit",
+          "pass": true,
+          "inputCost": 0.0162,
+          "cacheReadCost": 0.00019999999999999998,
+          "inputsUnchanged": true
+        },
+        {
+          "name": "partition-2-fallback",
+          "pass": true,
+          "inputCost": 0.03515,
+          "cacheReadCost": 0.0,
+          "inputsUnchanged": true
+        },
+        {
+          "name": "partition-2-zero",
+          "pass": true,
+          "inputCost": 0.03515,
+          "cacheReadCost": 0.0,
+          "inputsUnchanged": true
+        },
+        {
+          "name": "partition-2-explicit",
+          "pass": true,
+          "inputCost": 0.03515,
+          "cacheReadCost": 0.0,
+          "inputsUnchanged": true
+        },
+        {
+          "name": "partition-3-fallback",
+          "pass": true,
+          "inputCost": 0.014899999999999998,
+          "cacheReadCost": 0.0003,
+          "inputsUnchanged": true
+        },
+        {
+          "name": "partition-3-zero",
+          "pass": true,
+          "inputCost": 0.014719999999999999,
+          "cacheReadCost": 0.00011999999999999999,
+          "inputsUnchanged": true
+        },
+        {
+          "name": "partition-3-explicit",
+          "pass": true,
+          "inputCost": 0.01496,
+          "cacheReadCost": 0.00035999999999999997,
+          "inputsUnchanged": true
+        },
+        {
+          "name": "partition-4-fallback",
+          "pass": true,
+          "inputCost": 1.1609862999999998,
+          "cacheReadCost": 0.0244308,
+          "inputsUnchanged": true
+        },
+        {
+          "name": "partition-4-zero",
+          "pass": true,
+          "inputCost": 1.1529504999999998,
+          "cacheReadCost": 0.016395,
+          "inputsUnchanged": true
+        },
+        {
+          "name": "partition-4-explicit",
+          "pass": true,
+          "inputCost": 1.1636649,
+          "cacheReadCost": 0.0271094,
+          "inputsUnchanged": true
+        },
+        {
+          "name": "partition-5-fallback",
+          "pass": true,
+          "inputCost": 1.7837085999999998,
+          "cacheReadCost": 0.0403866,
+          "inputsUnchanged": true
+        },
+        {
+          "name": "partition-5-zero",
+          "pass": true,
+          "inputCost": 1.7531392,
+          "cacheReadCost": 0.0098172,
+          "inputsUnchanged": true
+        },
+        {
+          "name": "partition-5-explicit",
+          "pass": true,
+          "inputCost": 1.7938983999999998,
+          "cacheReadCost": 0.050576399999999994,
+          "inputsUnchanged": true
+        },
+        {
+          "name": "partition-6-fallback",
+          "pass": true,
+          "inputCost": 3.6193675,
+          "cacheReadCost": 0.029928,
+          "inputsUnchanged": true
+        },
+        {
+          "name": "partition-6-zero",
+          "pass": true,
+          "inputCost": 3.6093625,
+          "cacheReadCost": 0.019923,
+          "inputsUnchanged": true
+        },
+        {
+          "name": "partition-6-explicit",
+          "pass": true,
+          "inputCost": 3.6160325,
+          "cacheReadCost": 0.026593,
+          "inputsUnchanged": true
+        },
+        {
+          "name": "partition-7-fallback",
+          "pass": true,
+          "inputCost": 0.19314455,
+          "cacheReadCost": 0.0321543,
+          "inputsUnchanged": true
+        },
+        {
+          "name": "partition-7-zero",
+          "pass": true,
+          "inputCost": 0.19309805,
+          "cacheReadCost": 0.0321078,
+          "inputsUnchanged": true
+        },
+        {
+          "name": "partition-7-explicit",
+          "pass": true,
+          "inputCost": 0.19316005,
+          "cacheReadCost": 0.0321698,
+          "inputsUnchanged": true
+        },
+        {
+          "name": "partition-8-fallback",
+          "pass": true,
+          "inputCost": 0.62224225,
+          "cacheReadCost": 0.012936,
+          "inputsUnchanged": true
+        },
+        {
+          "name": "partition-8-zero",
+          "pass": true,
+          "inputCost": 0.6205319499999999,
+          "cacheReadCost": 0.0112257,
+          "inputsUnchanged": true
+        },
+        {
+          "name": "partition-8-explicit",
+          "pass": true,
+          "inputCost": 0.62281235,
+          "cacheReadCost": 0.0135061,
+          "inputsUnchanged": true
+        },
+        {
+          "name": "partition-9-fallback",
+          "pass": true,
+          "inputCost": 3.5499281,
+          "cacheReadCost": 0.0569586,
+          "inputsUnchanged": true
+        },
+        {
+          "name": "partition-9-zero",
+          "pass": true,
+          "inputCost": 3.5472257,
+          "cacheReadCost": 0.0542562,
+          "inputsUnchanged": true
+        },
+        {
+          "name": "partition-9-explicit",
+          "pass": true,
+          "inputCost": 3.5490272999999997,
+          "cacheReadCost": 0.0560578,
+          "inputsUnchanged": true
+        },
+        {
+          "name": "partition-10-fallback",
+          "pass": true,
+          "inputCost": 0.36989125,
+          "cacheReadCost": 0.0113835,
+          "inputsUnchanged": true
+        },
+        {
+          "name": "partition-10-zero",
+          "pass": true,
+          "inputCost": 0.36095964999999997,
+          "cacheReadCost": 0.0024519,
+          "inputsUnchanged": true
+        },
+        {
+          "name": "partition-10-explicit",
+          "pass": true,
+          "inputCost": 0.37286845,
+          "cacheReadCost": 0.014360699999999999,
+          "inputsUnchanged": true
+        },
+        {
+          "name": "partition-11-fallback",
+          "pass": true,
+          "inputCost": 1.8285631999999998,
+          "cacheReadCost": 0.0700392,
+          "inputsUnchanged": true
+        },
+        {
+          "name": "partition-11-zero",
+          "pass": true,
+          "inputCost": 1.7791915999999999,
+          "cacheReadCost": 0.020667599999999998,
+          "inputsUnchanged": true
+        },
+        {
+          "name": "partition-11-explicit",
+          "pass": true,
+          "inputCost": 1.812106,
+          "cacheReadCost": 0.05358199999999999,
+          "inputsUnchanged": true
+        },
+        {
+          "name": "partition-12-fallback",
+          "pass": true,
+          "inputCost": 0.17458755000000004,
+          "cacheReadCost": 0.0332283,
+          "inputsUnchanged": true
+        },
+        {
+          "name": "partition-12-zero",
+          "pass": true,
+          "inputCost": 0.17449365,
+          "cacheReadCost": 0.0331344,
+          "inputsUnchanged": true
+        },
+        {
+          "name": "partition-12-explicit",
+          "pass": true,
+          "inputCost": 0.17461885,
+          "cacheReadCost": 0.0332596,
+          "inputsUnchanged": true
+        },
+        {
+          "name": "partition-13-fallback",
+          "pass": true,
+          "inputCost": 1.0385632500000002,
+          "cacheReadCost": 0.04646399999999999,
+          "inputsUnchanged": true
+        },
+        {
+          "name": "partition-13-zero",
+          "pass": true,
+          "inputCost": 0.9941299499999999,
+          "cacheReadCost": 0.0020307,
+          "inputsUnchanged": true
+        },
+        {
+          "name": "partition-13-explicit",
+          "pass": true,
+          "inputCost": 1.0533743500000001,
+          "cacheReadCost": 0.0612751,
+          "inputsUnchanged": true
+        },
+        {
+          "name": "partition-14-fallback",
+          "pass": true,
+          "inputCost": 4.1463578,
+          "cacheReadCost": 0.06868679999999999,
+          "inputsUnchanged": true
+        },
+        {
+          "name": "partition-14-zero",
+          "pass": true,
+          "inputCost": 4.116579199999999,
+          "cacheReadCost": 0.0389082,
+          "inputsUnchanged": true
+        },
+        {
+          "name": "partition-14-explicit",
+          "pass": true,
+          "inputCost": 4.1364316,
+          "cacheReadCost": 0.058760599999999996,
+          "inputsUnchanged": true
+        },
+        {
+          "name": "partition-15-fallback",
+          "pass": true,
+          "inputCost": 2.4956945000000004,
+          "cacheReadCost": 0.06234,
+          "inputsUnchanged": true
+        },
+        {
+          "name": "partition-15-zero",
+          "pass": true,
+          "inputCost": 2.4902627,
+          "cacheReadCost": 0.0569082,
+          "inputsUnchanged": true
+        },
+        {
+          "name": "partition-15-explicit",
+          "pass": true,
+          "inputCost": 2.4938839,
+          "cacheReadCost": 0.0605294,
+          "inputsUnchanged": true
+        }
+      ]
+    },
+    {
+      "variant": "flash-r1",
+      "checks": 48,
+      "passed": 6,
+      "exit": 0,
+      "sourceSha256": "7ce563eb34a2410a41e00f9c741d26becc9f70e0a6c911b15eb6f1301f6af0b4",
+      "imports": {
+        "packageOrigin": "litellm/__init__.py",
+        "allLiteLLMModulesWithinWorkspace": true,
+        "moduleCount": 813
+      },
+      "bytecodePolicy": "fresh cache path; reads from adjacent caches and all writes disabled",
+      "outcomes": [
+        {
+          "name": "partition-0-fallback",
+          "pass": false,
+          "inputCost": 0.00294,
+          "cacheReadCost": 8.999999999999999e-05,
+          "inputsUnchanged": true
+        },
+        {
+          "name": "partition-0-zero",
+          "pass": false,
+          "inputCost": 0.00294,
+          "cacheReadCost": 8.999999999999999e-05,
+          "inputsUnchanged": true
+        },
+        {
+          "name": "partition-0-explicit",
+          "pass": false,
+          "inputCost": 0.00294,
+          "cacheReadCost": 8.999999999999999e-05,
+          "inputsUnchanged": true
+        },
+        {
+          "name": "partition-1-fallback",
+          "pass": true,
+          "inputCost": 0.01615,
+          "cacheReadCost": 0.00015,
+          "inputsUnchanged": true
+        },
+        {
+          "name": "partition-1-zero",
+          "pass": true,
+          "inputCost": 0.016,
+          "cacheReadCost": 0.0,
+          "inputsUnchanged": true
+        },
+        {
+          "name": "partition-1-explicit",
+          "pass": true,
+          "inputCost": 0.0162,
+          "cacheReadCost": 0.00019999999999999998,
+          "inputsUnchanged": true
+        },
+        {
+          "name": "partition-2-fallback",
+          "pass": false,
+          "inputCost": 0.035750000000000004,
+          "cacheReadCost": 0.0,
+          "inputsUnchanged": true
+        },
+        {
+          "name": "partition-2-zero",
+          "pass": false,
+          "inputCost": 0.035750000000000004,
+          "cacheReadCost": 0.0,
+          "inputsUnchanged": true
+        },
+        {
+          "name": "partition-2-explicit",
+          "pass": false,
+          "inputCost": 0.035750000000000004,
+          "cacheReadCost": 0.0,
+          "inputsUnchanged": true
+        },
+        {
+          "name": "partition-3-fallback",
+          "pass": true,
+          "inputCost": 0.014899999999999998,
+          "cacheReadCost": 0.0003,
+          "inputsUnchanged": true
+        },
+        {
+          "name": "partition-3-zero",
+          "pass": true,
+          "inputCost": 0.014719999999999999,
+          "cacheReadCost": 0.00011999999999999999,
+          "inputsUnchanged": true
+        },
+        {
+          "name": "partition-3-explicit",
+          "pass": true,
+          "inputCost": 0.014959999999999998,
+          "cacheReadCost": 0.00035999999999999997,
+          "inputsUnchanged": true
+        },
+        {
+          "name": "partition-4-fallback",
+          "pass": false,
+          "inputCost": 1.2215923,
+          "cacheReadCost": 0.0244308,
+          "inputsUnchanged": true
+        },
+        {
+          "name": "partition-4-zero",
+          "pass": false,
+          "inputCost": 1.2135565,
+          "cacheReadCost": 0.016395,
+          "inputsUnchanged": true
+        },
+        {
+          "name": "partition-4-explicit",
+          "pass": false,
+          "inputCost": 1.2242708999999998,
+          "cacheReadCost": 0.0271094,
+          "inputsUnchanged": true
+        },
+        {
+          "name": "partition-5-fallback",
+          "pass": false,
+          "inputCost": 1.7842725999999998,
+          "cacheReadCost": 0.0403866,
+          "inputsUnchanged": true
+        },
+        {
+          "name": "partition-5-zero",
+          "pass": false,
+          "inputCost": 1.7537032,
+          "cacheReadCost": 0.0098172,
+          "inputsUnchanged": true
+        },
+        {
+          "name": "partition-5-explicit",
+          "pass": false,
+          "inputCost": 1.7944623999999998,
+          "cacheReadCost": 0.050576399999999994,
+          "inputsUnchanged": true
+        },
+        {
+          "name": "partition-6-fallback",
+          "pass": false,
+          "inputCost": 4.0336855,
+          "cacheReadCost": 0.029928,
+          "inputsUnchanged": true
+        },
+        {
+          "name": "partition-6-zero",
+          "pass": false,
+          "inputCost": 4.0236805,
+          "cacheReadCost": 0.019923,
+          "inputsUnchanged": true
+        },
+        {
+          "name": "partition-6-explicit",
+          "pass": false,
+          "inputCost": 4.0303505,
+          "cacheReadCost": 0.026593,
+          "inputsUnchanged": true
+        },
+        {
+          "name": "partition-7-fallback",
+          "pass": false,
+          "inputCost": 0.19461755,
+          "cacheReadCost": 0.0321543,
+          "inputsUnchanged": true
+        },
+        {
+          "name": "partition-7-zero",
+          "pass": false,
+          "inputCost": 0.19457105,
+          "cacheReadCost": 0.0321078,
+          "inputsUnchanged": true
+        },
+        {
+          "name": "partition-7-explicit",
+          "pass": false,
+          "inputCost": 0.19463305,
+          "cacheReadCost": 0.0321698,
+          "inputsUnchanged": true
+        },
+        {
+          "name": "partition-8-fallback",
+          "pass": false,
+          "inputCost": 0.76016725,
+          "cacheReadCost": 0.012936,
+          "inputsUnchanged": true
+        },
+        {
+          "name": "partition-8-zero",
+          "pass": false,
+          "inputCost": 0.7584569499999999,
+          "cacheReadCost": 0.0112257,
+          "inputsUnchanged": true
+        },
+        {
+          "name": "partition-8-explicit",
+          "pass": false,
+          "inputCost": 0.76073735,
+          "cacheReadCost": 0.0135061,
+          "inputsUnchanged": true
+        },
+        {
+          "name": "partition-9-fallback",
+          "pass": false,
+          "inputCost": 3.6032861,
+          "cacheReadCost": 0.0569586,
+          "inputsUnchanged": true
+        },
+        {
+          "name": "partition-9-zero",
+          "pass": false,
+          "inputCost": 3.6005837,
+          "cacheReadCost": 0.0542562,
+          "inputsUnchanged": true
+        },
+        {
+          "name": "partition-9-explicit",
+          "pass": false,
+          "inputCost": 3.6023853,
+          "cacheReadCost": 0.0560578,
+          "inputsUnchanged": true
+        },
+        {
+          "name": "partition-10-fallback",
+          "pass": false,
+          "inputCost": 0.38949025,
+          "cacheReadCost": 0.0113835,
+          "inputsUnchanged": true
+        },
+        {
+          "name": "partition-10-zero",
+          "pass": false,
+          "inputCost": 0.38055865,
+          "cacheReadCost": 0.0024519,
+          "inputsUnchanged": true
+        },
+        {
+          "name": "partition-10-explicit",
+          "pass": false,
+          "inputCost": 0.39246745,
+          "cacheReadCost": 0.014360699999999999,
+          "inputsUnchanged": true
+        },
+        {
+          "name": "partition-11-fallback",
+          "pass": false,
+          "inputCost": 2.0835632,
+          "cacheReadCost": 0.0700392,
+          "inputsUnchanged": true
+        },
+        {
+          "name": "partition-11-zero",
+          "pass": false,
+          "inputCost": 2.0341915999999998,
+          "cacheReadCost": 0.020667599999999998,
+          "inputsUnchanged": true
+        },
+        {
+          "name": "partition-11-explicit",
+          "pass": false,
+          "inputCost": 2.067106,
+          "cacheReadCost": 0.05358199999999999,
+          "inputsUnchanged": true
+        },
+        {
+          "name": "partition-12-fallback",
+          "pass": false,
+          "inputCost": 0.18671654999999998,
+          "cacheReadCost": 0.0332283,
+          "inputsUnchanged": true
+        },
+        {
+          "name": "partition-12-zero",
+          "pass": false,
+          "inputCost": 0.18662265,
+          "cacheReadCost": 0.0331344,
+          "inputsUnchanged": true
+        },
+        {
+          "name": "partition-12-explicit",
+          "pass": false,
+          "inputCost": 0.18674785,
+          "cacheReadCost": 0.0332596,
+          "inputsUnchanged": true
+        },
+        {
+          "name": "partition-13-fallback",
+          "pass": false,
+          "inputCost": 1.05720825,
+          "cacheReadCost": 0.04646399999999999,
+          "inputsUnchanged": true
+        },
+        {
+          "name": "partition-13-zero",
+          "pass": false,
+          "inputCost": 1.01277495,
+          "cacheReadCost": 0.0020307,
+          "inputsUnchanged": true
+        },
+        {
+          "name": "partition-13-explicit",
+          "pass": false,
+          "inputCost": 1.0720193500000001,
+          "cacheReadCost": 0.0612751,
+          "inputsUnchanged": true
+        },
+        {
+          "name": "partition-14-fallback",
+          "pass": false,
+          "inputCost": 4.1654498,
+          "cacheReadCost": 0.06868679999999999,
+          "inputsUnchanged": true
+        },
+        {
+          "name": "partition-14-zero",
+          "pass": false,
+          "inputCost": 4.1356712,
+          "cacheReadCost": 0.0389082,
+          "inputsUnchanged": true
+        },
+        {
+          "name": "partition-14-explicit",
+          "pass": false,
+          "inputCost": 4.1555235999999995,
+          "cacheReadCost": 0.058760599999999996,
+          "inputsUnchanged": true
+        },
+        {
+          "name": "partition-15-fallback",
+          "pass": false,
+          "inputCost": 2.5532165000000004,
+          "cacheReadCost": 0.06234,
+          "inputsUnchanged": true
+        },
+        {
+          "name": "partition-15-zero",
+          "pass": false,
+          "inputCost": 2.5477847000000002,
+          "cacheReadCost": 0.0569082,
+          "inputsUnchanged": true
+        },
+        {
+          "name": "partition-15-explicit",
+          "pass": false,
+          "inputCost": 2.5514059000000002,
+          "cacheReadCost": 0.0605294,
+          "inputsUnchanged": true
+        }
+      ]
+    },
+    {
+      "variant": "flash-r2",
+      "checks": 48,
+      "passed": 6,
+      "exit": 0,
+      "sourceSha256": "c276f7b1600478cbf14546daa66d2bb9171155a51098889ebe81fc3d8ef670a4",
+      "imports": {
+        "packageOrigin": "litellm/__init__.py",
+        "allLiteLLMModulesWithinWorkspace": true,
+        "moduleCount": 813
+      },
+      "bytecodePolicy": "fresh cache path; reads from adjacent caches and all writes disabled",
+      "outcomes": [
+        {
+          "name": "partition-0-fallback",
+          "pass": false,
+          "inputCost": 0.00294,
+          "cacheReadCost": 8.999999999999999e-05,
+          "inputsUnchanged": true
+        },
+        {
+          "name": "partition-0-zero",
+          "pass": false,
+          "inputCost": 0.00294,
+          "cacheReadCost": 8.999999999999999e-05,
+          "inputsUnchanged": true
+        },
+        {
+          "name": "partition-0-explicit",
+          "pass": false,
+          "inputCost": 0.00294,
+          "cacheReadCost": 8.999999999999999e-05,
+          "inputsUnchanged": true
+        },
+        {
+          "name": "partition-1-fallback",
+          "pass": true,
+          "inputCost": 0.01615,
+          "cacheReadCost": 0.00015,
+          "inputsUnchanged": true
+        },
+        {
+          "name": "partition-1-zero",
+          "pass": true,
+          "inputCost": 0.016,
+          "cacheReadCost": 0.0,
+          "inputsUnchanged": true
+        },
+        {
+          "name": "partition-1-explicit",
+          "pass": true,
+          "inputCost": 0.0162,
+          "cacheReadCost": 0.00019999999999999998,
+          "inputsUnchanged": true
+        },
+        {
+          "name": "partition-2-fallback",
+          "pass": false,
+          "inputCost": 0.035750000000000004,
+          "cacheReadCost": 0.0,
+          "inputsUnchanged": true
+        },
+        {
+          "name": "partition-2-zero",
+          "pass": false,
+          "inputCost": 0.035750000000000004,
+          "cacheReadCost": 0.0,
+          "inputsUnchanged": true
+        },
+        {
+          "name": "partition-2-explicit",
+          "pass": false,
+          "inputCost": 0.035750000000000004,
+          "cacheReadCost": 0.0,
+          "inputsUnchanged": true
+        },
+        {
+          "name": "partition-3-fallback",
+          "pass": true,
+          "inputCost": 0.014899999999999998,
+          "cacheReadCost": 0.0003,
+          "inputsUnchanged": true
+        },
+        {
+          "name": "partition-3-zero",
+          "pass": true,
+          "inputCost": 0.014719999999999999,
+          "cacheReadCost": 0.00011999999999999999,
+          "inputsUnchanged": true
+        },
+        {
+          "name": "partition-3-explicit",
+          "pass": true,
+          "inputCost": 0.014959999999999998,
+          "cacheReadCost": 0.00035999999999999997,
+          "inputsUnchanged": true
+        },
+        {
+          "name": "partition-4-fallback",
+          "pass": false,
+          "inputCost": 1.2215923,
+          "cacheReadCost": 0.0244308,
+          "inputsUnchanged": true
+        },
+        {
+          "name": "partition-4-zero",
+          "pass": false,
+          "inputCost": 1.2135565,
+          "cacheReadCost": 0.016395,
+          "inputsUnchanged": true
+        },
+        {
+          "name": "partition-4-explicit",
+          "pass": false,
+          "inputCost": 1.2242708999999998,
+          "cacheReadCost": 0.0271094,
+          "inputsUnchanged": true
+        },
+        {
+          "name": "partition-5-fallback",
+          "pass": false,
+          "inputCost": 1.7842725999999998,
+          "cacheReadCost": 0.0403866,
+          "inputsUnchanged": true
+        },
+        {
+          "name": "partition-5-zero",
+          "pass": false,
+          "inputCost": 1.7537032,
+          "cacheReadCost": 0.0098172,
+          "inputsUnchanged": true
+        },
+        {
+          "name": "partition-5-explicit",
+          "pass": false,
+          "inputCost": 1.7944623999999998,
+          "cacheReadCost": 0.050576399999999994,
+          "inputsUnchanged": true
+        },
+        {
+          "name": "partition-6-fallback",
+          "pass": false,
+          "inputCost": 4.0336855,
+          "cacheReadCost": 0.029928,
+          "inputsUnchanged": true
+        },
+        {
+          "name": "partition-6-zero",
+          "pass": false,
+          "inputCost": 4.0236805,
+          "cacheReadCost": 0.019923,
+          "inputsUnchanged": true
+        },
+        {
+          "name": "partition-6-explicit",
+          "pass": false,
+          "inputCost": 4.0303505,
+          "cacheReadCost": 0.026593,
+          "inputsUnchanged": true
+        },
+        {
+          "name": "partition-7-fallback",
+          "pass": false,
+          "inputCost": 0.19461755,
+          "cacheReadCost": 0.0321543,
+          "inputsUnchanged": true
+        },
+        {
+          "name": "partition-7-zero",
+          "pass": false,
+          "inputCost": 0.19457105,
+          "cacheReadCost": 0.0321078,
+          "inputsUnchanged": true
+        },
+        {
+          "name": "partition-7-explicit",
+          "pass": false,
+          "inputCost": 0.19463305,
+          "cacheReadCost": 0.0321698,
+          "inputsUnchanged": true
+        },
+        {
+          "name": "partition-8-fallback",
+          "pass": false,
+          "inputCost": 0.76016725,
+          "cacheReadCost": 0.012936,
+          "inputsUnchanged": true
+        },
+        {
+          "name": "partition-8-zero",
+          "pass": false,
+          "inputCost": 0.7584569499999999,
+          "cacheReadCost": 0.0112257,
+          "inputsUnchanged": true
+        },
+        {
+          "name": "partition-8-explicit",
+          "pass": false,
+          "inputCost": 0.76073735,
+          "cacheReadCost": 0.0135061,
+          "inputsUnchanged": true
+        },
+        {
+          "name": "partition-9-fallback",
+          "pass": false,
+          "inputCost": 3.6032861,
+          "cacheReadCost": 0.0569586,
+          "inputsUnchanged": true
+        },
+        {
+          "name": "partition-9-zero",
+          "pass": false,
+          "inputCost": 3.6005837,
+          "cacheReadCost": 0.0542562,
+          "inputsUnchanged": true
+        },
+        {
+          "name": "partition-9-explicit",
+          "pass": false,
+          "inputCost": 3.6023853,
+          "cacheReadCost": 0.0560578,
+          "inputsUnchanged": true
+        },
+        {
+          "name": "partition-10-fallback",
+          "pass": false,
+          "inputCost": 0.38949025,
+          "cacheReadCost": 0.0113835,
+          "inputsUnchanged": true
+        },
+        {
+          "name": "partition-10-zero",
+          "pass": false,
+          "inputCost": 0.38055865,
+          "cacheReadCost": 0.0024519,
+          "inputsUnchanged": true
+        },
+        {
+          "name": "partition-10-explicit",
+          "pass": false,
+          "inputCost": 0.39246745,
+          "cacheReadCost": 0.014360699999999999,
+          "inputsUnchanged": true
+        },
+        {
+          "name": "partition-11-fallback",
+          "pass": false,
+          "inputCost": 2.0835632,
+          "cacheReadCost": 0.0700392,
+          "inputsUnchanged": true
+        },
+        {
+          "name": "partition-11-zero",
+          "pass": false,
+          "inputCost": 2.0341915999999998,
+          "cacheReadCost": 0.020667599999999998,
+          "inputsUnchanged": true
+        },
+        {
+          "name": "partition-11-explicit",
+          "pass": false,
+          "inputCost": 2.067106,
+          "cacheReadCost": 0.05358199999999999,
+          "inputsUnchanged": true
+        },
+        {
+          "name": "partition-12-fallback",
+          "pass": false,
+          "inputCost": 0.18671654999999998,
+          "cacheReadCost": 0.0332283,
+          "inputsUnchanged": true
+        },
+        {
+          "name": "partition-12-zero",
+          "pass": false,
+          "inputCost": 0.18662265,
+          "cacheReadCost": 0.0331344,
+          "inputsUnchanged": true
+        },
+        {
+          "name": "partition-12-explicit",
+          "pass": false,
+          "inputCost": 0.18674785,
+          "cacheReadCost": 0.0332596,
+          "inputsUnchanged": true
+        },
+        {
+          "name": "partition-13-fallback",
+          "pass": false,
+          "inputCost": 1.05720825,
+          "cacheReadCost": 0.04646399999999999,
+          "inputsUnchanged": true
+        },
+        {
+          "name": "partition-13-zero",
+          "pass": false,
+          "inputCost": 1.01277495,
+          "cacheReadCost": 0.0020307,
+          "inputsUnchanged": true
+        },
+        {
+          "name": "partition-13-explicit",
+          "pass": false,
+          "inputCost": 1.0720193500000001,
+          "cacheReadCost": 0.0612751,
+          "inputsUnchanged": true
+        },
+        {
+          "name": "partition-14-fallback",
+          "pass": false,
+          "inputCost": 4.1654498,
+          "cacheReadCost": 0.06868679999999999,
+          "inputsUnchanged": true
+        },
+        {
+          "name": "partition-14-zero",
+          "pass": false,
+          "inputCost": 4.1356712,
+          "cacheReadCost": 0.0389082,
+          "inputsUnchanged": true
+        },
+        {
+          "name": "partition-14-explicit",
+          "pass": false,
+          "inputCost": 4.1555235999999995,
+          "cacheReadCost": 0.058760599999999996,
+          "inputsUnchanged": true
+        },
+        {
+          "name": "partition-15-fallback",
+          "pass": false,
+          "inputCost": 2.5532165000000004,
+          "cacheReadCost": 0.06234,
+          "inputsUnchanged": true
+        },
+        {
+          "name": "partition-15-zero",
+          "pass": false,
+          "inputCost": 2.5477847000000002,
+          "cacheReadCost": 0.0569082,
+          "inputsUnchanged": true
+        },
+        {
+          "name": "partition-15-explicit",
+          "pass": false,
+          "inputCost": 2.5514059000000002,
+          "cacheReadCost": 0.0605294,
+          "inputsUnchanged": true
+        }
+      ]
+    },
+    {
+      "variant": "candidate-r1",
+      "checks": 48,
+      "passed": 48,
+      "exit": 0,
+      "sourceSha256": "793ba2d3dfcb6c975bbc3f9eafcca161fa348e00657143961f980b6ef9482185",
+      "imports": {
+        "packageOrigin": "litellm/__init__.py",
+        "allLiteLLMModulesWithinWorkspace": true,
+        "moduleCount": 813
+      },
+      "bytecodePolicy": "fresh cache path; reads from adjacent caches and all writes disabled",
+      "outcomes": [
+        {
+          "name": "partition-0-fallback",
+          "pass": true,
+          "inputCost": 0.00234,
+          "cacheReadCost": 8.999999999999999e-05,
+          "inputsUnchanged": true
+        },
+        {
+          "name": "partition-0-zero",
+          "pass": true,
+          "inputCost": 0.00234,
+          "cacheReadCost": 8.999999999999999e-05,
+          "inputsUnchanged": true
+        },
+        {
+          "name": "partition-0-explicit",
+          "pass": true,
+          "inputCost": 0.00234,
+          "cacheReadCost": 8.999999999999999e-05,
+          "inputsUnchanged": true
+        },
+        {
+          "name": "partition-1-fallback",
+          "pass": true,
+          "inputCost": 0.01615,
+          "cacheReadCost": 0.00015,
+          "inputsUnchanged": true
+        },
+        {
+          "name": "partition-1-zero",
+          "pass": true,
+          "inputCost": 0.016,
+          "cacheReadCost": 0.0,
+          "inputsUnchanged": true
+        },
+        {
+          "name": "partition-1-explicit",
+          "pass": true,
+          "inputCost": 0.0162,
+          "cacheReadCost": 0.00019999999999999998,
+          "inputsUnchanged": true
+        },
+        {
+          "name": "partition-2-fallback",
+          "pass": true,
+          "inputCost": 0.03515,
+          "cacheReadCost": 0.0,
+          "inputsUnchanged": true
+        },
+        {
+          "name": "partition-2-zero",
+          "pass": true,
+          "inputCost": 0.03515,
+          "cacheReadCost": 0.0,
+          "inputsUnchanged": true
+        },
+        {
+          "name": "partition-2-explicit",
+          "pass": true,
+          "inputCost": 0.03515,
+          "cacheReadCost": 0.0,
+          "inputsUnchanged": true
+        },
+        {
+          "name": "partition-3-fallback",
+          "pass": true,
+          "inputCost": 0.014899999999999998,
+          "cacheReadCost": 0.0003,
+          "inputsUnchanged": true
+        },
+        {
+          "name": "partition-3-zero",
+          "pass": true,
+          "inputCost": 0.014719999999999999,
+          "cacheReadCost": 0.00011999999999999999,
+          "inputsUnchanged": true
+        },
+        {
+          "name": "partition-3-explicit",
+          "pass": true,
+          "inputCost": 0.014959999999999998,
+          "cacheReadCost": 0.00035999999999999997,
+          "inputsUnchanged": true
+        },
+        {
+          "name": "partition-4-fallback",
+          "pass": true,
+          "inputCost": 1.1609862999999998,
+          "cacheReadCost": 0.0244308,
+          "inputsUnchanged": true
+        },
+        {
+          "name": "partition-4-zero",
+          "pass": true,
+          "inputCost": 1.1529504999999998,
+          "cacheReadCost": 0.016395,
+          "inputsUnchanged": true
+        },
+        {
+          "name": "partition-4-explicit",
+          "pass": true,
+          "inputCost": 1.1636649,
+          "cacheReadCost": 0.0271094,
+          "inputsUnchanged": true
+        },
+        {
+          "name": "partition-5-fallback",
+          "pass": true,
+          "inputCost": 1.7837085999999998,
+          "cacheReadCost": 0.0403866,
+          "inputsUnchanged": true
+        },
+        {
+          "name": "partition-5-zero",
+          "pass": true,
+          "inputCost": 1.7531392,
+          "cacheReadCost": 0.0098172,
+          "inputsUnchanged": true
+        },
+        {
+          "name": "partition-5-explicit",
+          "pass": true,
+          "inputCost": 1.7938983999999998,
+          "cacheReadCost": 0.050576399999999994,
+          "inputsUnchanged": true
+        },
+        {
+          "name": "partition-6-fallback",
+          "pass": true,
+          "inputCost": 3.6193675,
+          "cacheReadCost": 0.029928,
+          "inputsUnchanged": true
+        },
+        {
+          "name": "partition-6-zero",
+          "pass": true,
+          "inputCost": 3.6093625,
+          "cacheReadCost": 0.019923,
+          "inputsUnchanged": true
+        },
+        {
+          "name": "partition-6-explicit",
+          "pass": true,
+          "inputCost": 3.6160325,
+          "cacheReadCost": 0.026593,
+          "inputsUnchanged": true
+        },
+        {
+          "name": "partition-7-fallback",
+          "pass": true,
+          "inputCost": 0.19314455,
+          "cacheReadCost": 0.0321543,
+          "inputsUnchanged": true
+        },
+        {
+          "name": "partition-7-zero",
+          "pass": true,
+          "inputCost": 0.19309805,
+          "cacheReadCost": 0.0321078,
+          "inputsUnchanged": true
+        },
+        {
+          "name": "partition-7-explicit",
+          "pass": true,
+          "inputCost": 0.19316005,
+          "cacheReadCost": 0.0321698,
+          "inputsUnchanged": true
+        },
+        {
+          "name": "partition-8-fallback",
+          "pass": true,
+          "inputCost": 0.62224225,
+          "cacheReadCost": 0.012936,
+          "inputsUnchanged": true
+        },
+        {
+          "name": "partition-8-zero",
+          "pass": true,
+          "inputCost": 0.6205319499999999,
+          "cacheReadCost": 0.0112257,
+          "inputsUnchanged": true
+        },
+        {
+          "name": "partition-8-explicit",
+          "pass": true,
+          "inputCost": 0.62281235,
+          "cacheReadCost": 0.0135061,
+          "inputsUnchanged": true
+        },
+        {
+          "name": "partition-9-fallback",
+          "pass": true,
+          "inputCost": 3.5499281,
+          "cacheReadCost": 0.0569586,
+          "inputsUnchanged": true
+        },
+        {
+          "name": "partition-9-zero",
+          "pass": true,
+          "inputCost": 3.5472257,
+          "cacheReadCost": 0.0542562,
+          "inputsUnchanged": true
+        },
+        {
+          "name": "partition-9-explicit",
+          "pass": true,
+          "inputCost": 3.5490272999999997,
+          "cacheReadCost": 0.0560578,
+          "inputsUnchanged": true
+        },
+        {
+          "name": "partition-10-fallback",
+          "pass": true,
+          "inputCost": 0.36989125,
+          "cacheReadCost": 0.0113835,
+          "inputsUnchanged": true
+        },
+        {
+          "name": "partition-10-zero",
+          "pass": true,
+          "inputCost": 0.36095964999999997,
+          "cacheReadCost": 0.0024519,
+          "inputsUnchanged": true
+        },
+        {
+          "name": "partition-10-explicit",
+          "pass": true,
+          "inputCost": 0.37286845,
+          "cacheReadCost": 0.014360699999999999,
+          "inputsUnchanged": true
+        },
+        {
+          "name": "partition-11-fallback",
+          "pass": true,
+          "inputCost": 1.8285631999999998,
+          "cacheReadCost": 0.0700392,
+          "inputsUnchanged": true
+        },
+        {
+          "name": "partition-11-zero",
+          "pass": true,
+          "inputCost": 1.7791915999999999,
+          "cacheReadCost": 0.020667599999999998,
+          "inputsUnchanged": true
+        },
+        {
+          "name": "partition-11-explicit",
+          "pass": true,
+          "inputCost": 1.812106,
+          "cacheReadCost": 0.05358199999999999,
+          "inputsUnchanged": true
+        },
+        {
+          "name": "partition-12-fallback",
+          "pass": true,
+          "inputCost": 0.17458754999999998,
+          "cacheReadCost": 0.0332283,
+          "inputsUnchanged": true
+        },
+        {
+          "name": "partition-12-zero",
+          "pass": true,
+          "inputCost": 0.17449365,
+          "cacheReadCost": 0.0331344,
+          "inputsUnchanged": true
+        },
+        {
+          "name": "partition-12-explicit",
+          "pass": true,
+          "inputCost": 0.17461885,
+          "cacheReadCost": 0.0332596,
+          "inputsUnchanged": true
+        },
+        {
+          "name": "partition-13-fallback",
+          "pass": true,
+          "inputCost": 1.0385632500000002,
+          "cacheReadCost": 0.04646399999999999,
+          "inputsUnchanged": true
+        },
+        {
+          "name": "partition-13-zero",
+          "pass": true,
+          "inputCost": 0.9941299499999999,
+          "cacheReadCost": 0.0020307,
+          "inputsUnchanged": true
+        },
+        {
+          "name": "partition-13-explicit",
+          "pass": true,
+          "inputCost": 1.0533743500000001,
+          "cacheReadCost": 0.0612751,
+          "inputsUnchanged": true
+        },
+        {
+          "name": "partition-14-fallback",
+          "pass": true,
+          "inputCost": 4.1463578,
+          "cacheReadCost": 0.06868679999999999,
+          "inputsUnchanged": true
+        },
+        {
+          "name": "partition-14-zero",
+          "pass": true,
+          "inputCost": 4.116579199999999,
+          "cacheReadCost": 0.0389082,
+          "inputsUnchanged": true
+        },
+        {
+          "name": "partition-14-explicit",
+          "pass": true,
+          "inputCost": 4.1364316,
+          "cacheReadCost": 0.058760599999999996,
+          "inputsUnchanged": true
+        },
+        {
+          "name": "partition-15-fallback",
+          "pass": true,
+          "inputCost": 2.4956945000000004,
+          "cacheReadCost": 0.06234,
+          "inputsUnchanged": true
+        },
+        {
+          "name": "partition-15-zero",
+          "pass": true,
+          "inputCost": 2.4902627,
+          "cacheReadCost": 0.0569082,
+          "inputsUnchanged": true
+        },
+        {
+          "name": "partition-15-explicit",
+          "pass": true,
+          "inputCost": 2.4938839,
+          "cacheReadCost": 0.0605294,
+          "inputsUnchanged": true
+        }
+      ]
+    },
+    {
+      "variant": "control-r2",
+      "checks": 48,
+      "passed": 9,
+      "exit": 0,
+      "sourceSha256": "226db16e1c680cebf2478a57101380e82cdffaa46c2044be6f2632389874249f",
+      "imports": {
+        "packageOrigin": "litellm/__init__.py",
+        "allLiteLLMModulesWithinWorkspace": true,
+        "moduleCount": 813
+      },
+      "bytecodePolicy": "fresh cache path; reads from adjacent caches and all writes disabled",
+      "outcomes": [
+        {
+          "name": "partition-0-fallback",
+          "pass": false,
+          "inputCost": 0.00294,
+          "cacheReadCost": 8.999999999999999e-05,
+          "inputsUnchanged": true
+        },
+        {
+          "name": "partition-0-zero",
+          "pass": false,
+          "inputCost": 0.00294,
+          "cacheReadCost": 8.999999999999999e-05,
+          "inputsUnchanged": true
+        },
+        {
+          "name": "partition-0-explicit",
+          "pass": false,
+          "inputCost": 0.00294,
+          "cacheReadCost": 8.999999999999999e-05,
+          "inputsUnchanged": true
+        },
+        {
+          "name": "partition-1-fallback",
+          "pass": true,
+          "inputCost": 0.01615,
+          "cacheReadCost": 0.00015,
+          "inputsUnchanged": true
+        },
+        {
+          "name": "partition-1-zero",
+          "pass": true,
+          "inputCost": 0.016,
+          "cacheReadCost": 0.0,
+          "inputsUnchanged": true
+        },
+        {
+          "name": "partition-1-explicit",
+          "pass": true,
+          "inputCost": 0.0162,
+          "cacheReadCost": 0.00019999999999999998,
+          "inputsUnchanged": true
+        },
+        {
+          "name": "partition-2-fallback",
+          "pass": true,
+          "inputCost": 0.03515,
+          "cacheReadCost": 0.0,
+          "inputsUnchanged": true
+        },
+        {
+          "name": "partition-2-zero",
+          "pass": true,
+          "inputCost": 0.03515,
+          "cacheReadCost": 0.0,
+          "inputsUnchanged": true
+        },
+        {
+          "name": "partition-2-explicit",
+          "pass": true,
+          "inputCost": 0.03515,
+          "cacheReadCost": 0.0,
+          "inputsUnchanged": true
+        },
+        {
+          "name": "partition-3-fallback",
+          "pass": true,
+          "inputCost": 0.014899999999999998,
+          "cacheReadCost": 0.0003,
+          "inputsUnchanged": true
+        },
+        {
+          "name": "partition-3-zero",
+          "pass": true,
+          "inputCost": 0.014719999999999999,
+          "cacheReadCost": 0.00011999999999999999,
+          "inputsUnchanged": true
+        },
+        {
+          "name": "partition-3-explicit",
+          "pass": true,
+          "inputCost": 0.014959999999999998,
+          "cacheReadCost": 0.00035999999999999997,
+          "inputsUnchanged": true
+        },
+        {
+          "name": "partition-4-fallback",
+          "pass": false,
+          "inputCost": 1.2215923,
+          "cacheReadCost": 0.0244308,
+          "inputsUnchanged": true
+        },
+        {
+          "name": "partition-4-zero",
+          "pass": false,
+          "inputCost": 1.2135565,
+          "cacheReadCost": 0.016395,
+          "inputsUnchanged": true
+        },
+        {
+          "name": "partition-4-explicit",
+          "pass": false,
+          "inputCost": 1.2242708999999998,
+          "cacheReadCost": 0.0271094,
+          "inputsUnchanged": true
+        },
+        {
+          "name": "partition-5-fallback",
+          "pass": false,
+          "inputCost": 1.7842725999999998,
+          "cacheReadCost": 0.0403866,
+          "inputsUnchanged": true
+        },
+        {
+          "name": "partition-5-zero",
+          "pass": false,
+          "inputCost": 1.7537032,
+          "cacheReadCost": 0.0098172,
+          "inputsUnchanged": true
+        },
+        {
+          "name": "partition-5-explicit",
+          "pass": false,
+          "inputCost": 1.7944623999999998,
+          "cacheReadCost": 0.050576399999999994,
+          "inputsUnchanged": true
+        },
+        {
+          "name": "partition-6-fallback",
+          "pass": false,
+          "inputCost": 4.0336855,
+          "cacheReadCost": 0.029928,
+          "inputsUnchanged": true
+        },
+        {
+          "name": "partition-6-zero",
+          "pass": false,
+          "inputCost": 4.0236805,
+          "cacheReadCost": 0.019923,
+          "inputsUnchanged": true
+        },
+        {
+          "name": "partition-6-explicit",
+          "pass": false,
+          "inputCost": 4.0303505,
+          "cacheReadCost": 0.026593,
+          "inputsUnchanged": true
+        },
+        {
+          "name": "partition-7-fallback",
+          "pass": false,
+          "inputCost": 0.19461755,
+          "cacheReadCost": 0.0321543,
+          "inputsUnchanged": true
+        },
+        {
+          "name": "partition-7-zero",
+          "pass": false,
+          "inputCost": 0.19457105,
+          "cacheReadCost": 0.0321078,
+          "inputsUnchanged": true
+        },
+        {
+          "name": "partition-7-explicit",
+          "pass": false,
+          "inputCost": 0.19463305,
+          "cacheReadCost": 0.0321698,
+          "inputsUnchanged": true
+        },
+        {
+          "name": "partition-8-fallback",
+          "pass": false,
+          "inputCost": 0.76016725,
+          "cacheReadCost": 0.012936,
+          "inputsUnchanged": true
+        },
+        {
+          "name": "partition-8-zero",
+          "pass": false,
+          "inputCost": 0.7584569499999999,
+          "cacheReadCost": 0.0112257,
+          "inputsUnchanged": true
+        },
+        {
+          "name": "partition-8-explicit",
+          "pass": false,
+          "inputCost": 0.76073735,
+          "cacheReadCost": 0.0135061,
+          "inputsUnchanged": true
+        },
+        {
+          "name": "partition-9-fallback",
+          "pass": false,
+          "inputCost": 3.6032861,
+          "cacheReadCost": 0.0569586,
+          "inputsUnchanged": true
+        },
+        {
+          "name": "partition-9-zero",
+          "pass": false,
+          "inputCost": 3.6005837,
+          "cacheReadCost": 0.0542562,
+          "inputsUnchanged": true
+        },
+        {
+          "name": "partition-9-explicit",
+          "pass": false,
+          "inputCost": 3.6023853,
+          "cacheReadCost": 0.0560578,
+          "inputsUnchanged": true
+        },
+        {
+          "name": "partition-10-fallback",
+          "pass": false,
+          "inputCost": 0.38949025,
+          "cacheReadCost": 0.0113835,
+          "inputsUnchanged": true
+        },
+        {
+          "name": "partition-10-zero",
+          "pass": false,
+          "inputCost": 0.38055865,
+          "cacheReadCost": 0.0024519,
+          "inputsUnchanged": true
+        },
+        {
+          "name": "partition-10-explicit",
+          "pass": false,
+          "inputCost": 0.39246745,
+          "cacheReadCost": 0.014360699999999999,
+          "inputsUnchanged": true
+        },
+        {
+          "name": "partition-11-fallback",
+          "pass": false,
+          "inputCost": 2.0835632,
+          "cacheReadCost": 0.0700392,
+          "inputsUnchanged": true
+        },
+        {
+          "name": "partition-11-zero",
+          "pass": false,
+          "inputCost": 2.0341915999999998,
+          "cacheReadCost": 0.020667599999999998,
+          "inputsUnchanged": true
+        },
+        {
+          "name": "partition-11-explicit",
+          "pass": false,
+          "inputCost": 2.067106,
+          "cacheReadCost": 0.05358199999999999,
+          "inputsUnchanged": true
+        },
+        {
+          "name": "partition-12-fallback",
+          "pass": false,
+          "inputCost": 0.18671654999999998,
+          "cacheReadCost": 0.0332283,
+          "inputsUnchanged": true
+        },
+        {
+          "name": "partition-12-zero",
+          "pass": false,
+          "inputCost": 0.18662265,
+          "cacheReadCost": 0.0331344,
+          "inputsUnchanged": true
+        },
+        {
+          "name": "partition-12-explicit",
+          "pass": false,
+          "inputCost": 0.18674785,
+          "cacheReadCost": 0.0332596,
+          "inputsUnchanged": true
+        },
+        {
+          "name": "partition-13-fallback",
+          "pass": false,
+          "inputCost": 1.05720825,
+          "cacheReadCost": 0.04646399999999999,
+          "inputsUnchanged": true
+        },
+        {
+          "name": "partition-13-zero",
+          "pass": false,
+          "inputCost": 1.01277495,
+          "cacheReadCost": 0.0020307,
+          "inputsUnchanged": true
+        },
+        {
+          "name": "partition-13-explicit",
+          "pass": false,
+          "inputCost": 1.0720193500000001,
+          "cacheReadCost": 0.0612751,
+          "inputsUnchanged": true
+        },
+        {
+          "name": "partition-14-fallback",
+          "pass": false,
+          "inputCost": 4.1654498,
+          "cacheReadCost": 0.06868679999999999,
+          "inputsUnchanged": true
+        },
+        {
+          "name": "partition-14-zero",
+          "pass": false,
+          "inputCost": 4.1356712,
+          "cacheReadCost": 0.0389082,
+          "inputsUnchanged": true
+        },
+        {
+          "name": "partition-14-explicit",
+          "pass": false,
+          "inputCost": 4.1555235999999995,
+          "cacheReadCost": 0.058760599999999996,
+          "inputsUnchanged": true
+        },
+        {
+          "name": "partition-15-fallback",
+          "pass": false,
+          "inputCost": 2.5532165000000004,
+          "cacheReadCost": 0.06234,
+          "inputsUnchanged": true
+        },
+        {
+          "name": "partition-15-zero",
+          "pass": false,
+          "inputCost": 2.5477847000000002,
+          "cacheReadCost": 0.0569082,
+          "inputsUnchanged": true
+        },
+        {
+          "name": "partition-15-explicit",
+          "pass": false,
+          "inputCost": 2.5514059000000002,
+          "cacheReadCost": 0.0605294,
+          "inputsUnchanged": true
+        }
+      ]
+    },
+    {
+      "variant": "control-r1",
+      "checks": 48,
+      "passed": 9,
+      "exit": 0,
+      "sourceSha256": "984b93bd452aa76df476c0eb9c5b78a38d44a969a6ea13784e26273283a61c89",
+      "imports": {
+        "packageOrigin": "litellm/__init__.py",
+        "allLiteLLMModulesWithinWorkspace": true,
+        "moduleCount": 813
+      },
+      "bytecodePolicy": "fresh cache path; reads from adjacent caches and all writes disabled",
+      "outcomes": [
+        {
+          "name": "partition-0-fallback",
+          "pass": false,
+          "inputCost": 0.00294,
+          "cacheReadCost": 8.999999999999999e-05,
+          "inputsUnchanged": true
+        },
+        {
+          "name": "partition-0-zero",
+          "pass": false,
+          "inputCost": 0.00294,
+          "cacheReadCost": 8.999999999999999e-05,
+          "inputsUnchanged": true
+        },
+        {
+          "name": "partition-0-explicit",
+          "pass": false,
+          "inputCost": 0.00294,
+          "cacheReadCost": 8.999999999999999e-05,
+          "inputsUnchanged": true
+        },
+        {
+          "name": "partition-1-fallback",
+          "pass": true,
+          "inputCost": 0.01615,
+          "cacheReadCost": 0.00015,
+          "inputsUnchanged": true
+        },
+        {
+          "name": "partition-1-zero",
+          "pass": true,
+          "inputCost": 0.016,
+          "cacheReadCost": 0.0,
+          "inputsUnchanged": true
+        },
+        {
+          "name": "partition-1-explicit",
+          "pass": true,
+          "inputCost": 0.0162,
+          "cacheReadCost": 0.00019999999999999998,
+          "inputsUnchanged": true
+        },
+        {
+          "name": "partition-2-fallback",
+          "pass": true,
+          "inputCost": 0.03515,
+          "cacheReadCost": 0.0,
+          "inputsUnchanged": true
+        },
+        {
+          "name": "partition-2-zero",
+          "pass": true,
+          "inputCost": 0.03515,
+          "cacheReadCost": 0.0,
+          "inputsUnchanged": true
+        },
+        {
+          "name": "partition-2-explicit",
+          "pass": true,
+          "inputCost": 0.03515,
+          "cacheReadCost": 0.0,
+          "inputsUnchanged": true
+        },
+        {
+          "name": "partition-3-fallback",
+          "pass": true,
+          "inputCost": 0.014899999999999998,
+          "cacheReadCost": 0.0003,
+          "inputsUnchanged": true
+        },
+        {
+          "name": "partition-3-zero",
+          "pass": true,
+          "inputCost": 0.014719999999999999,
+          "cacheReadCost": 0.00011999999999999999,
+          "inputsUnchanged": true
+        },
+        {
+          "name": "partition-3-explicit",
+          "pass": true,
+          "inputCost": 0.014959999999999998,
+          "cacheReadCost": 0.00035999999999999997,
+          "inputsUnchanged": true
+        },
+        {
+          "name": "partition-4-fallback",
+          "pass": false,
+          "inputCost": 1.2215923,
+          "cacheReadCost": 0.0244308,
+          "inputsUnchanged": true
+        },
+        {
+          "name": "partition-4-zero",
+          "pass": false,
+          "inputCost": 1.2135565,
+          "cacheReadCost": 0.016395,
+          "inputsUnchanged": true
+        },
+        {
+          "name": "partition-4-explicit",
+          "pass": false,
+          "inputCost": 1.2242708999999998,
+          "cacheReadCost": 0.0271094,
+          "inputsUnchanged": true
+        },
+        {
+          "name": "partition-5-fallback",
+          "pass": false,
+          "inputCost": 1.7842725999999998,
+          "cacheReadCost": 0.0403866,
+          "inputsUnchanged": true
+        },
+        {
+          "name": "partition-5-zero",
+          "pass": false,
+          "inputCost": 1.7537032,
+          "cacheReadCost": 0.0098172,
+          "inputsUnchanged": true
+        },
+        {
+          "name": "partition-5-explicit",
+          "pass": false,
+          "inputCost": 1.7944623999999998,
+          "cacheReadCost": 0.050576399999999994,
+          "inputsUnchanged": true
+        },
+        {
+          "name": "partition-6-fallback",
+          "pass": false,
+          "inputCost": 4.0336855,
+          "cacheReadCost": 0.029928,
+          "inputsUnchanged": true
+        },
+        {
+          "name": "partition-6-zero",
+          "pass": false,
+          "inputCost": 4.0236805,
+          "cacheReadCost": 0.019923,
+          "inputsUnchanged": true
+        },
+        {
+          "name": "partition-6-explicit",
+          "pass": false,
+          "inputCost": 4.0303505,
+          "cacheReadCost": 0.026593,
+          "inputsUnchanged": true
+        },
+        {
+          "name": "partition-7-fallback",
+          "pass": false,
+          "inputCost": 0.19461755,
+          "cacheReadCost": 0.0321543,
+          "inputsUnchanged": true
+        },
+        {
+          "name": "partition-7-zero",
+          "pass": false,
+          "inputCost": 0.19457105,
+          "cacheReadCost": 0.0321078,
+          "inputsUnchanged": true
+        },
+        {
+          "name": "partition-7-explicit",
+          "pass": false,
+          "inputCost": 0.19463305,
+          "cacheReadCost": 0.0321698,
+          "inputsUnchanged": true
+        },
+        {
+          "name": "partition-8-fallback",
+          "pass": false,
+          "inputCost": 0.76016725,
+          "cacheReadCost": 0.012936,
+          "inputsUnchanged": true
+        },
+        {
+          "name": "partition-8-zero",
+          "pass": false,
+          "inputCost": 0.7584569499999999,
+          "cacheReadCost": 0.0112257,
+          "inputsUnchanged": true
+        },
+        {
+          "name": "partition-8-explicit",
+          "pass": false,
+          "inputCost": 0.76073735,
+          "cacheReadCost": 0.0135061,
+          "inputsUnchanged": true
+        },
+        {
+          "name": "partition-9-fallback",
+          "pass": false,
+          "inputCost": 3.6032861,
+          "cacheReadCost": 0.0569586,
+          "inputsUnchanged": true
+        },
+        {
+          "name": "partition-9-zero",
+          "pass": false,
+          "inputCost": 3.6005837,
+          "cacheReadCost": 0.0542562,
+          "inputsUnchanged": true
+        },
+        {
+          "name": "partition-9-explicit",
+          "pass": false,
+          "inputCost": 3.6023853,
+          "cacheReadCost": 0.0560578,
+          "inputsUnchanged": true
+        },
+        {
+          "name": "partition-10-fallback",
+          "pass": false,
+          "inputCost": 0.38949025,
+          "cacheReadCost": 0.0113835,
+          "inputsUnchanged": true
+        },
+        {
+          "name": "partition-10-zero",
+          "pass": false,
+          "inputCost": 0.38055865,
+          "cacheReadCost": 0.0024519,
+          "inputsUnchanged": true
+        },
+        {
+          "name": "partition-10-explicit",
+          "pass": false,
+          "inputCost": 0.39246745,
+          "cacheReadCost": 0.014360699999999999,
+          "inputsUnchanged": true
+        },
+        {
+          "name": "partition-11-fallback",
+          "pass": false,
+          "inputCost": 2.0835632,
+          "cacheReadCost": 0.0700392,
+          "inputsUnchanged": true
+        },
+        {
+          "name": "partition-11-zero",
+          "pass": false,
+          "inputCost": 2.0341915999999998,
+          "cacheReadCost": 0.020667599999999998,
+          "inputsUnchanged": true
+        },
+        {
+          "name": "partition-11-explicit",
+          "pass": false,
+          "inputCost": 2.067106,
+          "cacheReadCost": 0.05358199999999999,
+          "inputsUnchanged": true
+        },
+        {
+          "name": "partition-12-fallback",
+          "pass": false,
+          "inputCost": 0.18671654999999998,
+          "cacheReadCost": 0.0332283,
+          "inputsUnchanged": true
+        },
+        {
+          "name": "partition-12-zero",
+          "pass": false,
+          "inputCost": 0.18662265,
+          "cacheReadCost": 0.0331344,
+          "inputsUnchanged": true
+        },
+        {
+          "name": "partition-12-explicit",
+          "pass": false,
+          "inputCost": 0.18674785,
+          "cacheReadCost": 0.0332596,
+          "inputsUnchanged": true
+        },
+        {
+          "name": "partition-13-fallback",
+          "pass": false,
+          "inputCost": 1.05720825,
+          "cacheReadCost": 0.04646399999999999,
+          "inputsUnchanged": true
+        },
+        {
+          "name": "partition-13-zero",
+          "pass": false,
+          "inputCost": 1.01277495,
+          "cacheReadCost": 0.0020307,
+          "inputsUnchanged": true
+        },
+        {
+          "name": "partition-13-explicit",
+          "pass": false,
+          "inputCost": 1.0720193500000001,
+          "cacheReadCost": 0.0612751,
+          "inputsUnchanged": true
+        },
+        {
+          "name": "partition-14-fallback",
+          "pass": false,
+          "inputCost": 4.1654498,
+          "cacheReadCost": 0.06868679999999999,
+          "inputsUnchanged": true
+        },
+        {
+          "name": "partition-14-zero",
+          "pass": false,
+          "inputCost": 4.1356712,
+          "cacheReadCost": 0.0389082,
+          "inputsUnchanged": true
+        },
+        {
+          "name": "partition-14-explicit",
+          "pass": false,
+          "inputCost": 4.1555235999999995,
+          "cacheReadCost": 0.058760599999999996,
+          "inputsUnchanged": true
+        },
+        {
+          "name": "partition-15-fallback",
+          "pass": false,
+          "inputCost": 2.5532165000000004,
+          "cacheReadCost": 0.06234,
+          "inputsUnchanged": true
+        },
+        {
+          "name": "partition-15-zero",
+          "pass": false,
+          "inputCost": 2.5477847000000002,
+          "cacheReadCost": 0.0569082,
+          "inputsUnchanged": true
+        },
+        {
+          "name": "partition-15-explicit",
+          "pass": false,
+          "inputCost": 2.5514059000000002,
+          "cacheReadCost": 0.0605294,
+          "inputsUnchanged": true
+        }
+      ]
+    }
+  ],
+  "interpretation": "The merged reference and both earlier Astra patches pass48/48; the first v55 candidate also passes48/48. Both current controls score9/48, both earlier Flash patches6/48, and the base7/48. These48 correlated checks cover16 synthetic token partitions and three audio-rate variants on one development task; they are not48 independent PRs or a production/generalization estimate. All original and predeclared study scores remain unchanged."
+}

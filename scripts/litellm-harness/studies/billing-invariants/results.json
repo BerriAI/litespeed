@@ -13,11 +13,11 @@
     },
     {
       "variant": "control",
-      "evaluated": 1,
+      "evaluated": 2,
       "expected": 2,
       "successes": 0,
-      "meanSeconds": 1158.028,
-      "tokenPricedUsd": 0.288668562,
+      "meanSeconds": 1042.6675,
+      "tokenPricedUsd": 0.46655048,
       "trialsWithoutTokenPrice": 0
     }
   ],
@@ -26,13 +26,15 @@
       "variant": "billing-invariants",
       "eligibleEvaluated": 1,
       "successes": 1,
-      "incidentAllocations": 0
+      "incidentAllocations": 0,
+      "budgetCensoredAllocations": 0
     },
     {
       "variant": "control",
-      "eligibleEvaluated": 1,
+      "eligibleEvaluated": 2,
       "successes": 0,
-      "incidentAllocations": 0
+      "incidentAllocations": 0,
+      "budgetCensoredAllocations": 0
     }
   ],
   "comparisons": [
@@ -58,6 +60,7 @@
       "evaluated": true,
       "run": "replication-v55-billing-billing-invariants-r1-realtime-cached-audio-cost-2a1e0941",
       "infrastructureIncident": null,
+      "budgetCensored": false,
       "success": true,
       "completed": true,
       "completionReason": "completed",
@@ -134,6 +137,7 @@
       "evaluated": true,
       "run": "replication-v55-billing-control-r2-realtime-cached-audio-cost-8a992532",
       "infrastructureIncident": null,
+      "budgetCensored": false,
       "success": false,
       "completed": true,
       "completionReason": "completed",
@@ -205,7 +209,70 @@
       "effort": "medium",
       "kind": "litellm-specific",
       "timeoutSeconds": 1800,
-      "evaluated": false
+      "evaluated": true,
+      "run": "replication-v55-billing-control-r1-realtime-cached-audio-cost-f0df5960",
+      "infrastructureIncident": null,
+      "budgetCensored": false,
+      "success": false,
+      "completed": true,
+      "completionReason": "completed",
+      "seconds": 927.307,
+      "acceptance": {
+        "exit": 1,
+        "tests": 17,
+        "failures": 1,
+        "errors": 0,
+        "skipped": 0,
+        "passed": false
+      },
+      "computedUsd": 0.177881918,
+      "activations": {
+        "initialMapNotices": 1,
+        "contextToolCalls": 0,
+        "guideIdsShown": [],
+        "unparsedContextPayloads": 0,
+        "finalReviewNotices": 1,
+        "guidedFinalReviewNotices": 0,
+        "finalReviewGuideIdsShown": [],
+        "batchedEditCalls": 0,
+        "completedBatchedEditCalls": 0,
+        "batchEditsRequested": 0,
+        "batchSizes": [],
+        "backgroundCommandNotices": 0,
+        "testFocusNotices": 1,
+        "explorationFocusNotices": 1,
+        "readCallsByEffectiveLimit": {
+          "180": 2,
+          "160": 3,
+          "300": 2,
+          "80": 1,
+          "210": 1,
+          "280": 1,
+          "130": 3,
+          "60": 9,
+          "110": 1,
+          "100": 1,
+          "70": 3,
+          "50": 2,
+          "200": 1,
+          "30": 5,
+          "40": 6,
+          "45": 4,
+          "35": 1,
+          "14": 1
+        },
+        "defaultWindowReadCalls": null,
+        "readLimitProvenance": "unknown: saved arguments include host-injected defaults"
+      },
+      "originalSuccess": false,
+      "supplemental": {
+        "artifact": "billing-contract-probe.json",
+        "checks": 12,
+        "expectedChecks": 12,
+        "checksPassed": 9,
+        "exit": 0,
+        "passed": false
+      }
     },
     {
       "dataset": "training7",
