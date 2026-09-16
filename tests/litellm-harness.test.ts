@@ -27,6 +27,15 @@ describe('LiteLLM repository navigation',()=>{
     const result=JSON.parse(await litellmContext(root,{path:'litellm/router.py',query:'team strategy'},new AbortController().signal));
     expect(result.symbols).toHaveLength(1);expect(result.symbols[0].name).toBe('resolve_team_strategy');
   });
+  it('ranks the direct module test ahead of nested name matches and excludes fixture modules',async()=>{
+    await put('litellm/router.py','class Router: pass\n');
+    for(const file of ['test_router.py','caching/test_embedding_router.py','integrations/test_router_logging.py','llms/openrouter/test_openrouter_chat.py','router_strategy/__init__.py','router_strategy/conftest.py','router_strategy/helpers.py'])await put('tests/test_litellm/'+file);
+    const result=JSON.parse(await litellmContext(root,{path:'litellm/router.py'},new AbortController().signal));
+    expect(result.tests[0]).toBe('tests/test_litellm/test_router.py');
+    expect(result.tests).toContain('tests/test_litellm/caching/test_embedding_router.py');
+    expect(result.tests.some((p:string)=>p.includes('openrouter'))).toBe(false);
+    for(const file of ['__init__.py','conftest.py','helpers.py'])expect(result.tests.some((p:string)=>p.endsWith('/'+file))).toBe(false);
+  });
   it('finds backend behavior in generically named modules before dashboard filenames',async()=>{
     await put('litellm/proxy/common_utils.py','def check_team_member_budget(spend):\n    return spend\n');
     await put('ui/litellm-dashboard/src/components/team_member_budget.tsx','export const Budget = 1;');

@@ -4,7 +4,7 @@ import path from 'node:path';
 import fg from 'fast-glob';
 import type { ToolDefinition } from '../shared/types.js';
 
-export const LITELLM_HARNESS_VERSION='2026-09-15.33';
+export const LITELLM_HARNESS_VERSION='2026-09-15.34';
 export const litellmContextTool:ToolDefinition={type:'function',function:{name:'litellm_context',description:'Navigate the current LiteLLM checkout. Give a task query to find relevant definitions, inline conditions and existing tests. Give a source path to see its symbol outline and test partners; add a symbol name to read that definition with numbered lines, or callers to find functions invoking a named helper in that file. Reads only this workspace, never Git history or remote answers.',parameters:{type:'object',properties:{query:{type:'string',maxLength:1000},path:{type:'string',maxLength:500},symbol:{type:'string',maxLength:200},callers:{type:'string',maxLength:200,description:'Python helper name whose call sites and enclosing functions to find; requires path.'}},additionalProperties:false}}};
 
 const playbooks = [
@@ -132,7 +132,16 @@ async function sourceFile(workspace:string,relative:string):Promise<string>{
 function partners(files:string[],source:string):string[]{
   const mirror=source.startsWith('litellm/')?'tests/test_'+source:'tests/'+source;
   const directory=path.posix.dirname(mirror),base=path.posix.basename(source,'.py');
-  return files.filter(p=>p.startsWith(directory+'/')&&p.endsWith('.py')).sort((a,b)=>Number(b.includes(base))-Number(a.includes(base))||a.localeCompare(b)).slice(0,8);
+  const candidates=files.filter(p=>p.startsWith(directory+'/')&&/^(?:test_.*|.*_test)\.py$/.test(path.posix.basename(p)));
+  // Match module-name tokens, not a substring in any ancestor: "router" must
+  // not rank OpenRouter providers, fixture modules or __init__.py as its tests.
+  const named=candidates.filter(p=>`_${path.posix.basename(p,'.py')}_`.includes(`_${base}_`));
+  const exact=path.posix.join(directory,`test_${base}.py`);
+  return (named.length?named:candidates).sort((a,b)=>
+    Number(b===exact)-Number(a===exact)||
+    Number(path.posix.basename(b)===`test_${base}.py`)-Number(path.posix.basename(a)===`test_${base}.py`)||
+    a.split('/').length-b.split('/').length||a.localeCompare(b)
+  ).slice(0,8);
 }
 
 function outline(text:string){
