@@ -1,0 +1,66 @@
+{
+  "scope": "First repetition on one previously inspected training task. Second repetitions and other task remain pending; no paired-study or causal claim. Original scores and timeouts retained.",
+  "observedControlVerification": "The control created a subclass inheriting the legacy hook with native lifecycle opt-in, ran a focused check that failed with error instead of pass, and changed eligibility to follow inherited methods. It timed out during a later verification command.",
+  "trials": [
+    {
+      "run": "replication-v35-inspection-native-inspection-r1-legacy-stream-pipeline-826c12f2",
+      "harnessCommit": "b5f5899ce41cf64f64c495cfa42262eaf1848911",
+      "seconds": 838.445,
+      "completed": true,
+      "completionReason": "completed",
+      "acceptance": {
+        "exit": 1,
+        "tests": 16,
+        "failures": 2,
+        "errors": 0,
+        "skipped": 0,
+        "passed": false
+      },
+      "toolCounts": {
+        "read_file": 39,
+        "grep": 16,
+        "glob": 3,
+        "bash": 34,
+        "todo_write": 2,
+        "edit_file": 27,
+        "bash_output": 8
+      },
+      "timeToFirstEditSeconds": 317.723,
+      "toolActiveSeconds": 92.814,
+      "modelSeconds": 716.329,
+      "inputTokens": 14595047,
+      "cachedTokens": 13266428,
+      "outputTokens": 83066,
+      "computedUsd": 0.43998473600000004
+    },
+    {
+      "run": "replication-v35-inspection-control-r1-legacy-stream-pipeline-be9193ea",
+      "harnessCommit": "58eb44cb6ff1e0142e57cced9eed2e917f28cdb2",
+      "seconds": 900.714,
+      "completed": false,
+      "completionReason": "timeout",
+      "acceptance": {
+        "exit": 0,
+        "tests": 16,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0,
+        "passed": true
+      },
+      "toolCounts": {
+        "bash": 59,
+        "read_file": 48,
+        "litellm_context": 1,
+        "edit_file": 22,
+        "bash_output": 8
+      },
+      "timeToFirstEditSeconds": 446.002,
+      "toolActiveSeconds": 144.284,
+      "modelSeconds": 696.144,
+      "inputTokens": 12647526,
+      "cachedTokens": 11399236,
+      "outputTokens": 74356,
+      "computedUsd": 0.403493412
+    }
+  ]
+}

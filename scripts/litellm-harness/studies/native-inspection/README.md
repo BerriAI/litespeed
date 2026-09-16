@@ -29,3 +29,9 @@ Plan revision 2 assigns new `-envfix` labels to replacements for just those two 
 ## Metering-gateway outage
 
 The current plan explicitly replaces allocations affected by the verified gateway heap failure, regardless of their patch scores. [The outage audit](../gateway-memory/outage.json) records every original attempt and its admitted-request count; `plan-before-gateway-oom.json` preserves the previous identities. Source commits, tasks, effort, deadlines and concurrency are unchanged. Replacements use new `-oom1` labels. Original partial work, failed allocations and charges stay in the campaign-wide report; complete-pair summaries use the amended plan. These are infrastructure replacements, not selection of a better model attempt.
+
+## First valid legacy-streaming observations
+
+The search-preference candidate (`826c12f2`) finished normally at 838.45 seconds with 14/16 checks. The control (`be9193ea`) reached 16/16 but timed out at 900.71 seconds. Candidate/control tool activity was 92.81/144.28 seconds, first edit 317.72/446.00 seconds, Bash calls 34/59 and native grep calls 16/0. These are different trajectories on one repeated task, not causal savings. Token-priced costs were $0.4400/$0.4035; fewer shell calls did not imply lower model cost.
+
+The control's late verification was useful: it wrote an inherited-hook/native-lifecycle test, observed a failure, then fixed its leaf-class assumption. Its timeout occurred during subsequent checks. The candidate retained the same two inherited-hook reference failures seen in earlier training attempts, under the separately documented [ambiguous wording](../feature-effort/legacy-inheritance/README.md). Neither is a normally delivered all-checks-passing attempt. The mechanism remains unpromoted while the planned repetitions finish. [Recorded metrics](first-legacy-pair.json).

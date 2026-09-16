@@ -4,13 +4,21 @@
   "variants": [
     {
       "variant": "control",
-      "evaluated": 0,
-      "expected": 4
+      "evaluated": 1,
+      "expected": 4,
+      "successes": 0,
+      "meanSeconds": 900.714,
+      "tokenPricedUsd": 0.403493412,
+      "trialsWithoutTokenPrice": 0
     },
     {
       "variant": "native-inspection",
-      "evaluated": 0,
-      "expected": 4
+      "evaluated": 1,
+      "expected": 4,
+      "successes": 0,
+      "meanSeconds": 838.445,
+      "tokenPricedUsd": 0.43998473600000004,
+      "trialsWithoutTokenPrice": 0
     }
   ],
   "comparisons": [
@@ -67,7 +75,62 @@
       "label": "replication-v35-inspection-native-inspection-r1",
       "commit": "b5f5899ce41cf64f64c495cfa42262eaf1848911",
       "effort": "medium",
-      "evaluated": false
+      "evaluated": true,
+      "success": false,
+      "completed": true,
+      "completionReason": "completed",
+      "seconds": 838.445,
+      "acceptance": {
+        "exit": 1,
+        "tests": 16,
+        "failures": 2,
+        "errors": 0,
+        "skipped": 0,
+        "passed": false
+      },
+      "computedUsd": 0.43998473600000004,
+      "activations": {
+        "initialMapNotices": 1,
+        "contextToolCalls": 0,
+        "guideIdsShown": [],
+        "unparsedContextPayloads": 0,
+        "finalReviewNotices": 1,
+        "guidedFinalReviewNotices": 0,
+        "finalReviewGuideIdsShown": [],
+        "batchedEditCalls": 0,
+        "completedBatchedEditCalls": 0,
+        "batchEditsRequested": 0,
+        "batchSizes": [],
+        "backgroundCommandNotices": 0,
+        "testFocusNotices": 1,
+        "explorationFocusNotices": 1,
+        "readCallsByEffectiveLimit": {
+          "160": 3,
+          "450": 1,
+          "200": 3,
+          "60": 3,
+          "80": 5,
+          "120": 6,
+          "55": 1,
+          "180": 1,
+          "240": 1,
+          "150": 2,
+          "130": 1,
+          "100": 1,
+          "70": 2,
+          "220": 1,
+          "330": 1,
+          "115": 1,
+          "40": 1,
+          "95": 1,
+          "20": 1,
+          "34": 1,
+          "15": 1,
+          "50": 1
+        },
+        "defaultWindowReadCalls": null,
+        "readLimitProvenance": "unknown: saved arguments include host-injected defaults"
+      }
     },
     {
       "dataset": "training5",
@@ -76,7 +139,60 @@
       "label": "replication-v35-inspection-control-r1",
       "commit": "58eb44cb6ff1e0142e57cced9eed2e917f28cdb2",
       "effort": "medium",
-      "evaluated": false
+      "evaluated": true,
+      "success": false,
+      "completed": false,
+      "completionReason": "timeout",
+      "seconds": 900.714,
+      "acceptance": {
+        "exit": 0,
+        "tests": 16,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0,
+        "passed": true
+      },
+      "computedUsd": 0.403493412,
+      "activations": {
+        "initialMapNotices": 1,
+        "contextToolCalls": 1,
+        "guideIdsShown": [],
+        "unparsedContextPayloads": 0,
+        "finalReviewNotices": 0,
+        "guidedFinalReviewNotices": 0,
+        "finalReviewGuideIdsShown": [],
+        "batchedEditCalls": 0,
+        "completedBatchedEditCalls": 0,
+        "batchEditsRequested": 0,
+        "batchSizes": [],
+        "backgroundCommandNotices": 0,
+        "testFocusNotices": 1,
+        "explorationFocusNotices": 1,
+        "readCallsByEffectiveLimit": {
+          "160": 7,
+          "200": 1,
+          "120": 5,
+          "140": 2,
+          "90": 2,
+          "210": 1,
+          "330": 1,
+          "60": 5,
+          "130": 4,
+          "50": 2,
+          "40": 8,
+          "100": 2,
+          "80": 1,
+          "110": 1,
+          "70": 1,
+          "35": 1,
+          "14": 1,
+          "30": 1,
+          "25": 1,
+          "65": 1
+        },
+        "defaultWindowReadCalls": null,
+        "readLimitProvenance": "unknown: saved arguments include host-injected defaults"
+      }
     },
     {
       "dataset": "",
