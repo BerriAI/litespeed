@@ -1,6 +1,6 @@
 # Host sleep and unpriced transport failures
 
-**Campaign admission is paused. This is an infrastructure incident, not a model-quality result.**
+**Infrastructure incident; affected allocations remain excluded from quality comparisons.** After review, a [bounded serial resume](bounded-resume.json) uses only the existing $1.07233424 of safe headroom for the new billing study. All186 unresolved requests remain fully reserved. The figures below describe the incident checkpoint; see the current results report for subsequent spending.
 
 After the 12:41 UTC snapshot, 126 admitted requests lacked a recorded upstream response and usage receipt. Three were already-running long requests; subsequent attempts failed rapidly. The Mac power log records repeated sleep/dark-wake cycles and a lid/HID wake at 12:26:10 Pacific. The old metering gateway mapped caught exceptions to HTTP 429, so the solver called these rate-limit errors even though the underlying error and upstream status were not retained. This evidence does not prove each request was unbilled or establish its exact transport cause.
 
@@ -19,3 +19,7 @@ A second local HTTP case returns a successful response without usage and confirm
 ## Resume procedure
 
 Keep new allocations stopped while reconciling receipts or authoritative billing. Preserve the original ledger and all unknown charges that lack supporting evidence. Record any accounting amendment separately. Before resuming, load the corrected gateway, verify no admitted request remains active, archive the pause record after review, and restart: deleting the file alone does not reopen a live process. Check readiness before releasing the shared queue. Replacement trials require a published incident amendment with fresh labels and unchanged frozen runtime/input identities; do not rerun only low-scoring patches.
+
+## Bounded resume without releasing unknown charges
+
+The original pause was reviewed and archived, the fixed gateway restarted, and its unchanged ledger hash verified before admission resumed. All other paid controllers were stopped. A [preallocation amendment](../billing-invariants/plan.json) preserves the original plan and runs the new billing comparison serially inside the existing headroom. The gateway still refuses reservations above $100 and stops on any new missing receipt. This is not billing reconciliation: $46.9303296 remains unresolved and reserved. Idle sleep is inhibited during this controller; that does not guarantee connectivity through lid closure. No earlier failed allocation is retried.

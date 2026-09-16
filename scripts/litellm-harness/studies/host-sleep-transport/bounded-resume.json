@@ -1,0 +1,22 @@
+{
+  "at": "2026-09-16T20:38:07.737568+00:00",
+  "ledgerSha256Unchanged": "01e87310e70cd7fcf450dc22e3be14a93e4dc5af4eeaeb6c2e5a01eb1ab55418",
+  "knownPricedUsd": 51.99733616,
+  "unknownReservedUsd": 46.9303296,
+  "ready": {
+    "committedUsd": 98.92766575999973,
+    "requests": 28183,
+    "limitUsd": 100,
+    "paused": false
+  },
+  "reason": "Use only safe existing headroom after incident review; preserve all uncertain charges; serial predeclared v55 study only.",
+  "plan": "../billing-invariants/plan.json",
+  "unknownRequests": 186,
+  "originalIncidentUnchanged": true,
+  "allOtherControllersStopped": true,
+  "preflightRepair": {
+    "allocatedBeforeFix": 0,
+    "paidRequestsBeforeFix": 0,
+    "issue": "Two later datasets held stale copied connection files. Converted them to links to the current root connection after preserving the copies privately."
+  }
+}

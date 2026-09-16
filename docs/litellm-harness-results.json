@@ -1,16 +1,16 @@
 {
   "schemaVersion": 3,
-  "status": "campaign-paused",
-  "generatedAt": "2026-09-16T20:13:47.867373+00:00",
+  "status": "campaign-in-progress",
+  "generatedAt": "2026-09-16T20:40:10.506959+00:00",
   "currentHarnessVersion": "2026-09-16.52",
   "gatewayAccounting": {
     "limitUsd": 100,
-    "knownUsd": 51.99733616,
+    "knownUsd": 52.009468618,
     "unknownReservedUsd": 46.93032960000001,
     "unknownRequests": 186,
-    "pendingReservedUsd": 0,
-    "committedUsd": 98.92766575999973,
-    "admittedRequests": 28183,
+    "pendingReservedUsd": 0.2523136,
+    "committedUsd": 99.19211181799972,
+    "admittedRequests": 28197,
     "astraUsd": null
   },
   "runs": [

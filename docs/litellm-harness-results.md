@@ -1,18 +1,16 @@
 # LiteLLM harness campaign results
 
-Interim snapshot: 2026-09-16T20:13:47.867373+00:00. Current harness: **2026-09-16.52**.
+Interim snapshot: 2026-09-16T20:40:10.506959+00:00. Current harness: **2026-09-16.52**.
 
-**Paid trial admission is paused after unpriced request failures. The campaign has not established a quality win over Astra/Codex or production replacement readiness.**
+**The campaign is still running. It has not established a quality win over Astra/Codex or production replacement readiness.**
 
 The selectable architecture and replay workbench are implemented. The current work measures which mechanisms improve correct, completed patches and which add latency. Model-written critiques are hypotheses; executable checks decide whether a candidate works.
 
 ## Spending
 
-Confirmed token/header-priced charges: **$51.9973**. Missing receipts retain **$46.9303** across 186 requests; active requests reserve another **$0.0000**. The committed upper bound is **$98.9277** against the authorized **$100.00** ceiling. Reservations are not actual charges. Astra account billing is unavailable.
+Confirmed token/header-priced charges: **$52.0095**. Missing receipts retain **$46.9303** across 186 requests; active requests reserve another **$0.2523**. The committed upper bound is **$99.1921** against the authorized **$100.00** ceiling. Reservations are not actual charges. Astra account billing is unavailable.
 
 An [offline receipt reconciliation](../scripts/litellm-harness/studies/runner-receipt-recovery/README.md) subsequently matched 58 missing gateway records to independently persisted runner usage. Exact round binding agreed with 3,359 known receipts. It restored $0.07678 in token-priced charges and released $14.55740 in excess reservations; unmatched requests remain reserved. The original ledger and per-request reservation history are preserved.
-
-See the [host-sleep/transport incident](../scripts/litellm-harness/studies/host-sleep-transport/README.md). Reservations from these failures are not evidence of actual spending or model-quality failures. No unknown charge has been released without a receipt.
 
 ## Controlled development observations
 
