@@ -1,0 +1,19 @@
+{
+  "commit": "3461a33495e4a63c9a2ee7871a85b0272921938e",
+  "baseCommit": "1fb7a14",
+  "productionVersionStill": "2026-09-15.34",
+  "candidateVersion": "2026-09-15.37",
+  "status": "prepared, not promoted or separately paid-tested",
+  "changes": "Apply the frozen v31 job-event change on the current v34 runtime, gated in both drain locations to OpenAI-compatible providers. Anthropic and Codex keep their existing user-envelope behavior.",
+  "validation": {
+    "focusedTestsPassed": 29,
+    "focusedFiles": [
+      "tests/litellm-harness-runner.test.ts",
+      "tests/jobs-runner.test.ts",
+      "tests/envelope.test.ts"
+    ],
+    "typecheck": true,
+    "regression": "Both new non-OpenAI tests fail without the provider gate and pass with it. Real background jobs run; model responses are mocked. Existing OpenAI test checks once-only chronological events and stable early envelope."
+  },
+  "limits": "The frozen paid study remains on v31 and is not backported. This compatibility preparation does not establish quality or latency."
+}

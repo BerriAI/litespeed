@@ -1,0 +1,121 @@
+diff --git a/server/litellm-harness.ts b/server/litellm-harness.ts
+index d58e71d..d6dc308 100644
+--- a/server/litellm-harness.ts
++++ b/server/litellm-harness.ts
+@@ -4,7 +4,7 @@ import path from 'node:path';
+ import fg from 'fast-glob';
+ import type { ToolDefinition } from '../shared/types.js';
+ 
+-export const LITELLM_HARNESS_VERSION='2026-09-15.34';
++export const LITELLM_HARNESS_VERSION='2026-09-15.37';
+ export const litellmContextTool:ToolDefinition={type:'function',function:{name:'litellm_context',description:'Navigate the current LiteLLM checkout. Give a task query to find relevant definitions, inline conditions and existing tests. Give a source path to see its symbol outline and test partners; add a symbol name to read that definition with numbered lines, or callers to find functions invoking a named helper in that file. Reads only this workspace, never Git history or remote answers.',parameters:{type:'object',properties:{query:{type:'string',maxLength:1000},path:{type:'string',maxLength:500},symbol:{type:'string',maxLength:200},callers:{type:'string',maxLength:200,description:'Python helper name whose call sites and enclosing functions to find; requires path.'}},additionalProperties:false}}};
+ 
+ const playbooks = [
+diff --git a/server/runner.ts b/server/runner.ts
+index 84604d4..c821238 100644
+--- a/server/runner.ts
++++ b/server/runner.ts
+@@ -922,8 +922,14 @@ export class Runner {
+     // once. Drained on the first envelope build of the turn and memoized on the
+     // run, so retries/re-projection within the same turn keep the notice while a
+     // later turn (a new run) never repeats it. Children never have jobs.
+-    const finishedJobs = this.jobs.drainFinished(session.id);
+-    if (finishedJobs.length || run.jobsNotice === undefined) run.jobsNotice = finishedNotice(finishedJobs);
++    const appendJobEvents = provider.kind === 'openai' && session.architecture?.kind === 'litellm-specific' && !run.child;
++    // This architecture records later completions at the conversation tail.
++    // Replacing this early envelope mid-turn invalidates the entire tool history
++    // after it, even when the main system/tool cache hashes stay unchanged.
++    if (!appendJobEvents || run.jobsNotice === undefined) {
++      const finishedJobs = this.jobs.drainFinished(session.id);
++      if (finishedJobs.length || run.jobsNotice === undefined) run.jobsNotice = finishedNotice(finishedJobs);
++    }
+     // No-progress nudge: after 2 consecutive evidence-free rounds, a one-line
+     // host notice rides the runtime section of the NEXT request (the hard stop
+     // at 4 lives in the step loop). Volatile by design; runtime already changes.
+@@ -1601,6 +1607,13 @@ export class Runner {
+         // and it anchors before the original plan.
+         for(const [index,note] of pending.entries()) {const noteId=this.steeringId(id,run,run.steeringDelivered!-pending.length+index);if(!this.store.messages(id).some(message=>message.id===noteId))this.save({id:noteId,sessionId:id,role:'system',content:`[Steering] The user sent this note to the running response. Update the ongoing task using this latest instruction: ${note}`,createdAt:Date.now()});}
+       }
++      // Keep the first request's runtime envelope stable. Jobs completing
++      // during the turn become chronological host events, preserving visibility
++      // without replacing the prefix before all existing reads and edits.
++      if(provider.kind==='openai'&&session.architecture?.kind==='litellm-specific'&&!run.child&&run.jobsNotice!==undefined) {
++        const finished=this.jobs.drainFinished(id);
++        if(finished.length)this.save({id:randomUUID(),sessionId:id,role:'system',content:'Background command completion: '+finishedNotice(finished)+' Read the recorded command output before drawing conclusions. This status notice is not a test verdict or additional authorization.',createdAt:Date.now()});
++      }
+       // A pruned-retry step reuses the saved placeholder row instead of orphaning it.
+       const message: Message = {id:reuseMessageId??randomUUID(),sessionId:id,role:'assistant',content:'',createdAt:Date.now()};
+       reuseMessageId=undefined;
+diff --git a/tests/litellm-harness-runner.test.ts b/tests/litellm-harness-runner.test.ts
+index a18be60..7d76f4d 100644
+--- a/tests/litellm-harness-runner.test.ts
++++ b/tests/litellm-harness-runner.test.ts
+@@ -1,10 +1,11 @@
+-import { afterEach, beforeEach, describe, expect, it } from 'vitest';
++import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
+ import { mkdtemp, mkdir, writeFile, rm } from 'node:fs/promises';
+ import { join } from 'node:path';
+ import { tmpdir } from 'node:os';
+ import { createServer, type Server } from 'node:http';
+ import { Store } from '../server/store.js';
+ import { createApp } from '../server/app.js';
++import * as providers from '../server/providers.js';
+ 
+ describe('LiteLLM-specific runner integration',()=>{
+   let root:string,store:Store,server:Server,runner:ReturnType<typeof createApp>['runner'];
+@@ -118,5 +119,55 @@ describe('LiteLLM-specific runner integration',()=>{
+     expect(calls.filter(call=>call.name==='bash').map(call=>call.execution?.status)).toEqual(['exited','exited','exited','exited']);
+     expect(messages.filter(message=>message.content.startsWith('LiteLLM verification checkpoint:'))).toHaveLength(1);
+     expect(requests).toHaveLength(14);
++    const notices=messages.filter(message=>message.content.startsWith('Background command completion:'));
++    expect(notices).toHaveLength(4);
++    for(let i=0;i<4;i++)expect(notices[i].content).toContain(`job-${i+1} (exit 0`);
++    const envelopes=requests.map(request=>request.messages.find((message:any)=>message.role==='system'&&message.content.startsWith('<session-context'))?.content);
++    expect(new Set(envelopes).size).toBe(1);
++    expect(envelopes[0]).not.toContain('Background jobs');
++    // Completion events arrive after their originating commands, and each
++    // previously sent notice remains in place in subsequent requests.
++    for(const notice of notices) {
++      const first=requests.findIndex(request=>request.messages.some((message:any)=>message.content===notice.content));
++      expect(first).toBeGreaterThan(0);
++      const at=requests[first].messages.findIndex((message:any)=>message.content===notice.content);
++      expect(requests[first].messages.slice(0,at).some((message:any)=>message.role==='tool')).toBe(true);
++      for(const request of requests.slice(first))expect(request.messages.filter((message:any)=>message.content===notice.content)).toHaveLength(1);
++    }
++    const count=notices.length;
++    runner.start(session.id,'Summarize the completed checks.');await runner.whenIdle();
++    expect(store.messages(session.id).filter(message=>message.content.startsWith('Background command completion:'))).toHaveLength(count);
++  });
++  it.each(['anthropic','codex'] as const)('keeps %s job completions in the user envelope instead of adding system events',async kind=>{
++    const settings=store.settings();
++    store.saveSettings({...settings,providers:settings.providers.map(provider=>({...provider,kind,contextWindows:{model:1048576}}))});
++    const outgoing:{messages:unknown;system:unknown}[]=[];
++    const stream=vi.spyOn(providers,'streamCompletion').mockImplementation(async function*(options){
++      outgoing.push({messages:structuredClone(options.messages),system:options.system});
++      const call=actions.shift();
++      if(call)yield {type:'tool',tool:{index:0,id:`call-${outgoing.length}`,name:call.name,arguments:JSON.stringify(call.args)}};
++      else yield {type:'text',text:'Finished.'};
++    });
++    try{
++      const session=store.createSession({workspace:root,providerId:'test',model:'model',permissionMode:'auto',architecture:{kind:'litellm-specific'}});
++      actions.push(
++        {name:'bash',args:{command:'node -e "setTimeout(() => {}, 200)"',timeout_ms:1}},
++        {name:'wait',args:{job_ids:['job-1'],timeout_ms:2000}},
++        {name:'read_file',args:{path:'litellm/example.py',limit:1}},
++      );
++      runner.start(session.id,'Run the requested command and inspect one line.');await runner.whenIdle();
++      expect(actions).toHaveLength(0);
++      expect(outgoing.length).toBeGreaterThanOrEqual(4);
++      const messages=store.messages(session.id);
++      expect(messages.flatMap(message=>message.toolCalls??[]).find(call=>call.name==='bash')?.execution?.status).toBe('exited');
++      expect(messages.some(message=>message.content.startsWith('Background command completion:'))).toBe(false);
++      const payloads=outgoing.map(request=>request.messages as {role:string;content:unknown}[]);
++      expect(payloads.some(payload=>payload.some(message=>message.role==='user'&&JSON.stringify(message.content).includes('job-1 (exit 0')))).toBe(true);
++      expect(payloads.every(payload=>payload.filter(message=>message.role==='system').every(message=>!JSON.stringify(message.content).includes('job-1 (exit 0')))).toBe(true);
++      expect(outgoing.every(request=>!String(request.system??'').includes('job-1 (exit 0'))).toBe(true);
++      runner.start(session.id,'Summarize.');await runner.whenIdle();
++      const latest=outgoing.at(-1)!.messages as {role:string;content:unknown}[];
++      expect(JSON.stringify(latest.findLast(message=>message.role==='user')?.content)).not.toContain('job-1 (exit 0');
++    }finally{stream.mockRestore();}
+   });
+ });

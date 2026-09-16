@@ -10,9 +10,13 @@ The [plan](plan.json) compares two tasks, two repetitions and both arms, randomi
 
 Adapter scope: this experiment uses the OpenAI-compatible chat adapter. Anthropic and Codex adapters hoist system-role events into their instruction prefix. Before promoting the mechanism, constrain this event-placement behavior to adapters that serialize it chronologically, or separately validate a compatible representation. The frozen candidate remains unchanged for its planned Flash trials.
 
+A [compatible implementation](compatible-candidate.patch) is now prepared separately on the v34 runtime and is **not promoted**. Both job-drain locations limit chronological events to OpenAI-compatible providers. New real-background-job tests with mocked model responses verify that Anthropic and Codex keep completion notices in the latest user envelope, avoid persisted system events, and do not repeat the notice on the next turn. Both tests fail without the provider gate and pass with it; 29 selected tests and type checking pass. [The preparation record](compatible-candidate.json) distinguishes this implementation from the frozen paid study.
+
 ## Result interpretation
 
 The first appended-job Bedrock trial has high cache reuse but times out. Its raw
 24/34 includes the separately documented [tag-order contradiction](../bedrock-tag-order/README.md)
 and six unstated error-wording requirements. These diagnostics do not change the
 frozen scores, count the timeout as completion, or establish a quality benefit.
+
+Both appended-job MCP-auth repetitions finish normally with 52/52 checks (382.27 and 480.94 seconds; token-priced costs $0.0738 and $0.0982). The completed control repetition finishes in 545.40 seconds with 52/52 at $0.3122. The other control repetition is still pending. These partial observations are promising, but differences in task length and provider caching require complete matched reporting; the candidate remains unpromoted.
