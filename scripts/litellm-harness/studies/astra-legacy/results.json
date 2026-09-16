@@ -1,0 +1,34 @@
+{
+  "status": "interim",
+  "note": "Development selection only. Interim observed-task means can change as slower trials finish. Bootstrap resamples tasks, not attempts; it does not correct adaptive candidate selection or establish future generalization. Token prices exclude requests without usage and do not replace the campaign ledger.",
+  "variants": [
+    {
+      "variant": "astra",
+      "evaluated": 0,
+      "expected": 2
+    }
+  ],
+  "comparisons": [],
+  "trials": [
+    {
+      "dataset": "training5",
+      "case": "legacy-stream-pipeline",
+      "name": "astra",
+      "label": "replication-v41-astra-legacy-r1",
+      "commit": "05f3011b4c5000d1fbb384a2d237856d2120c72c",
+      "effort": "high",
+      "kind": "codex",
+      "evaluated": false
+    },
+    {
+      "dataset": "training5",
+      "case": "legacy-stream-pipeline",
+      "name": "astra",
+      "label": "replication-v41-astra-legacy-r2",
+      "commit": "05f3011b4c5000d1fbb384a2d237856d2120c72c",
+      "effort": "high",
+      "kind": "codex",
+      "evaluated": false
+    }
+  ]
+}

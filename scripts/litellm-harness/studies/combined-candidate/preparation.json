@@ -1,0 +1,49 @@
+{
+  "createdAt": "2026-09-16T08:20:36.888238+00:00",
+  "status": "prepared; not promoted; no paid solver trial yet",
+  "commit": "fe1c0207022db0ae878337962dfc28cd47033a42",
+  "base": "dd9f575bf7bd7451e93f2ae54bb9b550d629c0a1",
+  "version": "2026-09-16.44",
+  "mechanisms": [
+    {
+      "study": "batched-edits",
+      "candidate": "16bfa137",
+      "note": "Complete feature delta from control5a095de, including ordered atomic replacements and shared previews."
+    },
+    {
+      "study": "job-events",
+      "candidate": "3461a33495e4a63c9a2ee7871a85b0272921938e",
+      "note": "Both job drain locations are gated to OpenAI-compatible root LiteLLM sessions; other adapters retain user-envelope notices."
+    }
+  ],
+  "additionalPresentation": "Browser summaries show grouped edit count; host job notices collapse in web and terminal with full text available. No native-inspection preference or added streaming guide.",
+  "validation": {
+    "typecheck": "passed",
+    "build": "passed",
+    "fullSuiteFirst": {
+      "passed": 2140,
+      "failed": 1,
+      "skipped": 1,
+      "failure": "Unchanged tests/mcp-code.test.ts CPU-loop rejection message differed under the full run: cannot resolve rather than interrupted/limit."
+    },
+    "focusedMcpRerun": {
+      "passed": 12
+    },
+    "fullSuiteSecond": {
+      "passed": 2141,
+      "failed": 0,
+      "skipped": 1,
+      "maxWorkers": 2
+    },
+    "browser": {
+      "passed": 2,
+      "covers": [
+        "architecture/model persistence and Plan navigation",
+        "ask-mode grouped-edit review, ordered replacements, chronological job notice, raw expansion and whole-turn Undo"
+      ]
+    },
+    "terminal": "Actual PTY picker, one saved model, Plan navigation, no workers and narrow header pass"
+  },
+  "runtimeDependencies": "Physical copy inside the frozen checkout; no external node_modules link.",
+  "selection": "Preparation allows integration review while declared component experiments finish. It is not a promotion decision or evidence of patch-quality improvement. Production remains v34."
+}

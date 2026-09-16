@@ -1,16 +1,16 @@
 {
   "schemaVersion": 3,
   "status": "campaign-in-progress",
-  "generatedAt": "2026-09-16T07:59:22.243299+00:00",
+  "generatedAt": "2026-09-16T08:25:54.701737+00:00",
   "currentHarnessVersion": "2026-09-15.34",
   "gatewayAccounting": {
     "limitUsd": 100,
-    "knownUsd": 39.278900094,
+    "knownUsd": 40.146776022000005,
     "unknownReservedUsd": 29.773004800000002,
     "unknownRequests": 118,
-    "pendingReservedUsd": 0.2523136,
-    "committedUsd": 69.30421849399957,
-    "admittedRequests": 21472,
+    "pendingReservedUsd": 0,
+    "committedUsd": 69.91978082199957,
+    "admittedRequests": 21950,
     "astraUsd": null
   },
   "runs": [
@@ -13131,6 +13131,202 @@
     },
     {
       "dataset": "original",
+      "run": "replication-p6-ablation-control-r1-team-member-budget-9e2820a4",
+      "id": "team-member-budget",
+      "kind": "litellm-specific",
+      "label": "replication-p6-ablation-control-r1",
+      "promptRevision": 3,
+      "snapshotRevision": 2,
+      "harnessVersion": "2026-09-15.17",
+      "harnessSha256": "5345334fd3857c4066361947afb7c2c10aa106055e396f02e703ded5ac883cbd",
+      "harnessCommit": "f75ab327c649cec9719ac03847f171854d2e32ae",
+      "completed": true,
+      "completionReason": "completed",
+      "status": "idle",
+      "exit": null,
+      "evaluationProtocol": 6,
+      "isolation": "macOS-seatbelt",
+      "effort": "medium",
+      "timeoutSeconds": 900,
+      "seconds": 742.875,
+      "timedOut": false,
+      "interrupted": null,
+      "recovered": null,
+      "durationIncomplete": null,
+      "repairParent": null,
+      "requests": 101,
+      "reportedRequests": 101,
+      "inputTokens": 9237226,
+      "cachedTokens": 8946326,
+      "outputTokens": 54933,
+      "computedUsd": 0.162878062,
+      "acceptance": {
+        "exit": 1,
+        "tests": 5,
+        "failures": 2,
+        "errors": 0,
+        "skipped": 0,
+        "passed": false
+      },
+      "toolCounts": {
+        "read_file": 44,
+        "grep": 6,
+        "bash": 49,
+        "edit_file": 6,
+        "bash_output": 1
+      },
+      "exactRepeatedCalls": 0,
+      "toolOutputCharacters": 312015,
+      "toolActiveSeconds": 183.848,
+      "modelSeconds": 512.863,
+      "actionUsage": {
+        "classificationVersion": 2,
+        "basis": "complete assistant request grouped by chosen next action; not tool marginal cost. shell-mentions-checks matches known checker words in a recorded command without inferring passing checks or adequate coverage.",
+        "pricing": {
+          "inputPerMillionUsd": 0.22,
+          "cachedPerMillionUsd": 0.007,
+          "outputPerMillionUsd": 0.66
+        },
+        "groups": {
+          "navigation": {
+            "requests": 43,
+            "inputTokens": 2917088,
+            "cachedTokens": 2834270,
+            "outputTokens": 19006,
+            "estimatedUsd": 0.050603809999999985,
+            "cacheUnreportedRequests": 0,
+            "reportedModelSeconds": 184.60100000000003,
+            "durationUnreportedRequests": 0
+          },
+          "shell-command": {
+            "requests": 36,
+            "inputTokens": 3371374,
+            "cachedTokens": 3315996,
+            "outputTokens": 24851,
+            "estimatedUsd": 0.05179679200000001,
+            "cacheUnreportedRequests": 0,
+            "reportedModelSeconds": 214.45399999999995,
+            "durationUnreportedRequests": 0
+          },
+          "structured-edit": {
+            "requests": 6,
+            "inputTokens": 744261,
+            "cachedTokens": 737620,
+            "outputTokens": 3395,
+            "estimatedUsd": 0.00886506,
+            "cacheUnreportedRequests": 0,
+            "reportedModelSeconds": 29.05,
+            "durationUnreportedRequests": 0
+          },
+          "shell-mentions-checks": {
+            "requests": 13,
+            "inputTokens": 1777387,
+            "cachedTokens": 1633958,
+            "outputTokens": 5698,
+            "estimatedUsd": 0.046752766,
+            "cacheUnreportedRequests": 0,
+            "reportedModelSeconds": 66.141,
+            "durationUnreportedRequests": 0
+          },
+          "job-poll-or-wait": {
+            "requests": 1,
+            "inputTokens": 137096,
+            "cachedTokens": 136304,
+            "outputTokens": 60,
+            "estimatedUsd": 0.001167968,
+            "cacheUnreportedRequests": 0,
+            "reportedModelSeconds": 3.245,
+            "durationUnreportedRequests": 0
+          },
+          "text-only": {
+            "requests": 2,
+            "inputTokens": 290020,
+            "cachedTokens": 288178,
+            "outputTokens": 1923,
+            "estimatedUsd": 0.003691666,
+            "cacheUnreportedRequests": 0,
+            "reportedModelSeconds": 15.372,
+            "durationUnreportedRequests": 0
+          }
+        },
+        "assistantMessagesWithoutValidUsage": 0,
+        "breakdownRecordsWithoutValidUsage": 0,
+        "reconciliation": {
+          "inputTokens": {
+            "recorded": 9237226,
+            "attributed": 9237226,
+            "difference": 0
+          },
+          "cachedTokens": {
+            "recorded": 8946326,
+            "attributed": 8946326,
+            "difference": 0
+          },
+          "outputTokens": {
+            "recorded": 54933,
+            "attributed": 54933,
+            "difference": 0
+          },
+          "estimatedUsd": {
+            "recorded": 0.162878062,
+            "attributed": 0.162878062,
+            "difference": 0.0
+          }
+        }
+      },
+      "timeToFirstEditSeconds": 363.67,
+      "reviewStartedSeconds": 732.523,
+      "reviewModelRequests": 1,
+      "activations": {
+        "initialMapNotices": 1,
+        "contextToolCalls": 0,
+        "guideIdsShown": [
+          "budget-cache-reconciliation"
+        ],
+        "unparsedContextPayloads": 0,
+        "finalReviewNotices": 1,
+        "guidedFinalReviewNotices": 0,
+        "finalReviewGuideIdsShown": [],
+        "batchedEditCalls": 0,
+        "completedBatchedEditCalls": 0,
+        "batchEditsRequested": 0,
+        "batchSizes": [],
+        "backgroundCommandNotices": 0,
+        "testFocusNotices": 0,
+        "explorationFocusNotices": 1,
+        "readCallsByEffectiveLimit": {
+          "100": 2,
+          "70": 3,
+          "160": 2,
+          "320": 1,
+          "140": 2,
+          "130": 7,
+          "120": 6,
+          "150": 1,
+          "90": 1,
+          "200": 1,
+          "110": 2,
+          "60": 6,
+          "80": 2,
+          "180": 1,
+          "230": 1,
+          "125": 1,
+          "30": 2,
+          "50": 1,
+          "115": 1,
+          "20": 1
+        },
+        "defaultWindowReadCalls": null,
+        "readLimitProvenance": "unknown: saved arguments include host-injected defaults"
+      },
+      "fixturePlugins": [],
+      "fixtureProfileHash": "643d5437104296e21d906ecb15b2c96ad278f20cfc4af53b12bb6069bd853726",
+      "knownIntegrityIssue": false,
+      "snapshotBytecodeInherited": false,
+      "bytecodeIndependentAcceptanceUnchanged": null
+    },
+    {
+      "dataset": "original",
       "run": "replication-p6-ablation-control-r1-vertex-version-path-6a62ca02",
       "id": "vertex-version-path",
       "kind": "litellm-specific",
@@ -14015,6 +14211,210 @@
           "40": 1,
           "45": 1,
           "25": 1
+        },
+        "defaultWindowReadCalls": null,
+        "readLimitProvenance": "unknown: saved arguments include host-injected defaults"
+      },
+      "fixturePlugins": [],
+      "fixtureProfileHash": "643d5437104296e21d906ecb15b2c96ad278f20cfc4af53b12bb6069bd853726",
+      "knownIntegrityIssue": false,
+      "snapshotBytecodeInherited": false,
+      "bytecodeIndependentAcceptanceUnchanged": null
+    },
+    {
+      "dataset": "original",
+      "run": "replication-p6-ablation-no-guides-r1-empty-choices-2994ff89",
+      "id": "empty-choices",
+      "kind": "litellm-specific",
+      "label": "replication-p6-ablation-no-guides-r1",
+      "promptRevision": 3,
+      "snapshotRevision": 2,
+      "harnessVersion": "2026-09-15.17-ablate-no-guides",
+      "harnessSha256": "81d15381f183df7910fc169021e44c40477618549df43e058ea4cf82af6b1fa1",
+      "harnessCommit": "6d7fbe3e3c5192b6675c2bea2dc0af3913bd1480",
+      "completed": true,
+      "completionReason": "completed",
+      "status": "idle",
+      "exit": null,
+      "evaluationProtocol": 6,
+      "isolation": "macOS-seatbelt",
+      "effort": "medium",
+      "timeoutSeconds": 900,
+      "seconds": 784.282,
+      "timedOut": false,
+      "interrupted": null,
+      "recovered": null,
+      "durationIncomplete": null,
+      "repairParent": null,
+      "requests": 124,
+      "reportedRequests": 124,
+      "inputTokens": 14349428,
+      "cachedTokens": 13821548,
+      "outputTokens": 61609,
+      "computedUsd": 0.253546376,
+      "acceptance": {
+        "exit": 1,
+        "tests": 13,
+        "failures": 7,
+        "errors": 0,
+        "skipped": 0,
+        "passed": false
+      },
+      "toolCounts": {
+        "read_file": 42,
+        "bash": 96,
+        "litellm_context": 2,
+        "edit_file": 14,
+        "wait": 2,
+        "bash_output": 2
+      },
+      "exactRepeatedCalls": 0,
+      "toolOutputCharacters": 410626,
+      "toolActiveSeconds": 146.981,
+      "modelSeconds": 563.228,
+      "actionUsage": {
+        "classificationVersion": 2,
+        "basis": "complete assistant request grouped by chosen next action; not tool marginal cost. shell-mentions-checks matches known checker words in a recorded command without inferring passing checks or adequate coverage.",
+        "pricing": {
+          "inputPerMillionUsd": 0.22,
+          "cachedPerMillionUsd": 0.007,
+          "outputPerMillionUsd": 0.66
+        },
+        "groups": {
+          "mixed-tools": {
+            "requests": 11,
+            "inputTokens": 856537,
+            "cachedTokens": 832342,
+            "outputTokens": 5042,
+            "estimatedUsd": 0.014477014,
+            "cacheUnreportedRequests": 0,
+            "reportedModelSeconds": 42.61,
+            "durationUnreportedRequests": 0
+          },
+          "navigation": {
+            "requests": 33,
+            "inputTokens": 3443159,
+            "cachedTokens": 3383340,
+            "outputTokens": 11332,
+            "estimatedUsd": 0.04432268000000002,
+            "cacheUnreportedRequests": 0,
+            "reportedModelSeconds": 114.03,
+            "durationUnreportedRequests": 0
+          },
+          "shell-command": {
+            "requests": 52,
+            "inputTokens": 5517190,
+            "cachedTokens": 5431216,
+            "outputTokens": 33467,
+            "estimatedUsd": 0.07902101199999999,
+            "cacheUnreportedRequests": 0,
+            "reportedModelSeconds": 295.061,
+            "durationUnreportedRequests": 0
+          },
+          "structured-edit": {
+            "requests": 14,
+            "inputTokens": 2147075,
+            "cachedTokens": 2131980,
+            "outputTokens": 6351,
+            "estimatedUsd": 0.02243642,
+            "cacheUnreportedRequests": 0,
+            "reportedModelSeconds": 53.45100000000001,
+            "durationUnreportedRequests": 0
+          },
+          "shell-mentions-checks": {
+            "requests": 8,
+            "inputTokens": 1343896,
+            "cachedTokens": 1334644,
+            "outputTokens": 3173,
+            "estimatedUsd": 0.013472128000000002,
+            "cacheUnreportedRequests": 0,
+            "reportedModelSeconds": 29.17,
+            "durationUnreportedRequests": 0
+          },
+          "job-poll-or-wait": {
+            "requests": 4,
+            "inputTokens": 677828,
+            "cachedTokens": 346872,
+            "outputTokens": 208,
+            "estimatedUsd": 0.075375704,
+            "cacheUnreportedRequests": 0,
+            "reportedModelSeconds": 13.213999999999999,
+            "durationUnreportedRequests": 0
+          },
+          "text-only": {
+            "requests": 2,
+            "inputTokens": 363743,
+            "cachedTokens": 361154,
+            "outputTokens": 2036,
+            "estimatedUsd": 0.004441418000000001,
+            "cacheUnreportedRequests": 0,
+            "reportedModelSeconds": 15.692,
+            "durationUnreportedRequests": 0
+          }
+        },
+        "assistantMessagesWithoutValidUsage": 0,
+        "breakdownRecordsWithoutValidUsage": 0,
+        "reconciliation": {
+          "inputTokens": {
+            "recorded": 14349428,
+            "attributed": 14349428,
+            "difference": 0
+          },
+          "cachedTokens": {
+            "recorded": 13821548,
+            "attributed": 13821548,
+            "difference": 0
+          },
+          "outputTokens": {
+            "recorded": 61609,
+            "attributed": 61609,
+            "difference": 0
+          },
+          "estimatedUsd": {
+            "recorded": 0.253546376,
+            "attributed": 0.253546376,
+            "difference": 0.0
+          }
+        }
+      },
+      "timeToFirstEditSeconds": 458.038,
+      "reviewStartedSeconds": 775.196,
+      "reviewModelRequests": 1,
+      "activations": {
+        "initialMapNotices": 1,
+        "contextToolCalls": 2,
+        "guideIdsShown": [],
+        "unparsedContextPayloads": 0,
+        "finalReviewNotices": 1,
+        "guidedFinalReviewNotices": 0,
+        "finalReviewGuideIdsShown": [],
+        "batchedEditCalls": 0,
+        "completedBatchedEditCalls": 0,
+        "batchEditsRequested": 0,
+        "batchSizes": [],
+        "backgroundCommandNotices": 0,
+        "testFocusNotices": 0,
+        "explorationFocusNotices": 1,
+        "readCallsByEffectiveLimit": {
+          "160": 4,
+          "400": 1,
+          "100": 2,
+          "60": 6,
+          "140": 1,
+          "120": 2,
+          "80": 6,
+          "70": 3,
+          "40": 2,
+          "50": 2,
+          "110": 1,
+          "90": 2,
+          "30": 3,
+          "200": 1,
+          "130": 2,
+          "45": 1,
+          "36": 1,
+          "42": 1,
+          "12": 1
         },
         "defaultWindowReadCalls": null,
         "readLimitProvenance": "unknown: saved arguments include host-injected defaults"
@@ -15838,6 +16238,219 @@
           "130": 2,
           "45": 3,
           "25": 1
+        },
+        "defaultWindowReadCalls": null,
+        "readLimitProvenance": "unknown: saved arguments include host-injected defaults"
+      },
+      "fixturePlugins": [],
+      "fixtureProfileHash": "643d5437104296e21d906ecb15b2c96ad278f20cfc4af53b12bb6069bd853726",
+      "knownIntegrityIssue": false,
+      "snapshotBytecodeInherited": false,
+      "bytecodeIndependentAcceptanceUnchanged": null
+    },
+    {
+      "dataset": "original",
+      "run": "replication-p6-ablation-no-preload-r1-team-member-budget-e6f46fba",
+      "id": "team-member-budget",
+      "kind": "litellm-specific",
+      "label": "replication-p6-ablation-no-preload-r1",
+      "promptRevision": 3,
+      "snapshotRevision": 2,
+      "harnessVersion": "2026-09-15.17-ablate-no-preload",
+      "harnessSha256": "3257f174e07edebbc038153bade0d305bb046640754847018736790c0fe512b2",
+      "harnessCommit": "9b7cffd3ff2ca5a5c078321e879c9ee728b9a70c",
+      "completed": true,
+      "completionReason": "completed",
+      "status": "idle",
+      "exit": null,
+      "evaluationProtocol": 6,
+      "isolation": "macOS-seatbelt",
+      "effort": "medium",
+      "timeoutSeconds": 900,
+      "seconds": 877.394,
+      "timedOut": false,
+      "interrupted": null,
+      "recovered": null,
+      "durationIncomplete": null,
+      "repairParent": null,
+      "requests": 107,
+      "reportedRequests": 107,
+      "inputTokens": 12814844,
+      "cachedTokens": 12377606,
+      "outputTokens": 61973,
+      "computedUsd": 0.223737782,
+      "acceptance": {
+        "exit": 0,
+        "tests": 5,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0,
+        "passed": true
+      },
+      "toolCounts": {
+        "grep": 33,
+        "litellm_context": 2,
+        "read_file": 53,
+        "bash": 32,
+        "bash_output": 2,
+        "write_file": 1,
+        "edit_file": 13
+      },
+      "exactRepeatedCalls": 0,
+      "toolOutputCharacters": 432450,
+      "toolActiveSeconds": 230.843,
+      "modelSeconds": 613.255,
+      "actionUsage": {
+        "classificationVersion": 2,
+        "basis": "complete assistant request grouped by chosen next action; not tool marginal cost. shell-mentions-checks matches known checker words in a recorded command without inferring passing checks or adequate coverage.",
+        "pricing": {
+          "inputPerMillionUsd": 0.22,
+          "cachedPerMillionUsd": 0.007,
+          "outputPerMillionUsd": 0.66
+        },
+        "groups": {
+          "navigation": {
+            "requests": 59,
+            "inputTokens": 5498773,
+            "cachedTokens": 5288758,
+            "outputTokens": 36993,
+            "estimatedUsd": 0.107639986,
+            "cacheUnreportedRequests": 0,
+            "reportedModelSeconds": 366.51099999999985,
+            "durationUnreportedRequests": 0
+          },
+          "mixed-tools": {
+            "requests": 5,
+            "inputTokens": 505279,
+            "cachedTokens": 496878,
+            "outputTokens": 5167,
+            "estimatedUsd": 0.008736586000000001,
+            "cacheUnreportedRequests": 0,
+            "reportedModelSeconds": 48.692,
+            "durationUnreportedRequests": 0
+          },
+          "shell-mentions-checks": {
+            "requests": 19,
+            "inputTokens": 2991425,
+            "cachedTokens": 2968966,
+            "outputTokens": 6716,
+            "estimatedUsd": 0.030156302000000006,
+            "cacheUnreportedRequests": 0,
+            "reportedModelSeconds": 74.744,
+            "durationUnreportedRequests": 0
+          },
+          "shell-command": {
+            "requests": 8,
+            "inputTokens": 1318124,
+            "cachedTokens": 1137644,
+            "outputTokens": 2281,
+            "estimatedUsd": 0.049174568,
+            "cacheUnreportedRequests": 0,
+            "reportedModelSeconds": 30.436,
+            "durationUnreportedRequests": 0
+          },
+          "structured-edit": {
+            "requests": 13,
+            "inputTokens": 1959660,
+            "cachedTokens": 1945700,
+            "outputTokens": 8973,
+            "estimatedUsd": 0.02261328,
+            "cacheUnreportedRequests": 0,
+            "reportedModelSeconds": 76.15,
+            "durationUnreportedRequests": 0
+          },
+          "job-poll-or-wait": {
+            "requests": 1,
+            "inputTokens": 177352,
+            "cachedTokens": 176732,
+            "outputTokens": 60,
+            "estimatedUsd": 0.001413124,
+            "cacheUnreportedRequests": 0,
+            "reportedModelSeconds": 1.946,
+            "durationUnreportedRequests": 0
+          },
+          "text-only": {
+            "requests": 2,
+            "inputTokens": 364231,
+            "cachedTokens": 362928,
+            "outputTokens": 1783,
+            "estimatedUsd": 0.004003936,
+            "cacheUnreportedRequests": 0,
+            "reportedModelSeconds": 14.776,
+            "durationUnreportedRequests": 0
+          }
+        },
+        "assistantMessagesWithoutValidUsage": 0,
+        "breakdownRecordsWithoutValidUsage": 0,
+        "reconciliation": {
+          "inputTokens": {
+            "recorded": 12814844,
+            "attributed": 12814844,
+            "difference": 0
+          },
+          "cachedTokens": {
+            "recorded": 12377606,
+            "attributed": 12377606,
+            "difference": 0
+          },
+          "outputTokens": {
+            "recorded": 61973,
+            "attributed": 61973,
+            "difference": 0
+          },
+          "estimatedUsd": {
+            "recorded": 0.223737782,
+            "attributed": 0.22373778200000002,
+            "difference": -2.7755575615628914e-17
+          }
+        }
+      },
+      "timeToFirstEditSeconds": 391.56,
+      "reviewStartedSeconds": 865.404,
+      "reviewModelRequests": 2,
+      "activations": {
+        "initialMapNotices": 0,
+        "contextToolCalls": 2,
+        "guideIdsShown": [
+          "budget-cache-reconciliation"
+        ],
+        "unparsedContextPayloads": 1,
+        "finalReviewNotices": 1,
+        "guidedFinalReviewNotices": 0,
+        "finalReviewGuideIdsShown": [],
+        "batchedEditCalls": 0,
+        "completedBatchedEditCalls": 0,
+        "batchEditsRequested": 0,
+        "batchSizes": [],
+        "backgroundCommandNotices": 0,
+        "testFocusNotices": 0,
+        "explorationFocusNotices": 1,
+        "readCallsByEffectiveLimit": {
+          "120": 8,
+          "90": 3,
+          "160": 6,
+          "220": 2,
+          "130": 2,
+          "290": 1,
+          "70": 2,
+          "80": 4,
+          "110": 2,
+          "140": 3,
+          "45": 2,
+          "180": 3,
+          "200": 1,
+          "100": 1,
+          "60": 1,
+          "75": 2,
+          "330": 1,
+          "40": 1,
+          "50": 1,
+          "20": 2,
+          "18": 1,
+          "55": 1,
+          "230": 1,
+          "240": 1,
+          "15": 1
         },
         "defaultWindowReadCalls": null,
         "readLimitProvenance": "unknown: saved arguments include host-injected defaults"
@@ -66464,6 +67077,205 @@
     },
     {
       "dataset": "training5",
+      "run": "replication-v35-inspection-native-inspection-r2-envfix-oom1-legacy-stream-pipeline-d62aba9c",
+      "id": "legacy-stream-pipeline",
+      "kind": "litellm-specific",
+      "label": "replication-v35-inspection-native-inspection-r2-envfix-oom1",
+      "promptRevision": 3,
+      "snapshotRevision": 2,
+      "harnessVersion": "2026-09-15.35",
+      "harnessSha256": "64ae1069ac5b1b3f66f192a4e55100a960b47f89f33bf065ace96f8427813312",
+      "harnessCommit": "b5f5899ce41cf64f64c495cfa42262eaf1848911",
+      "completed": false,
+      "completionReason": "timeout",
+      "status": "idle",
+      "exit": null,
+      "evaluationProtocol": 6,
+      "isolation": "macOS-seatbelt",
+      "effort": "medium",
+      "timeoutSeconds": 900,
+      "seconds": 900.143,
+      "timedOut": true,
+      "interrupted": null,
+      "recovered": null,
+      "durationIncomplete": null,
+      "repairParent": null,
+      "requests": 107,
+      "reportedRequests": 106,
+      "inputTokens": 9603013,
+      "cachedTokens": 9303350,
+      "outputTokens": 60730,
+      "computedUsd": 0.17113111,
+      "acceptance": {
+        "exit": 1,
+        "tests": 16,
+        "failures": 2,
+        "errors": 0,
+        "skipped": 0,
+        "passed": false
+      },
+      "toolCounts": {
+        "bash": 57,
+        "litellm_context": 1,
+        "read_file": 33,
+        "edit_file": 13,
+        "bash_output": 3
+      },
+      "exactRepeatedCalls": 2,
+      "toolOutputCharacters": 311743,
+      "toolActiveSeconds": 317.115,
+      "modelSeconds": 529.463,
+      "actionUsage": {
+        "classificationVersion": 2,
+        "basis": "complete assistant request grouped by chosen next action; not tool marginal cost. shell-mentions-checks matches known checker words in a recorded command without inferring passing checks or adequate coverage.",
+        "pricing": {
+          "inputPerMillionUsd": 0.22,
+          "cachedPerMillionUsd": 0.007,
+          "outputPerMillionUsd": 0.66
+        },
+        "groups": {
+          "mixed-tools": {
+            "requests": 1,
+            "inputTokens": 8240,
+            "cachedTokens": 152,
+            "outputTokens": 191,
+            "estimatedUsd": 0.001906484,
+            "cacheUnreportedRequests": 0,
+            "reportedModelSeconds": 1.598,
+            "durationUnreportedRequests": 0
+          },
+          "navigation": {
+            "requests": 33,
+            "inputTokens": 2257971,
+            "cachedTokens": 2196502,
+            "outputTokens": 6729,
+            "estimatedUsd": 0.033339834,
+            "cacheUnreportedRequests": 0,
+            "reportedModelSeconds": 94.32500000000002,
+            "durationUnreportedRequests": 0
+          },
+          "shell-command": {
+            "requests": 43,
+            "inputTokens": 3829793,
+            "cachedTokens": 3764484,
+            "outputTokens": 32626,
+            "estimatedUsd": 0.062252528,
+            "cacheUnreportedRequests": 0,
+            "reportedModelSeconds": 271.38699999999994,
+            "durationUnreportedRequests": 0
+          },
+          "structured-edit": {
+            "requests": 13,
+            "inputTokens": 1358202,
+            "cachedTokens": 1346796,
+            "outputTokens": 15828,
+            "estimatedUsd": 0.022383372000000002,
+            "cacheUnreportedRequests": 0,
+            "reportedModelSeconds": 107.10399999999998,
+            "durationUnreportedRequests": 0
+          },
+          "shell-mentions-checks": {
+            "requests": 13,
+            "inputTokens": 1727565,
+            "cachedTokens": 1575166,
+            "outputTokens": 5155,
+            "estimatedUsd": 0.047956241999999996,
+            "cacheUnreportedRequests": 0,
+            "reportedModelSeconds": 48.907999999999994,
+            "durationUnreportedRequests": 0
+          },
+          "job-poll-or-wait": {
+            "requests": 3,
+            "inputTokens": 421242,
+            "cachedTokens": 420250,
+            "outputTokens": 201,
+            "estimatedUsd": 0.00329265,
+            "cacheUnreportedRequests": 0,
+            "reportedModelSeconds": 6.141,
+            "durationUnreportedRequests": 0
+          }
+        },
+        "assistantMessagesWithoutValidUsage": 1,
+        "breakdownRecordsWithoutValidUsage": 1,
+        "reconciliation": {
+          "inputTokens": {
+            "recorded": 9603013,
+            "attributed": 9603013,
+            "difference": 0
+          },
+          "cachedTokens": {
+            "recorded": 9303350,
+            "attributed": 9303350,
+            "difference": 0
+          },
+          "outputTokens": {
+            "recorded": 60730,
+            "attributed": 60730,
+            "difference": 0
+          },
+          "estimatedUsd": {
+            "recorded": 0.17113111,
+            "attributed": 0.17113111,
+            "difference": 0.0
+          }
+        }
+      },
+      "timeToFirstEditSeconds": 311.684,
+      "reviewStartedSeconds": null,
+      "reviewModelRequests": null,
+      "activations": {
+        "initialMapNotices": 1,
+        "contextToolCalls": 1,
+        "guideIdsShown": [],
+        "unparsedContextPayloads": 0,
+        "finalReviewNotices": 0,
+        "guidedFinalReviewNotices": 0,
+        "finalReviewGuideIdsShown": [],
+        "batchedEditCalls": 0,
+        "completedBatchedEditCalls": 0,
+        "batchEditsRequested": 0,
+        "batchSizes": [],
+        "backgroundCommandNotices": 0,
+        "testFocusNotices": 1,
+        "explorationFocusNotices": 1,
+        "readCallsByEffectiveLimit": {
+          "160": 3,
+          "200": 2,
+          "180": 1,
+          "150": 1,
+          "90": 1,
+          "120": 1,
+          "110": 2,
+          "280": 1,
+          "130": 1,
+          "80": 3,
+          "210": 1,
+          "70": 2,
+          "300": 1,
+          "60": 2,
+          "100": 1,
+          "30": 1,
+          "10": 2,
+          "55": 2,
+          "15": 1,
+          "18": 1,
+          "40": 1,
+          "52": 1,
+          "35": 1
+        },
+        "defaultWindowReadCalls": null,
+        "readLimitProvenance": "unknown: saved arguments include host-injected defaults"
+      },
+      "fixturePlugins": [
+        "tests.test_litellm.proxy.utils.proxy_logging.conftest"
+      ],
+      "fixtureProfileHash": "48cbe23f784dbc7962c6a86d6de79c008db26e4bb0ce56b8f0266d41f4bd4aa2",
+      "knownIntegrityIssue": false,
+      "snapshotBytecodeInherited": false,
+      "bytecodeIndependentAcceptanceUnchanged": null
+    },
+    {
+      "dataset": "training5",
       "run": "replication-v35-inspection-native-inspection-r2-legacy-stream-pipeline-45cc142c",
       "id": "legacy-stream-pipeline",
       "kind": "litellm-specific",
@@ -66902,6 +67714,192 @@
           "110": 1,
           "60": 2,
           "25": 1
+        },
+        "defaultWindowReadCalls": null,
+        "readLimitProvenance": "unknown: saved arguments include host-injected defaults"
+      },
+      "fixturePlugins": [
+        "tests.test_litellm.proxy.utils.proxy_logging.conftest"
+      ],
+      "fixtureProfileHash": "48cbe23f784dbc7962c6a86d6de79c008db26e4bb0ce56b8f0266d41f4bd4aa2",
+      "knownIntegrityIssue": false,
+      "snapshotBytecodeInherited": false,
+      "bytecodeIndependentAcceptanceUnchanged": null
+    },
+    {
+      "dataset": "training5",
+      "run": "replication-v39-streams-stream-guide-r2-legacy-stream-pipeline-929c8cfe",
+      "id": "legacy-stream-pipeline",
+      "kind": "litellm-specific",
+      "label": "replication-v39-streams-stream-guide-r2",
+      "promptRevision": 3,
+      "snapshotRevision": 2,
+      "harnessVersion": "2026-09-16.39",
+      "harnessSha256": "0d5eb57271f9c9b35b5d6c0c8868af066cb68963e6f0c96e4f0b5ce29014d296",
+      "harnessCommit": "85119eacb8640c6f1000ff48a246e50e4be53675",
+      "completed": false,
+      "completionReason": "timeout",
+      "status": "idle",
+      "exit": null,
+      "evaluationProtocol": 6,
+      "isolation": "macOS-seatbelt",
+      "effort": "medium",
+      "timeoutSeconds": 900,
+      "seconds": 900.781,
+      "timedOut": true,
+      "interrupted": null,
+      "recovered": null,
+      "durationIncomplete": null,
+      "repairParent": null,
+      "requests": 86,
+      "reportedRequests": 86,
+      "inputTokens": 8280070,
+      "cachedTokens": 8107744,
+      "outputTokens": 67689,
+      "computedUsd": 0.139340668,
+      "acceptance": {
+        "exit": 1,
+        "tests": 16,
+        "failures": 3,
+        "errors": 0,
+        "skipped": 0,
+        "passed": false
+      },
+      "toolCounts": {
+        "bash": 57,
+        "read_file": 39,
+        "edit_file": 15
+      },
+      "exactRepeatedCalls": 0,
+      "toolOutputCharacters": 334041,
+      "toolActiveSeconds": 304.818,
+      "modelSeconds": 547.829,
+      "actionUsage": {
+        "classificationVersion": 2,
+        "basis": "complete assistant request grouped by chosen next action; not tool marginal cost. shell-mentions-checks matches known checker words in a recorded command without inferring passing checks or adequate coverage.",
+        "pricing": {
+          "inputPerMillionUsd": 0.22,
+          "cachedPerMillionUsd": 0.007,
+          "outputPerMillionUsd": 0.66
+        },
+        "groups": {
+          "mixed-tools": {
+            "requests": 7,
+            "inputTokens": 329318,
+            "cachedTokens": 305478,
+            "outputTokens": 7279,
+            "estimatedUsd": 0.012187286,
+            "cacheUnreportedRequests": 0,
+            "reportedModelSeconds": 52.841,
+            "durationUnreportedRequests": 0
+          },
+          "navigation": {
+            "requests": 26,
+            "inputTokens": 1809369,
+            "cachedTokens": 1741062,
+            "outputTokens": 15916,
+            "estimatedUsd": 0.03771953399999999,
+            "cacheUnreportedRequests": 0,
+            "reportedModelSeconds": 138.26299999999998,
+            "durationUnreportedRequests": 0
+          },
+          "shell-command": {
+            "requests": 29,
+            "inputTokens": 2728853,
+            "cachedTokens": 2679854,
+            "outputTokens": 31306,
+            "estimatedUsd": 0.050200718000000005,
+            "cacheUnreportedRequests": 0,
+            "reportedModelSeconds": 233.461,
+            "durationUnreportedRequests": 0
+          },
+          "structured-edit": {
+            "requests": 15,
+            "inputTokens": 2054292,
+            "cachedTokens": 2035072,
+            "outputTokens": 9098,
+            "estimatedUsd": 0.024478584,
+            "cacheUnreportedRequests": 0,
+            "reportedModelSeconds": 67.601,
+            "durationUnreportedRequests": 0
+          },
+          "shell-mentions-checks": {
+            "requests": 9,
+            "inputTokens": 1358238,
+            "cachedTokens": 1346278,
+            "outputTokens": 4090,
+            "estimatedUsd": 0.014754546,
+            "cacheUnreportedRequests": 0,
+            "reportedModelSeconds": 55.663000000000004,
+            "durationUnreportedRequests": 0
+          }
+        },
+        "assistantMessagesWithoutValidUsage": 0,
+        "breakdownRecordsWithoutValidUsage": 0,
+        "reconciliation": {
+          "inputTokens": {
+            "recorded": 8280070,
+            "attributed": 8280070,
+            "difference": 0
+          },
+          "cachedTokens": {
+            "recorded": 8107744,
+            "attributed": 8107744,
+            "difference": 0
+          },
+          "outputTokens": {
+            "recorded": 67689,
+            "attributed": 67689,
+            "difference": 0
+          },
+          "estimatedUsd": {
+            "recorded": 0.139340668,
+            "attributed": 0.139340668,
+            "difference": 0.0
+          }
+        }
+      },
+      "timeToFirstEditSeconds": 446.283,
+      "reviewStartedSeconds": null,
+      "reviewModelRequests": null,
+      "activations": {
+        "initialMapNotices": 1,
+        "contextToolCalls": 0,
+        "guideIdsShown": [
+          "streaming-legacy-hook-boundaries"
+        ],
+        "unparsedContextPayloads": 0,
+        "finalReviewNotices": 0,
+        "guidedFinalReviewNotices": 0,
+        "finalReviewGuideIdsShown": [],
+        "batchedEditCalls": 0,
+        "completedBatchedEditCalls": 0,
+        "batchEditsRequested": 0,
+        "batchSizes": [],
+        "backgroundCommandNotices": 0,
+        "testFocusNotices": 1,
+        "explorationFocusNotices": 1,
+        "readCallsByEffectiveLimit": {
+          "160": 3,
+          "360": 1,
+          "80": 3,
+          "300": 1,
+          "120": 6,
+          "90": 3,
+          "100": 1,
+          "130": 2,
+          "200": 2,
+          "70": 3,
+          "60": 3,
+          "45": 2,
+          "140": 2,
+          "240": 1,
+          "40": 1,
+          "220": 1,
+          "8": 1,
+          "20": 1,
+          "110": 1,
+          "55": 1
         },
         "defaultWindowReadCalls": null,
         "readLimitProvenance": "unknown: saved arguments include host-injected defaults"

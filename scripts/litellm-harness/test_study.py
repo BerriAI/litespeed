@@ -9,6 +9,26 @@ from completion import completion_reason
 
 
 class StudyTests(unittest.TestCase):
+    def test_declared_codex_route_rejects_a_flash_trial_with_the_same_label(self):
+        with TemporaryDirectory() as temporary:
+            root = Path(temporary)
+            row = dict(dataset='', case='stream', name='control', label='study',
+                       commit='abc', effort='high', kind='codex')
+            plan = {'protocol': 6, 'repetitions': 1, 'runs': [row]}
+            record = dict(id='stream', run='stream', label='study', harnessCommit='abc',
+                          evaluationProtocol=6, effort='high', kind='litellm-specific',
+                          acceptance={'passed': True}, completed=True, seconds=1)
+            (root/'analysis.json').write_text(json.dumps([record]))
+            (root/'plan.json').write_text(json.dumps(plan))
+            with patch('sys.argv', ['study.py', str(root), str(root/'plan.json'), str(root/'output.json')]):
+                with self.assertRaisesRegex(ValueError, 'solver route'):
+                    main()
+            record['kind'] = 'codex'
+            (root/'analysis.json').write_text(json.dumps([record]))
+            with patch('sys.argv', ['study.py', str(root), str(root/'plan.json'), str(root/'output.json')]), patch('builtins.print'):
+                main()
+            self.assertEqual(json.loads((root/'output.json').read_text())['trials'][0]['kind'], 'codex')
+
     def test_missing_control_cannot_silently_produce_empty_comparisons(self):
         with TemporaryDirectory() as temporary:
             root = Path(temporary)

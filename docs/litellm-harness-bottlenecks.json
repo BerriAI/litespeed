@@ -1,11 +1,11 @@
 {
-  "sourceGeneratedAt": "2026-09-16T07:59:22.243299+00:00",
+  "sourceGeneratedAt": "2026-09-16T08:25:54.701737+00:00",
   "classificationVersion": 2,
   "scope": "Descriptive protocol-6 development attempts with recorded Flash usage. Different tasks, candidate versions and efforts are pooled only to locate spending. Includes paid interruptions and timeouts; excludes zero-usage startup failures. Not a quality comparison or causal estimate. Missing usage is outside these token-priced totals; the campaign ledger remains authoritative.",
-  "runs": 163,
+  "runs": 168,
   "completionReasons": {
-    "completed": 143,
-    "timeout": 17,
+    "completed": 146,
+    "timeout": 19,
     "runner-error": 3
   },
   "runIds": [
@@ -16,11 +16,13 @@
     "replication-p6-ablation-control-r1-empty-choices-ce6b2b87",
     "replication-p6-ablation-control-r1-router-candidates-976dd133",
     "replication-p6-ablation-control-r1-router-strategy-isolation-ad5bb49e",
+    "replication-p6-ablation-control-r1-team-member-budget-9e2820a4",
     "replication-p6-ablation-control-r1-vertex-version-path-6a62ca02",
     "replication-p6-ablation-no-guides-r1-anthropic-image-guardrail-54b64a02",
     "replication-p6-ablation-no-guides-r1-converse-config-fff0541b",
     "replication-p6-ablation-no-guides-r1-dashscope-rerank-cf1ec114",
     "replication-p6-ablation-no-guides-r1-databricks-reasoning-e8848e80",
+    "replication-p6-ablation-no-guides-r1-empty-choices-2994ff89",
     "replication-p6-ablation-no-guides-r1-router-candidates-360f3ddd",
     "replication-p6-ablation-no-guides-r1-router-strategy-isolation-d5a85676",
     "replication-p6-ablation-no-guides-r1-vertex-version-path-3ce63c27",
@@ -31,6 +33,7 @@
     "replication-p6-ablation-no-preload-r1-empty-choices-7d518a50",
     "replication-p6-ablation-no-preload-r1-router-candidates-cd7e66d3",
     "replication-p6-ablation-no-preload-r1-router-strategy-isolation-dc301e72",
+    "replication-p6-ablation-no-preload-r1-team-member-budget-e6f46fba",
     "replication-p6-ablation-no-preload-r1-vertex-version-path-2a97a8a2",
     "replication-p6-ablation-no-review-r1-anthropic-image-guardrail-8e989b04",
     "replication-p6-ablation-no-review-r1-converse-config-956edcd4",
@@ -170,80 +173,82 @@
     "replication-v29-edits-control-r2-oom1-aws-signing-off-loop-2d3432c0",
     "replication-v35-inspection-control-r1-legacy-stream-pipeline-be9193ea",
     "replication-v35-inspection-native-inspection-r1-legacy-stream-pipeline-826c12f2",
+    "replication-v35-inspection-native-inspection-r2-envfix-oom1-legacy-stream-pipeline-d62aba9c",
     "replication-v39-streams-control-r1-legacy-stream-pipeline-045a21e0",
-    "replication-v39-streams-stream-guide-r1-legacy-stream-pipeline-5933dea8"
+    "replication-v39-streams-stream-guide-r1-legacy-stream-pipeline-5933dea8",
+    "replication-v39-streams-stream-guide-r2-legacy-stream-pipeline-929c8cfe"
   ],
-  "recordedTokenPricedUsd": 21.135552102000002,
-  "attributedTokenPricedUsd": 21.135552102000002,
-  "unattributedTokenPricedUsd": 0.0,
+  "recordedTokenPricedUsd": 22.0861861,
+  "attributedTokenPricedUsd": 22.086186100000003,
+  "unattributedTokenPricedUsd": -3.552713678800501e-15,
   "groups": {
     "shell-command": {
-      "requests": 3226,
-      "estimatedUsd": 5.733772162000002,
-      "inputTokens": 259443487,
-      "cachedTokens": 247220466,
-      "outputTokens": 1991158,
-      "reportedModelSeconds": 17861.792999999998,
+      "requests": 3394,
+      "estimatedUsd": 6.026217780000001,
+      "inputTokens": 276208821,
+      "cachedTokens": 263549660,
+      "outputTokens": 2115689,
+      "reportedModelSeconds": 18906.591999999993,
       "durationUnreportedRequests": 0,
       "cacheUnreportedRequests": 0
     },
     "navigation": {
-      "requests": 3460,
-      "estimatedUsd": 4.609351984,
-      "inputTokens": 193148689,
-      "cachedTokens": 182615932,
-      "outputTokens": 1536112,
-      "reportedModelSeconds": 14365.395000000002,
+      "requests": 3654,
+      "estimatedUsd": 4.8829778280000005,
+      "inputTokens": 209075049,
+      "cachedTokens": 198059864,
+      "outputTokens": 1626088,
+      "reportedModelSeconds": 15263.125000000004,
       "durationUnreportedRequests": 0,
       "cacheUnreportedRequests": 0
     },
     "shell-mentions-checks": {
-      "requests": 1261,
-      "estimatedUsd": 3.4871382440000005,
-      "inputTokens": 124752554,
-      "cachedTokens": 114345232,
-      "outputTokens": 601683,
-      "reportedModelSeconds": 5479.6770000000015,
+      "requests": 1323,
+      "estimatedUsd": 3.6402302279999987,
+      "inputTokens": 133951065,
+      "cachedTokens": 123204244,
+      "outputTokens": 626515,
+      "reportedModelSeconds": 5754.303000000003,
       "durationUnreportedRequests": 0,
       "cacheUnreportedRequests": 0
     },
     "structured-edit": {
-      "requests": 1780,
-      "estimatedUsd": 3.1535348539999997,
-      "inputTokens": 157310732,
-      "cachedTokens": 151902562,
-      "outputTokens": 1364272,
-      "reportedModelSeconds": 9816.272000000003,
+      "requests": 1841,
+      "estimatedUsd": 3.2543115700000005,
+      "inputTokens": 165574222,
+      "cachedTokens": 160099730,
+      "outputTokens": 1407917,
+      "reportedModelSeconds": 10149.628000000002,
       "durationUnreportedRequests": 0,
       "cacheUnreportedRequests": 0
     },
     "job-poll-or-wait": {
-      "requests": 511,
-      "estimatedUsd": 2.836401526000001,
-      "inputTokens": 56476780,
-      "cachedTokens": 45130838,
-      "outputTokens": 36937,
-      "reportedModelSeconds": 1168.9059999999993,
+      "requests": 520,
+      "estimatedUsd": 2.917650972000001,
+      "inputTokens": 57890298,
+      "cachedTokens": 46210996,
+      "outputTokens": 37466,
+      "reportedModelSeconds": 1193.4519999999993,
       "durationUnreportedRequests": 0,
       "cacheUnreportedRequests": 0
     },
     "text-only": {
-      "requests": 287,
-      "estimatedUsd": 0.7478706179999994,
-      "inputTokens": 27012660,
-      "cachedTokens": 25239434,
-      "outputTokens": 274371,
-      "reportedModelSeconds": 2331.8029999999994,
+      "requests": 293,
+      "estimatedUsd": 0.7600076379999994,
+      "inputTokens": 28030654,
+      "cachedTokens": 26251694,
+      "outputTokens": 280113,
+      "reportedModelSeconds": 2377.6429999999996,
       "durationUnreportedRequests": 0,
       "cacheUnreportedRequests": 0
     },
     "mixed-tools": {
-      "requests": 316,
-      "estimatedUsd": 0.48238189800000003,
-      "inputTokens": 12504741,
-      "cachedTokens": 11284994,
-      "outputTokens": 204610,
-      "reportedModelSeconds": 1659.9710000000002,
+      "requests": 340,
+      "estimatedUsd": 0.5196892680000001,
+      "inputTokens": 14204115,
+      "cachedTokens": 12919844,
+      "outputTokens": 222289,
+      "reportedModelSeconds": 1805.712,
       "durationUnreportedRequests": 0,
       "cacheUnreportedRequests": 0
     },
@@ -260,16 +265,16 @@
   },
   "timing": {
     "modelSeconds": {
-      "measuredRuns": 163,
-      "medianSeconds": 323.032
+      "measuredRuns": 168,
+      "medianSeconds": 330.6095
     },
     "toolActiveSeconds": {
-      "measuredRuns": 163,
-      "medianSeconds": 78.034
+      "measuredRuns": 168,
+      "medianSeconds": 79.70349999999999
     },
     "timeToFirstEditSeconds": {
-      "measuredRuns": 163,
-      "medianSeconds": 142.102
+      "measuredRuns": 168,
+      "medianSeconds": 144.272
     }
   }
 }

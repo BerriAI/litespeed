@@ -90,9 +90,13 @@ def main():
         if len(matches) > 1:
             raise ValueError('More than one allocated result for a predeclared trial.')
         row = {k: item[k] for k in ['dataset', 'case', 'name', 'label', 'commit', 'effort']}
+        if 'kind' in item:
+            row['kind'] = item['kind']
         row['evaluated'] = False
         if matches:
             result = matches[0]
+            if 'kind' in item and result.get('kind') != item['kind']:
+                raise ValueError('Trial solver route differs from its predeclared configuration.')
             if result['harnessCommit'] != item['commit'] or result['evaluationProtocol'] != plan['protocol'] or result['effort'] != item['effort']:
                 raise ValueError('Trial runtime/protocol differs from its predeclared configuration.')
             acceptance = result.get('acceptance')
