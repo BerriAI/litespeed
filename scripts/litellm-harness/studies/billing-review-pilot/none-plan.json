@@ -1,0 +1,22 @@
+{
+  "createdAt": "2026-09-16T22:19:50.600278+00:00",
+  "statusAtFreeze": "Follow-up frozen after both Medium calls finish without a final answer; no none-effort allocation yet.",
+  "model": "fireworks_ai/deepseek-v4p1-flash",
+  "reasoningEffort": "none",
+  "maxOutputTokens": 2048,
+  "retries": 0,
+  "concurrency": 1,
+  "order": [
+    "generic",
+    "conservation"
+  ],
+  "inputSha256": "93c8d0688601a285a74515ed176b9c056fdbca469f7792364dcdc6fd9aec77d2",
+  "sourceSha256": "dcd7febccee07ca886c9c588389f1825b0d08d427ce869d4ffda2efd2d5670c5",
+  "promptSha256": {
+    "generic": "2fa80bee392adeae2e36fcc00691b9ceebc4a3617764b739d6f978a3fdc838d0",
+    "conservation": "59ce3ffc4340358b8afca5e81ec3daa69c7f691d802c631da6ad0c95b51a37aa"
+  },
+  "purpose": "Check whether the same bounded reviews can return a verifiable final finding without reasoning after both Medium calls exhausted8192 output tokens with no answer. This changes effort and output allowance together, so it is a capability pilot, not a clean causal effort comparison.",
+  "successCriteria": "Nonempty normal completion; independently verify every proposed finding against candidate and merged-reference public billing paths. Record false allegations, incomplete responses and budget stops. No promotion or general quality conclusion from one call per prompt on one known failing patch.",
+  "budget": "Use only remaining safe headroom. Future reservation remains full1048576-token input plus enforced2048-output cap. Preserve186 unknown records; no retries and stop on reservation/readiness/receipt failure."
+}
