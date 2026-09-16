@@ -34,7 +34,7 @@ The first edit takes345.846seconds. Recorded model time is797.185seconds, while 
 
 A posthoc check of the changed cost utility with installed basedpyright1.39.7 reports47 errors on the historical base and merged reference,52 on this first candidate,81/48 on the earlier Astra patches, and53/50 on the earlier Flash patches. Against the base, this candidate adds five rule/message diagnostics, including a `Final` declaration inside a loop and reassignment of `remaining: Final`. This is a one-file diagnostic with matched local dependencies, **not a full CI verdict**; the repository gate has its own environment and codebase-wide budgets. Functional scores remain unchanged. [Full comparison and source hashes](static-diagnostics.json).
 
-The initial request contains the root AGENTS instruction to read `CLAUDE.md`, but not its concrete immutability rules; no recorded tool arguments open that file. The harness reminder alone did not reliably deliver those rules. Loading referenced guidance is a possible follow-up, not an implemented or validated improvement. A behaviorally correct patch can still violate repository type and code rules.
+The initial request contains the root AGENTS instruction to read `CLAUDE.md`, but not its concrete immutability rules; no recorded tool arguments open that file. The harness reminder alone did not reliably deliver those rules. A separate [referenced-guidance candidate](../referenced-guidance/README.md) now passes delivery and host-regression checks, but has no paid model-quality comparison and remains unpromoted. A behaviorally correct patch can still violate repository type and code rules.
 
 ## First control (interim)
 
