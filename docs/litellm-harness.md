@@ -11,6 +11,8 @@ Choose **LiteLLM specific** in the model picker when working at the root of the 
 
 The campaign used a verified 1,048,576-token context limit. To reproduce that setting, open **Settings → Providers → Context window overrides** and add the exact Flash model ID with `1048576` tokens after confirming your gateway exposes that capacity. The architecture otherwise uses normal Litespeed model discovery or its planning default; choosing the architecture does not change provider limits.
 
+When the gateway supplies a valid `usage.cost` in the stream, Litespeed preserves that reported dollar amount in the turn receipt. Missing cost stays unknown; streaming response headers are not used as final charges. A LiteLLM administrator can enable [`include_cost_in_streaming_usage`](https://github.com/BerriAI/litellm/issues/31840) where the deployed route supports it. Litespeed already requests usage chunks. Token totals remain available independently.
+
 Your gateway credentials stay in the normal local provider configuration. Selecting the architecture preserves your model choice; it does not silently route requests to another provider. There is no specialist model to configure. Optional planner and Shunt models remain available through the existing settings; both were disabled in the campaign.
 
 The equivalent session API selection is:
