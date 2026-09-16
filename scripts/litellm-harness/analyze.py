@@ -5,6 +5,7 @@ import os
 import re
 from pathlib import Path
 from trace_metrics import activations
+from completion import completion_reason
 
 ROOT=Path(os.environ['LITELLM_CAMPAIGN_DIR'])
 records=[]
@@ -15,6 +16,8 @@ for p in sorted((ROOT/'runs').glob('*/result.json')):
     task=json.loads((directory/'task.json').read_text()) if (directory/'task.json').exists() else {}
     record['promptRevision']=result.get('promptRevision',task.get('prompt_revision',1))
     record['snapshotRevision']=result.get('snapshotRevision',task.get('snapshot_revision',1))
+    record['completionReason']=completion_reason(result)
+    record['completed']=record['completionReason']=='completed'
     record['taskPrompt']=task.get('prompt') or (directory/'prompt.txt').read_text().split('\n\nImplement the fix in this checkout')[0]
     if (directory/'harness-source.json').exists():
         snapshot=json.loads((directory/'harness-source.json').read_text())
@@ -70,7 +73,6 @@ for p in sorted((ROOT/'runs').glob('*/result.json')):
         events=[json.loads(line) for line in (directory/'codex.jsonl').read_text().splitlines()]
         usage=next((e.get('usage',{}) for e in reversed(events) if e.get('type')=='turn.completed'),{})
         record.update({'inputTokens':usage.get('input_tokens'),'cachedTokens':usage.get('cached_input_tokens'),'outputTokens':usage.get('output_tokens'),'computedUsd':None,'toolCounts':dict(Counter(e['item']['type'] for e in events if e.get('type')=='item.completed' and 'item' in e))})
-    record['completed']=not bool(result.get('timedOut') or result.get('interrupted')) and (result.get('exit')==0 if result['kind']=='codex' else result.get('status')=='idle')
     records.append(record)
 (ROOT/'analysis.json').write_text(json.dumps(records,indent=2))
 for r in records:

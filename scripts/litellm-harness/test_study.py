@@ -1,9 +1,21 @@
 import unittest
 from study import paired_summary
 from trace_metrics import activations
+from completion import completion_reason
 
 
 class StudyTests(unittest.TestCase):
+    def test_idle_guard_stop_is_not_a_completed_task(self):
+        result = {'kind': 'litellm-specific', 'status': 'idle', 'acceptance': {'passed': True},
+                  'final': 'I stopped because the model requested the same tools three times in a row. The third batch was not executed.'}
+        self.assertEqual(completion_reason(result), 'repeated-tools-guard')
+        result['final'] = '[Stopped: several rounds produced no new information. Summarize what was learned and what is blocking.]'
+        self.assertEqual(completion_reason(result), 'no-progress-guard')
+        result['final'] = 'Implemented and verified the change.'
+        self.assertEqual(completion_reason(result), 'completed')
+        result['timedOut'] = True
+        self.assertEqual(completion_reason(result), 'timeout')
+
     def test_activation_requires_observed_payload(self):
         messages = [{'role': 'system', 'content': 'LiteLLM starting locations\n<workspace_reference>\n{"playbooks":[{"id":"router"}]}\n</workspace_reference>'},
                     {'role': 'system', 'content': 'LiteLLM change review.'}]

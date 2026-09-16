@@ -74,7 +74,8 @@ def main():
             acceptance = result.get('acceptance')
             if acceptance is not None:
                 row.update(evaluated=True, success=bool(result['completed'] and acceptance.get('passed')),
-                           completed=result['completed'], seconds=result['seconds'], acceptance=acceptance,
+                           completed=result['completed'], completionReason=result.get('completionReason'),
+                           seconds=result['seconds'], acceptance=acceptance,
                            computedUsd=result.get('computedUsd'), activations=result.get('activations'))
         rows.append(row)
     summaries = []

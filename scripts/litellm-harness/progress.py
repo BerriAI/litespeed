@@ -15,7 +15,7 @@ root = Path(os.environ['LITELLM_CAMPAIGN_DIR']).resolve()
 out = Path(sys.argv[1]); out.mkdir(parents=True, exist_ok=True)
 datasets = [Path(p).resolve() for p in sys.argv[2:]] or [root]
 fields = ['run', 'id', 'kind', 'label', 'promptRevision', 'snapshotRevision', 'harnessVersion',
-          'harnessSha256', 'harnessCommit', 'completed', 'status', 'exit', 'evaluationProtocol',
+          'harnessSha256', 'harnessCommit', 'completed', 'completionReason', 'status', 'exit', 'evaluationProtocol',
           'isolation', 'effort', 'timeoutSeconds', 'seconds', 'timedOut', 'interrupted',
           'recovered', 'durationIncomplete', 'repairParent', 'requests', 'reportedRequests',
           'inputTokens', 'cachedTokens', 'outputTokens', 'computedUsd', 'acceptance',
@@ -64,6 +64,7 @@ lines += ['', '## What the traces changed', '',
     '- Three broad Medium-reasoning code audits exhausted 24,000 output tokens each without returning a review. A focused router audit with relevant function excerpts returned actionable findings in 4,026 completion tokens. Its focus came from prior training failures; this does not validate a general-purpose blind reviewer. A second-attempt repair is measured separately.',
     '- Disabling reasoning did not earn a default on the first two hard development cases: it missed more router checks and one budget check. Other effort results remain separate.',
     '- Per-batch concurrency limits collectively overloaded the host. All datasets now share three solver slots and one grader. Interrupted runs and unknown charges are preserved.', '',
+    '- An MCP-auth patch passed its reference checks, but repeated 600 ms job polling triggered the host loop guard. Earlier reporting treated every idle session as completed. The analyzer now separates explicit host guard stops from normal completion, even when the patch passes.', '',
     '## Evaluation status', '',
     'A feature-removal study compares the current harness with no learned guides, no automatic initial map, no forced final review, and a 480-line default read window. The plan uses 16 qualified training/development tasks, five variants, and two repetitions, with randomized order. Frozen worktrees preserve each candidate. Outcomes select the next candidate; they are not final test results.', '',
     'A separate corpus selects 20 recent September 15 Python changes by explicit file-count and diff-size criteria. Fourteen pass base/reference qualification; six have environment, new-private-API, or reference failures and are excluded before solver outcomes. Its outcomes remain reserved. Earlier September 9 reserved tasks predate some training snapshots, so they cannot establish chronological generalization.', '',
