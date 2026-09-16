@@ -217,10 +217,75 @@
       },
       "bytecodePolicy": "fresh cache path; reads from adjacent caches and all writes disabled",
       "exit": 0
+    },
+    "flash-r1": {
+      "rows": [
+        {
+          "name": "billing-cached-image-absent",
+          "pass": true,
+          "actualCost": 0.0015328,
+          "expectedCost": 0.0015328
+        },
+        {
+          "name": "billing-cached-image-zero",
+          "pass": true,
+          "actualCost": 0.0015328,
+          "expectedCost": 0.0015328
+        },
+        {
+          "name": "aggregate-token-values",
+          "pass": true,
+          "observed": {
+            "text_tokens": 64,
+            "audio_tokens": 228,
+            "image_tokens": 0
+          },
+          "inputsUnchanged": true
+        },
+        {
+          "name": "aggregate-input-billing",
+          "pass": true,
+          "actualCost": 0.0017728,
+          "expectedCost": 0.0017728
+        },
+        {
+          "name": "partial-split-first",
+          "pass": true,
+          "observed": {
+            "text_tokens": 64,
+            "audio_tokens": 128,
+            "image_tokens": 0
+          },
+          "inputsUnchanged": true
+        },
+        {
+          "name": "partial-split-last",
+          "pass": true,
+          "observed": {
+            "text_tokens": 64,
+            "audio_tokens": 128,
+            "image_tokens": 0
+          },
+          "inputsUnchanged": true
+        },
+        {
+          "name": "explicit-cached-image-sum",
+          "pass": true,
+          "cachedImage": 3,
+          "inputsUnchanged": true
+        }
+      ],
+      "passed": true,
+      "imports": {
+        "packageOrigin": "litellm/__init__.py",
+        "allLiteLLMModulesWithinWorkspace": true,
+        "moduleCount": 813
+      },
+      "bytecodePolicy": "fresh cache path; reads from adjacent caches and all writes disabled",
+      "exit": 0
     }
   },
   "pendingLabels": [
-    "replication-v50-larger-flash-r1",
     "replication-v50-larger-flash-r2",
     "replication-v50-larger-astra-r2"
   ],
@@ -233,5 +298,87 @@
     "supplementalPassed": 1,
     "supplementalTotal": 4
   },
-  "interpretation": "Base0/7,reference7/7,Astra7/7. Absent and zero image counts yield the same correct input price in the tested scenario; aggregate sums and nonzero image preservation also pass. The task explicitly requires omission of an entirely absent nested split, which Astra passes. It does not explicitly demand None for an absent inner image field. The three strict supplemental failures therefore do not establish three billing defects. This is a bounded contract/behavior diagnosis, not proof that every consumer treats these representations identically."
+  "interpretation": "Base0/7,reference7/7,Astra-first7/7,Flash-first7/7. Absent and zero image counts yield the same correct input price in the tested scenario; aggregate sums and nonzero image preservation also pass. Both models pass17/17reference and1/4strictsupplemental for the same zero-versus-None difference. This is a bounded contract/behavior diagnosis, not proof every consumer treats these representations identically. First Flash1017.864sec/$0.18754 versusAstra460.293sec/unknownUSD; repetitions2pending.",
+  "firstFlash": {
+    "run": "replication-v50-larger-flash-r1-realtime-cached-audio-cost-f4875007",
+    "seconds": 1017.864,
+    "completed": true,
+    "computedUsd": 0.187538058,
+    "requests": 141,
+    "modelSeconds": 573.068,
+    "toolActiveSeconds": 386.796,
+    "timeToFirstEditSeconds": 176.464,
+    "reviewStartedSeconds": 995.305,
+    "reviewModelRequests": 2,
+    "activations": {
+      "initialMapNotices": 1,
+      "contextToolCalls": 1,
+      "guideIdsShown": [],
+      "unparsedContextPayloads": 0,
+      "finalReviewNotices": 1,
+      "guidedFinalReviewNotices": 0,
+      "finalReviewGuideIdsShown": [],
+      "batchedEditCalls": 24,
+      "completedBatchedEditCalls": 22,
+      "batchEditsRequested": 44,
+      "batchSizes": [
+        3,
+        2,
+        1,
+        2,
+        1,
+        2,
+        4,
+        1,
+        2,
+        1,
+        3,
+        1,
+        1,
+        8,
+        1,
+        1,
+        1,
+        2,
+        1,
+        1,
+        2,
+        1,
+        1,
+        1
+      ],
+      "backgroundCommandNotices": 1,
+      "testFocusNotices": 1,
+      "explorationFocusNotices": 1,
+      "readCallsByEffectiveLimit": {
+        "160": 3,
+        "140": 1,
+        "120": 4,
+        "80": 5,
+        "50": 2,
+        "40": 5,
+        "280": 1,
+        "90": 1,
+        "180": 1,
+        "110": 1,
+        "260": 1,
+        "60": 4,
+        "130": 2,
+        "100": 1,
+        "25": 3,
+        "70": 2,
+        "30": 2,
+        "20": 2,
+        "15": 1,
+        "12": 1,
+        "10": 1
+      },
+      "defaultWindowReadCalls": null,
+      "readLimitProvenance": "unknown: saved arguments include host-injected defaults"
+    },
+    "referencePassed": 17,
+    "referenceTotal": 17,
+    "supplementalPassed": 1,
+    "supplementalTotal": 4
+  }
 }
