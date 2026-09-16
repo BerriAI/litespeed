@@ -4,7 +4,7 @@ import path from 'node:path';
 import fg from 'fast-glob';
 import type { ToolDefinition } from '../shared/types.js';
 
-export const LITELLM_HARNESS_VERSION='2026-09-15.28';
+export const LITELLM_HARNESS_VERSION='2026-09-15.30';
 export const litellmContextTool:ToolDefinition={type:'function',function:{name:'litellm_context',description:'Navigate the current LiteLLM checkout. Give a task query to find relevant definitions, inline conditions and existing tests. Give a source path to see its symbol outline and test partners; add a symbol name to read that definition with numbered lines, or callers to find functions invoking a named helper in that file. Reads only this workspace, never Git history or remote answers.',parameters:{type:'object',properties:{query:{type:'string',maxLength:1000},path:{type:'string',maxLength:500},symbol:{type:'string',maxLength:200},callers:{type:'string',maxLength:200,description:'Python helper name whose call sites and enclosing functions to find; requires path.'}},additionalProperties:false}}};
 
 const playbooks = [
@@ -29,7 +29,7 @@ const playbooks = [
   },
   {
     id: 'router-resolution-and-request-state',
-    matches: (query:string) => /(?:rout|deployment)/i.test(query) && /(?:candidat|strateg|override|select|callback|fallback|team|wildcard)/i.test(query),
+    matches: (query:string) => /(?:\brouter\b|\brouting\b|get_available_deployment|candidate_model_ids_for_route)/i.test(query) && /(?:candidat|strateg|override|select|callback|fallback|team|wildcard)/i.test(query),
     paths: ['litellm/router.py', 'litellm/router_strategy/simple_shuffle.py', 'litellm/router_strategy/lowest_tpm_rpm_v2.py'],
     lessons: [
       'Router resolution is ordered, not a union of matching deployments. Inspect aliases, routing groups, _try_early_resolve_deployments_for_model_not_in_names, team/wildcard/default resolution and _get_all_deployments in their existing order. A candidate-list helper should follow that precedence without accidentally applying fallbacks or admission checks.',
@@ -51,7 +51,7 @@ const playbooks = [
   },
   {
     id: 'cached-response-boundaries',
-    matches: (query:string) => /(?:empty|usage.only|cached)/i.test(query) && /(?:choices?|responses?|stream)/i.test(query),
+    matches: (query:string) => /(?:\b(?:empty|missing|malformed|no|zero)\b[\s\S]{0,40}\bchoices?\b|\bchoices?\b[\s\S]{0,40}\b(?:empty|missing|malformed)\b|usage[- _]?only|cached[- _]?(?:response|stream))/i.test(query),
     paths: ['litellm/litellm_core_utils/llm_response_utils/convert_dict_to_response.py', 'litellm/litellm_core_utils/streaming_handler.py', 'litellm/llms/anthropic/experimental_pass_through/adapters/transformation.py'],
     lessons: [
       'Dictionary conversion, cache replay, and the Anthropic compatibility adapter are separate boundaries. Changing a converter does not cover CustomStreamWrapper._dispatch_provider_chunk: its cached_response branch may index the first choice independently.',

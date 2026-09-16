@@ -61,6 +61,17 @@ describe('LiteLLM repository navigation',()=>{
     expect(JSON.parse(await litellmContext(root,{query:'Langfuse trace session'},signal)).playbooks).toHaveLength(1);
     expect(JSON.parse(await litellmContext(root,{query:'Langsmith trace session'},signal)).playbooks).toEqual([]);
   });
+  it('does not confuse credential identity selectors or empty guardrail text with routing and cached choices',async()=>{
+    await put('litellm/router.py','class Router: pass\n');
+    await put('litellm/litellm_core_utils/llm_response_utils/convert_dict_to_response.py','def convert(): pass\n');
+    const signal=new AbortController().signal;
+    for(const query of [
+      'Add AWS STS session-tag support. Deployments/credentials accept aws_session_tags. Caller-supplied AWS identity selectors must be stripped when merging deployment request params.',
+      'Extend the OpenAI Responses API guardrail handler for custom tool calls. texts_to_check stays empty. Non-streaming process_output_response maps tool calls back.',
+    ])expect(JSON.parse(await litellmContext(root,{query},signal)).playbooks).toEqual([]);
+    expect(JSON.parse(await litellmContext(root,{query:'Router candidate deployment IDs and team wildcard resolution'},signal)).playbooks.map((card:{id:string})=>card.id)).toContain('router-resolution-and-request-state');
+    expect(JSON.parse(await litellmContext(root,{query:'Cached responses with empty choices must stream safely'},signal)).playbooks.map((card:{id:string})=>card.id)).toContain('cached-response-boundaries');
+  });
   it('searches every relevant area for mixed provider, proxy and router queries',async()=>{
     await put('litellm/router.py','def resolve_team_router_name():\n    pass\n');
     await put('litellm/proxy/auth.py','def resolve_team_auth():\n    pass\n');
