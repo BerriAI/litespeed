@@ -36,3 +36,20 @@ The [executable probe](real_stream_probe.py) uses the actual Chat Completions, A
 The narrower conclusion is useful: both patches handle direct hooks through real chat and Messages adapters. The Medium patch nevertheless skips the real Responses hook entirely because its manual generic assembler cannot consume Responses events. The High patch invokes it and preserves `None`/exception behavior but discards the requested text rewrite. The critic identified a relevant abstraction boundary, but its exact reference-test symptoms did not establish which real endpoints failed. Testing one endpoint would have missed this distinction. Testing only a fake translator would have overstated the defect in the other two.
 
 Probe qualification also caught two host-test mistakes before these results: retaining a mutable response reference inspected its later write-back state, and string SSE did not match the Messages endpoint's byte-stream contract. The final probe snapshots input at hook entry and uses bytes. The earlier scratch outputs are retained privately; they are not scored evidence.
+
+## Real-adapter checks on other mechanism trials
+
+A [separate posthoc diagnostic](mechanism-probes.json) applies the unchanged qualified 24-case probe to every completed legacy-streaming attempt in the native-inspection and grouped-edit plans. Two planned attempts are still pending. No original study criterion, completion flag or score changes.
+
+| Attempt | Original checks | Real checks | Normal completion |
+|---|---:|---:|---|
+| Native inspection, first | 14/16 | 12/24 | Yes |
+| Native inspection, second | 14/16 | 12/24 | No |
+| Native control, first | 16/16 | 24/24 | No |
+| Grouped edits, second | 14/16 | 12/24 | No |
+| Grouped-edit control, first | 16/16 | 24/24 | No |
+| Grouped-edit control, second | 16/16 | 24/24 | No |
+
+The three 12/24 patches pass every direct-hook case across all three protocols; their remaining failures exclude inherited hooks under the task's ambiguous “own hook” wording. These candidates do not have the Responses assembly defect found in the first endpoint-guide trial. The controls pass all selected real checks, but all reach the deadline. A passing patch at cancellation does not establish a normally delivered or fully correct result.
+
+The native control fixed inheritance late, observed 37 passing focused tests, and started another check just before cancellation. Both grouped-edit controls were still running additional tests. These observations separate semantic mistakes from delivery-time failures; they do not establish that all further testing was unnecessary. The protocol imposes a 900-second cutoff but does not send a countdown to either solver. Real-adapter coverage and the hard-cutoff delivery metric answer different questions.

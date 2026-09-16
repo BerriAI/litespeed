@@ -15,3 +15,5 @@ The second grouped-edit background attempt (`d25104ed`) finishes normally at 6/7
 ## Metering-gateway outage
 
 The current plan explicitly replaces allocations affected by the verified gateway heap failure, regardless of their patch scores. [The outage audit](../gateway-memory/outage.json) records every original attempt and its admitted-request count; `plan-before-gateway-oom.json` preserves the previous identities. Source commits, tasks, effort, deadlines and concurrency are unchanged. Replacements use new `-oom1` labels. Original partial work, failed allocations and charges stay in the campaign-wide report; complete-pair summaries use the amended plan. These are infrastructure replacements, not selection of a better model attempt.
+
+The [posthoc real-adapter audit](../feature-effort/legacy-inheritance/README.md#real-adapter-checks-on-other-mechanism-trials) retains the distinction between semantically passing patches at cancellation and normal delivery. It does not replace this study’s original endpoint or deadline.
