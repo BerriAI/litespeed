@@ -4,20 +4,20 @@
   "variants": [
     {
       "variant": "combined",
-      "evaluated": 5,
+      "evaluated": 6,
       "expected": 8,
-      "successes": 4,
-      "meanSeconds": 554.9114,
-      "tokenPricedUsd": 0.522451826,
+      "successes": 5,
+      "meanSeconds": 524.9541666666667,
+      "tokenPricedUsd": 0.593212732,
       "trialsWithoutTokenPrice": 0
     },
     {
       "variant": "control",
-      "evaluated": 6,
+      "evaluated": 7,
       "expected": 8,
-      "successes": 4,
-      "meanSeconds": 575.5654999999999,
-      "tokenPricedUsd": 0.955675288,
+      "successes": 5,
+      "meanSeconds": 560.0165714285714,
+      "tokenPricedUsd": 1.147398614,
       "trialsWithoutTokenPrice": 0
     }
   ],
@@ -25,10 +25,21 @@
     {
       "variant": "combined",
       "control": "control",
-      "pairedTasks": 0,
+      "pairedTasks": 1,
       "expectedTasks": 4,
       "complete": false,
-      "pairs": []
+      "pairs": [
+        {
+          "dataset": "training2",
+          "case": "mcp-auth-challenge",
+          "successDelta": 0,
+          "secondsDelta": -35.769499999999994
+        }
+      ],
+      "successDelta": 0,
+      "secondsDelta": -35.769499999999994,
+      "taskBootstrap95": null,
+      "uncertaintyNote": "One task cannot estimate variation between tasks; no bootstrap interval is reported."
     }
   ],
   "trials": [
@@ -774,7 +785,59 @@
       "effort": "medium",
       "kind": "litellm-specific",
       "timeoutSeconds": 900,
-      "evaluated": false
+      "evaluated": true,
+      "success": true,
+      "completed": true,
+      "completionReason": "completed",
+      "seconds": 375.168,
+      "acceptance": {
+        "exit": 0,
+        "tests": 5,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0,
+        "passed": true
+      },
+      "computedUsd": 0.070760906,
+      "activations": {
+        "initialMapNotices": 1,
+        "contextToolCalls": 0,
+        "guideIdsShown": [],
+        "unparsedContextPayloads": 0,
+        "finalReviewNotices": 1,
+        "guidedFinalReviewNotices": 0,
+        "finalReviewGuideIdsShown": [],
+        "batchedEditCalls": 5,
+        "completedBatchedEditCalls": 5,
+        "batchEditsRequested": 12,
+        "batchSizes": [
+          2,
+          4,
+          2,
+          2,
+          2
+        ],
+        "backgroundCommandNotices": 0,
+        "testFocusNotices": 1,
+        "explorationFocusNotices": 1,
+        "readCallsByEffectiveLimit": {
+          "120": 8,
+          "200": 1,
+          "100": 1,
+          "130": 2,
+          "160": 4,
+          "140": 1,
+          "80": 5,
+          "60": 5,
+          "180": 1,
+          "125": 1,
+          "110": 1,
+          "70": 2,
+          "45": 1
+        },
+        "defaultWindowReadCalls": null,
+        "readLimitProvenance": "unknown: saved arguments include host-injected defaults"
+      }
     },
     {
       "dataset": "training2",
@@ -785,7 +848,56 @@
       "effort": "medium",
       "kind": "litellm-specific",
       "timeoutSeconds": 900,
-      "evaluated": false
+      "evaluated": true,
+      "success": true,
+      "completed": true,
+      "completionReason": "completed",
+      "seconds": 466.723,
+      "acceptance": {
+        "exit": 0,
+        "tests": 52,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0,
+        "passed": true
+      },
+      "computedUsd": 0.191723326,
+      "activations": {
+        "initialMapNotices": 1,
+        "contextToolCalls": 0,
+        "guideIdsShown": [],
+        "unparsedContextPayloads": 0,
+        "finalReviewNotices": 1,
+        "guidedFinalReviewNotices": 0,
+        "finalReviewGuideIdsShown": [],
+        "batchedEditCalls": 0,
+        "completedBatchedEditCalls": 0,
+        "batchEditsRequested": 0,
+        "batchSizes": [],
+        "backgroundCommandNotices": 0,
+        "testFocusNotices": 1,
+        "explorationFocusNotices": 1,
+        "readCallsByEffectiveLimit": {
+          "130": 4,
+          "160": 1,
+          "120": 3,
+          "200": 2,
+          "360": 1,
+          "60": 5,
+          "140": 3,
+          "80": 3,
+          "70": 1,
+          "40": 5,
+          "50": 1,
+          "180": 1,
+          "20": 1,
+          "10": 1,
+          "55": 2,
+          "15": 1
+        },
+        "defaultWindowReadCalls": null,
+        "readLimitProvenance": "unknown: saved arguments include host-injected defaults"
+      }
     },
     {
       "dataset": "",

@@ -4,20 +4,20 @@
   "variants": [
     {
       "variant": "control",
-      "evaluated": 17,
+      "evaluated": 18,
       "expected": 32,
-      "successes": 11,
-      "meanSeconds": 364.8981176470588,
-      "tokenPricedUsd": 1.29871351,
+      "successes": 12,
+      "meanSeconds": 370.7845,
+      "tokenPricedUsd": 1.4553851340000001,
       "trialsWithoutTokenPrice": 0
     },
     {
       "variant": "no-guides",
-      "evaluated": 17,
+      "evaluated": 18,
       "expected": 32,
-      "successes": 12,
-      "meanSeconds": 357.56105882352944,
-      "tokenPricedUsd": 2.097010982,
+      "successes": 13,
+      "meanSeconds": 365.3159444444444,
+      "tokenPricedUsd": 2.371528322,
       "trialsWithoutTokenPrice": 0
     },
     {
@@ -52,10 +52,16 @@
     {
       "variant": "no-guides",
       "control": "control",
-      "pairedTasks": 1,
+      "pairedTasks": 2,
       "expectedTasks": 16,
       "complete": false,
       "pairs": [
+        {
+          "dataset": "training2",
+          "case": "mcp-auth-challenge",
+          "successDelta": 0,
+          "secondsDelta": 73.702
+        },
         {
           "dataset": "training2",
           "case": "mcp-optional-discovery",
@@ -64,9 +70,11 @@
         }
       ],
       "successDelta": 0,
-      "secondsDelta": -57.56299999999999,
-      "taskBootstrap95": null,
-      "uncertaintyNote": "One task cannot estimate variation between tasks; no bootstrap interval is reported."
+      "secondsDelta": 8.069500000000005,
+      "taskBootstrap95": [
+        0,
+        0
+      ]
     },
     {
       "variant": "no-preload",
@@ -90,10 +98,16 @@
     {
       "variant": "no-review",
       "control": "control",
-      "pairedTasks": 1,
+      "pairedTasks": 2,
       "expectedTasks": 16,
       "complete": false,
       "pairs": [
+        {
+          "dataset": "training2",
+          "case": "mcp-auth-challenge",
+          "successDelta": 0,
+          "secondsDelta": -79.71200000000005
+        },
         {
           "dataset": "training2",
           "case": "mcp-optional-discovery",
@@ -102,17 +116,25 @@
         }
       ],
       "successDelta": 0,
-      "secondsDelta": -108.65599999999995,
-      "taskBootstrap95": null,
-      "uncertaintyNote": "One task cannot estimate variation between tasks; no bootstrap interval is reported."
+      "secondsDelta": -94.184,
+      "taskBootstrap95": [
+        0,
+        0
+      ]
     },
     {
       "variant": "read-480",
       "control": "control",
-      "pairedTasks": 1,
+      "pairedTasks": 2,
       "expectedTasks": 16,
       "complete": false,
       "pairs": [
+        {
+          "dataset": "training2",
+          "case": "mcp-auth-challenge",
+          "successDelta": 0,
+          "secondsDelta": 116.67049999999995
+        },
         {
           "dataset": "training2",
           "case": "mcp-optional-discovery",
@@ -121,9 +143,11 @@
         }
       ],
       "successDelta": 0,
-      "secondsDelta": -109.88299999999998,
-      "taskBootstrap95": null,
-      "uncertaintyNote": "One task cannot estimate variation between tasks; no bootstrap interval is reported."
+      "secondsDelta": 3.393749999999983,
+      "taskBootstrap95": [
+        0,
+        0
+      ]
     }
   ],
   "trials": [
@@ -4830,7 +4854,57 @@
       "label": "replication-p6-ablation-no-guides-r2",
       "commit": "6d7fbe3e3c5192b6675c2bea2dc0af3913bd1480",
       "effort": "medium",
-      "evaluated": false
+      "evaluated": true,
+      "success": true,
+      "completed": true,
+      "completionReason": "completed",
+      "seconds": 497.149,
+      "acceptance": {
+        "exit": 0,
+        "tests": 52,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0,
+        "passed": true
+      },
+      "computedUsd": 0.27451734,
+      "activations": {
+        "initialMapNotices": 1,
+        "contextToolCalls": 0,
+        "guideIdsShown": [],
+        "unparsedContextPayloads": 0,
+        "finalReviewNotices": 1,
+        "guidedFinalReviewNotices": 0,
+        "finalReviewGuideIdsShown": [],
+        "batchedEditCalls": 0,
+        "completedBatchedEditCalls": 0,
+        "batchEditsRequested": 0,
+        "batchSizes": [],
+        "backgroundCommandNotices": 0,
+        "testFocusNotices": 0,
+        "explorationFocusNotices": 1,
+        "readCallsByEffectiveLimit": {
+          "180": 4,
+          "160": 4,
+          "120": 3,
+          "80": 6,
+          "140": 2,
+          "100": 1,
+          "220": 1,
+          "30": 3,
+          "40": 3,
+          "150": 1,
+          "90": 1,
+          "110": 1,
+          "130": 2,
+          "70": 2,
+          "50": 1,
+          "45": 1,
+          "20": 1
+        },
+        "defaultWindowReadCalls": null,
+        "readLimitProvenance": "unknown: saved arguments include host-injected defaults"
+      }
     },
     {
       "dataset": "training2",
@@ -4839,7 +4913,57 @@
       "label": "replication-p6-ablation-control-r2",
       "commit": "f75ab327c649cec9719ac03847f171854d2e32ae",
       "effort": "medium",
-      "evaluated": false
+      "evaluated": true,
+      "success": true,
+      "completed": true,
+      "completionReason": "completed",
+      "seconds": 470.853,
+      "acceptance": {
+        "exit": 0,
+        "tests": 52,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0,
+        "passed": true
+      },
+      "computedUsd": 0.156671624,
+      "activations": {
+        "initialMapNotices": 1,
+        "contextToolCalls": 1,
+        "guideIdsShown": [],
+        "unparsedContextPayloads": 0,
+        "finalReviewNotices": 1,
+        "guidedFinalReviewNotices": 0,
+        "finalReviewGuideIdsShown": [],
+        "batchedEditCalls": 0,
+        "completedBatchedEditCalls": 0,
+        "batchEditsRequested": 0,
+        "batchSizes": [],
+        "backgroundCommandNotices": 0,
+        "testFocusNotices": 0,
+        "explorationFocusNotices": 1,
+        "readCallsByEffectiveLimit": {
+          "200": 2,
+          "150": 2,
+          "80": 3,
+          "120": 5,
+          "160": 3,
+          "240": 1,
+          "130": 1,
+          "140": 1,
+          "280": 1,
+          "60": 1,
+          "70": 1,
+          "30": 2,
+          "10": 3,
+          "50": 2,
+          "220": 1,
+          "15": 1,
+          "90": 1
+        },
+        "defaultWindowReadCalls": null,
+        "readLimitProvenance": "unknown: saved arguments include host-injected defaults"
+      }
     },
     {
       "dataset": "training2",

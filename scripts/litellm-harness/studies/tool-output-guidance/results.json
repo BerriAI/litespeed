@@ -1,0 +1,116 @@
+{
+  "status": "interim",
+  "note": "Development selection only. Interim observed-task means can change as slower trials finish. Bootstrap resamples tasks, not attempts; it does not correct adaptive candidate selection or establish future generalization. Token prices exclude requests without usage and do not replace the campaign ledger.",
+  "variants": [
+    {
+      "variant": "control",
+      "evaluated": 0,
+      "expected": 4
+    },
+    {
+      "variant": "tool-guidance",
+      "evaluated": 0,
+      "expected": 4
+    }
+  ],
+  "comparisons": [
+    {
+      "variant": "tool-guidance",
+      "control": "control",
+      "pairedTasks": 0,
+      "expectedTasks": 2,
+      "complete": false,
+      "pairs": []
+    }
+  ],
+  "trials": [
+    {
+      "dataset": "",
+      "case": "router-strategy-isolation",
+      "name": "control",
+      "label": "replication-v51-tool-output-control-r2",
+      "commit": "8e0a6d40d66f13f73f6174073836ff43919c4282",
+      "effort": "medium",
+      "kind": "litellm-specific",
+      "timeoutSeconds": 900,
+      "evaluated": false
+    },
+    {
+      "dataset": "",
+      "case": "router-strategy-isolation",
+      "name": "tool-guidance",
+      "label": "replication-v51-tool-output-tool-guidance-r2",
+      "commit": "1a28eddc9bf49351adce778de140122f383ac028",
+      "effort": "medium",
+      "kind": "litellm-specific",
+      "timeoutSeconds": 900,
+      "evaluated": false
+    },
+    {
+      "dataset": "training5",
+      "case": "legacy-stream-pipeline",
+      "name": "tool-guidance",
+      "label": "replication-v51-tool-output-tool-guidance-r1",
+      "commit": "1a28eddc9bf49351adce778de140122f383ac028",
+      "effort": "medium",
+      "kind": "litellm-specific",
+      "timeoutSeconds": 900,
+      "evaluated": false
+    },
+    {
+      "dataset": "training5",
+      "case": "legacy-stream-pipeline",
+      "name": "control",
+      "label": "replication-v51-tool-output-control-r2",
+      "commit": "8e0a6d40d66f13f73f6174073836ff43919c4282",
+      "effort": "medium",
+      "kind": "litellm-specific",
+      "timeoutSeconds": 900,
+      "evaluated": false
+    },
+    {
+      "dataset": "training5",
+      "case": "legacy-stream-pipeline",
+      "name": "control",
+      "label": "replication-v51-tool-output-control-r1",
+      "commit": "8e0a6d40d66f13f73f6174073836ff43919c4282",
+      "effort": "medium",
+      "kind": "litellm-specific",
+      "timeoutSeconds": 900,
+      "evaluated": false
+    },
+    {
+      "dataset": "",
+      "case": "router-strategy-isolation",
+      "name": "control",
+      "label": "replication-v51-tool-output-control-r1",
+      "commit": "8e0a6d40d66f13f73f6174073836ff43919c4282",
+      "effort": "medium",
+      "kind": "litellm-specific",
+      "timeoutSeconds": 900,
+      "evaluated": false
+    },
+    {
+      "dataset": "training5",
+      "case": "legacy-stream-pipeline",
+      "name": "tool-guidance",
+      "label": "replication-v51-tool-output-tool-guidance-r2",
+      "commit": "1a28eddc9bf49351adce778de140122f383ac028",
+      "effort": "medium",
+      "kind": "litellm-specific",
+      "timeoutSeconds": 900,
+      "evaluated": false
+    },
+    {
+      "dataset": "",
+      "case": "router-strategy-isolation",
+      "name": "tool-guidance",
+      "label": "replication-v51-tool-output-tool-guidance-r1",
+      "commit": "1a28eddc9bf49351adce778de140122f383ac028",
+      "effort": "medium",
+      "kind": "litellm-specific",
+      "timeoutSeconds": 900,
+      "evaluated": false
+    }
+  ]
+}
