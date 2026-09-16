@@ -76,8 +76,8 @@ export async function executeMcpCode(options: McpCodeOptions): Promise<string> {
         if (settled) return;
         try {
           if (message.type === 'done') {
-            if (active || queue.length) throw new Error('Await every tool call before returning from the script.');
             if (message.error) throw new Error(message.error.slice(0, 2000));
+            if (active || queue.length) throw new Error('Await every tool call before returning from the script.');
             if (typeof message.output !== 'string' || Buffer.byteLength(message.output) > limits.outputBytes + 200) throw new Error('Invalid code execution output.');
             finish(undefined, message.output); return;
           }
