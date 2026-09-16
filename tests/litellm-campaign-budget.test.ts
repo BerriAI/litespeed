@@ -1,10 +1,20 @@
 import { mkdtempSync, rmSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
+import { execFileSync } from 'node:child_process';
+import { fileURLToPath } from 'node:url';
 import { describe, expect, it } from 'vitest';
 import { CampaignBudget, usageCost, responseCharge, lockCampaign } from '../scripts/litellm-harness/budget.js';
 
 describe('paid harness campaign admission',()=>{
+  it('does not retain whole prompt strings through regex-derived ledger labels',()=>{
+    const probe=fileURLToPath(new URL('../scripts/litellm-harness/studies/gateway-memory/probe.mts',import.meta.url));
+    const measured=JSON.parse(execFileSync(process.execPath,['--expose-gc','--import','tsx',probe],{encoding:'utf8'}));
+    expect(measured.entries).toBe(96);expect(measured.lastLabel).toBe('example-run-95');
+    // The old sliced labels retain 24 MiB. Allow ample GC/runtime noise while
+    // detecting retention of most synthetic prompt contents.
+    expect(measured.heapGrowthBytes).toBeLessThan(8*1024*1024);
+  });
   it('allows only one gateway process to own a campaign ledger',()=>{
     const root=mkdtempSync(join(tmpdir(),'campaign-lock-'));
     try{const release=lockCampaign(root);expect(()=>lockCampaign(root)).toThrow('locked');release();release();lockCampaign(root)();}

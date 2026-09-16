@@ -40,11 +40,11 @@
     },
     {
       "variant": "read-480",
-      "evaluated": 9,
+      "evaluated": 10,
       "expected": 32,
       "successes": 7,
-      "meanSeconds": 330.026,
-      "tokenPricedUsd": 0.603821132,
+      "meanSeconds": 376.2657,
+      "tokenPricedUsd": 0.789704214,
       "trialsWithoutTokenPrice": 0
     }
   ],
@@ -2665,13 +2665,69 @@
       "label": "replication-p6-ablation-read-480-r1",
       "commit": "9e4af4bde94625d6eeca72efb0b9436e9d4fb43b",
       "effort": "medium",
-      "evaluated": false
+      "evaluated": true,
+      "success": false,
+      "completed": true,
+      "completionReason": "completed",
+      "seconds": 792.423,
+      "acceptance": {
+        "exit": 1,
+        "tests": 15,
+        "failures": 2,
+        "errors": 0,
+        "skipped": 0,
+        "passed": false
+      },
+      "computedUsd": 0.185883082,
+      "activations": {
+        "initialMapNotices": 1,
+        "contextToolCalls": 0,
+        "guideIdsShown": [
+          "cached-response-boundaries"
+        ],
+        "unparsedContextPayloads": 0,
+        "finalReviewNotices": 1,
+        "guidedFinalReviewNotices": 0,
+        "finalReviewGuideIdsShown": [],
+        "batchedEditCalls": 0,
+        "completedBatchedEditCalls": 0,
+        "batchEditsRequested": 0,
+        "batchSizes": [],
+        "backgroundCommandNotices": 0,
+        "testFocusNotices": 0,
+        "explorationFocusNotices": 1,
+        "readCallsByEffectiveLimit": {
+          "480": 2,
+          "600": 1,
+          "300": 2,
+          "100": 2,
+          "460": 1,
+          "120": 2,
+          "260": 1,
+          "55": 1,
+          "140": 1,
+          "130": 2,
+          "80": 3,
+          "70": 1,
+          "32": 1,
+          "50": 2,
+          "45": 1,
+          "25": 1,
+          "60": 1,
+          "230": 1,
+          "95": 1,
+          "40": 1,
+          "8": 1
+        },
+        "defaultWindowReadCalls": null,
+        "readLimitProvenance": "unknown: saved arguments include host-injected defaults"
+      }
     },
     {
       "dataset": "training2",
       "case": "responses-custom-guardrail",
       "name": "no-preload",
-      "label": "replication-p6-ablation-no-preload-r1",
+      "label": "replication-p6-ablation-no-preload-r1-oom1",
       "commit": "9b7cffd3ff2ca5a5c078321e879c9ee728b9a70c",
       "effort": "medium",
       "evaluated": false

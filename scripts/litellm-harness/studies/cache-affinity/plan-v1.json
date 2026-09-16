@@ -20,14 +20,5 @@
     "litellm/utils.py": "3d1190c6f791c95293dc88e046cd7f1bcc6a403f25f0cf134a69939edb3124eb"
   },
   "scope": "Transport-only synthetic growing conversations with public pre-merge training source; unique leading nonce per arm and repetition prevents cross-arm prefix warming. Identical source sizes and prompt instructions. Within each round arm order randomized. No correctness conclusion. Gateway does not forward the application session header; stable user body field is preserved.",
-  "primary": "Post-initial-round cached/input ratio, input-cost estimate and request elapsed time per paired scenario. Include warm-up separately. No causal tool-cost or production cache guarantee.",
-  "revision": 2,
-  "scenarioAttempts": {
-    "160000-r3": "oom1"
-  },
-  "gatewayOutageAmendment": {
-    "at": "2026-09-16T06:37:13.430045+00:00",
-    "originalUnadmittedMarker": "160000-r3-stable-user-step00.request.json",
-    "reason": "Gateway OOM caused connection refusal before the first request in this paired scenario. Preserve original marker, use new attempt prefix and nonce for both arms; continue the two untouched scenarios and retain all three completed pairs."
-  }
+  "primary": "Post-initial-round cached/input ratio, input-cost estimate and request elapsed time per paired scenario. Include warm-up separately. No causal tool-cost or production cache guarantee."
 }

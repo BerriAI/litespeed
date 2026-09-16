@@ -14,7 +14,9 @@ export class CampaignBudget {
   reserve(label:string,ceilingUsd:number){
     if(!Number.isFinite(ceilingUsd)||ceilingUsd<=0)throw new Error('A finite positive request reservation is required.');
     if(this.committedUsd+ceilingUsd>this.limitUsd)throw new Error('Campaign spending ceiling reached. No request sent.');
-    const record:Charge={id:randomUUID(),label,reservedUsd:ceilingUsd,status:'pending'};
+    // Regex captures can be sliced strings retaining an entire multi-megabyte
+    // prompt. Keep an owned copy of the small label in the long-lived ledger.
+    const record:Charge={id:randomUUID(),label:Buffer.from(label,'utf8').toString('utf8'),reservedUsd:ceilingUsd,status:'pending'};
     this.records.push(record);this.save();return record.id;
   }
   settle(id:string,charge:number|undefined,details:Pick<Charge,'usage'|'seconds'|'pricingSource'|'responseCostUsd'|'httpStatus'>={}){

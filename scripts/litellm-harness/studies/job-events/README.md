@@ -20,3 +20,7 @@ and six unstated error-wording requirements. These diagnostics do not change the
 frozen scores, count the timeout as completion, or establish a quality benefit.
 
 Both appended-job MCP-auth repetitions finish normally with 52/52 checks (382.27 and 480.94 seconds; token-priced costs $0.0738 and $0.0982). The completed control repetition finishes in 545.40 seconds with 52/52 at $0.3122. The other control repetition is still pending. These partial observations are promising, but differences in task length and provider caching require complete matched reporting; the candidate remains unpromoted.
+
+## Metering-gateway outage
+
+The current plan explicitly replaces allocations affected by the verified gateway heap failure, regardless of their patch scores. [The outage audit](../gateway-memory/outage.json) records every original attempt and its admitted-request count; `plan-before-gateway-oom.json` preserves the previous identities. Source commits, tasks, effort, deadlines and concurrency are unchanged. Replacements use new `-oom1` labels. Original partial work, failed allocations and charges stay in the campaign-wide report; complete-pair summaries use the amended plan. These are infrastructure replacements, not selection of a better model attempt.

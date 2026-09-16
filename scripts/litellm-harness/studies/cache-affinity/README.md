@@ -9,3 +9,7 @@ The [plan](plan.json) uses two source sizes, three repetitions, twelve conversat
 The [interim results](results.json) include only complete paired scenarios in comparisons. The two completed pairs (480,000 source characters, repetition 3; 160,000 characters, repetition 1) have approximately 99.86% and 99.60% post-initial cache reuse respectively in both arms. The affinity-arm ratio differences are below 0.003 percentage points, with input-cost differences below $0.000003 per scenario. These pairs do not yet support a useful affinity improvement on this gateway. Remaining planned repetitions are still queued/running. Missing cache measurements stay unknown, and failed/truncated responses remain visible.
 
 Regenerate the export with `cache_study.py PRIVATE_PILOT_DIRECTORY results.json`; source text and nonce values are not exported.
+
+## Gateway outage amendment
+
+Three paired scenarios completed before the campaign gateway exhausted its heap. The next scenario (`160000-r3`) failed to connect on its first request, with no gateway admission. Its original request marker is retained. Plan revision 2 gives that entire pair a new `oom1` attempt prefix and nonce, continues the two untouched scenarios, and retains the three completed pairs. The summarizer reads only the explicitly declared attempt for each pair; it cannot mix original and replacement receipts. [Gateway diagnosis and recovery](../gateway-memory/README.md).

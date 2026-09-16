@@ -1,0 +1,13 @@
+{
+  "scope": "Local isolated Node 26 process with explicit GC and synthetic prompt strings. No model requests. Retained bytes are engine/environment-dependent.",
+  "entries": 96,
+  "sourceCharactersPerEntry": 262144,
+  "before": {
+    "runtimeCommit": "63dded9",
+    "heapGrowthBytes": 25231416
+  },
+  "after": {
+    "heapGrowthBytes": 336776
+  },
+  "ledgerLabelsUnchanged": true
+}

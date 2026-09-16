@@ -454,10 +454,9 @@
       "dataset": "training2",
       "case": "responses-custom-guardrail",
       "name": "no-preload",
-      "label": "replication-p6-ablation-no-preload-r1-oom1",
+      "label": "replication-p6-ablation-no-preload-r1",
       "commit": "9b7cffd3ff2ca5a5c078321e879c9ee728b9a70c",
-      "effort": "medium",
-      "replacesGatewayOutageRun": "replication-p6-ablation-no-preload-r1-responses-custom-guardrail-7ac76eda"
+      "effort": "medium"
     },
     {
       "dataset": "",
@@ -1340,14 +1339,5 @@
       "effort": "medium"
     }
   ],
-  "runNote": "Recorded commits identify the original frozen runs. Patches reconstruct equivalent source from baseCommit without requiring the private experiment branches. New runs must record their own actual checkout commits/source hashes and new labels.",
-  "revision": 2,
-  "gatewayOutageAmendment": {
-    "at": "2026-09-16T06:34:41.187134+00:00",
-    "audit": "../gateway-memory/outage.json",
-    "reason": "Replace every allocation affected by the verified local gateway OOM, irrespective of candidate score. Original records, partial work and costs retained. Frozen source, task, effort, deadline and shared concurrency unchanged.",
-    "failedRuns": [
-      "replication-p6-ablation-no-preload-r1-responses-custom-guardrail-7ac76eda"
-    ]
-  }
+  "runNote": "Recorded commits identify the original frozen runs. Patches reconstruct equivalent source from baseCommit without requiring the private experiment branches. New runs must record their own actual checkout commits/source hashes and new labels."
 }

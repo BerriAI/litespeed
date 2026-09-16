@@ -60,3 +60,7 @@ do not overwrite the original plan or mix new runs into its results.
   duration; desktop wall times remain observational.
 - Reserved evaluation catalogs and outcomes are deliberately absent while
   candidate selection is ongoing. They are not inputs to this study.
+
+## Metering-gateway outage
+
+The current plan explicitly replaces allocations affected by the verified gateway heap failure, regardless of their patch scores. [The outage audit](../gateway-memory/outage.json) records every original attempt and its admitted-request count; `plan-before-gateway-oom.json` preserves the previous identities. Source commits, tasks, effort, deadlines and concurrency are unchanged. Replacements use new `-oom1` labels. Original partial work, failed allocations and charges stay in the campaign-wide report; complete-pair summaries use the amended plan. These are infrastructure replacements, not selection of a better model attempt.

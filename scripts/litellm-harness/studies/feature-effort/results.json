@@ -13,11 +13,11 @@
     },
     {
       "variant": "medium",
-      "evaluated": 5,
+      "evaluated": 6,
       "expected": 8,
-      "successes": 3,
-      "meanSeconds": 536.7566,
-      "tokenPricedUsd": 0.582766472,
+      "successes": 4,
+      "meanSeconds": 552.254,
+      "tokenPricedUsd": 0.710397288,
       "trialsWithoutTokenPrice": 0
     }
   ],
@@ -623,13 +623,56 @@
       "label": "replication-v24-features-medium-r2",
       "commit": "c7e6826341989fd6ebf3588b53901087b2fa7a56",
       "effort": "medium",
-      "evaluated": false
+      "evaluated": true,
+      "success": true,
+      "completed": true,
+      "completionReason": "completed",
+      "seconds": 629.741,
+      "acceptance": {
+        "exit": 0,
+        "tests": 5,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0,
+        "passed": true
+      },
+      "computedUsd": 0.127630816,
+      "activations": {
+        "initialMapNotices": 1,
+        "contextToolCalls": 0,
+        "guideIdsShown": [],
+        "unparsedContextPayloads": 0,
+        "finalReviewNotices": 1,
+        "guidedFinalReviewNotices": 0,
+        "finalReviewGuideIdsShown": [],
+        "batchedEditCalls": 0,
+        "completedBatchedEditCalls": 0,
+        "batchEditsRequested": 0,
+        "batchSizes": [],
+        "backgroundCommandNotices": 0,
+        "testFocusNotices": 1,
+        "explorationFocusNotices": 1,
+        "readCallsByEffectiveLimit": {
+          "120": 6,
+          "80": 4,
+          "300": 2,
+          "220": 1,
+          "70": 4,
+          "160": 1,
+          "150": 1,
+          "60": 1,
+          "40": 1,
+          "90": 3
+        },
+        "defaultWindowReadCalls": null,
+        "readLimitProvenance": "unknown: saved arguments include host-injected defaults"
+      }
     },
     {
       "dataset": "training5",
       "case": "aws-signing-off-loop",
       "name": "high",
-      "label": "replication-v24-features-high-r2",
+      "label": "replication-v24-features-high-r2-oom1",
       "commit": "c7e6826341989fd6ebf3588b53901087b2fa7a56",
       "effort": "high",
       "evaluated": false
@@ -638,7 +681,7 @@
       "dataset": "training5",
       "case": "background-responses-pipeline",
       "name": "high",
-      "label": "replication-v24-features-high-r2",
+      "label": "replication-v24-features-high-r2-oom1",
       "commit": "c7e6826341989fd6ebf3588b53901087b2fa7a56",
       "effort": "high",
       "evaluated": false
@@ -647,7 +690,7 @@
       "dataset": "training5",
       "case": "background-responses-pipeline",
       "name": "medium",
-      "label": "replication-v24-features-medium-r2",
+      "label": "replication-v24-features-medium-r2-oom1",
       "commit": "c7e6826341989fd6ebf3588b53901087b2fa7a56",
       "effort": "medium",
       "evaluated": false

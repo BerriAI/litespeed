@@ -421,7 +421,7 @@
       "dataset": "training5",
       "case": "legacy-stream-pipeline",
       "name": "batched-edits",
-      "label": "replication-v29-edits-batched-edits-r1",
+      "label": "replication-v29-edits-batched-edits-r1-oom1",
       "commit": "16bfa137d089a68f8a768f3043b644514b750aea",
       "effort": "medium",
       "evaluated": false
@@ -430,7 +430,7 @@
       "dataset": "training5",
       "case": "background-responses-pipeline",
       "name": "batched-edits",
-      "label": "replication-v29-edits-batched-edits-r2",
+      "label": "replication-v29-edits-batched-edits-r2-oom1",
       "commit": "16bfa137d089a68f8a768f3043b644514b750aea",
       "effort": "medium",
       "evaluated": false
@@ -439,7 +439,7 @@
       "dataset": "training5",
       "case": "aws-signing-off-loop",
       "name": "batched-edits",
-      "label": "replication-v29-edits-batched-edits-r2",
+      "label": "replication-v29-edits-batched-edits-r2-oom1",
       "commit": "16bfa137d089a68f8a768f3043b644514b750aea",
       "effort": "medium",
       "evaluated": false
@@ -448,7 +448,7 @@
       "dataset": "training5",
       "case": "aws-signing-off-loop",
       "name": "control",
-      "label": "replication-v29-edits-control-r2",
+      "label": "replication-v29-edits-control-r2-oom1",
       "commit": "5a095ded6b1f79db5725aca6b3db6a29ed6a9293",
       "effort": "medium",
       "evaluated": false

@@ -1,5 +1,8 @@
 import unittest
-from cache_study import aggregate
+import tempfile
+import json
+from pathlib import Path
+from cache_study import aggregate, summarize
 
 
 class CacheMeasurementTests(unittest.TestCase):
@@ -27,3 +30,24 @@ class CacheMeasurementTests(unittest.TestCase):
         self.assertTrue(result['completeMeasurements'])
         self.assertFalse(result['allResponsesOK'])
         self.assertEqual(result['cacheRatio'],.5)
+
+    def test_declared_replacement_excludes_original_attempt_receipts(self):
+        with tempfile.TemporaryDirectory() as temporary:
+            root=Path(temporary)
+            plan={'targetSourceCharacters':[100], 'repetitions':1, 'arms':['omitted-user','stable-user'],
+                  'roundsPerArm':2, 'scenarioAttempts':{'100-r1':'oom1'}}
+            (root/'plan.json').write_text(json.dumps(plan))
+            for arm in plan['arms']:
+                for step in range(2):
+                    for attempt,cached in [('',0),('-oom1',50)]:
+                        row={**self.row(100,cached),'sourceCharacters':100,'rep':1,'arm':arm,'round':step}
+                        (root/f'100-r1{attempt}-{arm}-step{step:02d}.result.json').write_text(json.dumps(row))
+            result=summarize(root)
+            self.assertEqual(result['status'],'complete')
+            self.assertEqual(len(result['comparisons']),1)
+            for trial in result['trials']:
+                self.assertEqual(trial['attempt'],'oom1')
+                self.assertEqual(trial['postInitial']['cacheRatio'],.5)
+            plan['scenarioAttempts']['100-r1']='../outside'
+            (root/'plan.json').write_text(json.dumps(plan))
+            with self.assertRaises(ValueError):summarize(root)

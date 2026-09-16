@@ -4,6 +4,7 @@ import { execFileSync, spawn } from 'node:child_process';
 import { createHash, randomUUID } from 'node:crypto';
 import { homedir } from 'node:os';
 import { assertReplayDependencyRoot, replayGitEnvironment, replaySandboxProfile } from './isolation.js';
+import { assertCampaignGatewayReady } from './preflight.js';
 import type { ReasoningEffort } from '../../shared/types.js';
 
 if(process.platform!=='darwin')throw new Error('This replay launcher requires macOS sandbox-exec. Port the filesystem isolation before running on another platform.');
@@ -18,6 +19,7 @@ if(!process.env.LITELLM_SOURCE_REPO)throw new Error('Set LITELLM_SOURCE_REPO so 
 if(!process.env.LITELLM_EVAL_PYTHON)throw new Error('Set LITELLM_EVAL_PYTHON to the installed benchmark interpreter.');
 const runtimeRoot=resolve(import.meta.dirname,'../..');
 assertReplayDependencyRoot(runtimeRoot);
+if(kind!=='codex')await assertCampaignGatewayReady(JSON.parse(readFileSync(join(root,'connection.json'),'utf8')));
 const corpus=JSON.parse(readFileSync(join(root,'cases.json'),'utf8'));
 const task=corpus.find((c:{id:string})=>c.id===id);
 if(!task)throw new Error('Unknown task.');

@@ -1,6 +1,7 @@
 """Export the predeclared cache pilot; compare complete paired scenarios only."""
 from pathlib import Path
 import json
+import re
 from statistics import mean
 import sys
 from action_usage import number
@@ -32,10 +33,14 @@ def summarize(directory):
     for size in plan['targetSourceCharacters']:
         for rep in range(1, plan['repetitions'] + 1):
             arms = {}
+            attempt = plan.get('scenarioAttempts', {}).get(f'{size}-r{rep}', '')
+            if not isinstance(attempt, str) or (attempt and not re.fullmatch('[a-z0-9-]+', attempt)):
+                raise ValueError('Scenario attempt must be a path-safe declared label.')
+            suffix = f'-{attempt}' if attempt else ''
             for arm in plan['arms']:
                 rows = []
                 for step in range(plan['roundsPerArm']):
-                    path = directory / f'{size}-r{rep}-{arm}-step{step:02d}.result.json'
+                    path = directory / f'{size}-r{rep}{suffix}-{arm}-step{step:02d}.result.json'
                     if not path.exists():
                         continue
                     row = json.loads(path.read_text())
@@ -43,6 +48,7 @@ def summarize(directory):
                         raise ValueError('Result identity differs from its planned scenario.')
                     rows.append(row)
                 entry = {'sourceCharacters': size, 'rep': rep, 'arm': arm,
+                         'attempt': attempt or 'original',
                          'completedRequests': len(rows), 'expectedRequests': plan['roundsPerArm'],
                          'warmup': aggregate([r for r in rows if r['round'] == 0]),
                          'postInitial': aggregate([r for r in rows if r['round'] > 0])}
