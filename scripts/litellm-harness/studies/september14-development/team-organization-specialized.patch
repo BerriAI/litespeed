@@ -1,0 +1,232 @@
+diff --git a/litellm/proxy/_types.py b/litellm/proxy/_types.py
+index 655b3cf..2f4b538 100644
+--- a/litellm/proxy/_types.py
++++ b/litellm/proxy/_types.py
+@@ -4413,6 +4413,9 @@ class TeamInfoMember(Member):
+ class TeamInfoResponseObjectTeamTable(LiteLLM_TeamTable):
+     members_with_roles: tuple[TeamInfoMember, ...] = ()
+     team_member_budget_table: LiteLLM_BudgetTableFull | None = None
++    # Parent organization's model allowlist, only populated for callers allowed to
++    # manage this team (proxy admin, team admin, or admin of the team's org).
++    organization_models: list[str] | None = None
+     # Resources inherited from access groups (separate from direct assignments)
+     access_group_models: list[str] | None = None
+     access_group_mcp_server_ids: list[str] | None = None
+diff --git a/litellm/proxy/management_endpoints/team_endpoints.py b/litellm/proxy/management_endpoints/team_endpoints.py
+index 6b16692..f71de53 100644
+--- a/litellm/proxy/management_endpoints/team_endpoints.py
++++ b/litellm/proxy/management_endpoints/team_endpoints.py
+@@ -4370,6 +4370,41 @@ async def _hydrate_member_user_details(
+     return tuple(hydrate(m) for m in members)
+ 
+ 
++async def _resolve_team_organization_models(
++    team_obj: LiteLLM_TeamTable,
++    user_api_key_dict: UserAPIKeyAuth,
++    prisma_client: PrismaClient,
++) -> list[str] | None:
++    """Return the parent organization's model allowlist for a team, or ``None``.
++
++    Only proxy admins, admins of the team, and admins of the team's parent
++    organization may see the org allowlist, so team managers can configure the
++    team's model access without calling ``/organization/info``. Ordinary members
++    and team keys get ``None``, as does a team with no organization. The stored
++    value is returned unchanged, preserving an empty list or the
++    ``all-proxy-models`` sentinel as configured.
++    """
++    if not team_obj.organization_id:
++        return None
++
++    can_view: Final = (
++        _user_has_admin_view(user_api_key_dict)
++        or _is_user_team_admin(user_api_key_dict=user_api_key_dict, team_obj=team_obj)
++        or await _is_user_org_admin_for_team(user_api_key_dict=user_api_key_dict, team_obj=team_obj)
++    )
++    if not can_view:
++        return None
++
++    organization_row: Final = await _org_db(prisma_client).find_unique(
++        where={"organization_id": team_obj.organization_id}
++    )
++    if organization_row is None:
++        return None
++
++    organization_obj: Final = LiteLLM_OrganizationTable.model_validate(organization_row.model_dump())
++    return list(organization_obj.models)
++
++
+ async def _resolve_team_access_group_resources(
+     _team_info: TeamInfoResponseObjectTeamTable,
+ ) -> TeamInfoResponseObjectTeamTable:
+@@ -4515,9 +4550,18 @@ async def team_info(
+             update={"members_with_roles": hydrated_members}  # mutable-ok: pydantic update payload
+         )
+ 
++        organization_models: Final = await _resolve_team_organization_models(
++            team_obj=hydrated_team_info,
++            user_api_key_dict=user_api_key_dict,
++            prisma_client=prisma_client,
++        )
++        response_team_info: Final = hydrated_team_info.model_copy(
++            update={"organization_models": organization_models}  # mutable-ok: pydantic update payload
++        )
++
+         response_object: Final = TeamInfoResponseObject(
+             team_id=team_id,
+-            team_info=hydrated_team_info,
++            team_info=response_team_info,
+             keys=keys,
+             team_memberships=returned_tm,
+         )
+diff --git a/tests/test_litellm/proxy/management_endpoints/test_team_endpoints.py b/tests/test_litellm/proxy/management_endpoints/test_team_endpoints.py
+index ccb66fd..79aa0aa 100644
+--- a/tests/test_litellm/proxy/management_endpoints/test_team_endpoints.py
++++ b/tests/test_litellm/proxy/management_endpoints/test_team_endpoints.py
+@@ -11483,6 +11483,147 @@ async def test_team_info_hydrates_member_names_and_emails_from_the_user_table():
+     assert find_many.await_args.kwargs["where"] == {"user_id": {"in": ["already-stored", "no-email-on-roster"]}}
+ 
+ 
++def _org_row(models):
++    """Prisma-shaped organization row whose only interesting column is ``models``."""
++    row = MagicMock()
++    row.model_dump.return_value = {
++        "organization_id": "org-1",
++        "organization_alias": "org-one",
++        "budget_id": "budget-1",
++        "created_by": "admin",
++        "updated_by": "admin",
++        "models": models,
++    }
++    return row
++
++
++async def _run_team_info(team_row, caller, org_row=None, org_admin_returns=False):
++    """Drive ``team_info`` with a mocked prisma client and return (response, client)."""
++    from fastapi import Request
++
++    from litellm.proxy.management_endpoints import team_endpoints
++
++    mock_prisma = MagicMock()
++    mock_prisma.db.litellm_teamtable.find_unique = AsyncMock(return_value=team_row)
++    mock_prisma.db.litellm_organizationtable.find_unique = AsyncMock(return_value=org_row)
++    mock_prisma.get_data = AsyncMock(return_value=[])
++
++    with (
++        patch("litellm.proxy.proxy_server.prisma_client", mock_prisma),
++        patch.object(team_endpoints, "get_all_team_memberships", AsyncMock(return_value=[])),
++        patch.object(team_endpoints, "UserRepository") as repo,
++        patch.object(
++            team_endpoints,
++            "_is_user_org_admin_for_team",
++            AsyncMock(return_value=org_admin_returns),
++        ),
++    ):
++        repo.return_value.table.find_many = AsyncMock(return_value=[])
++        response = await team_endpoints.team_info(
++            http_request=MagicMock(spec=Request),
++            team_id=team_row.team_id,
++            user_api_key_dict=caller,
++        )
++
++    return response, mock_prisma
++
++
++@pytest.mark.asyncio
++async def test_team_info_returns_organization_models_for_team_admin():
++    """/team/info must expose the parent org's model allowlist to a team admin so
++    they can configure team model access without calling /organization/info."""
++    team_row = LiteLLM_TeamTable(
++        team_id="team-1",
++        organization_id="org-1",
++        members_with_roles=[Member(user_id="team-admin", role="admin")],
++    )
++    caller = UserAPIKeyAuth(user_role=LitellmUserRoles.INTERNAL_USER, user_id="team-admin")
++
++    response, mock_prisma = await _run_team_info(team_row, caller, org_row=_org_row(["gpt-4", "all-proxy-models"]))
++
++    assert response["team_info"].organization_models == ["gpt-4", "all-proxy-models"]
++    mock_prisma.db.litellm_organizationtable.find_unique.assert_awaited_once()
++
++
++@pytest.mark.asyncio
++async def test_team_info_returns_organization_models_for_org_admin():
++    """An admin of the team's parent organization may also see the allowlist."""
++    team_row = LiteLLM_TeamTable(
++        team_id="team-1",
++        organization_id="org-1",
++        members_with_roles=[Member(user_id="someone-else", role="user")],
++    )
++    caller = UserAPIKeyAuth(user_role=LitellmUserRoles.INTERNAL_USER, user_id="org-admin")
++
++    response, _ = await _run_team_info(
++        team_row,
++        caller,
++        org_row=_org_row(["gpt-4"]),
++        org_admin_returns=True,
++    )
++
++    assert response["team_info"].organization_models == ["gpt-4"]
++
++
++@pytest.mark.asyncio
++async def test_team_info_organization_models_null_for_ordinary_member():
++    """Ordinary team members keep full team info but must not receive the org
++    allowlist, and the org table must not even be queried for them."""
++    team_row = LiteLLM_TeamTable(
++        team_id="team-1",
++        organization_id="org-1",
++        members_with_roles=[Member(user_id="member", role="user")],
++    )
++    caller = UserAPIKeyAuth(user_role=LitellmUserRoles.INTERNAL_USER, user_id="member")
++
++    response, mock_prisma = await _run_team_info(team_row, caller, org_row=_org_row(["gpt-4"]))
++
++    assert response["team_info"].organization_models is None
++    assert response["team_info"].team_id == "team-1"
++    mock_prisma.db.litellm_organizationtable.find_unique.assert_not_awaited()
++
++
++@pytest.mark.asyncio
++async def test_team_info_organization_models_null_for_team_key():
++    """A team key (no user_id) can view team info but gets no org allowlist."""
++    team_row = LiteLLM_TeamTable(
++        team_id="team-1",
++        organization_id="org-1",
++        members_with_roles=[Member(user_id="member", role="admin")],
++    )
++    caller = UserAPIKeyAuth(team_id="team-1", user_id=None, user_role=None)
++
++    response, _ = await _run_team_info(team_row, caller, org_row=_org_row(["gpt-4"]))
++
++    assert response["team_info"].organization_models is None
++
++
++@pytest.mark.asyncio
++async def test_team_info_organization_models_null_without_organization():
++    """A team with no parent organization always returns a null allowlist, even
++    for a proxy admin."""
++    team_row = LiteLLM_TeamTable(team_id="team-1", organization_id=None)
++    caller = UserAPIKeyAuth(user_role=LitellmUserRoles.PROXY_ADMIN)
++
++    response, mock_prisma = await _run_team_info(team_row, caller, org_row=_org_row(["gpt-4"]))
++
++    assert response["team_info"].organization_models is None
++    mock_prisma.db.litellm_organizationtable.find_unique.assert_not_awaited()
++
++
++@pytest.mark.asyncio
++@pytest.mark.parametrize("configured_models", [[], ["all-proxy-models"], ["gpt-4", "claude-3"]])
++async def test_team_info_organization_models_preserved_as_configured(configured_models):
++    """The configured org allowlist is returned unchanged, including an empty
++    list (distinct from null) and the all-proxy-models sentinel."""
++    team_row = LiteLLM_TeamTable(team_id="team-1", organization_id="org-1")
++    caller = UserAPIKeyAuth(user_role=LitellmUserRoles.PROXY_ADMIN)
++
++    response, _ = await _run_team_info(team_row, caller, org_row=_org_row(configured_models))
++
++    assert response["team_info"].organization_models == configured_models
++
++
+ @pytest.mark.asyncio
+ async def test_update_model_table_clears_aliases_with_empty_map():
+     """``model_aliases={}`` on /team/update must persist an empty map (json.dumps({}))

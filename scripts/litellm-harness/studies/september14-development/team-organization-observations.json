@@ -1,0 +1,1116 @@
+{
+  "status": "qualified posthoc diagnostic; original study unchanged",
+  "plan": {
+    "status": "posthoc diagnostic",
+    "case": "team-organization-models",
+    "base": "51926c2e7918182891ba70cc439a08893286fcd9",
+    "reference": "7b6d2231052791eee316150e658805daa2198554",
+    "probeSha256": "e001871496caf5ad1ad464bbe88edc71fd1f4b912d34138ae30b6c4ff92673ce",
+    "expectedChecks": 22,
+    "note": "Existing scores unchanged; inputs read before creating this probe."
+  },
+  "method": "Fresh full Git archives for base/reference; production files byte-verified. Actual decorated team_info endpoint and membership/admin gates. In-memory database supports both include relation and separate find_unique consistently. get_user_object boundary substituted, not authorization decisions. Network denied and fresh bytecode path; all LiteLLM imports verified. No live PostgreSQL or authentication middleware claim.",
+  "originalAcceptance": {
+    "plain": "3/6 normal",
+    "specialized": "3/6 normal"
+  },
+  "explanation": "All three original candidate failures await an unconfigured organization-table MagicMock. Reference tests supply the organization only through a joined team row; both candidates use a separate organization lookup.",
+  "qualification": {
+    "base": {
+      "passed": 3,
+      "total": 22
+    },
+    "reference": {
+      "passed": 22,
+      "total": 22
+    },
+    "plain": {
+      "passed": 22,
+      "total": 22
+    },
+    "specialized": {
+      "passed": 22,
+      "total": 22
+    }
+  },
+  "observations": {
+    "base": {
+      "rows": [
+        {
+          "name": "proxy-admin:empty",
+          "pass": false,
+          "expected": [],
+          "actual": "<absent>",
+          "databaseCalls": [
+            "team.find_unique"
+          ],
+          "callerInputUnchanged": true
+        },
+        {
+          "name": "proxy-admin:sentinel",
+          "pass": false,
+          "expected": [
+            "all-proxy-models"
+          ],
+          "actual": "<absent>",
+          "databaseCalls": [
+            "team.find_unique"
+          ],
+          "callerInputUnchanged": true
+        },
+        {
+          "name": "proxy-admin:concrete",
+          "pass": false,
+          "expected": [
+            "model-a",
+            "model-b"
+          ],
+          "actual": "<absent>",
+          "databaseCalls": [
+            "team.find_unique"
+          ],
+          "callerInputUnchanged": true
+        },
+        {
+          "name": "team-admin:empty",
+          "pass": false,
+          "expected": [],
+          "actual": "<absent>",
+          "databaseCalls": [
+            "team.find_unique"
+          ],
+          "callerInputUnchanged": true
+        },
+        {
+          "name": "team-admin:sentinel",
+          "pass": false,
+          "expected": [
+            "all-proxy-models"
+          ],
+          "actual": "<absent>",
+          "databaseCalls": [
+            "team.find_unique"
+          ],
+          "callerInputUnchanged": true
+        },
+        {
+          "name": "team-admin:concrete",
+          "pass": false,
+          "expected": [
+            "model-a",
+            "model-b"
+          ],
+          "actual": "<absent>",
+          "databaseCalls": [
+            "team.find_unique"
+          ],
+          "callerInputUnchanged": true
+        },
+        {
+          "name": "org-admin:empty",
+          "pass": false,
+          "expected": [],
+          "actual": "<absent>",
+          "databaseCalls": [
+            "team.find_unique"
+          ],
+          "callerInputUnchanged": true
+        },
+        {
+          "name": "org-admin:sentinel",
+          "pass": false,
+          "expected": [
+            "all-proxy-models"
+          ],
+          "actual": "<absent>",
+          "databaseCalls": [
+            "team.find_unique"
+          ],
+          "callerInputUnchanged": true
+        },
+        {
+          "name": "org-admin:concrete",
+          "pass": false,
+          "expected": [
+            "model-a",
+            "model-b"
+          ],
+          "actual": "<absent>",
+          "databaseCalls": [
+            "team.find_unique"
+          ],
+          "callerInputUnchanged": true
+        },
+        {
+          "name": "member:empty",
+          "pass": false,
+          "expected": null,
+          "actual": "<absent>",
+          "databaseCalls": [
+            "team.find_unique"
+          ],
+          "callerInputUnchanged": true
+        },
+        {
+          "name": "member:sentinel",
+          "pass": false,
+          "expected": null,
+          "actual": "<absent>",
+          "databaseCalls": [
+            "team.find_unique"
+          ],
+          "callerInputUnchanged": true
+        },
+        {
+          "name": "member:concrete",
+          "pass": false,
+          "expected": null,
+          "actual": "<absent>",
+          "databaseCalls": [
+            "team.find_unique"
+          ],
+          "callerInputUnchanged": true
+        },
+        {
+          "name": "team-key:empty",
+          "pass": false,
+          "expected": null,
+          "actual": "<absent>",
+          "databaseCalls": [
+            "team.find_unique"
+          ],
+          "callerInputUnchanged": true
+        },
+        {
+          "name": "team-key:sentinel",
+          "pass": false,
+          "expected": null,
+          "actual": "<absent>",
+          "databaseCalls": [
+            "team.find_unique"
+          ],
+          "callerInputUnchanged": true
+        },
+        {
+          "name": "team-key:concrete",
+          "pass": false,
+          "expected": null,
+          "actual": "<absent>",
+          "databaseCalls": [
+            "team.find_unique"
+          ],
+          "callerInputUnchanged": true
+        },
+        {
+          "name": "other-team-key:denied",
+          "pass": true,
+          "expected": "403",
+          "errorType": "ProxyException",
+          "error": "{'error': 'Team key for team=team-2 not authorized to access this team=team-1'}",
+          "code": "403",
+          "databaseCalls": [
+            "team.find_unique"
+          ]
+        },
+        {
+          "name": "other-org-admin:denied",
+          "pass": true,
+          "expected": "403",
+          "errorType": "ProxyException",
+          "error": "{'error': 'User=other-org-admin not authorized to access this team=team-1'}",
+          "code": "403",
+          "databaseCalls": [
+            "team.find_unique"
+          ]
+        },
+        {
+          "name": "unrelated-user:denied",
+          "pass": true,
+          "expected": "403",
+          "errorType": "ProxyException",
+          "error": "{'error': 'User=unrelated not authorized to access this team=team-1'}",
+          "code": "403",
+          "databaseCalls": [
+            "team.find_unique"
+          ]
+        },
+        {
+          "name": "proxy-admin:no-org",
+          "pass": false,
+          "expected": null,
+          "actual": "<absent>",
+          "databaseCalls": [
+            "team.find_unique"
+          ],
+          "callerInputUnchanged": true
+        },
+        {
+          "name": "proxy-admin:missing-org",
+          "pass": false,
+          "expected": null,
+          "actual": "<absent>",
+          "databaseCalls": [
+            "team.find_unique"
+          ],
+          "callerInputUnchanged": true
+        },
+        {
+          "name": "team-admin:no-org",
+          "pass": false,
+          "expected": null,
+          "actual": "<absent>",
+          "databaseCalls": [
+            "team.find_unique"
+          ],
+          "callerInputUnchanged": true
+        },
+        {
+          "name": "team-admin:missing-org",
+          "pass": false,
+          "expected": null,
+          "actual": "<absent>",
+          "databaseCalls": [
+            "team.find_unique"
+          ],
+          "callerInputUnchanged": true
+        }
+      ],
+      "passed": false,
+      "imports": {
+        "packageOrigin": "litellm/__init__.py",
+        "allLiteLLMModulesWithinWorkspace": true,
+        "moduleCount": 1210
+      },
+      "bytecodePolicy": "fresh cache path; reads from adjacent caches and all writes disabled",
+      "exit": 0
+    },
+    "reference": {
+      "rows": [
+        {
+          "name": "proxy-admin:empty",
+          "pass": true,
+          "expected": [],
+          "actual": [],
+          "databaseCalls": [
+            "team.find_unique"
+          ],
+          "callerInputUnchanged": true
+        },
+        {
+          "name": "proxy-admin:sentinel",
+          "pass": true,
+          "expected": [
+            "all-proxy-models"
+          ],
+          "actual": [
+            "all-proxy-models"
+          ],
+          "databaseCalls": [
+            "team.find_unique"
+          ],
+          "callerInputUnchanged": true
+        },
+        {
+          "name": "proxy-admin:concrete",
+          "pass": true,
+          "expected": [
+            "model-a",
+            "model-b"
+          ],
+          "actual": [
+            "model-a",
+            "model-b"
+          ],
+          "databaseCalls": [
+            "team.find_unique"
+          ],
+          "callerInputUnchanged": true
+        },
+        {
+          "name": "team-admin:empty",
+          "pass": true,
+          "expected": [],
+          "actual": [],
+          "databaseCalls": [
+            "team.find_unique"
+          ],
+          "callerInputUnchanged": true
+        },
+        {
+          "name": "team-admin:sentinel",
+          "pass": true,
+          "expected": [
+            "all-proxy-models"
+          ],
+          "actual": [
+            "all-proxy-models"
+          ],
+          "databaseCalls": [
+            "team.find_unique"
+          ],
+          "callerInputUnchanged": true
+        },
+        {
+          "name": "team-admin:concrete",
+          "pass": true,
+          "expected": [
+            "model-a",
+            "model-b"
+          ],
+          "actual": [
+            "model-a",
+            "model-b"
+          ],
+          "databaseCalls": [
+            "team.find_unique"
+          ],
+          "callerInputUnchanged": true
+        },
+        {
+          "name": "org-admin:empty",
+          "pass": true,
+          "expected": [],
+          "actual": [],
+          "databaseCalls": [
+            "team.find_unique"
+          ],
+          "callerInputUnchanged": true
+        },
+        {
+          "name": "org-admin:sentinel",
+          "pass": true,
+          "expected": [
+            "all-proxy-models"
+          ],
+          "actual": [
+            "all-proxy-models"
+          ],
+          "databaseCalls": [
+            "team.find_unique"
+          ],
+          "callerInputUnchanged": true
+        },
+        {
+          "name": "org-admin:concrete",
+          "pass": true,
+          "expected": [
+            "model-a",
+            "model-b"
+          ],
+          "actual": [
+            "model-a",
+            "model-b"
+          ],
+          "databaseCalls": [
+            "team.find_unique"
+          ],
+          "callerInputUnchanged": true
+        },
+        {
+          "name": "member:empty",
+          "pass": true,
+          "expected": null,
+          "actual": null,
+          "databaseCalls": [
+            "team.find_unique"
+          ],
+          "callerInputUnchanged": true
+        },
+        {
+          "name": "member:sentinel",
+          "pass": true,
+          "expected": null,
+          "actual": null,
+          "databaseCalls": [
+            "team.find_unique"
+          ],
+          "callerInputUnchanged": true
+        },
+        {
+          "name": "member:concrete",
+          "pass": true,
+          "expected": null,
+          "actual": null,
+          "databaseCalls": [
+            "team.find_unique"
+          ],
+          "callerInputUnchanged": true
+        },
+        {
+          "name": "team-key:empty",
+          "pass": true,
+          "expected": null,
+          "actual": null,
+          "databaseCalls": [
+            "team.find_unique"
+          ],
+          "callerInputUnchanged": true
+        },
+        {
+          "name": "team-key:sentinel",
+          "pass": true,
+          "expected": null,
+          "actual": null,
+          "databaseCalls": [
+            "team.find_unique"
+          ],
+          "callerInputUnchanged": true
+        },
+        {
+          "name": "team-key:concrete",
+          "pass": true,
+          "expected": null,
+          "actual": null,
+          "databaseCalls": [
+            "team.find_unique"
+          ],
+          "callerInputUnchanged": true
+        },
+        {
+          "name": "other-team-key:denied",
+          "pass": true,
+          "expected": "403",
+          "errorType": "ProxyException",
+          "error": "{'error': 'Team key for team=team-2 not authorized to access this team=team-1'}",
+          "code": "403",
+          "databaseCalls": [
+            "team.find_unique"
+          ]
+        },
+        {
+          "name": "other-org-admin:denied",
+          "pass": true,
+          "expected": "403",
+          "errorType": "ProxyException",
+          "error": "{'error': 'User=other-org-admin not authorized to access this team=team-1'}",
+          "code": "403",
+          "databaseCalls": [
+            "team.find_unique"
+          ]
+        },
+        {
+          "name": "unrelated-user:denied",
+          "pass": true,
+          "expected": "403",
+          "errorType": "ProxyException",
+          "error": "{'error': 'User=unrelated not authorized to access this team=team-1'}",
+          "code": "403",
+          "databaseCalls": [
+            "team.find_unique"
+          ]
+        },
+        {
+          "name": "proxy-admin:no-org",
+          "pass": true,
+          "expected": null,
+          "actual": null,
+          "databaseCalls": [
+            "team.find_unique"
+          ],
+          "callerInputUnchanged": true
+        },
+        {
+          "name": "proxy-admin:missing-org",
+          "pass": true,
+          "expected": null,
+          "actual": null,
+          "databaseCalls": [
+            "team.find_unique"
+          ],
+          "callerInputUnchanged": true
+        },
+        {
+          "name": "team-admin:no-org",
+          "pass": true,
+          "expected": null,
+          "actual": null,
+          "databaseCalls": [
+            "team.find_unique"
+          ],
+          "callerInputUnchanged": true
+        },
+        {
+          "name": "team-admin:missing-org",
+          "pass": true,
+          "expected": null,
+          "actual": null,
+          "databaseCalls": [
+            "team.find_unique"
+          ],
+          "callerInputUnchanged": true
+        }
+      ],
+      "passed": true,
+      "imports": {
+        "packageOrigin": "litellm/__init__.py",
+        "allLiteLLMModulesWithinWorkspace": true,
+        "moduleCount": 1210
+      },
+      "bytecodePolicy": "fresh cache path; reads from adjacent caches and all writes disabled",
+      "exit": 0
+    },
+    "plain": {
+      "rows": [
+        {
+          "name": "proxy-admin:empty",
+          "pass": true,
+          "expected": [],
+          "actual": [],
+          "databaseCalls": [
+            "team.find_unique",
+            "organization.find_unique"
+          ],
+          "callerInputUnchanged": true
+        },
+        {
+          "name": "proxy-admin:sentinel",
+          "pass": true,
+          "expected": [
+            "all-proxy-models"
+          ],
+          "actual": [
+            "all-proxy-models"
+          ],
+          "databaseCalls": [
+            "team.find_unique",
+            "organization.find_unique"
+          ],
+          "callerInputUnchanged": true
+        },
+        {
+          "name": "proxy-admin:concrete",
+          "pass": true,
+          "expected": [
+            "model-a",
+            "model-b"
+          ],
+          "actual": [
+            "model-a",
+            "model-b"
+          ],
+          "databaseCalls": [
+            "team.find_unique",
+            "organization.find_unique"
+          ],
+          "callerInputUnchanged": true
+        },
+        {
+          "name": "team-admin:empty",
+          "pass": true,
+          "expected": [],
+          "actual": [],
+          "databaseCalls": [
+            "team.find_unique",
+            "organization.find_unique"
+          ],
+          "callerInputUnchanged": true
+        },
+        {
+          "name": "team-admin:sentinel",
+          "pass": true,
+          "expected": [
+            "all-proxy-models"
+          ],
+          "actual": [
+            "all-proxy-models"
+          ],
+          "databaseCalls": [
+            "team.find_unique",
+            "organization.find_unique"
+          ],
+          "callerInputUnchanged": true
+        },
+        {
+          "name": "team-admin:concrete",
+          "pass": true,
+          "expected": [
+            "model-a",
+            "model-b"
+          ],
+          "actual": [
+            "model-a",
+            "model-b"
+          ],
+          "databaseCalls": [
+            "team.find_unique",
+            "organization.find_unique"
+          ],
+          "callerInputUnchanged": true
+        },
+        {
+          "name": "org-admin:empty",
+          "pass": true,
+          "expected": [],
+          "actual": [],
+          "databaseCalls": [
+            "team.find_unique",
+            "organization.find_unique"
+          ],
+          "callerInputUnchanged": true
+        },
+        {
+          "name": "org-admin:sentinel",
+          "pass": true,
+          "expected": [
+            "all-proxy-models"
+          ],
+          "actual": [
+            "all-proxy-models"
+          ],
+          "databaseCalls": [
+            "team.find_unique",
+            "organization.find_unique"
+          ],
+          "callerInputUnchanged": true
+        },
+        {
+          "name": "org-admin:concrete",
+          "pass": true,
+          "expected": [
+            "model-a",
+            "model-b"
+          ],
+          "actual": [
+            "model-a",
+            "model-b"
+          ],
+          "databaseCalls": [
+            "team.find_unique",
+            "organization.find_unique"
+          ],
+          "callerInputUnchanged": true
+        },
+        {
+          "name": "member:empty",
+          "pass": true,
+          "expected": null,
+          "actual": null,
+          "databaseCalls": [
+            "team.find_unique"
+          ],
+          "callerInputUnchanged": true
+        },
+        {
+          "name": "member:sentinel",
+          "pass": true,
+          "expected": null,
+          "actual": null,
+          "databaseCalls": [
+            "team.find_unique"
+          ],
+          "callerInputUnchanged": true
+        },
+        {
+          "name": "member:concrete",
+          "pass": true,
+          "expected": null,
+          "actual": null,
+          "databaseCalls": [
+            "team.find_unique"
+          ],
+          "callerInputUnchanged": true
+        },
+        {
+          "name": "team-key:empty",
+          "pass": true,
+          "expected": null,
+          "actual": null,
+          "databaseCalls": [
+            "team.find_unique"
+          ],
+          "callerInputUnchanged": true
+        },
+        {
+          "name": "team-key:sentinel",
+          "pass": true,
+          "expected": null,
+          "actual": null,
+          "databaseCalls": [
+            "team.find_unique"
+          ],
+          "callerInputUnchanged": true
+        },
+        {
+          "name": "team-key:concrete",
+          "pass": true,
+          "expected": null,
+          "actual": null,
+          "databaseCalls": [
+            "team.find_unique"
+          ],
+          "callerInputUnchanged": true
+        },
+        {
+          "name": "other-team-key:denied",
+          "pass": true,
+          "expected": "403",
+          "errorType": "ProxyException",
+          "error": "{'error': 'Team key for team=team-2 not authorized to access this team=team-1'}",
+          "code": "403",
+          "databaseCalls": [
+            "team.find_unique"
+          ]
+        },
+        {
+          "name": "other-org-admin:denied",
+          "pass": true,
+          "expected": "403",
+          "errorType": "ProxyException",
+          "error": "{'error': 'User=other-org-admin not authorized to access this team=team-1'}",
+          "code": "403",
+          "databaseCalls": [
+            "team.find_unique"
+          ]
+        },
+        {
+          "name": "unrelated-user:denied",
+          "pass": true,
+          "expected": "403",
+          "errorType": "ProxyException",
+          "error": "{'error': 'User=unrelated not authorized to access this team=team-1'}",
+          "code": "403",
+          "databaseCalls": [
+            "team.find_unique"
+          ]
+        },
+        {
+          "name": "proxy-admin:no-org",
+          "pass": true,
+          "expected": null,
+          "actual": null,
+          "databaseCalls": [
+            "team.find_unique"
+          ],
+          "callerInputUnchanged": true
+        },
+        {
+          "name": "proxy-admin:missing-org",
+          "pass": true,
+          "expected": null,
+          "actual": null,
+          "databaseCalls": [
+            "team.find_unique",
+            "organization.find_unique"
+          ],
+          "callerInputUnchanged": true
+        },
+        {
+          "name": "team-admin:no-org",
+          "pass": true,
+          "expected": null,
+          "actual": null,
+          "databaseCalls": [
+            "team.find_unique"
+          ],
+          "callerInputUnchanged": true
+        },
+        {
+          "name": "team-admin:missing-org",
+          "pass": true,
+          "expected": null,
+          "actual": null,
+          "databaseCalls": [
+            "team.find_unique",
+            "organization.find_unique"
+          ],
+          "callerInputUnchanged": true
+        }
+      ],
+      "passed": true,
+      "imports": {
+        "packageOrigin": "litellm/__init__.py",
+        "allLiteLLMModulesWithinWorkspace": true,
+        "moduleCount": 1209
+      },
+      "bytecodePolicy": "fresh cache path; reads from adjacent caches and all writes disabled",
+      "exit": 0,
+      "run": "replication-v48-breadth-plain-r1-team-organization-models-f18af856",
+      "candidatePatch": {
+        "path": "team-organization-plain.patch",
+        "sha256": "05601dd21e255cebb75532e1e1de0dae6ee8f1075fd22b206122e529daf41dce"
+      }
+    },
+    "specialized": {
+      "rows": [
+        {
+          "name": "proxy-admin:empty",
+          "pass": true,
+          "expected": [],
+          "actual": [],
+          "databaseCalls": [
+            "team.find_unique",
+            "organization.find_unique"
+          ],
+          "callerInputUnchanged": true
+        },
+        {
+          "name": "proxy-admin:sentinel",
+          "pass": true,
+          "expected": [
+            "all-proxy-models"
+          ],
+          "actual": [
+            "all-proxy-models"
+          ],
+          "databaseCalls": [
+            "team.find_unique",
+            "organization.find_unique"
+          ],
+          "callerInputUnchanged": true
+        },
+        {
+          "name": "proxy-admin:concrete",
+          "pass": true,
+          "expected": [
+            "model-a",
+            "model-b"
+          ],
+          "actual": [
+            "model-a",
+            "model-b"
+          ],
+          "databaseCalls": [
+            "team.find_unique",
+            "organization.find_unique"
+          ],
+          "callerInputUnchanged": true
+        },
+        {
+          "name": "team-admin:empty",
+          "pass": true,
+          "expected": [],
+          "actual": [],
+          "databaseCalls": [
+            "team.find_unique",
+            "organization.find_unique"
+          ],
+          "callerInputUnchanged": true
+        },
+        {
+          "name": "team-admin:sentinel",
+          "pass": true,
+          "expected": [
+            "all-proxy-models"
+          ],
+          "actual": [
+            "all-proxy-models"
+          ],
+          "databaseCalls": [
+            "team.find_unique",
+            "organization.find_unique"
+          ],
+          "callerInputUnchanged": true
+        },
+        {
+          "name": "team-admin:concrete",
+          "pass": true,
+          "expected": [
+            "model-a",
+            "model-b"
+          ],
+          "actual": [
+            "model-a",
+            "model-b"
+          ],
+          "databaseCalls": [
+            "team.find_unique",
+            "organization.find_unique"
+          ],
+          "callerInputUnchanged": true
+        },
+        {
+          "name": "org-admin:empty",
+          "pass": true,
+          "expected": [],
+          "actual": [],
+          "databaseCalls": [
+            "team.find_unique",
+            "organization.find_unique"
+          ],
+          "callerInputUnchanged": true
+        },
+        {
+          "name": "org-admin:sentinel",
+          "pass": true,
+          "expected": [
+            "all-proxy-models"
+          ],
+          "actual": [
+            "all-proxy-models"
+          ],
+          "databaseCalls": [
+            "team.find_unique",
+            "organization.find_unique"
+          ],
+          "callerInputUnchanged": true
+        },
+        {
+          "name": "org-admin:concrete",
+          "pass": true,
+          "expected": [
+            "model-a",
+            "model-b"
+          ],
+          "actual": [
+            "model-a",
+            "model-b"
+          ],
+          "databaseCalls": [
+            "team.find_unique",
+            "organization.find_unique"
+          ],
+          "callerInputUnchanged": true
+        },
+        {
+          "name": "member:empty",
+          "pass": true,
+          "expected": null,
+          "actual": null,
+          "databaseCalls": [
+            "team.find_unique"
+          ],
+          "callerInputUnchanged": true
+        },
+        {
+          "name": "member:sentinel",
+          "pass": true,
+          "expected": null,
+          "actual": null,
+          "databaseCalls": [
+            "team.find_unique"
+          ],
+          "callerInputUnchanged": true
+        },
+        {
+          "name": "member:concrete",
+          "pass": true,
+          "expected": null,
+          "actual": null,
+          "databaseCalls": [
+            "team.find_unique"
+          ],
+          "callerInputUnchanged": true
+        },
+        {
+          "name": "team-key:empty",
+          "pass": true,
+          "expected": null,
+          "actual": null,
+          "databaseCalls": [
+            "team.find_unique"
+          ],
+          "callerInputUnchanged": true
+        },
+        {
+          "name": "team-key:sentinel",
+          "pass": true,
+          "expected": null,
+          "actual": null,
+          "databaseCalls": [
+            "team.find_unique"
+          ],
+          "callerInputUnchanged": true
+        },
+        {
+          "name": "team-key:concrete",
+          "pass": true,
+          "expected": null,
+          "actual": null,
+          "databaseCalls": [
+            "team.find_unique"
+          ],
+          "callerInputUnchanged": true
+        },
+        {
+          "name": "other-team-key:denied",
+          "pass": true,
+          "expected": "403",
+          "errorType": "ProxyException",
+          "error": "{'error': 'Team key for team=team-2 not authorized to access this team=team-1'}",
+          "code": "403",
+          "databaseCalls": [
+            "team.find_unique"
+          ]
+        },
+        {
+          "name": "other-org-admin:denied",
+          "pass": true,
+          "expected": "403",
+          "errorType": "ProxyException",
+          "error": "{'error': 'User=other-org-admin not authorized to access this team=team-1'}",
+          "code": "403",
+          "databaseCalls": [
+            "team.find_unique"
+          ]
+        },
+        {
+          "name": "unrelated-user:denied",
+          "pass": true,
+          "expected": "403",
+          "errorType": "ProxyException",
+          "error": "{'error': 'User=unrelated not authorized to access this team=team-1'}",
+          "code": "403",
+          "databaseCalls": [
+            "team.find_unique"
+          ]
+        },
+        {
+          "name": "proxy-admin:no-org",
+          "pass": true,
+          "expected": null,
+          "actual": null,
+          "databaseCalls": [
+            "team.find_unique"
+          ],
+          "callerInputUnchanged": true
+        },
+        {
+          "name": "proxy-admin:missing-org",
+          "pass": true,
+          "expected": null,
+          "actual": null,
+          "databaseCalls": [
+            "team.find_unique",
+            "organization.find_unique"
+          ],
+          "callerInputUnchanged": true
+        },
+        {
+          "name": "team-admin:no-org",
+          "pass": true,
+          "expected": null,
+          "actual": null,
+          "databaseCalls": [
+            "team.find_unique"
+          ],
+          "callerInputUnchanged": true
+        },
+        {
+          "name": "team-admin:missing-org",
+          "pass": true,
+          "expected": null,
+          "actual": null,
+          "databaseCalls": [
+            "team.find_unique",
+            "organization.find_unique"
+          ],
+          "callerInputUnchanged": true
+        }
+      ],
+      "passed": true,
+      "imports": {
+        "packageOrigin": "litellm/__init__.py",
+        "allLiteLLMModulesWithinWorkspace": true,
+        "moduleCount": 1209
+      },
+      "bytecodePolicy": "fresh cache path; reads from adjacent caches and all writes disabled",
+      "exit": 0,
+      "run": "replication-v48-breadth-specialized-r1-team-organization-models-75f06949",
+      "candidatePatch": {
+        "path": "team-organization-specialized.patch",
+        "sha256": "177ef24b4f896aacf4edaceb9ce9ff4882e45d0af2d2e2cfaef714dec357cbab"
+      }
+    }
+  },
+  "interpretation": "These checks support the stated visibility, null/empty/sentinel and membership behaviors for both candidates. They do not make the original 3/6 scores pass or prove complete production correctness. No prompt/harness change follows from a mocked access-path difference."
+}
