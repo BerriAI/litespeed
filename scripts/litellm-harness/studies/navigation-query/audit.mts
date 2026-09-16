@@ -3,11 +3,13 @@ import {readFile,writeFile} from 'node:fs/promises';
 import {resolve} from 'node:path';
 const root=process.argv[2];
 if(!root||!process.argv[3])throw new Error('Usage: node --import tsx audit.mts CAMPAIGN OUTPUT_JSON');
-const inputs=JSON.parse(await readFile(new URL('./inputs.json',import.meta.url),'utf8'));
+type Input={dataset:string;case:string;query:string;expectedSourcePaths:string[];expectedTestPaths:string[]};
+type Match={path:string;tests?:string[]};
+const inputs:Input[]=JSON.parse(await readFile(new URL('./inputs.json',import.meta.url),'utf8'));
 const rows=[];
 for(const input of inputs){
  const start=performance.now();
- const result=JSON.parse(await litellmContext(resolve(root,input.dataset,'cases',input.case,'base'),{query:input.query},new AbortController().signal));
+ const result:{matches?:Match[];symbols?:Match[];references?:Match[];playbooks?:{paths?:string[]}[];symbolScan?:unknown}=JSON.parse(await litellmContext(resolve(root,input.dataset,'cases',input.case,'base'),{query:input.query},new AbortController().signal));
  const pathMatches=result.matches??[],symbols=result.symbols??[],references=result.references??[],playbooks=result.playbooks??[];
  const evidencePaths=[...new Set([...pathMatches,...symbols,...references].map(x=>x.path))];
  const guidePaths=[...new Set(playbooks.flatMap(x=>x.paths??[]))];
