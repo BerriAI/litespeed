@@ -1,5 +1,6 @@
 """Measure observed harness activation, without inferring causality from a score."""
 import json
+from collections import Counter
 
 
 def activations(messages, calls):
@@ -32,6 +33,9 @@ def activations(messages, calls):
         'finalReviewNotices': sum(s.startswith('LiteLLM change review.') for s in system),
         'testFocusNotices': sum(s.startswith('LiteLLM verification checkpoint:') for s in system),
         'explorationFocusNotices': sum(s.startswith('LiteLLM exploration checkpoint:') for s in system),
-        'defaultWindowReadCalls': sum('limit' not in c.get('args', {}) for c in reads),
-        'explicitWindowReadCalls': sum('limit' in c.get('args', {}) for c in reads),
+        # The runner fills the default BEFORE saving tool arguments. Historical
+        # traces cannot distinguish a model-selected limit from that default.
+        'readCallsByEffectiveLimit': dict(Counter(str(c.get('args', {}).get('limit', 'missing')) for c in reads)),
+        'defaultWindowReadCalls': None,
+        'readLimitProvenance': 'unknown: saved arguments include host-injected defaults',
     }

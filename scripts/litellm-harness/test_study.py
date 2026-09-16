@@ -13,8 +13,8 @@ class StudyTests(unittest.TestCase):
         result = activations(messages, calls)
         self.assertEqual(result['guideIdsShown'], ['router'])
         self.assertEqual(result['finalReviewNotices'], 1)
-        self.assertEqual(result['defaultWindowReadCalls'], 1)
-        self.assertEqual(result['explicitWindowReadCalls'], 1)
+        self.assertIsNone(result['defaultWindowReadCalls'])
+        self.assertEqual(result['readCallsByEffectiveLimit'], {'missing': 1, '20': 1})
         self.assertEqual(result['unparsedContextPayloads'], 1)
 
     def test_incomplete_pair_is_not_compared(self):
