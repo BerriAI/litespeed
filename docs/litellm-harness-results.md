@@ -1,6 +1,6 @@
 # LiteLLM harness campaign results
 
-Interim snapshot: 2026-09-16T11:57:31.209796+00:00. Current harness: **2026-09-16.45**.
+Interim snapshot: 2026-09-16T12:17:10.521260+00:00. Current harness: **2026-09-16.52**.
 
 **The campaign is still running. It has not established a quality win over Astra/Codex or production replacement readiness.**
 
@@ -8,7 +8,7 @@ The selectable architecture and replay workbench are implemented. The current wo
 
 ## Spending
 
-Confirmed token/header-priced charges: **$50.5365**. Missing receipts retain **$15.1388** across 60 requests; active requests reserve another **$0.7569**. The committed upper bound is **$66.4323** against the authorized **$100.00** ceiling. Reservations are not actual charges. Astra account billing is unavailable.
+Confirmed token/header-priced charges: **$51.2403**. Missing receipts retain **$15.1388** across 60 requests; active requests reserve another **$0.5046**. The committed upper bound is **$66.8837** against the authorized **$100.00** ceiling. Reservations are not actual charges. Astra account billing is unavailable.
 
 An [offline receipt reconciliation](../scripts/litellm-harness/studies/runner-receipt-recovery/README.md) subsequently matched 58 missing gateway records to independently persisted runner usage. Exact round binding agreed with 3,359 known receipts. It restored $0.07678 in token-priced charges and released $14.55740 in excess reservations; unmatched requests remain reserved. The original ledger and per-request reservation history are preserved.
 
@@ -42,6 +42,8 @@ The following are training/development trials under protocol 5, after enforcing 
 - An MCP-auth patch passed its reference checks, but repeated 600 ms job polling triggered the host loop guard. Earlier reporting treated every idle session as completed. The analyzer now separates explicit host guard stops from normal completion, even when the patch passes.
 
 A [large-repository command-history audit](../scripts/litellm-harness/studies/command-history/README.md) reproduced a host defect: bounded snapshots omitted an already edited adapter, so legitimate shell writes caused later structured edits to fail. Version 33 prioritizes tracked paths within the same limits and preserves Undo/Redo and external-change guards. The deterministic regression and full suite pass; frozen solver studies retain their original code and scores.
+
+A [price-map capability correction](../scripts/litellm-harness/studies/price-map-limit/README.md) raises the shared edit/history/restore allowance to 4 MiB for the two exact LiteLLM price-map paths. A paid replay exposed the old 2 MiB rejection; real-map edit, exact Undo and Redo now pass. Other file limits and the total snapshot budget remain unchanged. This is a host fix, not a measured quality improvement.
 
 A separate [router-accounting diagnostic](../scripts/litellm-harness/studies/router-accounting/README.md) qualifies eight public-entrypoint/callback checks: base 2/8, merged reference 8/8, and two training candidates 8/8. Both candidates retain their original 8/9 acceptance scores because of a new private-helper assertion; one remains a timeout. This diagnostic does not choose a read-window variant or replace the frozen oracle.
 

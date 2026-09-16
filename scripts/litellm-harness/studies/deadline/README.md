@@ -14,4 +14,8 @@ Install physical dependencies within the reconstructed runtime, then set the per
 
 ## First pair observed
 
-The first team-member-budget repetition passes all five checks and finishes normally in both arms: **529.54 seconds / $0.09644** with the standard limit and **642.56 seconds / $0.09841** with the extended limit. Both finish before 900 seconds, so this pair supplies no evidence that additional time caused a success. The second repetitions and streaming pairs remain pending. [Interim results](results.json).
+The first team-member-budget repetition passes all five checks and finishes normally in both arms: **529.54 seconds / $0.09644** with the standard limit and **642.56 seconds / $0.09841** with the extended limit. Both finish before 900 seconds, so this pair supplies no evidence that additional time caused a success. The second repetitions remain pending. [Interim results](results.json).
+
+## First streaming pair observed
+
+The standard-limit attempt times out at 900.14 seconds ($0.16732); the extended-limit attempt finishes normally at 1,032.97 seconds ($0.24743). Both pass 13/16 original checks and 12/24 real-adapter checks. Extra time allows delivery in this pair, but does not yield a correct complete implementation. This is one attempt per arm on a known difficult task, with the second repetitions still pending.

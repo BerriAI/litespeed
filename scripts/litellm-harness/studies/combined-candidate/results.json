@@ -4,11 +4,11 @@
   "variants": [
     {
       "variant": "combined",
-      "evaluated": 6,
+      "evaluated": 7,
       "expected": 8,
-      "successes": 5,
-      "meanSeconds": 524.9541666666667,
-      "tokenPricedUsd": 0.593212732,
+      "successes": 6,
+      "meanSeconds": 511.63614285714283,
+      "tokenPricedUsd": 0.647592428,
       "trialsWithoutTokenPrice": 0
     },
     {
@@ -25,10 +25,16 @@
     {
       "variant": "combined",
       "control": "control",
-      "pairedTasks": 1,
+      "pairedTasks": 2,
       "expectedTasks": 4,
       "complete": false,
       "pairs": [
+        {
+          "dataset": "",
+          "case": "databricks-reasoning",
+          "successDelta": 0,
+          "secondsDelta": 37.73150000000004
+        },
         {
           "dataset": "training2",
           "case": "mcp-auth-challenge",
@@ -37,9 +43,11 @@
         }
       ],
       "successDelta": 0,
-      "secondsDelta": -35.769499999999994,
-      "taskBootstrap95": null,
-      "uncertaintyNote": "One task cannot estimate variation between tasks; no bootstrap interval is reported."
+      "secondsDelta": 0.981000000000023,
+      "taskBootstrap95": [
+        0,
+        0
+      ]
     }
   ],
   "trials": [
@@ -908,7 +916,56 @@
       "effort": "medium",
       "kind": "litellm-specific",
       "timeoutSeconds": 900,
-      "evaluated": false
+      "evaluated": true,
+      "success": true,
+      "completed": true,
+      "completionReason": "completed",
+      "seconds": 431.728,
+      "acceptance": {
+        "exit": 0,
+        "tests": 6,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0,
+        "passed": true
+      },
+      "computedUsd": 0.054379696,
+      "activations": {
+        "initialMapNotices": 1,
+        "contextToolCalls": 0,
+        "guideIdsShown": [],
+        "unparsedContextPayloads": 0,
+        "finalReviewNotices": 1,
+        "guidedFinalReviewNotices": 0,
+        "finalReviewGuideIdsShown": [],
+        "batchedEditCalls": 3,
+        "completedBatchedEditCalls": 2,
+        "batchEditsRequested": 8,
+        "batchSizes": [
+          4,
+          2,
+          2
+        ],
+        "backgroundCommandNotices": 0,
+        "testFocusNotices": 1,
+        "explorationFocusNotices": 1,
+        "readCallsByEffectiveLimit": {
+          "300": 1,
+          "160": 2,
+          "200": 1,
+          "120": 1,
+          "220": 1,
+          "60": 3,
+          "70": 3,
+          "80": 1,
+          "50": 2,
+          "14": 1,
+          "16": 1,
+          "45": 1
+        },
+        "defaultWindowReadCalls": null,
+        "readLimitProvenance": "unknown: saved arguments include host-injected defaults"
+      }
     },
     {
       "dataset": "training5",
