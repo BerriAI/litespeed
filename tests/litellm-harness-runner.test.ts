@@ -84,15 +84,16 @@ describe('LiteLLM-specific runner integration',()=>{
     expect(reviews[0].content).toContain("Follow the user's scope and verification constraints");
     expect(requests).toHaveLength(3);expect(store.session(session.id).status).toBe('idle');
   });
-  it('reminds the model once after repeated check commands without blocking them',async()=>{
+  it.each(['','LITELLM_LOCAL_MODEL_COST_MAP=True '])('reminds once after test activity with prefix %s without inventing a check verdict',async(prefix)=>{
     await writeFile(join(root,'package.json'),JSON.stringify({scripts:{test:'node -e "process.exit(0)"'}}));
     const session=store.createSession({workspace:root,providerId:'test',model:'model',permissionMode:'auto',architecture:{kind:'litellm-specific'}});
-    actions=Array.from({length:4},(_,i)=>({name:'bash',args:{command:`npm test -- --no-warnings=${i}`,timeout_ms:5000}}));
+    actions=Array.from({length:4},(_,i)=>({name:'bash',args:{command:`${prefix}npm test -- --no-warnings=${i}`,timeout_ms:5000}}));
     runner.start(session.id,'Run the requested checks.');await runner.whenIdle();
     const messages=store.messages(session.id);
     expect(messages.filter(m=>m.role==='system'&&m.content.startsWith('LiteLLM verification checkpoint:'))).toHaveLength(1);
     expect(messages.flatMap(m=>m.toolCalls??[]).filter(c=>c.status==='completed')).toHaveLength(4);
     expect(requests).toHaveLength(5);
+    if(prefix)expect(messages.flatMap(m=>m.toolCalls??[]).every(call=>call.execution?.checkKey===undefined)).toBe(true);
   });
   it('nudges prolonged exploration once without authorizing an edit',async()=>{
     const session=store.createSession({workspace:root,providerId:'test',model:'model',permissionMode:'auto',architecture:{kind:'litellm-specific'}});

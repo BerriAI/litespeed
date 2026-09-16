@@ -16,7 +16,7 @@ import { shuntSource, shuntReadGate, shuntWriteTarget } from './tools.js';
 import { progressTimeout } from './progress-timeout.js';
 import { clientContext, fileScopeGuidance } from './client-context.js';
 import { clientSurface as parseClientSurface, type ClientSurface } from '../shared/client.js';
-import { checkFailed } from '../shared/receipts.js';
+import { checkFailed, isCheckCommand } from '../shared/receipts.js';
 import { ParallelWorkers, type WorkerWorkspace } from './parallel-workers.js';
 import { UsageLedger } from './usage.js';
 import type { RequestUsage } from '../shared/usage.js';
@@ -1563,6 +1563,7 @@ export class Runner {
     let previousBatch = '', repeatedBatches = 0, autoCompactionAttempted = false, compactionRetryStep = 0, overflowPruneUsed = false, retryPruned = false, reuseMessageId: string | undefined;
     let litellmReviewed = false;
     let litellmTestsReviewed = false;
+    const litellmCheckJobs = new Set<string>();
     let litellmExplorationReviewed = false, litellmCalls = 0;
     // Storm breaker state: consecutive identical FAILURES per call signature
     // (name + canonical args, status error/denied). Any success clears every
@@ -1757,7 +1758,7 @@ export class Runner {
         const evidence=computeReceipts(run.child?this.store.messages(id):this.delegations.evidence(id),run.turnId);
         if(!run.child&&session.mode==='build'&&session.architecture?.kind==='litellm-specific'&&!litellmReviewed&&evidence.filesChanged.length) {
           litellmReviewed=true;
-          this.save({id:randomUUID(),sessionId:id,role:'system',content:litellmReview(evidence.filesChanged,evidence.checksRun),createdAt:Date.now()});
+          this.save({id:randomUUID(),sessionId:id,role:'system',content:litellmReview(evidence.filesChanged,evidence.commandsRun.filter(command=>isCheckCommand(command))),createdAt:Date.now()});
           continue;
         }
         if(run.toolFailures?.size||evidence.unresolvedChecks?.length) {
@@ -2051,7 +2052,16 @@ export class Runner {
           litellmExplorationReviewed=true;
           if(!evidence.filesChanged.length)this.save({id:randomUUID(),sessionId:id,role:'system',content:litellmExplorationFocus,createdAt:Date.now()});
         }
-        if(!litellmTestsReviewed&&evidence.checksRun.length>=4) {
+        // This is an advisory about activity, not a passing-check receipt.
+        // Python/env wrappers and compound shells can execute tests without a
+        // safely attributable checkKey. Count finished jobs once, not polls.
+        for(const call of message.toolCalls) {
+          const execution=call.execution;
+          if(call.status==='completed'&&execution&&execution.status!=='running'&&isCheckCommand(execution.command)) {
+            litellmCheckJobs.add(execution.jobId??`${execution.startedAt}:${call.id}`);
+          }
+        }
+        if(!litellmTestsReviewed&&litellmCheckJobs.size>=4) {
           litellmTestsReviewed=true;
           this.save({id:randomUUID(),sessionId:id,role:'system',content:litellmTestFocus,createdAt:Date.now()});
         }

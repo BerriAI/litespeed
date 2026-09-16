@@ -4,7 +4,7 @@ import path from 'node:path';
 import fg from 'fast-glob';
 import type { ToolDefinition } from '../shared/types.js';
 
-export const LITELLM_HARNESS_VERSION='2026-09-15.22';
+export const LITELLM_HARNESS_VERSION='2026-09-15.24';
 export const litellmContextTool:ToolDefinition={type:'function',function:{name:'litellm_context',description:'Navigate the current LiteLLM checkout. Give a task query to find relevant definitions, inline conditions and existing tests. Give a source path to see its symbol outline and test partners; add a symbol name to read that definition with numbered lines, or callers to find functions invoking a named helper in that file. Reads only this workspace, never Git history or remote answers.',parameters:{type:'object',properties:{query:{type:'string',maxLength:1000},path:{type:'string',maxLength:500},symbol:{type:'string',maxLength:200},callers:{type:'string',maxLength:200,description:'Python helper name whose call sites and enclosing functions to find; requires path.'}},additionalProperties:false}}};
 
 const playbooks = [
@@ -87,7 +87,7 @@ Only investigate further when you can name a specific uncovered requirement or c
 Never remove the working fix to demonstrate a baseline failure. If a baseline check is necessary, use a separate temporary copy and keep the current patch intact; cancellation must not strand the checkout without its fix. A baseline check is not required just to finish this review. Report unresolved unrelated failures with the evidence available instead of chasing them indefinitely.
 Relevant boundary audit: URLs preserve parsed path/query components; image/document adapters preserve source type and MIME; request configuration avoids shared-state mutation and distinguishes absent from explicit false. Apply only what the requested change touches. Then finish.
 Host-recorded changed paths: ${JSON.stringify(files.slice(0,30))}
-Host-recorded check commands (execution is not proof of coverage): ${JSON.stringify(checks.slice(-5))}`;
+Host-recorded commands mentioning test tools (execution is not proof of coverage or passing): ${JSON.stringify(checks.slice(-5))}`;
 }
 
 export function isLitellmDefinitionRead(output:string,file:string):boolean {
