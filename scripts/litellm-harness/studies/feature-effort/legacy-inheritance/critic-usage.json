@@ -1,0 +1,283 @@
+{
+  "scope": "Reference-aware posthoc training critic; final answer is advice, not a correctness oracle. Token pricing is not account billing. No hidden reasoning is exported.",
+  "reviews": 13,
+  "promptTokens": 236019,
+  "completionTokens": 25014,
+  "cachedTokens": 470,
+  "tokenPricedUsd": 0.06833331,
+  "receipts": [
+    {
+      "file": "synthesis.json",
+      "model": "fireworks_ai/deepseek-v4p1-flash",
+      "effort": "medium",
+      "complete": true,
+      "finishReason": "stop",
+      "usage": {
+        "completion_tokens": 4413,
+        "prompt_tokens": 64062,
+        "total_tokens": 68475,
+        "completion_tokens_details": {
+          "reasoning_tokens": 3631
+        },
+        "prompt_tokens_details": {
+          "cached_tokens": 0
+        },
+        "output_tokens_details": {
+          "reasoning_tokens": 3631
+        }
+      }
+    },
+    {
+      "file": "window-001.json",
+      "model": "fireworks_ai/deepseek-v4p1-flash",
+      "effort": "medium",
+      "complete": true,
+      "finishReason": "stop",
+      "usage": {
+        "completion_tokens": 1441,
+        "prompt_tokens": 15592,
+        "total_tokens": 17033,
+        "completion_tokens_details": {
+          "reasoning_tokens": 937
+        },
+        "prompt_tokens_details": {
+          "cached_tokens": 20
+        },
+        "output_tokens_details": {
+          "reasoning_tokens": 937
+        }
+      }
+    },
+    {
+      "file": "window-002.json",
+      "model": "fireworks_ai/deepseek-v4p1-flash",
+      "effort": "medium",
+      "complete": true,
+      "finishReason": "stop",
+      "usage": {
+        "completion_tokens": 1337,
+        "prompt_tokens": 16494,
+        "total_tokens": 17831,
+        "completion_tokens_details": {
+          "reasoning_tokens": 804
+        },
+        "prompt_tokens_details": {
+          "cached_tokens": 0
+        },
+        "output_tokens_details": {
+          "reasoning_tokens": 804
+        }
+      }
+    },
+    {
+      "file": "window-003.json",
+      "model": "fireworks_ai/deepseek-v4p1-flash",
+      "effort": "medium",
+      "complete": true,
+      "finishReason": "stop",
+      "usage": {
+        "completion_tokens": 2323,
+        "prompt_tokens": 14505,
+        "total_tokens": 16828,
+        "completion_tokens_details": {
+          "reasoning_tokens": 1836
+        },
+        "prompt_tokens_details": {
+          "cached_tokens": 0
+        },
+        "output_tokens_details": {
+          "reasoning_tokens": 1836
+        }
+      }
+    },
+    {
+      "file": "window-004.json",
+      "model": "fireworks_ai/deepseek-v4p1-flash",
+      "effort": "medium",
+      "complete": true,
+      "finishReason": "stop",
+      "usage": {
+        "completion_tokens": 3309,
+        "prompt_tokens": 16035,
+        "total_tokens": 19344,
+        "completion_tokens_details": {
+          "reasoning_tokens": 2912
+        },
+        "prompt_tokens_details": {
+          "cached_tokens": 0
+        },
+        "output_tokens_details": {
+          "reasoning_tokens": 2912
+        }
+      }
+    },
+    {
+      "file": "window-005.json",
+      "model": "fireworks_ai/deepseek-v4p1-flash",
+      "effort": "medium",
+      "complete": true,
+      "finishReason": "stop",
+      "usage": {
+        "completion_tokens": 984,
+        "prompt_tokens": 15034,
+        "total_tokens": 16018,
+        "completion_tokens_details": {
+          "reasoning_tokens": 503
+        },
+        "prompt_tokens_details": {
+          "cached_tokens": 0
+        },
+        "output_tokens_details": {
+          "reasoning_tokens": 503
+        }
+      }
+    },
+    {
+      "file": "window-006.json",
+      "model": "fireworks_ai/deepseek-v4p1-flash",
+      "effort": "medium",
+      "complete": true,
+      "finishReason": "stop",
+      "usage": {
+        "completion_tokens": 1201,
+        "prompt_tokens": 15849,
+        "total_tokens": 17050,
+        "completion_tokens_details": {
+          "reasoning_tokens": 749
+        },
+        "prompt_tokens_details": {
+          "cached_tokens": 0
+        },
+        "output_tokens_details": {
+          "reasoning_tokens": 749
+        }
+      }
+    },
+    {
+      "file": "window-007.json",
+      "model": "fireworks_ai/deepseek-v4p1-flash",
+      "effort": "medium",
+      "complete": true,
+      "finishReason": "stop",
+      "usage": {
+        "completion_tokens": 1558,
+        "prompt_tokens": 17114,
+        "total_tokens": 18672,
+        "completion_tokens_details": {
+          "reasoning_tokens": 1030
+        },
+        "prompt_tokens_details": {
+          "cached_tokens": 0
+        },
+        "output_tokens_details": {
+          "reasoning_tokens": 1030
+        }
+      }
+    },
+    {
+      "file": "window-008.json",
+      "model": "fireworks_ai/deepseek-v4p1-flash",
+      "effort": "medium",
+      "complete": true,
+      "finishReason": "stop",
+      "usage": {
+        "completion_tokens": 1575,
+        "prompt_tokens": 13061,
+        "total_tokens": 14636,
+        "completion_tokens_details": {
+          "reasoning_tokens": 1123
+        },
+        "prompt_tokens_details": {
+          "cached_tokens": 20
+        },
+        "output_tokens_details": {
+          "reasoning_tokens": 1123
+        }
+      }
+    },
+    {
+      "file": "window-009.json",
+      "model": "fireworks_ai/deepseek-v4p1-flash",
+      "effort": "medium",
+      "complete": true,
+      "finishReason": "stop",
+      "usage": {
+        "completion_tokens": 1290,
+        "prompt_tokens": 9883,
+        "total_tokens": 11173,
+        "completion_tokens_details": {
+          "reasoning_tokens": 903
+        },
+        "prompt_tokens_details": {
+          "cached_tokens": 410
+        },
+        "output_tokens_details": {
+          "reasoning_tokens": 903
+        }
+      }
+    },
+    {
+      "file": "window-010.json",
+      "model": "fireworks_ai/deepseek-v4p1-flash",
+      "effort": "medium",
+      "complete": true,
+      "finishReason": "stop",
+      "usage": {
+        "completion_tokens": 1481,
+        "prompt_tokens": 15879,
+        "total_tokens": 17360,
+        "completion_tokens_details": {
+          "reasoning_tokens": 974
+        },
+        "prompt_tokens_details": {
+          "cached_tokens": 20
+        },
+        "output_tokens_details": {
+          "reasoning_tokens": 974
+        }
+      }
+    },
+    {
+      "file": "window-011.json",
+      "model": "fireworks_ai/deepseek-v4p1-flash",
+      "effort": "medium",
+      "complete": true,
+      "finishReason": "stop",
+      "usage": {
+        "completion_tokens": 3207,
+        "prompt_tokens": 13475,
+        "total_tokens": 16682,
+        "completion_tokens_details": {
+          "reasoning_tokens": 2772
+        },
+        "prompt_tokens_details": {
+          "cached_tokens": 0
+        },
+        "output_tokens_details": {
+          "reasoning_tokens": 2772
+        }
+      }
+    },
+    {
+      "file": "window-012.json",
+      "model": "fireworks_ai/deepseek-v4p1-flash",
+      "effort": "medium",
+      "complete": true,
+      "finishReason": "stop",
+      "usage": {
+        "completion_tokens": 895,
+        "prompt_tokens": 9036,
+        "total_tokens": 9931,
+        "completion_tokens_details": {
+          "reasoning_tokens": 473
+        },
+        "prompt_tokens_details": {
+          "cached_tokens": 0
+        },
+        "output_tokens_details": {
+          "reasoning_tokens": 473
+        }
+      }
+    }
+  ]
+}

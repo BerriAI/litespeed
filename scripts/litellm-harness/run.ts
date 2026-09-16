@@ -3,7 +3,7 @@ import { resolve, join, dirname } from 'node:path';
 import { execFileSync, spawn } from 'node:child_process';
 import { createHash, randomUUID } from 'node:crypto';
 import { homedir } from 'node:os';
-import { replayGitEnvironment, replaySandboxProfile } from './isolation.js';
+import { assertReplayDependencyRoot, replayGitEnvironment, replaySandboxProfile } from './isolation.js';
 import type { ReasoningEffort } from '../../shared/types.js';
 
 if(process.platform!=='darwin')throw new Error('This replay launcher requires macOS sandbox-exec. Port the filesystem isolation before running on another platform.');
@@ -16,6 +16,8 @@ if(!['single','litellm-specific','codex'].includes(kind))throw new Error('Choose
 if(!/^[a-z0-9-]+$/.test(label))throw new Error('Use a simple campaign label.');
 if(!process.env.LITELLM_SOURCE_REPO)throw new Error('Set LITELLM_SOURCE_REPO so the live source can be blocked.');
 if(!process.env.LITELLM_EVAL_PYTHON)throw new Error('Set LITELLM_EVAL_PYTHON to the installed benchmark interpreter.');
+const runtimeRoot=resolve(import.meta.dirname,'../..');
+assertReplayDependencyRoot(runtimeRoot);
 const corpus=JSON.parse(readFileSync(join(root,'cases.json'),'utf8'));
 const task=corpus.find((c:{id:string})=>c.id===id);
 if(!task)throw new Error('Unknown task.');
@@ -76,7 +78,6 @@ writeFileSync(join(directory,'solver-task.json'),JSON.stringify({id:task.id,prom
 writeFileSync(join(directory,'harness-source.json'),JSON.stringify({base:execFileSync('git',['rev-parse','HEAD'],{cwd:resolve(import.meta.dirname,'../..'),encoding:'utf8'}).trim(),node:process.version,files:Object.fromEntries(['server/runner.ts','server/tools.ts','server/litellm-harness.ts','scripts/litellm-harness/run.ts','scripts/litellm-harness/solve.ts','scripts/litellm-harness/isolation.ts'].map(file=>{const source=readFileSync(resolve(import.meta.dirname,'../..',file),'utf8');return [file,{sha256:createHash('sha256').update(source).digest('hex'),source}];}))},null,2));
 const started=Date.now();
 const timeoutSeconds=kind==='codex'||label.startsWith('comparison-')||label.startsWith('replication-')?900:600;
-const runtimeRoot=resolve(import.meta.dirname,'../..');
 const profile=join(directory,'isolation.sb');
 writeFileSync(profile,replaySandboxProfile({runDirectory:directory,runtimeRoot,pythonEnvironment:resolve(process.env.LITELLM_EVAL_PYTHON,'../..'),nodeRoot:dirname(dirname(realpathSync(process.execPath))),home:homedir(),campaignRoot:root,sourceRepo:process.env.LITELLM_SOURCE_REPO}));
 if(kind==='codex'){

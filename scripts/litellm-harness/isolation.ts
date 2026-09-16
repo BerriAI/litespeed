@@ -1,5 +1,16 @@
 import { realpathSync } from 'node:fs';
-import { dirname, isAbsolute } from 'node:path';
+import { dirname, isAbsolute, join } from 'node:path';
+
+/** Catch a common frozen-worktree setup error before allocating a trial.
+ * This checks the dependency root; the sandbox still enforces every file read.
+ */
+export function assertReplayDependencyRoot(runtimeRoot:string):void {
+  const runtime=realpathSync(runtimeRoot);
+  let dependencies:string;
+  try{dependencies=realpathSync(join(runtime,'node_modules'));}
+  catch{throw new Error('Install dependencies inside the frozen runtime before allocating a replay.');}
+  if(!dependencies.startsWith(runtime+'/'))throw new Error('Replay node_modules resolves outside the frozen runtime. Copy or install dependencies inside it; external links are blocked by isolation.');
+}
 
 /** Evaluation-only filesystem boundary. Production Litespeed is unchanged.
  * Runtime/dependency trees are readable; only this run can read campaign data.

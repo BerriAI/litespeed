@@ -3,7 +3,20 @@ import { mkdtempSync, mkdirSync, realpathSync, rmSync, symlinkSync, writeFileSyn
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { expect, it } from 'vitest';
-import { replayGitEnvironment, replaySandboxProfile } from '../scripts/litellm-harness/isolation.js';
+import { assertReplayDependencyRoot, replayGitEnvironment, replaySandboxProfile } from '../scripts/litellm-harness/isolation.js';
+
+it('rejects frozen-runtime dependencies linked to another checkout before allocation',()=>{
+  const root=realpathSync(mkdtempSync(join(tmpdir(),'litellm-dependencies-')));
+  try{
+    const runtime=join(root,'runtime'),external=join(root,'runtime-other','node_modules');
+    mkdirSync(runtime);mkdirSync(external,{recursive:true});
+    expect(()=>assertReplayDependencyRoot(runtime)).toThrow('Install dependencies inside');
+    symlinkSync(external,join(runtime,'node_modules'));
+    expect(()=>assertReplayDependencyRoot(runtime)).toThrow('outside the frozen runtime');
+    rmSync(join(runtime,'node_modules'));mkdirSync(join(runtime,'node_modules'));
+    expect(()=>assertReplayDependencyRoot(runtime)).not.toThrow();
+  }finally{rmSync(root,{recursive:true,force:true});}
+});
 
 it.skipIf(process.platform!=='darwin')('blocks live source and reference data, including symlinks and subprocesses',()=>{
   const root=realpathSync(mkdtempSync(join(tmpdir(),'litellm-isolation-')));
