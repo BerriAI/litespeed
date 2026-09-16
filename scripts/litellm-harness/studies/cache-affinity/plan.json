@@ -1,0 +1,24 @@
+{
+  "createdAt": "2026-09-16T03:56:39.604297+00:00",
+  "seed": 31160926,
+  "targetSourceCharacters": [
+    160000,
+    480000
+  ],
+  "repetitions": 3,
+  "roundsPerArm": 12,
+  "arms": [
+    "omitted-user",
+    "stable-user"
+  ],
+  "maxTokens": 64,
+  "reasoningEffort": "none",
+  "temperature": 0,
+  "sharedSlots": 3,
+  "sourceHashes": {
+    "litellm/router.py": "8290a1eb02597a0b746f9dd6119e9df07a203887b0f8d4ac4795a8f421a57ce1",
+    "litellm/utils.py": "3d1190c6f791c95293dc88e046cd7f1bcc6a403f25f0cf134a69939edb3124eb"
+  },
+  "scope": "Transport-only synthetic growing conversations with public pre-merge training source; unique leading nonce per arm and repetition prevents cross-arm prefix warming. Identical source sizes and prompt instructions. Within each round arm order randomized. No correctness conclusion. Gateway does not forward the application session header; stable user body field is preserved.",
+  "primary": "Post-initial-round cached/input ratio, input-cost estimate and request elapsed time per paired scenario. Include warm-up separately. No causal tool-cost or production cache guarantee."
+}

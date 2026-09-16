@@ -1,0 +1,100 @@
+{
+  "status": "interim",
+  "note": "Development selection only. Interim observed-task means can change as slower trials finish. Bootstrap resamples tasks, not attempts; it does not correct adaptive candidate selection or establish future generalization. Token prices exclude requests without usage and do not replace the campaign ledger.",
+  "variants": [
+    {
+      "variant": "appended-jobs",
+      "evaluated": 0,
+      "expected": 4
+    },
+    {
+      "variant": "control",
+      "evaluated": 0,
+      "expected": 4
+    }
+  ],
+  "comparisons": [
+    {
+      "variant": "appended-jobs",
+      "control": "control",
+      "pairedTasks": 0,
+      "expectedTasks": 2,
+      "complete": false,
+      "pairs": []
+    }
+  ],
+  "trials": [
+    {
+      "dataset": "training2",
+      "case": "bedrock-session-tags",
+      "name": "appended-jobs",
+      "label": "replication-v31-jobs-appended-jobs-r2",
+      "commit": "f1fed69e9130dce15f24458a4763040028b96dfb",
+      "effort": "medium",
+      "evaluated": false
+    },
+    {
+      "dataset": "training2",
+      "case": "mcp-auth-challenge",
+      "name": "control",
+      "label": "replication-v31-jobs-control-r2",
+      "commit": "e2646a171ea5cef0506f76d797740e5d11632419",
+      "effort": "medium",
+      "evaluated": false
+    },
+    {
+      "dataset": "training2",
+      "case": "mcp-auth-challenge",
+      "name": "appended-jobs",
+      "label": "replication-v31-jobs-appended-jobs-r2",
+      "commit": "f1fed69e9130dce15f24458a4763040028b96dfb",
+      "effort": "medium",
+      "evaluated": false
+    },
+    {
+      "dataset": "training2",
+      "case": "mcp-auth-challenge",
+      "name": "appended-jobs",
+      "label": "replication-v31-jobs-appended-jobs-r1",
+      "commit": "f1fed69e9130dce15f24458a4763040028b96dfb",
+      "effort": "medium",
+      "evaluated": false
+    },
+    {
+      "dataset": "training2",
+      "case": "bedrock-session-tags",
+      "name": "control",
+      "label": "replication-v31-jobs-control-r2",
+      "commit": "e2646a171ea5cef0506f76d797740e5d11632419",
+      "effort": "medium",
+      "evaluated": false
+    },
+    {
+      "dataset": "training2",
+      "case": "mcp-auth-challenge",
+      "name": "control",
+      "label": "replication-v31-jobs-control-r1",
+      "commit": "e2646a171ea5cef0506f76d797740e5d11632419",
+      "effort": "medium",
+      "evaluated": false
+    },
+    {
+      "dataset": "training2",
+      "case": "bedrock-session-tags",
+      "name": "control",
+      "label": "replication-v31-jobs-control-r1",
+      "commit": "e2646a171ea5cef0506f76d797740e5d11632419",
+      "effort": "medium",
+      "evaluated": false
+    },
+    {
+      "dataset": "training2",
+      "case": "bedrock-session-tags",
+      "name": "appended-jobs",
+      "label": "replication-v31-jobs-appended-jobs-r1",
+      "commit": "f1fed69e9130dce15f24458a4763040028b96dfb",
+      "effort": "medium",
+      "evaluated": false
+    }
+  ]
+}

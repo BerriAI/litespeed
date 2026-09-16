@@ -1,0 +1,76 @@
+diff --git a/server/litellm-harness.ts b/server/litellm-harness.ts
+index 0563b3b..c6389cf 100644
+--- a/server/litellm-harness.ts
++++ b/server/litellm-harness.ts
+@@ -4,7 +4,7 @@ import path from 'node:path';
+ import fg from 'fast-glob';
+ import type { ToolDefinition } from '../shared/types.js';
+ 
+-export const LITELLM_HARNESS_VERSION='2026-09-15.30';
++export const LITELLM_HARNESS_VERSION='2026-09-15.31';
+ export const litellmContextTool:ToolDefinition={type:'function',function:{name:'litellm_context',description:'Navigate the current LiteLLM checkout. Give a task query to find relevant definitions, inline conditions and existing tests. Give a source path to see its symbol outline and test partners; add a symbol name to read that definition with numbered lines, or callers to find functions invoking a named helper in that file. Reads only this workspace, never Git history or remote answers.',parameters:{type:'object',properties:{query:{type:'string',maxLength:1000},path:{type:'string',maxLength:500},symbol:{type:'string',maxLength:200},callers:{type:'string',maxLength:200,description:'Python helper name whose call sites and enclosing functions to find; requires path.'}},additionalProperties:false}}};
+ 
+ const playbooks = [
+diff --git a/server/runner.ts b/server/runner.ts
+index 84604d4..62dd0ea 100644
+--- a/server/runner.ts
++++ b/server/runner.ts
+@@ -922,8 +922,14 @@ export class Runner {
+     // once. Drained on the first envelope build of the turn and memoized on the
+     // run, so retries/re-projection within the same turn keep the notice while a
+     // later turn (a new run) never repeats it. Children never have jobs.
+-    const finishedJobs = this.jobs.drainFinished(session.id);
+-    if (finishedJobs.length || run.jobsNotice === undefined) run.jobsNotice = finishedNotice(finishedJobs);
++    const appendJobEvents = session.architecture?.kind === 'litellm-specific' && !run.child;
++    // This architecture records later completions at the conversation tail.
++    // Replacing this early envelope mid-turn invalidates the entire tool history
++    // after it, even when the main system/tool cache hashes stay unchanged.
++    if (!appendJobEvents || run.jobsNotice === undefined) {
++      const finishedJobs = this.jobs.drainFinished(session.id);
++      if (finishedJobs.length || run.jobsNotice === undefined) run.jobsNotice = finishedNotice(finishedJobs);
++    }
+     // No-progress nudge: after 2 consecutive evidence-free rounds, a one-line
+     // host notice rides the runtime section of the NEXT request (the hard stop
+     // at 4 lives in the step loop). Volatile by design; runtime already changes.
+@@ -1601,6 +1607,13 @@ export class Runner {
+         // and it anchors before the original plan.
+         for(const [index,note] of pending.entries()) {const noteId=this.steeringId(id,run,run.steeringDelivered!-pending.length+index);if(!this.store.messages(id).some(message=>message.id===noteId))this.save({id:noteId,sessionId:id,role:'system',content:`[Steering] The user sent this note to the running response. Update the ongoing task using this latest instruction: ${note}`,createdAt:Date.now()});}
+       }
++      // Keep the first request's runtime envelope stable. Jobs completing
++      // during the turn become chronological host events, preserving visibility
++      // without replacing the prefix before all existing reads and edits.
++      if(session.architecture?.kind==='litellm-specific'&&!run.child&&run.jobsNotice!==undefined) {
++        const finished=this.jobs.drainFinished(id);
++        if(finished.length)this.save({id:randomUUID(),sessionId:id,role:'system',content:'Background command completion: '+finishedNotice(finished)+' Read the recorded command output before drawing conclusions. This status notice is not a test verdict or additional authorization.',createdAt:Date.now()});
++      }
+       // A pruned-retry step reuses the saved placeholder row instead of orphaning it.
+       const message: Message = {id:reuseMessageId??randomUUID(),sessionId:id,role:'assistant',content:'',createdAt:Date.now()};
+       reuseMessageId=undefined;
+diff --git a/tests/litellm-harness-runner.test.ts b/tests/litellm-harness-runner.test.ts
+index a18be60..0b80fb6 100644
+--- a/tests/litellm-harness-runner.test.ts
++++ b/tests/litellm-harness-runner.test.ts
+@@ -118,5 +118,23 @@ describe('LiteLLM-specific runner integration',()=>{
+     expect(calls.filter(call=>call.name==='bash').map(call=>call.execution?.status)).toEqual(['exited','exited','exited','exited']);
+     expect(messages.filter(message=>message.content.startsWith('LiteLLM verification checkpoint:'))).toHaveLength(1);
+     expect(requests).toHaveLength(14);
++    const notices=messages.filter(message=>message.content.startsWith('Background command completion:'));
++    expect(notices).toHaveLength(4);
++    for(let i=0;i<4;i++)expect(notices[i].content).toContain(`job-${i+1} (exit 0`);
++    const envelopes=requests.map(request=>request.messages.find((message:any)=>message.role==='system'&&message.content.startsWith('<session-context'))?.content);
++    expect(new Set(envelopes).size).toBe(1);
++    expect(envelopes[0]).not.toContain('Background jobs');
++    // Completion events arrive after their originating commands, and each
++    // previously sent notice remains in place in subsequent requests.
++    for(const notice of notices) {
++      const first=requests.findIndex(request=>request.messages.some((message:any)=>message.content===notice.content));
++      expect(first).toBeGreaterThan(0);
++      const at=requests[first].messages.findIndex((message:any)=>message.content===notice.content);
++      expect(requests[first].messages.slice(0,at).some((message:any)=>message.role==='tool')).toBe(true);
++      for(const request of requests.slice(first))expect(request.messages.filter((message:any)=>message.content===notice.content)).toHaveLength(1);
++    }
++    const count=notices.length;
++    runner.start(session.id,'Summarize the completed checks.');await runner.whenIdle();
++    expect(store.messages(session.id).filter(message=>message.content.startsWith('Background command completion:'))).toHaveLength(count);
+   });
+ });

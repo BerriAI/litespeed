@@ -1,0 +1,81 @@
+{
+  "createdAt": "2026-09-16T04:00:39.801141+00:00",
+  "protocol": 6,
+  "repetitions": 2,
+  "control": "control",
+  "seed": 31160927,
+  "runs": [
+    {
+      "dataset": "training2",
+      "case": "bedrock-session-tags",
+      "name": "appended-jobs",
+      "label": "replication-v31-jobs-appended-jobs-r2",
+      "commit": "f1fed69e9130dce15f24458a4763040028b96dfb",
+      "effort": "medium"
+    },
+    {
+      "dataset": "training2",
+      "case": "mcp-auth-challenge",
+      "name": "control",
+      "label": "replication-v31-jobs-control-r2",
+      "commit": "e2646a171ea5cef0506f76d797740e5d11632419",
+      "effort": "medium"
+    },
+    {
+      "dataset": "training2",
+      "case": "mcp-auth-challenge",
+      "name": "appended-jobs",
+      "label": "replication-v31-jobs-appended-jobs-r2",
+      "commit": "f1fed69e9130dce15f24458a4763040028b96dfb",
+      "effort": "medium"
+    },
+    {
+      "dataset": "training2",
+      "case": "mcp-auth-challenge",
+      "name": "appended-jobs",
+      "label": "replication-v31-jobs-appended-jobs-r1",
+      "commit": "f1fed69e9130dce15f24458a4763040028b96dfb",
+      "effort": "medium"
+    },
+    {
+      "dataset": "training2",
+      "case": "bedrock-session-tags",
+      "name": "control",
+      "label": "replication-v31-jobs-control-r2",
+      "commit": "e2646a171ea5cef0506f76d797740e5d11632419",
+      "effort": "medium"
+    },
+    {
+      "dataset": "training2",
+      "case": "mcp-auth-challenge",
+      "name": "control",
+      "label": "replication-v31-jobs-control-r1",
+      "commit": "e2646a171ea5cef0506f76d797740e5d11632419",
+      "effort": "medium"
+    },
+    {
+      "dataset": "training2",
+      "case": "bedrock-session-tags",
+      "name": "control",
+      "label": "replication-v31-jobs-control-r1",
+      "commit": "e2646a171ea5cef0506f76d797740e5d11632419",
+      "effort": "medium"
+    },
+    {
+      "dataset": "training2",
+      "case": "bedrock-session-tags",
+      "name": "appended-jobs",
+      "label": "replication-v31-jobs-appended-jobs-r1",
+      "commit": "f1fed69e9130dce15f24458a4763040028b96dfb",
+      "effort": "medium"
+    }
+  ],
+  "hypothesis": "Preserving the initial runtime envelope and appending later command completion notices avoids invalidating the entire tool-history cache prefix while keeping completions visible.",
+  "selectionDataOnly": true,
+  "successNote": "Normal completion and original acceptance, with mechanism activation and token/cost/timing reported separately. Bedrock acceptance includes known unstated error-wording coupling; retain raw scores and disclose it. No reference or reserved outcomes given to solvers.",
+  "execution": {
+    "timeoutSeconds": 900,
+    "sharedSolverConcurrency": 3
+  },
+  "activationNote": "Count persisted Background command completion notices and compare outgoing early-envelope hashes. Token priced cost is whole-task, not pure marginal notification cost. Affinity transport study is separate; this candidate does not alter provider parameters."
+}
