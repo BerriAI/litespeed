@@ -1,0 +1,352 @@
+{
+  "generatedAt": "2026-09-16T21:05:08.856855+00:00",
+  "scope": "Posthoc one-file static diagnostic. Does not change frozen functional scores or selection rule; not a whole-repository CI verdict. All seven snapshots use the same installed basedpyright1.39.7 and interpreter with network denied. CI uses a separately provisioned gate environment and codebase-wide budgets; these counts do not establish its outcome.",
+  "command": "python -m basedpyright --outputjson --pythonpath <same benchmark interpreter> litellm/litellm_core_utils/llm_cost_calc/utils.py",
+  "comparisonMethod": "Additional diagnostics are a multiset difference by exact rule and message versus the historical base; line numbers describe each candidate and are not used for matching.",
+  "sourceSha256": {
+    "base": "861c3b229f98d9a277791c074909901840cac7a92cb86f3eecc6ede986597587",
+    "reference": "8a17c63632d282fe6a6a600b96f6ef54c6e03b3b15f5161aae24b2abaa73b207",
+    "astra-r1": "87f9a049bebb15a64c93d202cd4a441d789ac08489a2181d5673a7f94a312889",
+    "astra-r2": "3a942ad3a9c671fc6fcb77aa5cdfa254a93bbb6f44b0366b2df037805815855a",
+    "flash-r1": "7ce563eb34a2410a41e00f9c741d26becc9f70e0a6c911b15eb6f1301f6af0b4",
+    "flash-r2": "c276f7b1600478cbf14546daa66d2bb9171155a51098889ebe81fc3d8ef670a4",
+    "candidate": "793ba2d3dfcb6c975bbc3f9eafcca161fa348e00657143961f980b6ef9482185"
+  },
+  "observations": [
+    {
+      "variant": "base",
+      "summary": {
+        "filesAnalyzed": 1,
+        "errorCount": 47,
+        "warningCount": 0,
+        "informationCount": 0,
+        "timeInSec": 0.948
+      },
+      "additionalDiagnosticsByRuleAndMessage": []
+    },
+    {
+      "variant": "reference",
+      "summary": {
+        "filesAnalyzed": 1,
+        "errorCount": 47,
+        "warningCount": 0,
+        "informationCount": 0,
+        "timeInSec": 0.978
+      },
+      "additionalDiagnosticsByRuleAndMessage": []
+    },
+    {
+      "variant": "astra-r1",
+      "summary": {
+        "filesAnalyzed": 1,
+        "errorCount": 81,
+        "warningCount": 0,
+        "informationCount": 0,
+        "timeInSec": 0.873
+      },
+      "additionalDiagnosticsByRuleAndMessage": [
+        {
+          "rule": "reportUnknownVariableType",
+          "line": 1221,
+          "message": "Type of \"total_details\" is partially unknown\n\u00a0\u00a0Type of \"total_details\" is \"int | Unknown | float | Any\""
+        },
+        {
+          "rule": "reportOperatorIssue",
+          "line": 1221,
+          "message": "Operator \"+\" not supported for types \"int | CacheCreationTokenDetails | float | object | Any | None\" and \"int | CacheCreationTokenDetails | float | object | Any | None\"\n\u00a0\u00a0Operator \"+\" not supported for types \"int\" and \"CacheCreationTokenDetails\"\n\u00a0\u00a0Operator \"+\" not supported for types \"int\" and \"None\"\n\u00a0\u00a0Operator \"+\" not supported for types \"int\" and \"object\"\n\u00a0\u00a0Operator \"+\" not supported for types \"CacheCreationTokenDetails\" and \"int\"\n\u00a0\u00a0Operator \"+\" not supported for types \"CacheCreationTokenDetails\" and \"CacheCreationTokenDetails\"\n\u00a0\u00a0Operator \"+\" not supported for types \"CacheCreationTokenDetails\" and \"None\"\n\u00a0\u00a0Operator \"+\" not supported for types \"CacheCreationTokenDetails\" and \"float\"\n\u00a0\u00a0Operator \"+\" not supported for types \"CacheCreationTokenDetails\" and \"object\"\n  ..."
+        },
+        {
+          "rule": "reportOperatorIssue",
+          "line": 1221,
+          "message": "Operator \"+\" not supported for types \"int | Unknown | float | Any\" and \"int | CacheCreationTokenDetails | float | object | Any | None\"\n\u00a0\u00a0Operator \"+\" not supported for types \"int\" and \"CacheCreationTokenDetails\"\n\u00a0\u00a0Operator \"+\" not supported for types \"int\" and \"None\"\n\u00a0\u00a0Operator \"+\" not supported for types \"int\" and \"object\"\n\u00a0\u00a0Operator \"+\" not supported for types \"float\" and \"CacheCreationTokenDetails\"\n\u00a0\u00a0Operator \"+\" not supported for types \"float\" and \"None\"\n\u00a0\u00a0Operator \"+\" not supported for types \"float\" and \"object\""
+        },
+        {
+          "rule": "reportOperatorIssue",
+          "line": 1221,
+          "message": "Operator \"+\" not supported for types \"int | Unknown | float | Any\" and \"int | CacheCreationTokenDetails | float | object | Any | None\"\n\u00a0\u00a0Operator \"+\" not supported for types \"int\" and \"CacheCreationTokenDetails\"\n\u00a0\u00a0Operator \"+\" not supported for types \"int\" and \"None\"\n\u00a0\u00a0Operator \"+\" not supported for types \"int\" and \"object\"\n\u00a0\u00a0Operator \"+\" not supported for types \"float\" and \"CacheCreationTokenDetails\"\n\u00a0\u00a0Operator \"+\" not supported for types \"float\" and \"None\"\n\u00a0\u00a0Operator \"+\" not supported for types \"float\" and \"object\""
+        },
+        {
+          "rule": "reportOperatorIssue",
+          "line": 1221,
+          "message": "Operator \"+\" not supported for types \"int | Unknown | float | Any\" and \"int | CacheCreationTokenDetails | float | object | Any | None\"\n\u00a0\u00a0Operator \"+\" not supported for types \"int\" and \"CacheCreationTokenDetails\"\n\u00a0\u00a0Operator \"+\" not supported for types \"int\" and \"None\"\n\u00a0\u00a0Operator \"+\" not supported for types \"int\" and \"object\"\n\u00a0\u00a0Operator \"+\" not supported for types \"float\" and \"CacheCreationTokenDetails\"\n\u00a0\u00a0Operator \"+\" not supported for types \"float\" and \"None\"\n\u00a0\u00a0Operator \"+\" not supported for types \"float\" and \"object\""
+        },
+        {
+          "rule": "reportOperatorIssue",
+          "line": 1221,
+          "message": "Operator \"+\" not supported for types \"int | Unknown | float | Any\" and \"int | CacheCreationTokenDetails | float | object | Any | None\"\n\u00a0\u00a0Operator \"+\" not supported for types \"int\" and \"CacheCreationTokenDetails\"\n\u00a0\u00a0Operator \"+\" not supported for types \"int\" and \"None\"\n\u00a0\u00a0Operator \"+\" not supported for types \"int\" and \"object\"\n\u00a0\u00a0Operator \"+\" not supported for types \"float\" and \"CacheCreationTokenDetails\"\n\u00a0\u00a0Operator \"+\" not supported for types \"float\" and \"None\"\n\u00a0\u00a0Operator \"+\" not supported for types \"float\" and \"object\""
+        },
+        {
+          "rule": "reportUnknownVariableType",
+          "line": 1222,
+          "message": "Type of \"has_double_counting\" is partially unknown\n\u00a0\u00a0Type of \"has_double_counting\" is \"Unknown | bool | Any\""
+        },
+        {
+          "rule": "reportOperatorIssue",
+          "line": 1222,
+          "message": "Operator \">\" not supported for types \"int | CacheCreationTokenDetails | float | object | Any | None\" and \"Literal[0]\"\n\u00a0\u00a0Operator \">\" not supported for types \"CacheCreationTokenDetails\" and \"Literal[0]\"\n\u00a0\u00a0Operator \">\" not supported for types \"None\" and \"Literal[0]\"\n\u00a0\u00a0Operator \">\" not supported for types \"object\" and \"Literal[0]\""
+        },
+        {
+          "rule": "reportOperatorIssue",
+          "line": 1222,
+          "message": "Operator \">\" not supported for types \"int | CacheCreationTokenDetails | float | object | Any | None\" and \"Literal[0]\"\n\u00a0\u00a0Operator \">\" not supported for types \"CacheCreationTokenDetails\" and \"Literal[0]\"\n\u00a0\u00a0Operator \">\" not supported for types \"None\" and \"Literal[0]\"\n\u00a0\u00a0Operator \">\" not supported for types \"object\" and \"Literal[0]\""
+        },
+        {
+          "rule": "reportUnknownVariableType",
+          "line": 1227,
+          "message": "Type of \"uncached_budget\" is partially unknown\n\u00a0\u00a0Type of \"uncached_budget\" is \"int | Unknown | float | Any\""
+        },
+        {
+          "rule": "reportOperatorIssue",
+          "line": 1227,
+          "message": "Operator \"-\" not supported for types \"int\" and \"int | CacheCreationTokenDetails | float | object | Any | None\"\n\u00a0\u00a0Operator \"-\" not supported for types \"int\" and \"CacheCreationTokenDetails\"\n\u00a0\u00a0Operator \"-\" not supported for types \"int\" and \"None\"\n\u00a0\u00a0Operator \"-\" not supported for types \"int\" and \"object\""
+        },
+        {
+          "rule": "reportOperatorIssue",
+          "line": 1227,
+          "message": "Operator \"-\" not supported for types \"int | Unknown | float | Any\" and \"int | CacheCreationTokenDetails | float | object | Any | None\"\n\u00a0\u00a0Operator \"-\" not supported for types \"int\" and \"CacheCreationTokenDetails\" when expected type is \"int | Unknown | float | Any\"\n\u00a0\u00a0Operator \"-\" not supported for types \"int\" and \"None\" when expected type is \"int | Unknown | float | Any\"\n\u00a0\u00a0Operator \"-\" not supported for types \"int\" and \"object\" when expected type is \"int | Unknown | float | Any\"\n\u00a0\u00a0Operator \"-\" not supported for types \"float\" and \"CacheCreationTokenDetails\" when expected type is \"int | Unknown | float | Any\"\n\u00a0\u00a0Operator \"-\" not supported for types \"float\" and \"None\" when expected type is \"int | Unknown | float | Any\"\n\u00a0\u00a0Operator \"-\" not supported for types \"float\" and \"object\" when expected type is \"int | Unknown | float | Any\""
+        },
+        {
+          "rule": "reportUnknownArgumentType",
+          "line": 1227,
+          "message": "Argument type is partially unknown\n\u00a0\u00a0Argument corresponds to parameter \"arg1\" in function \"max\"\n\u00a0\u00a0Argument type is \"int | Unknown | float | Any\""
+        },
+        {
+          "rule": "reportUnknownVariableType",
+          "line": 1228,
+          "message": "Type of \"billable_audio\" is partially unknown\n\u00a0\u00a0Type of \"billable_audio\" is \"int | Unknown | float | Any\""
+        },
+        {
+          "rule": "reportArgumentType",
+          "line": 1228,
+          "message": "Argument of type \"int | CacheCreationTokenDetails | float | object | Any | None\" cannot be assigned to parameter \"arg1\" of type \"SupportsRichComparisonT@min\" in function \"min\"\n\u00a0\u00a0Type \"int | CacheCreationTokenDetails | float | object | Any | None\" is not assignable to type \"SupportsRichComparison\"\n\u00a0\u00a0\u00a0\u00a0Type \"int | CacheCreationTokenDetails | float | object | Any | None\" is not assignable to type \"SupportsRichComparison\"\n\u00a0\u00a0\u00a0\u00a0\u00a0\u00a0Type \"object\" is not assignable to type \"SupportsRichComparison\"\n\u00a0\u00a0\u00a0\u00a0\u00a0\u00a0\u00a0\u00a0\"object\" is incompatible with protocol \"SupportsDunderLT[Any]\"\n\u00a0\u00a0\u00a0\u00a0\u00a0\u00a0\u00a0\u00a0\u00a0\u00a0\"__lt__\" is not present\n\u00a0\u00a0\u00a0\u00a0\u00a0\u00a0\u00a0\u00a0\"object\" is incompatible with protocol \"SupportsDunderGT[Any]\"\n\u00a0\u00a0\u00a0\u00a0\u00a0\u00a0\u00a0\u00a0\u00a0\u00a0\"__gt__\" is not present"
+        },
+        {
+          "rule": "reportUnknownArgumentType",
+          "line": 1228,
+          "message": "Argument type is partially unknown\n\u00a0\u00a0Argument corresponds to parameter \"arg2\" in function \"min\"\n\u00a0\u00a0Argument type is \"int | Unknown | float | Any\""
+        },
+        {
+          "rule": "reportUnknownVariableType",
+          "line": 1229,
+          "message": "Type of \"billable_image\" is partially unknown\n\u00a0\u00a0Type of \"billable_image\" is \"int | Unknown | float | Any\""
+        },
+        {
+          "rule": "reportArgumentType",
+          "line": 1229,
+          "message": "Argument of type \"int | CacheCreationTokenDetails | float | object | Any | None\" cannot be assigned to parameter \"arg1\" of type \"SupportsRichComparisonT@min\" in function \"min\"\n\u00a0\u00a0Type \"int | CacheCreationTokenDetails | float | object | Any | None\" is not assignable to type \"SupportsRichComparison\"\n\u00a0\u00a0\u00a0\u00a0Type \"int | CacheCreationTokenDetails | float | object | Any | None\" is not assignable to type \"SupportsRichComparison\"\n\u00a0\u00a0\u00a0\u00a0\u00a0\u00a0Type \"object\" is not assignable to type \"SupportsRichComparison\"\n\u00a0\u00a0\u00a0\u00a0\u00a0\u00a0\u00a0\u00a0\"object\" is incompatible with protocol \"SupportsDunderLT[Any]\"\n\u00a0\u00a0\u00a0\u00a0\u00a0\u00a0\u00a0\u00a0\u00a0\u00a0\"__lt__\" is not present\n\u00a0\u00a0\u00a0\u00a0\u00a0\u00a0\u00a0\u00a0\"object\" is incompatible with protocol \"SupportsDunderGT[Any]\"\n\u00a0\u00a0\u00a0\u00a0\u00a0\u00a0\u00a0\u00a0\u00a0\u00a0\"__gt__\" is not present"
+        },
+        {
+          "rule": "reportUnknownArgumentType",
+          "line": 1229,
+          "message": "Argument type is partially unknown\n\u00a0\u00a0Argument corresponds to parameter \"arg2\" in function \"min\"\n\u00a0\u00a0Argument type is \"int | Unknown | float | Any\""
+        },
+        {
+          "rule": "reportUnknownVariableType",
+          "line": 1230,
+          "message": "Type of \"billable_video\" is partially unknown\n\u00a0\u00a0Type of \"billable_video\" is \"int | Unknown | float | Any\""
+        },
+        {
+          "rule": "reportArgumentType",
+          "line": 1230,
+          "message": "Argument of type \"int | CacheCreationTokenDetails | float | object | Any | None\" cannot be assigned to parameter \"arg1\" of type \"SupportsRichComparisonT@min\" in function \"min\"\n\u00a0\u00a0Type \"int | CacheCreationTokenDetails | float | object | Any | None\" is not assignable to type \"SupportsRichComparison\"\n\u00a0\u00a0\u00a0\u00a0Type \"int | CacheCreationTokenDetails | float | object | Any | None\" is not assignable to type \"SupportsRichComparison\"\n\u00a0\u00a0\u00a0\u00a0\u00a0\u00a0Type \"object\" is not assignable to type \"SupportsRichComparison\"\n\u00a0\u00a0\u00a0\u00a0\u00a0\u00a0\u00a0\u00a0\"object\" is incompatible with protocol \"SupportsDunderLT[Any]\"\n\u00a0\u00a0\u00a0\u00a0\u00a0\u00a0\u00a0\u00a0\u00a0\u00a0\"__lt__\" is not present\n\u00a0\u00a0\u00a0\u00a0\u00a0\u00a0\u00a0\u00a0\"object\" is incompatible with protocol \"SupportsDunderGT[Any]\"\n\u00a0\u00a0\u00a0\u00a0\u00a0\u00a0\u00a0\u00a0\u00a0\u00a0\"__gt__\" is not present"
+        },
+        {
+          "rule": "reportUnknownArgumentType",
+          "line": 1230,
+          "message": "Argument type is partially unknown\n\u00a0\u00a0Argument corresponds to parameter \"arg2\" in function \"min\"\n\u00a0\u00a0Argument type is \"int | Unknown | float | Any\""
+        },
+        {
+          "rule": "reportGeneralTypeIssues",
+          "line": 1231,
+          "message": "Could not assign item in TypedDict\n\u00a0\u00a0Type \"int | Unknown | float | Any\" is not assignable to type \"int\"\n\u00a0\u00a0\u00a0\u00a0\"float\" is not assignable to \"int\""
+        },
+        {
+          "rule": "reportGeneralTypeIssues",
+          "line": 1232,
+          "message": "Could not assign item in TypedDict\n\u00a0\u00a0Type \"int | Unknown | float | Any\" is not assignable to type \"int\"\n\u00a0\u00a0\u00a0\u00a0\"float\" is not assignable to \"int\""
+        },
+        {
+          "rule": "reportGeneralTypeIssues",
+          "line": 1233,
+          "message": "Could not assign item in TypedDict\n\u00a0\u00a0Type \"int | Unknown | float | Any\" is not assignable to type \"int\"\n\u00a0\u00a0\u00a0\u00a0\"float\" is not assignable to \"int\""
+        },
+        {
+          "rule": "reportGeneralTypeIssues",
+          "line": 1234,
+          "message": "Could not assign item in TypedDict\n\u00a0\u00a0Type \"int | Unknown | float | Any\" is not assignable to type \"int\"\n\u00a0\u00a0\u00a0\u00a0\"float\" is not assignable to \"int\""
+        },
+        {
+          "rule": "reportGeneralTypeIssues",
+          "line": 1237,
+          "message": "Could not assign item in TypedDict\n\u00a0\u00a0Type \"int | Unknown | float | Any\" is not assignable to type \"int\"\n\u00a0\u00a0\u00a0\u00a0\"float\" is not assignable to \"int\""
+        },
+        {
+          "rule": "reportOperatorIssue",
+          "line": 1238,
+          "message": "Operator \"-\" not supported for types \"int\" and \"int | CacheCreationTokenDetails | float | object | Any | None\"\n\u00a0\u00a0Operator \"-\" not supported for types \"int\" and \"CacheCreationTokenDetails\"\n\u00a0\u00a0Operator \"-\" not supported for types \"int\" and \"None\"\n\u00a0\u00a0Operator \"-\" not supported for types \"int\" and \"object\""
+        },
+        {
+          "rule": "reportOperatorIssue",
+          "line": 1238,
+          "message": "Operator \"-\" not supported for types \"int | Unknown | float | Any\" and \"int | CacheCreationTokenDetails | float | object | Any | None\"\n\u00a0\u00a0Operator \"-\" not supported for types \"int\" and \"CacheCreationTokenDetails\"\n\u00a0\u00a0Operator \"-\" not supported for types \"int\" and \"None\"\n\u00a0\u00a0Operator \"-\" not supported for types \"int\" and \"object\"\n\u00a0\u00a0Operator \"-\" not supported for types \"float\" and \"CacheCreationTokenDetails\"\n\u00a0\u00a0Operator \"-\" not supported for types \"float\" and \"None\"\n\u00a0\u00a0Operator \"-\" not supported for types \"float\" and \"object\""
+        },
+        {
+          "rule": "reportOperatorIssue",
+          "line": 1238,
+          "message": "Operator \"-\" not supported for types \"int | Unknown | float | Any\" and \"int | CacheCreationTokenDetails | float | object | Any | None\"\n\u00a0\u00a0Operator \"-\" not supported for types \"int\" and \"CacheCreationTokenDetails\"\n\u00a0\u00a0Operator \"-\" not supported for types \"int\" and \"None\"\n\u00a0\u00a0Operator \"-\" not supported for types \"int\" and \"object\"\n\u00a0\u00a0Operator \"-\" not supported for types \"float\" and \"CacheCreationTokenDetails\"\n\u00a0\u00a0Operator \"-\" not supported for types \"float\" and \"None\"\n\u00a0\u00a0Operator \"-\" not supported for types \"float\" and \"object\""
+        },
+        {
+          "rule": "reportOperatorIssue",
+          "line": 1238,
+          "message": "Operator \"-\" not supported for types \"int | Unknown | float | Any\" and \"int | CacheCreationTokenDetails | float | object | Any | None\"\n\u00a0\u00a0Operator \"-\" not supported for types \"int\" and \"CacheCreationTokenDetails\"\n\u00a0\u00a0Operator \"-\" not supported for types \"int\" and \"None\"\n\u00a0\u00a0Operator \"-\" not supported for types \"int\" and \"object\"\n\u00a0\u00a0Operator \"-\" not supported for types \"float\" and \"CacheCreationTokenDetails\"\n\u00a0\u00a0Operator \"-\" not supported for types \"float\" and \"None\"\n\u00a0\u00a0Operator \"-\" not supported for types \"float\" and \"object\""
+        },
+        {
+          "rule": "reportOperatorIssue",
+          "line": 1238,
+          "message": "Operator \"-\" not supported for types \"int | Unknown | float | Any\" and \"int | CacheCreationTokenDetails | float | object | Any | None\"\n\u00a0\u00a0Operator \"-\" not supported for types \"int\" and \"CacheCreationTokenDetails\" when expected type is \"int | Unknown | float | Any\"\n\u00a0\u00a0Operator \"-\" not supported for types \"int\" and \"None\" when expected type is \"int | Unknown | float | Any\"\n\u00a0\u00a0Operator \"-\" not supported for types \"int\" and \"object\" when expected type is \"int | Unknown | float | Any\"\n\u00a0\u00a0Operator \"-\" not supported for types \"float\" and \"CacheCreationTokenDetails\" when expected type is \"int | Unknown | float | Any\"\n\u00a0\u00a0Operator \"-\" not supported for types \"float\" and \"None\" when expected type is \"int | Unknown | float | Any\"\n\u00a0\u00a0Operator \"-\" not supported for types \"float\" and \"object\" when expected type is \"int | Unknown | float | Any\""
+        },
+        {
+          "rule": "reportUnknownArgumentType",
+          "line": 1238,
+          "message": "Argument type is partially unknown\n\u00a0\u00a0Argument corresponds to parameter \"arg1\" in function \"max\"\n\u00a0\u00a0Argument type is \"int | Unknown | float | Any\""
+        },
+        {
+          "rule": "reportArgumentType",
+          "line": 1257,
+          "message": "Argument of type \"dict[str, int | CacheCreationTokenDetails | float | object | Any | None] | PromptTokensDetailsResult\" cannot be assigned to parameter \"prompt_tokens_details\" of type \"PromptTokensDetailsResult\" in function \"_calculate_input_cost\"\n\u00a0\u00a0Type \"dict[str, int | CacheCreationTokenDetails | float | object | Any | None] | PromptTokensDetailsResult\" is not assignable to type \"PromptTokensDetailsResult\"\n\u00a0\u00a0\u00a0\u00a0\"dict[str, int | CacheCreationTokenDetails | float | object | Any | None]\" is not assignable to \"PromptTokensDetailsResult\""
+        }
+      ]
+    },
+    {
+      "variant": "astra-r2",
+      "summary": {
+        "filesAnalyzed": 1,
+        "errorCount": 48,
+        "warningCount": 0,
+        "informationCount": 0,
+        "timeInSec": 0.908
+      },
+      "additionalDiagnosticsByRuleAndMessage": [
+        {
+          "rule": "reportArgumentType",
+          "line": 1260,
+          "message": "Argument of type \"dict[str, int | CacheCreationTokenDetails | float | object | None]\" cannot be assigned to parameter \"prompt_tokens_details\" of type \"PromptTokensDetailsResult\" in function \"_calculate_input_cost\"\n\u00a0\u00a0\"dict[str, int | CacheCreationTokenDetails | float | object | None]\" is not assignable to \"PromptTokensDetailsResult\""
+        }
+      ]
+    },
+    {
+      "variant": "flash-r1",
+      "summary": {
+        "filesAnalyzed": 1,
+        "errorCount": 53,
+        "warningCount": 0,
+        "informationCount": 0,
+        "timeInSec": 0.863
+      },
+      "additionalDiagnosticsByRuleAndMessage": [
+        {
+          "rule": "reportUnknownArgumentType",
+          "line": 797,
+          "message": "Argument type is unknown\n\u00a0\u00a0Argument corresponds to parameter \"text_tokens\" in function \"__init__\""
+        },
+        {
+          "rule": "reportUnknownArgumentType",
+          "line": 797,
+          "message": "Argument type is unknown\n\u00a0\u00a0Argument corresponds to parameter \"audio_tokens\" in function \"__init__\""
+        },
+        {
+          "rule": "reportUnknownArgumentType",
+          "line": 797,
+          "message": "Argument type is unknown\n\u00a0\u00a0Argument corresponds to parameter \"image_tokens\" in function \"__init__\""
+        },
+        {
+          "rule": "reportGeneralTypeIssues",
+          "line": 817,
+          "message": "\"budget\" is declared as Final and cannot be reassigned"
+        },
+        {
+          "rule": "reportGeneralTypeIssues",
+          "line": 819,
+          "message": "\"budget\" is declared as Final and cannot be reassigned"
+        },
+        {
+          "rule": "reportCallIssue",
+          "line": 1212,
+          "message": "No overloads for \"__init__\" match the provided arguments\n\u00a0\u00a0Argument types: (Literal[0], Literal[0], None, int, Literal[0], Literal[0], Literal[0], Literal[0], Literal[0], float, float, Literal[0])"
+        }
+      ]
+    },
+    {
+      "variant": "flash-r2",
+      "summary": {
+        "filesAnalyzed": 1,
+        "errorCount": 50,
+        "warningCount": 0,
+        "informationCount": 0,
+        "timeInSec": 0.932
+      },
+      "additionalDiagnosticsByRuleAndMessage": [
+        {
+          "rule": "reportGeneralTypeIssues",
+          "line": 935,
+          "message": "A \"Final\" variable cannot be assigned within a loop"
+        },
+        {
+          "rule": "reportGeneralTypeIssues",
+          "line": 936,
+          "message": "A \"Final\" variable cannot be assigned within a loop"
+        },
+        {
+          "rule": "reportGeneralTypeIssues",
+          "line": 938,
+          "message": "\"remaining\" is declared as Final and cannot be reassigned"
+        }
+      ]
+    },
+    {
+      "variant": "candidate",
+      "summary": {
+        "filesAnalyzed": 1,
+        "errorCount": 52,
+        "warningCount": 0,
+        "informationCount": 0,
+        "timeInSec": 1.189
+      },
+      "additionalDiagnosticsByRuleAndMessage": [
+        {
+          "rule": "reportUnknownVariableType",
+          "line": 796,
+          "message": "Type of \"value\" is partially unknown\n\u00a0\u00a0Type of \"value\" is \"Unknown | Any | None\""
+        },
+        {
+          "rule": "reportUnknownMemberType",
+          "line": 796,
+          "message": "Type of \"get\" is partially unknown\n\u00a0\u00a0Type of \"get\" is \"Overload[(key: Unknown, /) -> (Unknown | None), (key: Unknown, default: Unknown, /) -> Unknown, (key: Unknown, default: _T@get, /) -> (Unknown | _T@get)]\""
+        },
+        {
+          "rule": "reportGeneralTypeIssues",
+          "line": 817,
+          "message": "A \"Final\" variable cannot be assigned within a loop"
+        },
+        {
+          "rule": "reportAny",
+          "line": 817,
+          "message": "Argument type is Any\n\u00a0\u00a0Argument corresponds to parameter \"details\" in function \"_cached_modality_token_count\""
+        },
+        {
+          "rule": "reportGeneralTypeIssues",
+          "line": 819,
+          "message": "\"remaining\" is declared as Final and cannot be reassigned"
+        }
+      ]
+    }
+  ],
+  "guidanceDelivery": {
+    "firstRequestContainsRootAGENTSReference": true,
+    "firstRequestContainsFinalRule": false,
+    "firstRequestContainsMutationRule": false,
+    "recordedClaudeReadCallIds": [],
+    "archiveCount": 0,
+    "interpretation": "The harness text told the model to read the referenced CLAUDE file, but its rules were absent from the initial request and no recorded tool arguments opened that file. This does not prove automatically loading it would eliminate the defects. No new guidance-loading candidate has been implemented or evaluated."
+  }
+}
