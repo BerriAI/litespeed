@@ -9,8 +9,11 @@ const engine = await getQuickJS();
 const runtime = engine.newRuntime();
 runtime.setMemoryLimit(limits.memoryBytes);
 runtime.setMaxStackSize(512 * 1024);
-let spent = 0, sliceStart = performance.now(), done = false, nextId = 0, output = '';
-runtime.setInterruptHandler(() => spent + performance.now() - sliceStart > limits.cpuMs);
+let spent = 0, sliceStart = performance.now(), done = false, nextId = 0, output = '', cpuInterrupted = false;
+runtime.setInterruptHandler(() => {
+  if (spent + performance.now() - sliceStart > limits.cpuMs) cpuInterrupted = true;
+  return cpuInterrupted;
+});
 const vm = runtime.newContext();
 const pending = new Map<number, QuickJSDeferredPromise>();
 const append = (text: string) => {
@@ -19,6 +22,9 @@ const append = (text: string) => {
 };
 function finish(error?: string) {
   if (done) return; done = true;
+  // QuickJS can surface a secondary guest error while unwinding an interrupt.
+  // Preserve the actual host stop reason rather than asking the agent to debug it.
+  if (cpuInterrupted) error = 'MCP code execution interrupted by its CPU limit.';
   const bytes = Buffer.from(output), truncated = bytes.length > limits.outputBytes;
   let end = limits.outputBytes;
   if (truncated) while (end > 0 && (bytes[end] & 0xc0) === 0x80) end--;

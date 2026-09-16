@@ -54,6 +54,10 @@ describe('isolated TypeScript MCP execution', () => {
     expect(await run('return "still usable";')).toContain('still usable');
   });
 
+  it('preserves an ordinary guest TypeError when the CPU interrupt did not fire', async () => {
+    await expect(run('({}).missing();')).rejects.toThrow(/not a function/i);
+  });
+
   it('bounds guest memory and reports invalid syntax without making calls', async () => {
     const invoke = vi.fn<McpCodeOptions['invoke']>();
     await expect(run('const x = ; await tools.write({});', { names: ['write'], invoke })).rejects.toThrow();
