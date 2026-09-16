@@ -55,7 +55,7 @@ Request-level cost analysis found that completed background jobs repeatedly chan
 
 ## Evaluation status
 
-A [feature-removal study](../scripts/litellm-harness/studies/feature-removal/README.md) compares the current harness with no learned guides, no automatic initial map, no forced final review, and a 480-line default read window. The plan uses 16 qualified training/development tasks, five variants, and two repetitions, with randomized order. Frozen worktrees preserve each candidate. Outcomes select the next candidate; they are not final test results. The linked catalogs and patches reconstruct the inputs.
+A [feature-removal study](../scripts/litellm-harness/studies/feature-removal/README.md) compares the frozen version-17 harness with no learned guides, no automatic initial map, no forced final review, and a 480-line default read window. The plan uses 16 qualified training/development tasks, five variants, and two repetitions, with randomized order. Frozen worktrees preserve each candidate. Outcomes select the next candidate; they are not final test results. The linked catalogs and patches reconstruct the inputs.
 
 The Bedrock session-tags oracle requires exact error wording absent from the solver prompt. In one 27/34 run, six failures were this wording mismatch; the remaining failure was tuple versus list, which the prompt did specify. Its host oracle note had incorrectly claimed both contracts were supplied. The active study retains its original inputs and raw scores, with this interpretation correction. The router-strategy oracle also includes a new private-helper assertion.
 
