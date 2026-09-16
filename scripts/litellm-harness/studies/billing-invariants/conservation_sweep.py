@@ -58,9 +58,12 @@ for index, (text, audio, cached_text, cached_audio, writes) in enumerate(cases):
             actual = generic_cost_per_token(model=model, usage=usage, custom_llm_provider='openai')[0]
             breakdown = get_token_type_cost_breakdown(model=model, usage=usage, custom_llm_provider='openai')
             unchanged = usage.model_dump() == before
+            cache_matches = (breakdown.cache_read_cost is None and expected_cache == 0) or (
+                isinstance(breakdown.cache_read_cost, (int, float))
+                and math.isclose(breakdown.cache_read_cost, expected_cache, rel_tol=1e-9, abs_tol=1e-12))
             row.update(inputCost=actual, cacheReadCost=breakdown.cache_read_cost, inputsUnchanged=unchanged,
                        passedArithmetic=math.isclose(actual, expected, rel_tol=1e-9, abs_tol=1e-12)
-                           and math.isclose(breakdown.cache_read_cost, expected_cache, rel_tol=1e-9, abs_tol=1e-12))
+                           and cache_matches)
             row['pass'] = row['passedArithmetic'] and unchanged
         except Exception as error:
             row.update({'pass': False, 'error': type(error).__name__})
