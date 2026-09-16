@@ -131,3 +131,11 @@ Export the original fixed study with `report.py OUTPUT_DIRECTORY` after its anal
 For a predeclared feature-removal plan, `study.py CAMPAIGN_DIRECTORY PLAN_JSON OUTPUT_JSON` matches only its named trials and verifies their frozen commits, protocol and effort. It compares complete repeated pairs by task; missing attempts do not become successes or zero-cost results. The task bootstrap is descriptive development evidence, not an automatic promotion rule. `analyze.py` also records whether initial maps, learned guides and final review appeared in the trace. It counts effective read limits, but cannot distinguish model-selected limits from host-injected defaults in historical traces. Preserve that uncertainty when attributing an outcome to a mechanism.
 
 The current [160-trial feature study](studies/feature-removal/README.md) includes its frozen order, task catalogs, qualification records and source patches for reconstructing the variants.
+
+### Per-response cost attribution
+
+`analyze.py` exports `actionUsage`: recorded assistant requests grouped by their chosen next action (navigation, structured edit, shell/check command, job polling/wait, mixed tools, other tool, or text). Mixed replies count once. Estimates use the campaign's fixed token prices, with missing cache counters explicitly counted; the gateway ledger remains the spending authority. These groups assign the **whole request**, including its existing input history, to the reply's action. They are not the marginal cost of executing a tool or an estimate of savings from removing it.
+
+The report reconciles attributed token/cost totals with the recorded request-usage breakdown. Missing or invalid receipts, and positive or negative differences, remain visible. Compaction or canceled requests are not silently allocated to a tool family. Raw arguments, source, commands and reasoning are excluded from the public export.
+
+The [background-retrieval oracle audit](studies/background-router-oracle/README.md) documents a reference test double coupled to one router lookup method. Original scores remain intact; a real-router diagnostic distinguishes the measured failure from an actual missing retrieval behavior.

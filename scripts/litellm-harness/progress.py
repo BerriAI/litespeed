@@ -20,7 +20,7 @@ fields = ['run', 'id', 'kind', 'label', 'promptRevision', 'snapshotRevision', 'h
           'recovered', 'durationIncomplete', 'repairParent', 'requests', 'reportedRequests',
           'inputTokens', 'cachedTokens', 'outputTokens', 'computedUsd', 'acceptance',
           'toolCounts', 'exactRepeatedCalls', 'toolOutputCharacters', 'toolActiveSeconds',
-          'modelSeconds', 'timeToFirstEditSeconds', 'reviewStartedSeconds', 'reviewModelRequests', 'activations',
+          'modelSeconds', 'actionUsage', 'timeToFirstEditSeconds', 'reviewStartedSeconds', 'reviewModelRequests', 'activations',
           'fixturePlugins', 'fixtureProfileHash']
 runs = []
 for dataset in datasets:

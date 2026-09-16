@@ -1,0 +1,34 @@
+{
+  "scope": "Posthoc training oracle audit; original acceptance and frozen study inputs unchanged",
+  "base": "08b60c409a0b556efb6bbe6470402a4530666870",
+  "reference": "3caa3b60d5a319efa78871198081783dd4c70ad1",
+  "candidateRun": "replication-v24-features-high-r1-background-responses-pipeline-4c64c9b6",
+  "probeSha256": "a73178f8c82a4eeead5c2606754e193d83d24e9703af50e330e172246e8b13dd",
+  "method": "Copies of the recorded full base, reference validation and candidate acceptance snapshots; original reference test file overlaid; same retrieval assertion with only the router test double replaced by an actual Router. offline-pytest.py disables network and adjacent bytecode, checks all imported LiteLLM module origins.",
+  "results": [
+    {
+      "name": "base",
+      "tests": 1,
+      "failures": 1,
+      "errors": 0,
+      "skipped": 0,
+      "exit": 1
+    },
+    {
+      "name": "reference",
+      "tests": 1,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "exit": 0
+    },
+    {
+      "name": "candidate",
+      "tests": 1,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "exit": 0
+    }
+  ]
+}

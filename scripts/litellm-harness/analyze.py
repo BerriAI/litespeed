@@ -5,6 +5,7 @@ import os
 import re
 from pathlib import Path
 from trace_metrics import activations
+from action_usage import action_usage
 from completion import completion_reason
 from fixtures import fixture_profile_hash
 
@@ -42,6 +43,7 @@ for p in sorted((ROOT/'runs').glob('*/result.json')):
         record['activations']=activations(messages,calls)
         usage=result.get('usage',{})
         record['reportedRequests']=usage.get('reportedRequests')
+        record['actionUsage']=action_usage(messages, usage.get('breakdown', []))
         units=[r['usage'] for r in usage.get('breakdown',[]) if r.get('usage')]
         record.update({'requests':usage.get('requests'),'inputTokens':(sum(x.get('inputTokens',0) for x in units) if units else None),'cachedTokens':(sum(x.get('cachedTokens',0) for x in units) if units else None),'outputTokens':(sum(x.get('outputTokens',0) for x in units) if units else None),'computedUsd':(sum((x.get('inputTokens',0)-x.get('cachedTokens',0))*0.22/1e6+x.get('cachedTokens',0)*0.007/1e6+x.get('outputTokens',0)*0.66/1e6 for x in units) if units else None),'toolCounts':dict(Counter(c['name'] for c in calls)),'toolErrors':[{k:c.get(k) for k in ['name','args','status','output']} for c in calls if c.get('status') in ['error','denied']],'checks':[{'command':c['execution']['command'],'exit':c['execution'].get('exitCode')} for c in calls if c.get('execution',{}).get('checkKey')],'readCharacters':sum(len(c.get('output') or '') for c in calls if c['name'] in ['read_file','grep','glob','litellm_context']),'toolOutputCharacters':sum(len(c.get('output') or '') for c in calls),'bashOutputCharacters':sum(len(c.get('output') or '') for c in calls if c['name'] in ['bash','bash_output']),'finalCharacters':len(result.get('final',''))})
         # Tool calls can overlap. Report both per-tool summed latency and the
