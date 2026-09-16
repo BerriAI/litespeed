@@ -1,0 +1,282 @@
+diff --git a/litellm/litellm_core_utils/litellm_logging.py b/litellm/litellm_core_utils/litellm_logging.py
+index 5fe9432..4dbaef0 100644
+--- a/litellm/litellm_core_utils/litellm_logging.py
++++ b/litellm/litellm_core_utils/litellm_logging.py
+@@ -556,7 +556,14 @@ class Logging(LiteLLMLoggingBaseClass):
+         # ids leaking into a different, later request on the same thread. Sync
+         # support is deferred to a follow-up PR with its own safe-restore
+         # mechanism; async calls (the proxy's only call path) are unaffected.
+-        if supports_correlation_logging:
++        #
++        # litellm.request_correlation_in_logs gates the whole feature. Off (the
++        # default), nothing ever reads trace_id_var/session_id_var (see
++        # CorrelationContextFilter), so skip the stamping entirely - and with it
++        # set_trace_id()/set_session_id()'s control-char stripping and credential
++        # redaction on every Logging object created.
++        self._correlation_logging_enabled: bool = supports_correlation_logging and litellm.request_correlation_in_logs
++        if self._correlation_logging_enabled:
+             set_trace_id(self.litellm_trace_id)
+             set_session_id(self.litellm_session_id)
+         # set_trace_id()/set_session_id() sanitize (strip control chars, bound
+@@ -2453,8 +2460,12 @@ class Logging(LiteLLMLoggingBaseClass):
+         that Task's view of the contextvars, so calling it multiple times
+         (once per Task involved in this attempt) is required, not just safe.
+         """
+-        set_trace_id(self._pre_call_trace_id)
+-        set_session_id(self._pre_call_session_id)
++        # _pre_call_trace_id/_pre_call_session_id were read straight back out of
++        # the contextvars, so they are already sanitized - write them back
++        # directly instead of re-running set_trace_id()/set_session_id()'s
++        # control-char stripping and credential redaction on every restore.
++        trace_id_var.set(self._pre_call_trace_id)
++        session_id_var.set(self._pre_call_session_id)
+ 
+     def _restore_correlation_context_if_unclaimed(self) -> None:
+         """Guarded variant for __del__-triggered cleanup only.
+diff --git a/tests/test_litellm/litellm_core_utils/test_litellm_logging.py b/tests/test_litellm/litellm_core_utils/test_litellm_logging.py
+index 451b740..78a3030 100644
+--- a/tests/test_litellm/litellm_core_utils/test_litellm_logging.py
++++ b/tests/test_litellm/litellm_core_utils/test_litellm_logging.py
+@@ -5221,10 +5221,92 @@ def test_handle_anthropic_messages_parsed_response_logging_preserves_fast_mode_s
+     assert getattr(result.usage, "speed", None) == "fast"
+ 
+ 
+-def test_logging_init_sets_trace_id():
++def test_logging_init_skips_correlation_stamping_when_request_correlation_disabled(
++    monkeypatch: pytest.MonkeyPatch,
++):
++    """With litellm.request_correlation_in_logs off (the default) nothing reads
++    trace_id_var/session_id_var, so Logging.__init__() must not stamp them - and
++    must not pay set_trace_id()/set_session_id()'s control-char stripping and
++    credential redaction cost on every Logging object created."""
++    import litellm._logging as litellm_logging_module
++    from litellm.litellm_core_utils.litellm_logging import Logging
++
++    monkeypatch.setattr(litellm, "request_correlation_in_logs", False)
++    sanitize_calls: list[str] = []
++    monkeypatch.setattr(
++        litellm_logging_module,
++        "_sanitize_correlation_id",
++        lambda value: sanitize_calls.append(value) or value,
++    )
++    trace_id_var.set("")
++    session_id_var.set("")
++
++    log_obj = Logging(
++        model="gpt-3.5-turbo",
++        messages=[{"role": "user", "content": "hi"}],
++        stream=False,
++        call_type="completion",
++        start_time=None,
++        litellm_call_id="call-disabled",
++        function_id="fn-disabled",
++        litellm_trace_id="caller-trace",
++        kwargs={"litellm_session_id": "caller-session"},
++    )
++
++    assert sanitize_calls == []
++    assert trace_id_var.get() == ""
++    assert session_id_var.get() == ""
++    # Only the ambient contextvar stamping is gated - the plain attributes the
++    # StandardLoggingPayload reads stay populated as usual.
++    assert log_obj.litellm_trace_id == "caller-trace"
++    assert log_obj.litellm_session_id == "caller-session"
++    assert log_obj._correlation_logging_enabled is False
++
++
++def test_restore_correlation_context_does_not_resanitize_captured_values(
++    monkeypatch: pytest.MonkeyPatch,
++):
++    """_restore_correlation_context() writes back pre-call values that were read
++    straight out of the contextvars (already sanitized), so it must not re-run
++    sanitization/redaction on them."""
++    import litellm._logging as litellm_logging_module
++    from litellm.litellm_core_utils.litellm_logging import Logging
++
++    monkeypatch.setattr(litellm, "request_correlation_in_logs", True)
++    trace_id_var.set("outer-trace-already-sanitized")
++    session_id_var.set("outer-session-already-sanitized")
++    try:
++        log_obj = Logging(
++            model="gpt-3.5-turbo",
++            messages=[{"role": "user", "content": "hi"}],
++            stream=False,
++            call_type="completion",
++            start_time=None,
++            litellm_call_id="call-restore",
++            function_id="fn-restore",
++            kwargs={"litellm_session_id": "inner-session"},
++        )
++        assert session_id_var.get() == "inner-session"
++
++        def _must_not_be_called(value: str) -> str:
++            raise AssertionError("restore must not re-sanitize already-sanitized values")
++
++        monkeypatch.setattr(litellm_logging_module, "_sanitize_correlation_id", _must_not_be_called)
++
++        log_obj._restore_correlation_context()
++
++        assert trace_id_var.get() == "outer-trace-already-sanitized"
++        assert session_id_var.get() == "outer-session-already-sanitized"
++    finally:
++        trace_id_var.set("")
++        session_id_var.set("")
++
++
++def test_logging_init_sets_trace_id(monkeypatch: pytest.MonkeyPatch):
+     """Logging.__init__() must call set_trace_id with self.litellm_trace_id."""
+     from litellm.litellm_core_utils.litellm_logging import Logging
+ 
++    monkeypatch.setattr(litellm, "request_correlation_in_logs", True)
+     trace_id_var.set("")
+ 
+     log_obj = Logging(
+@@ -5271,10 +5353,11 @@ def test_logging_init_skips_stamping_when_correlation_logging_unsupported():
+     assert log_obj.litellm_session_id == "should-not-be-stamped"
+ 
+ 
+-def test_logging_init_sets_session_id_when_provided():
++def test_logging_init_sets_session_id_when_provided(monkeypatch: pytest.MonkeyPatch):
+     """Logging.__init__() must call set_session_id when litellm_session_id is in kwargs."""
+     from litellm.litellm_core_utils.litellm_logging import Logging
+ 
++    monkeypatch.setattr(litellm, "request_correlation_in_logs", True)
+     session_id_var.set("")
+ 
+     Logging(
+@@ -5290,11 +5373,12 @@ def test_logging_init_sets_session_id_when_provided():
+     assert session_id_var.get() == "my-session-99"
+ 
+ 
+-def test_logging_init_resets_session_id_to_empty_when_absent():
++def test_logging_init_resets_session_id_to_empty_when_absent(monkeypatch: pytest.MonkeyPatch):
+     """When no session_id is in kwargs, Logging.__init__() must reset session_id_var to ""
+     so a prior request's session_id does not leak into subsequent log records."""
+     from litellm.litellm_core_utils.litellm_logging import Logging
+ 
++    monkeypatch.setattr(litellm, "request_correlation_in_logs", True)
+     session_id_var.set("preexisting-sid")
+ 
+     Logging(
+@@ -5310,7 +5394,7 @@ def test_logging_init_resets_session_id_to_empty_when_absent():
+     assert session_id_var.get() == ""
+ 
+ 
+-def test_restore_correlation_context_resets_to_pre_call_value():
++def test_restore_correlation_context_resets_to_pre_call_value(monkeypatch: pytest.MonkeyPatch):
+     """_restore_correlation_context() must put trace_id_var/session_id_var back to
+     whatever they were immediately before this Logging instance was constructed.
+     This is the mechanism that prevents a nested call (e.g. a guardrail's own
+@@ -5318,6 +5402,7 @@ def test_restore_correlation_context_resets_to_pre_call_value():
+     session_id into the outer call's subsequent log lines."""
+     from litellm.litellm_core_utils.litellm_logging import Logging
+ 
++    monkeypatch.setattr(litellm, "request_correlation_in_logs", True)
+     trace_id_var.set("outer-trace")
+     session_id_var.set("outer-session")
+     try:
+@@ -5368,7 +5453,7 @@ def test_restore_correlation_context_safe_to_call_repeatedly():
+ 
+ 
+ @pytest.mark.asyncio
+-async def test_restore_correlation_context_works_across_asyncio_task_boundary():
++async def test_restore_correlation_context_works_across_asyncio_task_boundary(monkeypatch: pytest.MonkeyPatch):
+     """_restore_correlation_context() must succeed even when it's called from a
+     different asyncio Task than the one Logging.__init__() ran in - exactly what
+     happens on litellm's real async success path, where async_success_handler is
+@@ -5385,6 +5470,7 @@ async def test_restore_correlation_context_works_across_asyncio_task_boundary():
+     """
+     from litellm.litellm_core_utils.litellm_logging import Logging
+ 
++    monkeypatch.setattr(litellm, "request_correlation_in_logs", True)
+     trace_id_var.set("outer-trace-cross-task")
+     session_id_var.set("outer-session-cross-task")
+     try:
+diff --git a/tests/test_litellm/litellm_core_utils/test_streaming_handler.py b/tests/test_litellm/litellm_core_utils/test_streaming_handler.py
+index 37e2031..1604882 100644
+--- a/tests/test_litellm/litellm_core_utils/test_streaming_handler.py
++++ b/tests/test_litellm/litellm_core_utils/test_streaming_handler.py
+@@ -4159,12 +4159,13 @@ def test_stream_wrapper_del_never_raises_with_broken_logging_obj():
+     wrapper.__del__()  # must not raise
+ 
+ 
+-def test_stream_wrapper_del_does_not_clobber_a_newer_active_call():
++def test_stream_wrapper_del_does_not_clobber_a_newer_active_call(monkeypatch):
+     """A delayed finalizer must never stomp a different, still-active call's
+     context. If an abandoned stream's __del__ fires late - after a new call
+     has already started in the same Task/thread and claimed the contextvars -
+     unconditionally restoring the abandoned stream's own pre-call snapshot
+     would corrupt the active call's subsequent log lines with stale ids."""
++    monkeypatch.setattr(litellm, "request_correlation_in_logs", True)
+     trace_id_var.set("outer-trace-before-abandoned-call")
+     session_id_var.set("outer-session-before-abandoned-call")
+     try:
+@@ -4250,7 +4251,7 @@ def test_stream_wrapper_del_restores_when_own_session_id_needed_sanitizing():
+         session_id_var.set("")
+ 
+ 
+-def test_stream_wrapper_next_keeps_context_active_through_synthesized_finish_reason_chunk():
++def test_stream_wrapper_next_keeps_context_active_through_synthesized_finish_reason_chunk(monkeypatch):
+     """When the underlying stream ends without ever emitting an explicit
+     finish_reason chunk, __next__ synthesizes one via finish_reason_handler()
+     and returns it. That chunk is still this call's own data - the caller's
+@@ -4261,6 +4262,7 @@ def test_stream_wrapper_next_keeps_context_active_through_synthesized_finish_rea
+     correct, deterministic restore on the very next __next__() call, since
+     completion_stream is already exhausted and immediately re-raises
+     StopIteration."""
++    monkeypatch.setattr(litellm, "request_correlation_in_logs", True)
+     trace_id_var.set("outer-trace-finish-reason")
+     session_id_var.set("outer-session-finish-reason")
+     try:
+@@ -4338,10 +4340,11 @@ def test_stream_wrapper_del_cleans_up_after_synthesized_finish_reason_chunk():
+ 
+ 
+ @pytest.mark.asyncio
+-async def test_stream_wrapper_anext_keeps_context_active_through_synthesized_finish_reason_chunk():
++async def test_stream_wrapper_anext_keeps_context_active_through_synthesized_finish_reason_chunk(monkeypatch):
+     """Async sibling of test_stream_wrapper_next_keeps_context_active_through_synthesized_finish_reason_chunk -
+     _finalize_completed_stream()'s else branch must not restore before
+     returning the synthesized chunk either."""
++    monkeypatch.setattr(litellm, "request_correlation_in_logs", True)
+     trace_id_var.set("outer-trace-anext-finish-reason")
+     session_id_var.set("outer-session-anext-finish-reason")
+     try:
+@@ -4394,6 +4397,7 @@ async def test_stream_wrapper_anext_max_duration_timeout_restores_consumer_corre
+     path as every other failure so the consumer's outer correlation context gets
+     restored - calling the check before entering __anext__()'s try block would
+     let the Timeout bypass that restoration entirely."""
++    monkeypatch.setattr(litellm, "request_correlation_in_logs", True)
+     monkeypatch.setattr(litellm.constants, "LITELLM_MAX_STREAMING_DURATION_SECONDS", 1)
+     trace_id_var.set("outer-trace-max-duration")
+     session_id_var.set("outer-session-max-duration")
+@@ -4434,12 +4438,13 @@ async def test_stream_wrapper_anext_max_duration_timeout_restores_consumer_corre
+ 
+ 
+ @pytest.mark.asyncio
+-async def test_stream_wrapper_aclose_restores_consumer_correlation_context():
++async def test_stream_wrapper_aclose_restores_consumer_correlation_context(monkeypatch):
+     """Explicit early termination (aclose(), e.g. on client disconnect or a
+     router fallback aborting an in-progress stream) must restore the caller's
+     correlation context too - not just __del__'s best-effort GC-timed fallback,
+     since aclose() is normally called deterministically by the consumer/
+     framework, unlike __del__."""
++    monkeypatch.setattr(litellm, "request_correlation_in_logs", True)
+     trace_id_var.set("outer-trace-aclose")
+     session_id_var.set("outer-session-aclose")
+     try:
+@@ -4481,6 +4486,7 @@ async def test_stream_wrapper_aclose_keeps_context_active_through_close_failure_
+     branch logs a debug diagnostic. That log line must still carry the
+     closing stream's own trace_id/session_id - the outer context must not be
+     restored until after the close attempt (and its diagnostic) completes."""
++    monkeypatch.setattr(litellm, "request_correlation_in_logs", True)
+     trace_id_var.set("outer-trace-close-fail")
+     session_id_var.set("outer-session-close-fail")
+     try:
+@@ -4541,6 +4547,7 @@ def test_handle_stream_fallback_error_restores_context_only_after_exception_mapp
+     mapping. The consumer's outer context must not be restored until that
+     mapping call returns, or the diagnostic log line would carry the outer
+     (or empty) trace_id/session_id instead of the failing stream's own."""
++    monkeypatch.setattr(litellm, "request_correlation_in_logs", True)
+     trace_id_var.set("outer-trace-fallback")
+     session_id_var.set("outer-session-fallback")
+     try:

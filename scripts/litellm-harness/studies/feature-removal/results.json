@@ -31,11 +31,11 @@
     },
     {
       "variant": "no-review",
-      "evaluated": 16,
+      "evaluated": 17,
       "expected": 32,
-      "successes": 13,
-      "meanSeconds": 347.368125,
-      "tokenPricedUsd": 1.48374663,
+      "successes": 14,
+      "meanSeconds": 338.912,
+      "tokenPricedUsd": 1.516041606,
       "trialsWithoutTokenPrice": 0
     },
     {
@@ -4471,7 +4471,45 @@
       "label": "replication-p6-ablation-no-review-r2",
       "commit": "33a4ed86b414245c0b87546551b693ff216888e3",
       "effort": "medium",
-      "evaluated": false
+      "evaluated": true,
+      "success": true,
+      "completed": true,
+      "completionReason": "completed",
+      "seconds": 203.614,
+      "acceptance": {
+        "exit": 0,
+        "tests": 29,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0,
+        "passed": true
+      },
+      "computedUsd": 0.032294976,
+      "activations": {
+        "initialMapNotices": 1,
+        "contextToolCalls": 1,
+        "guideIdsShown": [],
+        "unparsedContextPayloads": 1,
+        "finalReviewNotices": 0,
+        "guidedFinalReviewNotices": 0,
+        "finalReviewGuideIdsShown": [],
+        "batchedEditCalls": 0,
+        "completedBatchedEditCalls": 0,
+        "batchEditsRequested": 0,
+        "batchSizes": [],
+        "backgroundCommandNotices": 0,
+        "testFocusNotices": 0,
+        "explorationFocusNotices": 1,
+        "readCallsByEffectiveLimit": {
+          "160": 1,
+          "200": 1,
+          "260": 1,
+          "180": 1,
+          "70": 1
+        },
+        "defaultWindowReadCalls": null,
+        "readLimitProvenance": "unknown: saved arguments include host-injected defaults"
+      }
     },
     {
       "dataset": "training2",

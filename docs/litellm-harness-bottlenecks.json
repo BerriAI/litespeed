@@ -1,10 +1,10 @@
 {
-  "sourceGeneratedAt": "2026-09-16T10:41:23.018400+00:00",
+  "sourceGeneratedAt": "2026-09-16T10:53:26.656946+00:00",
   "classificationVersion": 2,
   "scope": "Descriptive protocol-6/7 development attempts with recorded Flash usage. Different tasks, candidate versions, isolation protocols and efforts are pooled only to locate spending. Includes paid interruptions and timeouts; excludes zero-usage startup failures. Not a quality comparison or causal estimate. Protocol 6 has the disclosed runtime-artifact access limitation. Missing usage is outside these token-priced totals; the campaign ledger remains authoritative.",
   "protocolCounts": {
-    "6": 197,
-    "7": 13
+    "6": 198,
+    "7": 16
   },
   "runProtocols": {
     "replication-p6-ablation-control-r1-anthropic-image-guardrail-2510a6a3": 6,
@@ -109,6 +109,8 @@
     "replication-v35-inspection-native-inspection-r2-databricks-reasoning-ff61f727": 6,
     "replication-v44-combined-combined-r2-databricks-reasoning-d41ba293": 7,
     "replication-v44-combined-control-r1-databricks-reasoning-d3f77814": 7,
+    "replication-v47-output-control-r1-router-strategy-isolation-dc1b2ede": 7,
+    "replication-v47-output-control-r2-router-strategy-isolation-809e3c6a": 7,
     "replication-v47-output-retain-output-r2-router-strategy-isolation-b21e08d3": 7,
     "replication-p6-ablation-control-r1-bedrock-session-tags-3e02204f": 6,
     "replication-p6-ablation-control-r1-langfuse-session-traces-434c82c9": 6,
@@ -134,6 +136,7 @@
     "replication-p6-ablation-no-review-r1-mcp-optional-discovery-2c5aecde": 6,
     "replication-p6-ablation-no-review-r1-mock-input-tokens-d8a7690f": 6,
     "replication-p6-ablation-no-review-r1-responses-custom-guardrail-51100941": 6,
+    "replication-p6-ablation-no-review-r2-mcp-optional-discovery-f7b41bb6": 6,
     "replication-p6-ablation-read-480-r1-bedrock-session-tags-9710c198": 6,
     "replication-p6-ablation-read-480-r1-langfuse-session-traces-d07240fb": 6,
     "replication-p6-ablation-read-480-r1-mcp-auth-challenge-90d71d3c": 6,
@@ -216,11 +219,12 @@
     "replication-v44-combined-control-r2-legacy-stream-pipeline-78ee2f68": 7,
     "replication-v47-output-control-r1-legacy-stream-pipeline-8377c382": 7,
     "replication-v47-output-control-r2-legacy-stream-pipeline-ffbf9624": 7,
-    "replication-v47-output-retain-output-r2-legacy-stream-pipeline-c15168ea": 7
+    "replication-v47-output-retain-output-r2-legacy-stream-pipeline-c15168ea": 7,
+    "replication-v48-breadth-specialized-r1-correlation-logging-cost-f1105fbb": 7
   },
-  "runs": 210,
+  "runs": 214,
   "completionReasons": {
-    "completed": 181,
+    "completed": 185,
     "timeout": 26,
     "runner-error": 3
   },
@@ -327,6 +331,8 @@
     "replication-v35-inspection-native-inspection-r2-databricks-reasoning-ff61f727",
     "replication-v44-combined-combined-r2-databricks-reasoning-d41ba293",
     "replication-v44-combined-control-r1-databricks-reasoning-d3f77814",
+    "replication-v47-output-control-r1-router-strategy-isolation-dc1b2ede",
+    "replication-v47-output-control-r2-router-strategy-isolation-809e3c6a",
     "replication-v47-output-retain-output-r2-router-strategy-isolation-b21e08d3",
     "replication-p6-ablation-control-r1-bedrock-session-tags-3e02204f",
     "replication-p6-ablation-control-r1-langfuse-session-traces-434c82c9",
@@ -352,6 +358,7 @@
     "replication-p6-ablation-no-review-r1-mcp-optional-discovery-2c5aecde",
     "replication-p6-ablation-no-review-r1-mock-input-tokens-d8a7690f",
     "replication-p6-ablation-no-review-r1-responses-custom-guardrail-51100941",
+    "replication-p6-ablation-no-review-r2-mcp-optional-discovery-f7b41bb6",
     "replication-p6-ablation-read-480-r1-bedrock-session-tags-9710c198",
     "replication-p6-ablation-read-480-r1-langfuse-session-traces-d07240fb",
     "replication-p6-ablation-read-480-r1-mcp-auth-challenge-90d71d3c",
@@ -434,79 +441,80 @@
     "replication-v44-combined-control-r2-legacy-stream-pipeline-78ee2f68",
     "replication-v47-output-control-r1-legacy-stream-pipeline-8377c382",
     "replication-v47-output-control-r2-legacy-stream-pipeline-ffbf9624",
-    "replication-v47-output-retain-output-r2-legacy-stream-pipeline-c15168ea"
+    "replication-v47-output-retain-output-r2-legacy-stream-pipeline-c15168ea",
+    "replication-v48-breadth-specialized-r1-correlation-logging-cost-f1105fbb"
   ],
-  "recordedTokenPricedUsd": 27.784674812000002,
-  "attributedTokenPricedUsd": 27.784674812,
-  "unattributedTokenPricedUsd": 3.552713678800501e-15,
+  "recordedTokenPricedUsd": 28.254694668,
+  "attributedTokenPricedUsd": 28.254694668,
+  "unattributedTokenPricedUsd": 0.0,
   "groups": {
     "shell-command": {
-      "requests": 4206,
-      "estimatedUsd": 7.626599718000001,
-      "inputTokens": 342856695,
-      "cachedTokens": 326374474,
-      "outputTokens": 2599833,
-      "reportedModelSeconds": 23532.434999999994,
+      "requests": 4277,
+      "estimatedUsd": 7.7966052820000025,
+      "inputTokens": 347695585,
+      "cachedTokens": 330729926,
+      "outputTokens": 2650077,
+      "reportedModelSeconds": 24009.244,
       "durationUnreportedRequests": 0,
       "cacheUnreportedRequests": 0
     },
     "navigation": {
-      "requests": 4674,
-      "estimatedUsd": 6.144536025999998,
-      "inputTokens": 275232814,
-      "cachedTokens": 261673758,
-      "outputTokens": 2014890,
-      "reportedModelSeconds": 19166.978000000003,
+      "requests": 4753,
+      "estimatedUsd": 6.238230857999997,
+      "inputTokens": 278632617,
+      "cachedTokens": 264890994,
+      "outputTokens": 2061874,
+      "reportedModelSeconds": 19594.243000000002,
       "durationUnreportedRequests": 0,
       "cacheUnreportedRequests": 0
     },
     "shell-mentions-checks": {
-      "requests": 1654,
-      "estimatedUsd": 4.3619833980000005,
-      "inputTokens": 171260526,
-      "cachedTokens": 158800314,
-      "outputTokens": 771416,
-      "reportedModelSeconds": 7130.344,
+      "requests": 1678,
+      "estimatedUsd": 4.431526962,
+      "inputTokens": 173331291,
+      "cachedTokens": 160652246,
+      "outputTokens": 784199,
+      "reportedModelSeconds": 7254.002,
       "durationUnreportedRequests": 0,
       "cacheUnreportedRequests": 0
     },
     "structured-edit": {
-      "requests": 2366,
-      "estimatedUsd": 4.2099272339999985,
-      "inputTokens": 217381182,
-      "cachedTokens": 210395802,
-      "outputTokens": 1818747,
-      "reportedModelSeconds": 13211.222000000002,
+      "requests": 2397,
+      "estimatedUsd": 4.253240363999999,
+      "inputTokens": 219615936,
+      "cachedTokens": 212574112,
+      "outputTokens": 1842455,
+      "reportedModelSeconds": 13374.335000000001,
       "durationUnreportedRequests": 0,
       "cacheUnreportedRequests": 0
     },
     "job-poll-or-wait": {
-      "requests": 658,
-      "estimatedUsd": 3.7074640559999996,
-      "inputTokens": 73671255,
-      "cachedTokens": 58833448,
-      "outputTokens": 47443,
-      "reportedModelSeconds": 1519.4969999999996,
+      "requests": 672,
+      "estimatedUsd": 3.7598465940000003,
+      "inputTokens": 75045894,
+      "cachedTokens": 60010022,
+      "outputTokens": 48310,
+      "reportedModelSeconds": 1545.1369999999995,
       "durationUnreportedRequests": 0,
       "cacheUnreportedRequests": 0
     },
     "text-only": {
-      "requests": 363,
-      "estimatedUsd": 0.9582925199999994,
-      "inputTokens": 35166987,
-      "cachedTokens": 32888400,
-      "outputTokens": 343613,
-      "reportedModelSeconds": 2941.081,
+      "requests": 371,
+      "estimatedUsd": 0.9918324539999995,
+      "inputTokens": 35956542,
+      "cachedTokens": 33568522,
+      "outputTokens": 350740,
+      "reportedModelSeconds": 3012.365,
       "durationUnreportedRequests": 0,
       "cacheUnreportedRequests": 0
     },
     "mixed-tools": {
-      "requests": 441,
-      "estimatedUsd": 0.6674975980000002,
-      "inputTokens": 18916276,
-      "cachedTokens": 17254254,
-      "outputTokens": 274353,
-      "reportedModelSeconds": 2284.2179999999994,
+      "requests": 445,
+      "estimatedUsd": 0.6750378920000003,
+      "inputTokens": 19050314,
+      "cachedTokens": 17374156,
+      "outputTokens": 279794,
+      "reportedModelSeconds": 2327.118,
       "durationUnreportedRequests": 0,
       "cacheUnreportedRequests": 0
     },
@@ -523,15 +531,15 @@
   },
   "timing": {
     "modelSeconds": {
-      "measuredRuns": 210,
+      "measuredRuns": 214,
       "medianSeconds": 330.111
     },
     "toolActiveSeconds": {
-      "measuredRuns": 210,
+      "measuredRuns": 214,
       "medianSeconds": 81.6905
     },
     "timeToFirstEditSeconds": {
-      "measuredRuns": 210,
+      "measuredRuns": 214,
       "medianSeconds": 142.49450000000002
     }
   }
