@@ -39,17 +39,21 @@ Probe qualification also caught two host-test mistakes before these results: ret
 
 ## Real-adapter checks on other mechanism trials
 
-A [separate posthoc diagnostic](mechanism-probes.json) applies the unchanged qualified 24-case probe to every completed legacy-streaming attempt in the native-inspection and grouped-edit plans. Two planned attempts are still pending. No original study criterion, completion flag or score changes.
+A [separate posthoc diagnostic](mechanism-probes.json) applies the unchanged qualified 24-case probe to all eight legacy-streaming attempts in the native-inspection and grouped-edit plans. No original study criterion, completion flag or score changes.
 
 | Attempt | Original checks | Real checks | Normal completion |
 |---|---:|---:|---|
 | Native inspection, first | 14/16 | 12/24 | Yes |
 | Native inspection, second | 14/16 | 12/24 | No |
 | Native control, first | 16/16 | 24/24 | No |
+| Native control, second | 14/16 | 12/24 | No |
+| Grouped edits, first | 12/16 | 11/24 | Yes |
 | Grouped edits, second | 14/16 | 12/24 | No |
 | Grouped-edit control, first | 16/16 | 24/24 | No |
 | Grouped-edit control, second | 16/16 | 24/24 | No |
 
-The three 12/24 patches pass every direct-hook case across all three protocols; their remaining failures exclude inherited hooks under the task's ambiguous “own hook” wording. These candidates do not have the Responses assembly defect found in the first endpoint-guide trial. The controls pass all selected real checks, but all reach the deadline. A passing patch at cancellation does not establish a normally delivered or fully correct result.
+The four 12/24 patches pass every direct-hook case across all three protocols; their remaining failures exclude inherited hooks under the task's ambiguous “own hook” wording. These patches do not have the Responses assembly defect found in the first endpoint-guide trial. Three controls pass all selected real checks, but all reach the deadline. A passing patch at cancellation does not establish a normally delivered or fully correct result.
 
 The native control fixed inheritance late, observed 37 passing focused tests, and started another check just before cancellation. Both grouped-edit controls were still running additional tests. These observations separate semantic mistakes from delivery-time failures; they do not establish that all further testing was unnecessary. The protocol imposes a 900-second cutoff but does not send a countdown to either solver. Real-adapter coverage and the hard-cutoff delivery metric answer different questions.
+
+The final grouped-edit legacy repetition (`b8cb7b87`) finishes normally at 770.09 seconds with 12/16 original checks and 11/24 real-adapter checks. Direct Chat and Messages pass; direct Responses runs the hook but loses its text rewrite; inherited native hooks do not run. The final native control (`e1c959a3`) times out at 901.24 seconds with 14/16 original and 12/24 real-adapter checks. The [mechanism table](mechanism-probes.json) includes all eight completed attempts. Original scores and timeout distinctions remain unchanged.

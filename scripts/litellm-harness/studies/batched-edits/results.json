@@ -1,14 +1,14 @@
 {
-  "status": "interim",
+  "status": "complete",
   "note": "Development selection only. Interim observed-task means can change as slower trials finish. Bootstrap resamples tasks, not attempts; it does not correct adaptive candidate selection or establish future generalization. Token prices exclude requests without usage and do not replace the campaign ledger.",
   "variants": [
     {
       "variant": "batched-edits",
-      "evaluated": 5,
+      "evaluated": 6,
       "expected": 6,
       "successes": 3,
-      "meanSeconds": 598.3322,
-      "tokenPricedUsd": 1.05595597,
+      "meanSeconds": 626.9576666666667,
+      "tokenPricedUsd": 1.290390916,
       "trialsWithoutTokenPrice": 0
     },
     {
@@ -25,9 +25,9 @@
     {
       "variant": "batched-edits",
       "control": "control",
-      "pairedTasks": 2,
+      "pairedTasks": 3,
       "expectedTasks": 3,
-      "complete": false,
+      "complete": true,
       "pairs": [
         {
           "dataset": "training5",
@@ -40,10 +40,16 @@
           "case": "background-responses-pipeline",
           "successDelta": 0.5,
           "secondsDelta": -52.70850000000007
+        },
+        {
+          "dataset": "training5",
+          "case": "legacy-stream-pipeline",
+          "successDelta": 0,
+          "secondsDelta": -77.9335000000001
         }
       ],
-      "successDelta": 0.25,
-      "secondsDelta": -55.61200000000002,
+      "successDelta": 0.16666666666666666,
+      "secondsDelta": -63.052500000000045,
       "taskBootstrap95": [
         0,
         0.5
@@ -443,7 +449,80 @@
       "label": "replication-v29-edits-batched-edits-r1-oom1",
       "commit": "16bfa137d089a68f8a768f3043b644514b750aea",
       "effort": "medium",
-      "evaluated": false
+      "evaluated": true,
+      "success": false,
+      "completed": true,
+      "completionReason": "completed",
+      "seconds": 770.085,
+      "acceptance": {
+        "exit": 1,
+        "tests": 16,
+        "failures": 4,
+        "errors": 0,
+        "skipped": 0,
+        "passed": false
+      },
+      "computedUsd": 0.234434946,
+      "activations": {
+        "initialMapNotices": 1,
+        "contextToolCalls": 2,
+        "guideIdsShown": [],
+        "unparsedContextPayloads": 0,
+        "finalReviewNotices": 1,
+        "guidedFinalReviewNotices": 0,
+        "finalReviewGuideIdsShown": [],
+        "batchedEditCalls": 17,
+        "completedBatchedEditCalls": 17,
+        "batchEditsRequested": 27,
+        "batchSizes": [
+          1,
+          1,
+          3,
+          3,
+          1,
+          1,
+          3,
+          2,
+          1,
+          1,
+          1,
+          1,
+          2,
+          1,
+          2,
+          1,
+          2
+        ],
+        "backgroundCommandNotices": 0,
+        "testFocusNotices": 1,
+        "explorationFocusNotices": 1,
+        "readCallsByEffectiveLimit": {
+          "200": 1,
+          "340": 1,
+          "160": 2,
+          "100": 2,
+          "120": 5,
+          "260": 1,
+          "220": 2,
+          "70": 4,
+          "80": 2,
+          "50": 2,
+          "40": 4,
+          "30": 3,
+          "60": 5,
+          "245": 1,
+          "130": 1,
+          "35": 1,
+          "140": 1,
+          "420": 1,
+          "18": 1,
+          "45": 1,
+          "12": 1,
+          "15": 1
+        },
+        "defaultWindowReadCalls": null,
+        "readLimitProvenance": "unknown: saved arguments include host-injected defaults"
+      }
     },
     {
       "dataset": "training5",

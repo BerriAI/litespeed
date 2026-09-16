@@ -1,14 +1,14 @@
 {
-  "status": "interim",
+  "status": "complete",
   "note": "Development selection only. Interim observed-task means can change as slower trials finish. Bootstrap resamples tasks, not attempts; it does not correct adaptive candidate selection or establish future generalization. Token prices exclude requests without usage and do not replace the campaign ledger.",
   "variants": [
     {
       "variant": "control",
-      "evaluated": 2,
+      "evaluated": 4,
       "expected": 4,
-      "successes": 1,
-      "meanSeconds": 551.2385,
-      "tokenPricedUsd": 0.434862668,
+      "successes": 2,
+      "meanSeconds": 556.383,
+      "tokenPricedUsd": 0.641372742,
       "trialsWithoutTokenPrice": 0
     },
     {
@@ -25,10 +25,29 @@
     {
       "variant": "native-inspection",
       "control": "control",
-      "pairedTasks": 0,
+      "pairedTasks": 2,
       "expectedTasks": 2,
-      "complete": false,
-      "pairs": []
+      "complete": true,
+      "pairs": [
+        {
+          "dataset": "",
+          "case": "databricks-reasoning",
+          "successDelta": 0,
+          "secondsDelta": 49.680499999999995
+        },
+        {
+          "dataset": "training5",
+          "case": "legacy-stream-pipeline",
+          "successDelta": 0,
+          "secondsDelta": -31.682000000000016
+        }
+      ],
+      "successDelta": 0,
+      "secondsDelta": 8.99924999999999,
+      "taskBootstrap95": [
+        0,
+        0
+      ]
     }
   ],
   "trials": [
@@ -104,7 +123,47 @@
       "label": "replication-v35-inspection-control-r1-envfix-oom1",
       "commit": "58eb44cb6ff1e0142e57cced9eed2e917f28cdb2",
       "effort": "medium",
-      "evaluated": false
+      "evaluated": true,
+      "success": true,
+      "completed": true,
+      "completionReason": "completed",
+      "seconds": 221.817,
+      "acceptance": {
+        "exit": 0,
+        "tests": 6,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0,
+        "passed": true
+      },
+      "computedUsd": 0.033265064000000004,
+      "activations": {
+        "initialMapNotices": 1,
+        "contextToolCalls": 0,
+        "guideIdsShown": [],
+        "unparsedContextPayloads": 0,
+        "finalReviewNotices": 1,
+        "guidedFinalReviewNotices": 0,
+        "finalReviewGuideIdsShown": [],
+        "batchedEditCalls": 0,
+        "completedBatchedEditCalls": 0,
+        "batchEditsRequested": 0,
+        "batchSizes": [],
+        "backgroundCommandNotices": 0,
+        "testFocusNotices": 1,
+        "explorationFocusNotices": 1,
+        "readCallsByEffectiveLimit": {
+          "120": 2,
+          "300": 1,
+          "344": 1,
+          "160": 1,
+          "110": 1,
+          "50": 1,
+          "40": 1
+        },
+        "defaultWindowReadCalls": null,
+        "readLimitProvenance": "unknown: saved arguments include host-injected defaults"
+      }
     },
     {
       "dataset": "training5",
@@ -113,7 +172,63 @@
       "label": "replication-v35-inspection-control-r2-oom1",
       "commit": "58eb44cb6ff1e0142e57cced9eed2e917f28cdb2",
       "effort": "medium",
-      "evaluated": false
+      "evaluated": true,
+      "success": false,
+      "completed": false,
+      "completionReason": "timeout",
+      "seconds": 901.238,
+      "acceptance": {
+        "exit": 1,
+        "tests": 16,
+        "failures": 2,
+        "errors": 0,
+        "skipped": 0,
+        "passed": false
+      },
+      "computedUsd": 0.17324501,
+      "activations": {
+        "initialMapNotices": 1,
+        "contextToolCalls": 0,
+        "guideIdsShown": [],
+        "unparsedContextPayloads": 0,
+        "finalReviewNotices": 0,
+        "guidedFinalReviewNotices": 0,
+        "finalReviewGuideIdsShown": [],
+        "batchedEditCalls": 0,
+        "completedBatchedEditCalls": 0,
+        "batchEditsRequested": 0,
+        "batchSizes": [],
+        "backgroundCommandNotices": 0,
+        "testFocusNotices": 1,
+        "explorationFocusNotices": 1,
+        "readCallsByEffectiveLimit": {
+          "160": 2,
+          "350": 1,
+          "200": 1,
+          "80": 2,
+          "70": 7,
+          "40": 4,
+          "60": 3,
+          "140": 3,
+          "110": 2,
+          "250": 1,
+          "30": 2,
+          "300": 1,
+          "210": 1,
+          "100": 1,
+          "240": 1,
+          "120": 2,
+          "50": 1,
+          "180": 1,
+          "130": 1,
+          "55": 1,
+          "90": 1,
+          "45": 1,
+          "15": 1
+        },
+        "defaultWindowReadCalls": null,
+        "readLimitProvenance": "unknown: saved arguments include host-injected defaults"
+      }
     },
     {
       "dataset": "",

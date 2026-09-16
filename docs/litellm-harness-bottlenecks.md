@@ -1,6 +1,6 @@
 # Where development requests spend tokens
 
-Snapshot: 2026-09-16T08:55:19.326910+00:00. **176 development attempts**, with $23.2698 recorded token-priced usage. Protocol counts: {'6': 175, '7': 1}.
+Snapshot: 2026-09-16T09:28:15.969679+00:00. **185 development attempts**, with $24.4812 recorded token-priced usage. Protocol counts: {'6': 182, '7': 3}.
 
 Descriptive protocol-6/7 development attempts with recorded Flash usage. Different tasks, candidate versions, isolation protocols and efforts are pooled only to locate spending. Includes paid interruptions and timeouts; excludes zero-usage startup failures. Not a quality comparison or causal estimate. Protocol 6 has the disclosed runtime-artifact access limitation. Missing usage is outside these token-priced totals; the campaign ledger remains authoritative.
 
@@ -8,14 +8,14 @@ Each row attributes the complete input/output cost of a model request to its cho
 
 | Next action | Requests | Share of requests | Token-priced cost | Share of attributed cost | Cached input |
 |---|---:|---:|---:|---:|---:|
-| Other shell requests | 3,567 | 29.7% | $6.4319 | 27.6% | 95.2% |
-| Source navigation | 3,886 | 32.3% | $5.1554 | 22.2% | 94.9% |
-| Shell requests mentioning check tools | 1,396 | 11.6% | $3.7993 | 16.3% | 92.2% |
-| Structured edits | 1,935 | 16.1% | $3.3783 | 14.5% | 96.8% |
-| Job polling or waiting | 547 | 4.5% | $3.0935 | 13.3% | 79.6% |
-| Text-only replies | 306 | 2.5% | $0.7818 | 3.4% | 93.9% |
-| Mixed tool families | 352 | 2.9% | $0.5369 | 2.3% | 90.9% |
-| Other tools | 39 | 0.3% | $0.0927 | 0.4% | 95.2% |
+| Other shell requests | 3,729 | 29.3% | $6.7019 | 27.4% | 95.2% |
+| Source navigation | 4,134 | 32.5% | $5.4527 | 22.3% | 95.0% |
+| Shell requests mentioning check tools | 1,486 | 11.7% | $3.9266 | 16.0% | 92.7% |
+| Structured edits | 2,057 | 16.2% | $3.6323 | 14.8% | 96.8% |
+| Job polling or waiting | 580 | 4.6% | $3.2246 | 13.2% | 80.1% |
+| Text-only replies | 320 | 2.5% | $0.8698 | 3.6% | 93.2% |
+| Mixed tool families | 381 | 3.0% | $0.5788 | 2.4% | 91.2% |
+| Other tools | 40 | 0.3% | $0.0946 | 0.4% | 95.2% |
 
 Unattributed recorded cost: $0.000000. Unknown gateway receipts are excluded here and remain reserved in the [campaign ledger summary](litellm-harness-results.md).
 
@@ -23,9 +23,9 @@ Unattributed recorded cost: $0.000000. Unknown gateway receipts are excluded her
 
 | Measurement | Runs with measurement | Median seconds |
 |---|---:|---:|
-| Recorded model-request duration | 176 | 330.6 |
-| Union of active tool intervals | 176 | 80.7 |
-| First recorded edit attempt | 176 | 144.7 |
+| Recorded model-request duration | 185 | 330.8 |
+| Union of active tool intervals | 185 | 83.6 |
+| First recorded edit attempt | 185 | 144.1 |
 
 These are separate medians across varying tasks, not parts of one representative turn. Model/tool intervals can overlap; do not add them to infer wall time. The edit measure includes structured edit attempts, which can fail, and shell calls that record changes. It is not proof of a successful first write.
 

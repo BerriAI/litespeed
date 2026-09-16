@@ -317,62 +317,62 @@
       "rep": 3,
       "arm": "early-envelope",
       "attempt": "original",
-      "completedRequests": 0,
+      "completedRequests": 12,
       "expectedRequests": 12,
       "warmup": {
-        "requests": 0,
-        "validMeasurements": 0,
-        "completeMeasurements": false,
-        "inputTokens": null,
-        "cachedTokens": null,
-        "cacheRatio": null,
-        "inputEstimatedUsd": null,
-        "meanSeconds": null,
-        "allResponsesOK": null
+        "requests": 1,
+        "validMeasurements": 1,
+        "completeMeasurements": true,
+        "inputTokens": 104461,
+        "cachedTokens": 0,
+        "cacheRatio": 0.0,
+        "inputEstimatedUsd": 0.022981420000000002,
+        "meanSeconds": 3.5536203329684213,
+        "allResponsesOK": true
       },
       "postInitial": {
-        "requests": 0,
-        "validMeasurements": 0,
-        "completeMeasurements": false,
-        "inputTokens": null,
-        "cachedTokens": null,
-        "cacheRatio": null,
-        "inputEstimatedUsd": null,
-        "meanSeconds": null,
-        "allResponsesOK": null
+        "requests": 11,
+        "validMeasurements": 11,
+        "completeMeasurements": true,
+        "inputTokens": 1149951,
+        "cachedTokens": 0,
+        "cacheRatio": 0.0,
+        "inputEstimatedUsd": 0.25298922,
+        "meanSeconds": 3.0920437840766017,
+        "allResponsesOK": true
       },
-      "complete": false
+      "complete": true
     },
     {
       "sourceCharacters": 480000,
       "rep": 3,
       "arm": "chronological-event",
       "attempt": "original",
-      "completedRequests": 0,
+      "completedRequests": 12,
       "expectedRequests": 12,
       "warmup": {
-        "requests": 0,
-        "validMeasurements": 0,
-        "completeMeasurements": false,
-        "inputTokens": null,
-        "cachedTokens": null,
-        "cacheRatio": null,
-        "inputEstimatedUsd": null,
-        "meanSeconds": null,
-        "allResponsesOK": null
+        "requests": 1,
+        "validMeasurements": 1,
+        "completeMeasurements": true,
+        "inputTokens": 104464,
+        "cachedTokens": 0,
+        "cacheRatio": 0.0,
+        "inputEstimatedUsd": 0.022982080000000002,
+        "meanSeconds": 3.347770166932605,
+        "allResponsesOK": true
       },
       "postInitial": {
-        "requests": 0,
-        "validMeasurements": 0,
-        "completeMeasurements": false,
-        "inputTokens": null,
-        "cachedTokens": null,
-        "cacheRatio": null,
-        "inputEstimatedUsd": null,
-        "meanSeconds": null,
-        "allResponsesOK": null
+        "requests": 11,
+        "validMeasurements": 11,
+        "completeMeasurements": true,
+        "inputTokens": 1150820,
+        "cachedTokens": 1149104,
+        "cacheRatio": 0.9985088893137067,
+        "inputEstimatedUsd": 0.008421248,
+        "meanSeconds": 2.4138952688822015,
+        "allResponsesOK": true
       },
-      "complete": false
+      "complete": true
     }
   ],
   "comparisons": [
@@ -389,6 +389,13 @@
       "cacheRatioDelta": 0.9985184618766787,
       "inputEstimatedUsdDelta": -0.24457265800000003,
       "meanSecondsDelta": -1.4144243143329565
+    },
+    {
+      "sourceCharacters": 480000,
+      "rep": 3,
+      "cacheRatioDelta": 0.9985088893137067,
+      "inputEstimatedUsdDelta": -0.24456797200000002,
+      "meanSecondsDelta": -0.6781485151944002
     }
   ]
 }

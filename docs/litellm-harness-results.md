@@ -1,6 +1,6 @@
 # LiteLLM harness campaign results
 
-Interim snapshot: 2026-09-16T08:55:19.326910+00:00. Current harness: **2026-09-16.45**.
+Interim snapshot: 2026-09-16T09:28:15.969679+00:00. Current harness: **2026-09-16.45**.
 
 **The campaign is still running. It has not established a quality win over Astra/Codex or production replacement readiness.**
 
@@ -8,7 +8,7 @@ The selectable architecture and replay workbench are implemented. The current wo
 
 ## Spending
 
-Confirmed token/header-priced charges: **$41.9041**. Missing receipts retain **$29.7730** across 118 requests; active requests reserve another **$0.7569**. The committed upper bound is **$72.4340** against the authorized **$100.00** ceiling. Reservations are not actual charges. Astra account billing is unavailable.
+Confirmed token/header-priced charges: **$43.6855**. Missing receipts retain **$29.7730** across 118 requests; active requests reserve another **$0.2523**. The committed upper bound is **$73.7108** against the authorized **$100.00** ceiling. Reservations are not actual charges. Astra account billing is unavailable.
 
 ## Controlled development observations
 
@@ -59,7 +59,9 @@ A [background-retrieval oracle audit](../scripts/litellm-harness/studies/backgro
 
 Request-level cost analysis found that completed background jobs repeatedly changed the runtime envelope before the original user message, invalidating reuse of subsequent tool history despite unchanged system/tool hashes. A [chronological job-event candidate](../scripts/litellm-harness/studies/job-events/README.md) is under evaluation. The separate [session-affinity transport pilot](../scripts/litellm-harness/studies/cache-affinity/README.md) completed all six paired scenarios with no useful improvement from a stable user hint; that change is not promoted. Per-action usage assigns the entire model request to its chosen next action, not marginal tool cost; reconciliation gaps remain visible.
 
-A [real streaming-adapter audit](../scripts/litellm-harness/studies/feature-effort/legacy-inheritance/README.md#real-endpoint-check) qualifies 24 hook/stream checks across Chat Completions, Anthropic Messages and Responses. It narrows a critic's diagnosis: two patches handle direct hooks through chat and Messages but fail real Responses behavior differently. An [endpoint-aware guide](../scripts/litellm-harness/studies/streaming-contract/README.md) is now in a separate predeclared development comparison. No held-out result is used to design that guide.
+A [real streaming-adapter audit](../scripts/litellm-harness/studies/feature-effort/legacy-inheritance/README.md#real-endpoint-check) qualifies 24 hook/stream checks across Chat Completions, Anthropic Messages and Responses. It narrows a critic's diagnosis: two patches handle direct hooks through chat and Messages but fail real Responses behavior differently. The completed [endpoint-aware guide comparison](../scripts/litellm-harness/studies/streaming-contract/README.md) delivers zero strict successes in either arm and costs more with the guide; it is not promoted. No held-out result was used to design that guide.
+
+The completed [inspection-preference comparison](../scripts/litellm-harness/studies/native-inspection/README.md) delivers 2/4 strict successes in each arm, with slightly higher mean time and cost for the preference; it is not promoted. The completed [grouped-edit comparison](../scripts/litellm-harness/studies/batched-edits/README.md) shows lower time and cost on three known tasks, but its raw pass-rate difference is coupled to the background-test design. The [combined comparison](../scripts/litellm-harness/studies/combined-candidate/README.md) remains in progress.
 
 ## Evaluation status
 

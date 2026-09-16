@@ -1,6 +1,6 @@
 # Native inspection preference — predeclared training study
 
-Status: candidate only. The production harness remains v34.
+Status: complete; preference not promoted. Later production fixes are independent of this frozen v34-based comparison.
 
 A legacy-stream training replay made 55 Bash calls, many just to search source. Foreground Bash commands acquire before-and-after bounded workspace snapshots for history even when the command is read-only. Built-in `grep`, `glob`, `read_file` and `litellm_context` already provide focused inspection without these command snapshots.
 
@@ -37,3 +37,9 @@ The search-preference candidate (`826c12f2`) finished normally at 838.45 seconds
 The control's late verification was useful: it wrote an inherited-hook/native-lifecycle test, observed a failure, then fixed its leaf-class assumption. Its timeout occurred during subsequent checks. The candidate retained the same two inherited-hook reference failures seen in earlier training attempts, under the separately documented [ambiguous wording](../feature-effort/legacy-inheritance/README.md). Neither is a normally delivered all-checks-passing attempt. The mechanism remains unpromoted while the planned repetitions finish. [Recorded metrics](first-legacy-pair.json).
 
 The [posthoc real-adapter audit](../feature-effort/legacy-inheritance/README.md#real-adapter-checks-on-other-mechanism-trials) retains the distinction between semantically passing patches at cancellation and normal delivery. It does not replace this study’s original endpoint or deadline.
+
+## Completed comparison
+
+All eight declared replacements and unaffected attempts are complete. Both arms deliver 2/4 strict successes, all on Databricks reasoning. Candidate mean elapsed time is 565.38 seconds versus 556.38 for control; token-priced total is $0.6961 versus $0.6414. The two task-level elapsed differences point in opposite directions: candidate +49.68 seconds on Databricks and −31.68 seconds on legacy streaming. [All measurements](results.json).
+
+The final legacy control reaches 14/16 original and 12/24 real-adapter checks, then times out. Neither arm delivers a normally completed, fully passing legacy patch. The extra inspection preference does not earn promotion: the microbenchmark establishes cheaper individual source inspection, but this small coding comparison establishes neither better delivery nor lower total cost. These are two already inspected training tasks, and protocol 6 retains the [runtime-artifact boundary limitation](../runtime-artifact-isolation/README.md).

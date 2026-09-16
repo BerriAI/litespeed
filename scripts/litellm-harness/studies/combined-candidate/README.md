@@ -1,6 +1,6 @@
 # Prepared combined candidate
 
-**Not promoted.** A separately frozen 16-trial development comparison is queued; the feature combination remains experimental while component and integration comparisons finish.
+**Not promoted.** A separately frozen 16-trial development comparison is running; the feature combination remains experimental while component and integration comparisons finish.
 
 The [patch](candidate.patch) combines grouped edits with chronological background-job notices. It includes the provider gate required for Anthropic and Codex compatibility. It does not add the experimental inspection preference or streaming guide. Browser summaries show the number of edits, and host command notices are collapsed with their full text available in web and terminal.
 
@@ -15,3 +15,13 @@ The [plan](plan.json) fixes two repetitions per arm on Databricks reasoning, MCP
 ## Isolation amendment before allocation
 
 The [original protocol-6 plan](plan-v1.json) allocated no trials. The [amendment](protocol7-amendment.json) pins both arms to the corrected runtime-artifact boundary, keeping all tasks and comparison conditions unchanged. The original feature patch and preparation record remain historical. Production subsequently receives the independent v45 final-output delivery correction; the study preserves its frozen v34-based control and candidate, which both precede that correction. Both actual model routes must pass the [isolation smoke](../runtime-artifact-isolation/README.md) before this comparison starts.
+
+## Integrated follow-up with the delivered-output fix
+
+A separate v46 checkout combines the same feature mechanisms with the independent [v45 bookkeeping correction](../final-output-delivery/README.md). The stricter browser assertion fails without that correction and passes with it: final command output is read once, its redundant reminder and extra answer disappear, and review plus whole-turn Undo remain intact. The full suite passes **2,146 tests (1 skipped)**, type checking and build pass, both actual browser flows pass, and the real terminal checks pass. [Pinned record](integration-v46.json) and [patch against the recorded main commit](integration-v46.patch).
+
+This is integration preparation only. The paid 16-trial comparison keeps the earlier declared commits; no version is substituted mid-study.
+
+## First two observations
+
+The combined arm completes MCP authentication normally in 456.05 seconds, passing 52/52 checks for $0.08410 token-priced. Its first legacy-streaming attempt times out at 901.29 seconds with 12/16 original and 11/24 real-adapter checks for $0.16253. These are two candidate observations without their matching controls; they establish neither a comparative gain nor future-task quality. [Interim results](results.json).
