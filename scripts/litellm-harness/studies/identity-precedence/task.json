@@ -1,0 +1,13 @@
+{
+  "id": "langfuse-session-traces",
+  "base": "eb45a088d3d3c255118d0effb41e4613af0907c0",
+  "reference": "fc161faa96a27f16d90d1aee6e4fc0574f679dd9",
+  "prompt": "In litellm's Langfuse integration, when a request's trace id was produced from a session header rather than given explicitly, each call in the session must be logged as its own Langfuse trace instead of upserting one trace per session.\n\nBehavior: In the Langfuse logging path, resolve the trace id used for the Langfuse trace and returned to callers. If no existing trace id is supplied and the incoming trace id is merely a session alias, use the call's litellm_call_id as the trace id (the returned trace_id must equal the trace id used). Session aliases are recognized from litellm_params['proxy_server_request']['headers'] (keys compared case-insensitively): a header whose value equals the trace id and whose name is `x-litellm-session-id`, or matches `x-<...>-session-id` (e.g. `x-session-id`, `x-claude-code-session-id`) when the trace id is at least 8 chars of `[A-Za-z0-9_-]`, or the codex-only names `session-id`, `session_id`, `thread-id`, `conversation_id` under the same 8-char rule when `user-agent` starts with `codex` followed by space, `-`, `_` or `/` (case-insensitive).\n\nKeep the caller's trace id when: no proxy_server_request/headers (or headers is None); an explicit `x-litellm-trace-id` or `langfuse_trace_id` is present (use its supplied value, including one equal to the session alias); the trace id differs from the session id and the `langfuse_session_id` header doesn't equal the session id; or no header value equals the trace id. An explicit `langfuse_existing_trace_id` wins and is used as the trace id.\n\n`langfuse_session_id` sets the trace's session_id; otherwise the metadata session_id is used. If litellm_call_id is empty, keep the session alias as the trace id instead of splitting per call. This applies at both DEFAULT and ERROR levels. Trace session_id/input/output/name are otherwise unchanged from current behavior.",
+  "test_nodes": [
+    "tests/test_litellm/integrations/test_langfuse.py::test_session_header_trace_provenance",
+    "tests/test_litellm/integrations/test_langfuse.py::test_session_header_trace_without_call_id_keeps_session_alias",
+    "tests/test_litellm/integrations/test_langfuse.py::test_sdk_caller_without_request_headers_keeps_its_trace"
+  ],
+  "candidatePatchSha256": "9f23b54cc3b35ce0ebeb6e7a9b69f6ad33ae6a21ca2379b18b2cb15a566d15fa",
+  "probeSha256": "6f58c21b25fc8e87e49ad488d6093a4ee1296b9b6d1802b56920ffcf746cd019"
+}

@@ -1,0 +1,194 @@
+{
+  "scope": "Supplemental training counterexample after original 60/60 acceptance; original oracle and study scores unchanged. Public logger entrypoint, synthetic IDs, fully mocked Langfuse SDK.",
+  "results": {
+    "candidate": {
+      "exit": 0,
+      "rows": [
+        {
+          "level": "DEFAULT",
+          "session": "trace-alpha",
+          "headers": {},
+          "expected": "call-unique",
+          "used": "call-unique",
+          "returned": "call-unique",
+          "pass": true
+        },
+        {
+          "level": "DEFAULT",
+          "session": "session-beta",
+          "headers": {},
+          "expected": "trace-alpha",
+          "used": "call-unique",
+          "returned": "call-unique",
+          "pass": false
+        },
+        {
+          "level": "DEFAULT",
+          "session": "session-beta",
+          "headers": {
+            "langfuse_session_id": "session-beta"
+          },
+          "expected": "call-unique",
+          "used": "call-unique",
+          "returned": "call-unique",
+          "pass": true
+        },
+        {
+          "level": "ERROR",
+          "session": "trace-alpha",
+          "headers": {},
+          "expected": "call-unique",
+          "used": "call-unique",
+          "returned": "call-unique",
+          "pass": true
+        },
+        {
+          "level": "ERROR",
+          "session": "session-beta",
+          "headers": {},
+          "expected": "trace-alpha",
+          "used": "call-unique",
+          "returned": "call-unique",
+          "pass": false
+        },
+        {
+          "level": "ERROR",
+          "session": "session-beta",
+          "headers": {
+            "langfuse_session_id": "session-beta"
+          },
+          "expected": "call-unique",
+          "used": "call-unique",
+          "returned": "call-unique",
+          "pass": true
+        }
+      ]
+    },
+    "base": {
+      "exit": 0,
+      "rows": [
+        {
+          "level": "DEFAULT",
+          "session": "trace-alpha",
+          "headers": {},
+          "expected": "call-unique",
+          "used": "trace-alpha",
+          "returned": "trace-alpha",
+          "pass": false
+        },
+        {
+          "level": "DEFAULT",
+          "session": "session-beta",
+          "headers": {},
+          "expected": "trace-alpha",
+          "used": "trace-alpha",
+          "returned": "trace-alpha",
+          "pass": true
+        },
+        {
+          "level": "DEFAULT",
+          "session": "session-beta",
+          "headers": {
+            "langfuse_session_id": "session-beta"
+          },
+          "expected": "call-unique",
+          "used": "trace-alpha",
+          "returned": "trace-alpha",
+          "pass": false
+        },
+        {
+          "level": "ERROR",
+          "session": "trace-alpha",
+          "headers": {},
+          "expected": "call-unique",
+          "used": "trace-alpha",
+          "returned": "trace-alpha",
+          "pass": false
+        },
+        {
+          "level": "ERROR",
+          "session": "session-beta",
+          "headers": {},
+          "expected": "trace-alpha",
+          "used": "trace-alpha",
+          "returned": "trace-alpha",
+          "pass": true
+        },
+        {
+          "level": "ERROR",
+          "session": "session-beta",
+          "headers": {
+            "langfuse_session_id": "session-beta"
+          },
+          "expected": "call-unique",
+          "used": "trace-alpha",
+          "returned": "trace-alpha",
+          "pass": false
+        }
+      ]
+    },
+    "reference": {
+      "exit": 0,
+      "rows": [
+        {
+          "level": "DEFAULT",
+          "session": "trace-alpha",
+          "headers": {},
+          "expected": "call-unique",
+          "used": "call-unique",
+          "returned": "call-unique",
+          "pass": true
+        },
+        {
+          "level": "DEFAULT",
+          "session": "session-beta",
+          "headers": {},
+          "expected": "trace-alpha",
+          "used": "trace-alpha",
+          "returned": "trace-alpha",
+          "pass": true
+        },
+        {
+          "level": "DEFAULT",
+          "session": "session-beta",
+          "headers": {
+            "langfuse_session_id": "session-beta"
+          },
+          "expected": "call-unique",
+          "used": "call-unique",
+          "returned": "call-unique",
+          "pass": true
+        },
+        {
+          "level": "ERROR",
+          "session": "trace-alpha",
+          "headers": {},
+          "expected": "call-unique",
+          "used": "call-unique",
+          "returned": "call-unique",
+          "pass": true
+        },
+        {
+          "level": "ERROR",
+          "session": "session-beta",
+          "headers": {},
+          "expected": "trace-alpha",
+          "used": "trace-alpha",
+          "returned": "trace-alpha",
+          "pass": true
+        },
+        {
+          "level": "ERROR",
+          "session": "session-beta",
+          "headers": {
+            "langfuse_session_id": "session-beta"
+          },
+          "expected": "call-unique",
+          "used": "call-unique",
+          "returned": "call-unique",
+          "pass": true
+        }
+      ]
+    }
+  }
+}
