@@ -5,6 +5,50 @@ import { spawn } from 'node:child_process';
 import { request } from 'node:http';
 import { expect, it } from 'vitest';
 import { GatewayPause } from '../scripts/litellm-harness/gateway-pause.js';
+import { FLASH_PRICES } from '../scripts/litellm-harness/budget.js';
+
+it('reserves the enforced output cap for future requests without changing old unknown charges',async()=>{
+  const directory=mkdtempSync(join(tmpdir(),'campaign-output-cap-'));
+  const keyFile=join(directory,'key');writeFileSync(keyFile,'test-only-key',{mode:0o600});
+  const old={id:'old-unknown',label:'old',reservedUsd:0.5,chargedUsd:0.5,costKnown:false,status:'settled'};
+  writeFileSync(join(directory,'spend.json'),JSON.stringify({limitUsd:0.74,committedUsd:0.5,records:[old]}));
+  const stub=join(directory,'usage.mjs');
+  writeFileSync(stub,'globalThis.fetch=async(_url,options)=>new Response(JSON.stringify({choices:[],observedMax:JSON.parse(options.body).max_tokens,usage:{prompt_tokens:1,completion_tokens:1}}),{status:200,headers:{"Content-Type":"application/json"}});');
+  const child=spawn(process.execPath,['--import','tsx','--import',stub,'scripts/litellm-harness/gateway.ts'],{
+    env:{PATH:process.env.PATH,LITELLM_CAMPAIGN_DIR:directory,LITELLM_CAMPAIGN_KEY_FILE:keyFile,
+      LITELLM_CAMPAIGN_BASE_URL:'https://127.0.0.1:9',LITELLM_CAMPAIGN_LIMIT_USD:'0.74'},
+    stdio:['ignore','pipe','pipe'],
+  });
+  try {
+    await new Promise<void>((resolve,reject)=>{
+      const timeout=setTimeout(()=>reject(new Error('Gateway did not start.')),5000);
+      child.once('error',error=>{clearTimeout(timeout);reject(error);});
+      child.stdout.once('data',()=>{clearTimeout(timeout);resolve();});
+    });
+    const connection=JSON.parse(readFileSync(join(directory,'connection.json'),'utf8'));
+    const headers={Authorization:`Bearer ${connection.apiKey}`,'Content-Type':'application/json'};
+    const send=(limits:{max_tokens?:number;max_completion_tokens?:number})=>fetch(connection.baseUrl+'/v1/chat/completions',{method:'POST',headers,
+      body:JSON.stringify({model:'fireworks_ai/deepseek-v4p1-flash',messages:[{role:'user',content:'Local output-cap test.'}],...limits})});
+    for(const limits of [{max_tokens:8192},{max_completion_tokens:8192}]){
+      const response=await send(limits);expect(response.status).toBe(200);
+      expect((await response.json()).observedMax).toBe(8192);
+    }
+    for(const limits of [{},{max_tokens:32768},{max_tokens:131072}]){
+      const response=await send(limits);expect(response.status).toBe(403);
+      expect((await response.json()).error.code).toBe('budget_exceeded');
+    }
+    const ledger=JSON.parse(readFileSync(join(directory,'spend.json'),'utf8'));
+    expect(ledger.records).toHaveLength(3);expect(ledger.records[0]).toEqual(old);
+    for(const record of ledger.records.slice(1)){
+      expect(record.reservedUsd).toBeCloseTo(1048576*FLASH_PRICES.input+8192*FLASH_PRICES.output,12);
+      expect(record).toMatchObject({status:'settled',costKnown:true});
+    }
+    expect(ledger.committedUsd).toBeCloseTo(0.5+2*(FLASH_PRICES.input+FLASH_PRICES.output),12);
+  } finally {
+    if(child.exitCode===null){const exited=new Promise<void>(resolve=>child.once('exit',()=>resolve()));child.kill('SIGTERM');await exited;}
+    rmSync(directory,{recursive:true,force:true});
+  }
+},10000);
 
 it('persists a pause across restarts without recording sensitive exception text',()=>{
   const directory=mkdtempSync(join(tmpdir(),'campaign-pause-'));

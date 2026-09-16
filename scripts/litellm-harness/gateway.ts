@@ -21,7 +21,6 @@ const budget=new CampaignBudget(join(directory,'spend.json'),Number(process.env.
 const pause=new GatewayPause(directory);
 const token=randomBytes(24).toString('hex');
 const maxOutput=32768;
-const reservation=1048576*FLASH_PRICES.input+maxOutput*FLASH_PRICES.output;
 const server=createServer(async(req,res)=>{
   if(req.headers.authorization!==`Bearer ${token}`){res.writeHead(401).end();return;}
   if(req.method==='GET'&&req.url==='/status'){res.statusCode=pause.paused?503:200;res.setHeader('Content-Type','application/json');res.end(JSON.stringify({committedUsd:budget.committedUsd,requests:budget.records.length,limitUsd:budget.limitUsd,paused:pause.paused}));return;}
@@ -47,6 +46,9 @@ const server=createServer(async(req,res)=>{
     const label=String(req.headers['x-campaign-label']??workspaceLabel??body.user??'unlabeled').slice(0,150);
     // Another admitted request may have failed while this body was arriving.
     if(pause.paused)throw new Error('Campaign admission paused while receiving the request.');
+    // Keep the full input-window bound, but reserve only the output cap that
+    // this request actually enforces. Historical unknown charges stay intact.
+    const reservation=1048576*FLASH_PRICES.input+body.max_tokens*FLASH_PRICES.output;
     requestId=budget.reserve(label,reservation);
     stage='request-capture';
     writeFileSync(join(directory,'requests',requestId+'.request.json'),JSON.stringify(body),{mode:0o600});

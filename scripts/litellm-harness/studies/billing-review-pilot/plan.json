@@ -1,0 +1,22 @@
+{
+  "createdAt": "2026-09-16T22:15:34.270088+00:00",
+  "statusAtFreeze": "Frozen before either call.",
+  "model": "fireworks_ai/deepseek-v4p1-flash",
+  "reasoningEffort": "medium",
+  "maxOutputTokens": 8192,
+  "retries": 0,
+  "concurrency": 1,
+  "order": [
+    "generic",
+    "conservation"
+  ],
+  "inputSha256": "93c8d0688601a285a74515ed176b9c056fdbca469f7792364dcdc6fd9aec77d2",
+  "sourceSha256": "dcd7febccee07ca886c9c588389f1825b0d08d427ce869d4ffda2efd2d5670c5",
+  "promptSha256": {
+    "generic": "2fa80bee392adeae2e36fcc00691b9ceebc4a3617764b739d6f978a3fdc838d0",
+    "conservation": "59ce3ffc4340358b8afca5e81ec3daa69c7f691d802c631da6ad0c95b51a37aa"
+  },
+  "purpose": "Check whether a fresh bounded review of a known failing training patch can identify an executable billing counterexample that its long-session self-review missed. Compare generic arithmetic review with explicit token-conservation prompting as an exploratory two-call pilot.",
+  "successCriteria": "Nonempty normal completion; independently verify every proposed finding against candidate and merged-reference public billing paths. Record false allegations, incomplete responses and budget stops. No promotion or general quality conclusion from one call per prompt on one known failing patch.",
+  "budget": "Use only existing safe headroom under the unchanged100USD ceiling. For future requests reserve full1048576-token input plus enforced8192-output cap. Retain all186 unknown charges intact. Stop when a full reservation cannot fit or readiness/receipts fail; never retry silently."
+}
