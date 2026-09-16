@@ -11,3 +11,7 @@ The [replay-only configuration patch](replay-config.patch) applies to the pinned
 The original experiment commit identifies a private frozen branch; reproducing it does not require that branch. Start from public PR commit `7faf6883c01fb0191412e03d1e60a2736ae93f39`, apply the [v46 integration patch](../combined-candidate/integration-v46.patch), then apply this study's replay configuration patch. A fresh archive reconstruction byte-matches all 335 checked application/test/runtime files and dependency manifests. [Validation and patch hashes](reconstruction-validation.json). Historical report helpers and archives differ; use the current main workbench for report export.
 
 Install physical dependencies within the reconstructed runtime, then set the per-trial timeout from the plan while invoking the shared workbench's `batch.py`. Record the reconstructed commit under fresh labels in a new local plan; preserve the original plan. Replacements must use new identities and retain any interrupted attempt. The reserved September 15 corpus remains unused.
+
+## First pair observed
+
+The first team-member-budget repetition passes all five checks and finishes normally in both arms: **529.54 seconds / $0.09644** with the standard limit and **642.56 seconds / $0.09841** with the extended limit. Both finish before 900 seconds, so this pair supplies no evidence that additional time caused a success. The second repetitions and streaming pairs remain pending. [Interim results](results.json).

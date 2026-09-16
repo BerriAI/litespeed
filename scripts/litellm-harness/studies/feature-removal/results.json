@@ -13,11 +13,11 @@
     },
     {
       "variant": "no-guides",
-      "evaluated": 16,
+      "evaluated": 17,
       "expected": 32,
-      "successes": 11,
-      "meanSeconds": 363.041,
-      "tokenPricedUsd": 2.04168026,
+      "successes": 12,
+      "meanSeconds": 357.56105882352944,
+      "tokenPricedUsd": 2.097010982,
       "trialsWithoutTokenPrice": 0
     },
     {
@@ -31,20 +31,20 @@
     },
     {
       "variant": "no-review",
-      "evaluated": 17,
+      "evaluated": 18,
       "expected": 32,
-      "successes": 14,
-      "meanSeconds": 338.912,
-      "tokenPricedUsd": 1.516041606,
+      "successes": 15,
+      "meanSeconds": 342.07666666666665,
+      "tokenPricedUsd": 1.597063036,
       "trialsWithoutTokenPrice": 0
     },
     {
       "variant": "read-480",
-      "evaluated": 17,
+      "evaluated": 18,
       "expected": 32,
-      "successes": 13,
-      "meanSeconds": 363.9301176470588,
-      "tokenPricedUsd": 1.5113802920000001,
+      "successes": 14,
+      "meanSeconds": 373.2793888888889,
+      "tokenPricedUsd": 1.618291768,
       "trialsWithoutTokenPrice": 0
     }
   ],
@@ -52,10 +52,21 @@
     {
       "variant": "no-guides",
       "control": "control",
-      "pairedTasks": 0,
+      "pairedTasks": 1,
       "expectedTasks": 16,
       "complete": false,
-      "pairs": []
+      "pairs": [
+        {
+          "dataset": "training2",
+          "case": "mcp-optional-discovery",
+          "successDelta": 0,
+          "secondsDelta": -57.56299999999999
+        }
+      ],
+      "successDelta": 0,
+      "secondsDelta": -57.56299999999999,
+      "taskBootstrap95": null,
+      "uncertaintyNote": "One task cannot estimate variation between tasks; no bootstrap interval is reported."
     },
     {
       "variant": "no-preload",
@@ -4650,7 +4661,51 @@
       "label": "replication-p6-ablation-no-guides-r2",
       "commit": "6d7fbe3e3c5192b6675c2bea2dc0af3913bd1480",
       "effort": "medium",
-      "evaluated": false
+      "evaluated": true,
+      "success": true,
+      "completed": true,
+      "completionReason": "completed",
+      "seconds": 269.882,
+      "acceptance": {
+        "exit": 0,
+        "tests": 29,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0,
+        "passed": true
+      },
+      "computedUsd": 0.055330722,
+      "activations": {
+        "initialMapNotices": 1,
+        "contextToolCalls": 0,
+        "guideIdsShown": [],
+        "unparsedContextPayloads": 0,
+        "finalReviewNotices": 1,
+        "guidedFinalReviewNotices": 0,
+        "finalReviewGuideIdsShown": [],
+        "batchedEditCalls": 0,
+        "completedBatchedEditCalls": 0,
+        "batchEditsRequested": 0,
+        "batchSizes": [],
+        "backgroundCommandNotices": 0,
+        "testFocusNotices": 0,
+        "explorationFocusNotices": 1,
+        "readCallsByEffectiveLimit": {
+          "280": 1,
+          "204": 1,
+          "130": 1,
+          "300": 1,
+          "160": 1,
+          "200": 1,
+          "100": 1,
+          "30": 1,
+          "80": 1,
+          "40": 1,
+          "95": 1
+        },
+        "defaultWindowReadCalls": null,
+        "readLimitProvenance": "unknown: saved arguments include host-injected defaults"
+      }
     },
     {
       "dataset": "training2",
@@ -4659,7 +4714,56 @@
       "label": "replication-p6-ablation-read-480-r2",
       "commit": "9e4af4bde94625d6eeca72efb0b9436e9d4fb43b",
       "effort": "medium",
-      "evaluated": false
+      "evaluated": true,
+      "success": true,
+      "completed": true,
+      "completionReason": "completed",
+      "seconds": 532.217,
+      "acceptance": {
+        "exit": 0,
+        "tests": 52,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0,
+        "passed": true
+      },
+      "computedUsd": 0.106911476,
+      "activations": {
+        "initialMapNotices": 1,
+        "contextToolCalls": 0,
+        "guideIdsShown": [],
+        "unparsedContextPayloads": 0,
+        "finalReviewNotices": 1,
+        "guidedFinalReviewNotices": 0,
+        "finalReviewGuideIdsShown": [],
+        "batchedEditCalls": 0,
+        "completedBatchedEditCalls": 0,
+        "batchEditsRequested": 0,
+        "batchSizes": [],
+        "backgroundCommandNotices": 0,
+        "testFocusNotices": 0,
+        "explorationFocusNotices": 1,
+        "readCallsByEffectiveLimit": {
+          "120": 2,
+          "50": 1,
+          "180": 1,
+          "400": 1,
+          "80": 5,
+          "60": 7,
+          "40": 2,
+          "30": 4,
+          "35": 3,
+          "160": 1,
+          "130": 2,
+          "70": 2,
+          "14": 2,
+          "55": 1,
+          "90": 3,
+          "230": 1
+        },
+        "defaultWindowReadCalls": null,
+        "readLimitProvenance": "unknown: saved arguments include host-injected defaults"
+      }
     },
     {
       "dataset": "training2",
@@ -4668,7 +4772,56 @@
       "label": "replication-p6-ablation-no-review-r2",
       "commit": "33a4ed86b414245c0b87546551b693ff216888e3",
       "effort": "medium",
-      "evaluated": false
+      "evaluated": true,
+      "success": true,
+      "completed": true,
+      "completionReason": "completed",
+      "seconds": 395.876,
+      "acceptance": {
+        "exit": 0,
+        "tests": 52,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0,
+        "passed": true
+      },
+      "computedUsd": 0.08102143,
+      "activations": {
+        "initialMapNotices": 1,
+        "contextToolCalls": 0,
+        "guideIdsShown": [],
+        "unparsedContextPayloads": 0,
+        "finalReviewNotices": 0,
+        "guidedFinalReviewNotices": 0,
+        "finalReviewGuideIdsShown": [],
+        "batchedEditCalls": 0,
+        "completedBatchedEditCalls": 0,
+        "batchEditsRequested": 0,
+        "batchSizes": [],
+        "backgroundCommandNotices": 0,
+        "testFocusNotices": 0,
+        "explorationFocusNotices": 1,
+        "readCallsByEffectiveLimit": {
+          "180": 3,
+          "120": 8,
+          "300": 1,
+          "40": 3,
+          "130": 2,
+          "80": 2,
+          "50": 1,
+          "160": 1,
+          "70": 4,
+          "260": 1,
+          "150": 1,
+          "36": 1,
+          "90": 1,
+          "60": 1,
+          "100": 2,
+          "12": 1
+        },
+        "defaultWindowReadCalls": null,
+        "readLimitProvenance": "unknown: saved arguments include host-injected defaults"
+      }
     },
     {
       "dataset": "training2",

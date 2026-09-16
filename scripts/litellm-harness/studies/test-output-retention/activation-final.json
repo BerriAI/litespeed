@@ -1,0 +1,585 @@
+{
+  "generatedAt": "2026-09-16T11:29:01.182394+00:00",
+  "status": "all eight trials complete; command syntax audit, not a causal waste estimate",
+  "method": "One-based saved-message steps. Count only literal python -m pytest invocations, excluding grep references and heredocs that write pytest tests. A shell filter after a retained log is not classified as direct loss. Static syntax does not inspect nested scripts. Retention-positive candidate commands were inspected manually.",
+  "trials": [
+    {
+      "run": "replication-v47-output-retain-output-r2-router-strategy-isolation-b21e08d3",
+      "name": "retain-output",
+      "case": "router-strategy-isolation",
+      "commands": [
+        {
+          "step": 106,
+          "directOutputFilter": true,
+          "logRetentionSyntax": false,
+          "tracebacksDisabled": false,
+          "shortTracebacks": true
+        },
+        {
+          "step": 108,
+          "directOutputFilter": true,
+          "logRetentionSyntax": false,
+          "tracebacksDisabled": false,
+          "shortTracebacks": false
+        },
+        {
+          "step": 110,
+          "directOutputFilter": true,
+          "logRetentionSyntax": false,
+          "tracebacksDisabled": false,
+          "shortTracebacks": false
+        },
+        {
+          "step": 116,
+          "directOutputFilter": true,
+          "logRetentionSyntax": false,
+          "tracebacksDisabled": false,
+          "shortTracebacks": true
+        },
+        {
+          "step": 119,
+          "directOutputFilter": true,
+          "logRetentionSyntax": false,
+          "tracebacksDisabled": false,
+          "shortTracebacks": true
+        },
+        {
+          "step": 123,
+          "directOutputFilter": true,
+          "logRetentionSyntax": false,
+          "tracebacksDisabled": false,
+          "shortTracebacks": true
+        },
+        {
+          "step": 129,
+          "directOutputFilter": true,
+          "logRetentionSyntax": false,
+          "tracebacksDisabled": false,
+          "shortTracebacks": true
+        },
+        {
+          "step": 135,
+          "directOutputFilter": true,
+          "logRetentionSyntax": false,
+          "tracebacksDisabled": false,
+          "shortTracebacks": true
+        }
+      ],
+      "pytestCommandCount": 8,
+      "directlyFilteredCount": 8,
+      "retentionSyntaxCount": 0,
+      "shortTracebackCount": 6,
+      "outboundInstructionEvidence": [
+        {
+          "position": "first",
+          "requestSha256": "cd84b3637faa33c695131bf61b69b7aa101d1853f590a84098460ea054e71ba4",
+          "instructionPresentInSystemMessage": true
+        },
+        {
+          "position": "last",
+          "requestSha256": "357144993fd7c4dbfbbcf10a5d7bad2e612850fed24180d6216820424199192d",
+          "instructionPresentInSystemMessage": true
+        }
+      ]
+    },
+    {
+      "run": "replication-v47-output-control-r2-legacy-stream-pipeline-ffbf9624",
+      "name": "control",
+      "case": "legacy-stream-pipeline",
+      "commands": [
+        {
+          "step": 166,
+          "directOutputFilter": true,
+          "logRetentionSyntax": false,
+          "tracebacksDisabled": false,
+          "shortTracebacks": false
+        },
+        {
+          "step": 170,
+          "directOutputFilter": true,
+          "logRetentionSyntax": false,
+          "tracebacksDisabled": false,
+          "shortTracebacks": false
+        },
+        {
+          "step": 178,
+          "directOutputFilter": true,
+          "logRetentionSyntax": false,
+          "tracebacksDisabled": false,
+          "shortTracebacks": false
+        },
+        {
+          "step": 202,
+          "directOutputFilter": true,
+          "logRetentionSyntax": false,
+          "tracebacksDisabled": false,
+          "shortTracebacks": false
+        },
+        {
+          "step": 206,
+          "directOutputFilter": true,
+          "logRetentionSyntax": false,
+          "tracebacksDisabled": false,
+          "shortTracebacks": false
+        },
+        {
+          "step": 221,
+          "directOutputFilter": true,
+          "logRetentionSyntax": false,
+          "tracebacksDisabled": false,
+          "shortTracebacks": false
+        },
+        {
+          "step": 233,
+          "directOutputFilter": true,
+          "logRetentionSyntax": false,
+          "tracebacksDisabled": false,
+          "shortTracebacks": false
+        },
+        {
+          "step": 241,
+          "directOutputFilter": true,
+          "logRetentionSyntax": false,
+          "tracebacksDisabled": false,
+          "shortTracebacks": false
+        }
+      ],
+      "pytestCommandCount": 8,
+      "directlyFilteredCount": 8,
+      "retentionSyntaxCount": 0,
+      "shortTracebackCount": 0
+    },
+    {
+      "run": "replication-v47-output-control-r1-legacy-stream-pipeline-8377c382",
+      "name": "control",
+      "case": "legacy-stream-pipeline",
+      "commands": [
+        {
+          "step": 203,
+          "directOutputFilter": true,
+          "logRetentionSyntax": false,
+          "tracebacksDisabled": false,
+          "shortTracebacks": false
+        },
+        {
+          "step": 209,
+          "directOutputFilter": true,
+          "logRetentionSyntax": false,
+          "tracebacksDisabled": false,
+          "shortTracebacks": false
+        },
+        {
+          "step": 213,
+          "directOutputFilter": true,
+          "logRetentionSyntax": false,
+          "tracebacksDisabled": false,
+          "shortTracebacks": false
+        },
+        {
+          "step": 217,
+          "directOutputFilter": true,
+          "logRetentionSyntax": false,
+          "tracebacksDisabled": false,
+          "shortTracebacks": false
+        },
+        {
+          "step": 226,
+          "directOutputFilter": true,
+          "logRetentionSyntax": false,
+          "tracebacksDisabled": false,
+          "shortTracebacks": false
+        },
+        {
+          "step": 248,
+          "directOutputFilter": true,
+          "logRetentionSyntax": false,
+          "tracebacksDisabled": false,
+          "shortTracebacks": false
+        },
+        {
+          "step": 252,
+          "directOutputFilter": true,
+          "logRetentionSyntax": false,
+          "tracebacksDisabled": false,
+          "shortTracebacks": false
+        }
+      ],
+      "pytestCommandCount": 7,
+      "directlyFilteredCount": 7,
+      "retentionSyntaxCount": 0,
+      "shortTracebackCount": 0
+    },
+    {
+      "run": "replication-v47-output-retain-output-r2-legacy-stream-pipeline-c15168ea",
+      "name": "retain-output",
+      "case": "legacy-stream-pipeline",
+      "commands": [
+        {
+          "step": 145,
+          "directOutputFilter": true,
+          "logRetentionSyntax": false,
+          "tracebacksDisabled": false,
+          "shortTracebacks": true
+        },
+        {
+          "step": 163,
+          "directOutputFilter": true,
+          "logRetentionSyntax": false,
+          "tracebacksDisabled": false,
+          "shortTracebacks": true
+        },
+        {
+          "step": 169,
+          "directOutputFilter": true,
+          "logRetentionSyntax": false,
+          "tracebacksDisabled": false,
+          "shortTracebacks": true
+        },
+        {
+          "step": 175,
+          "directOutputFilter": true,
+          "logRetentionSyntax": false,
+          "tracebacksDisabled": false,
+          "shortTracebacks": true
+        },
+        {
+          "step": 178,
+          "directOutputFilter": true,
+          "logRetentionSyntax": false,
+          "tracebacksDisabled": false,
+          "shortTracebacks": false
+        },
+        {
+          "step": 182,
+          "directOutputFilter": true,
+          "logRetentionSyntax": false,
+          "tracebacksDisabled": false,
+          "shortTracebacks": true
+        },
+        {
+          "step": 184,
+          "directOutputFilter": true,
+          "logRetentionSyntax": false,
+          "tracebacksDisabled": false,
+          "shortTracebacks": true
+        },
+        {
+          "step": 188,
+          "directOutputFilter": true,
+          "logRetentionSyntax": false,
+          "tracebacksDisabled": false,
+          "shortTracebacks": true
+        },
+        {
+          "step": 190,
+          "directOutputFilter": true,
+          "logRetentionSyntax": false,
+          "tracebacksDisabled": false,
+          "shortTracebacks": false
+        },
+        {
+          "step": 192,
+          "directOutputFilter": true,
+          "logRetentionSyntax": false,
+          "tracebacksDisabled": false,
+          "shortTracebacks": true
+        },
+        {
+          "step": 194,
+          "directOutputFilter": true,
+          "logRetentionSyntax": false,
+          "tracebacksDisabled": false,
+          "shortTracebacks": false
+        },
+        {
+          "step": 196,
+          "directOutputFilter": true,
+          "logRetentionSyntax": false,
+          "tracebacksDisabled": false,
+          "shortTracebacks": false
+        }
+      ],
+      "pytestCommandCount": 12,
+      "directlyFilteredCount": 12,
+      "retentionSyntaxCount": 0,
+      "shortTracebackCount": 8,
+      "outboundInstructionEvidence": [
+        {
+          "position": "first",
+          "requestSha256": "75171714bfb6528abf9e5665784647ba5f41a7fe4d68bc7c7d348f3c02ead529",
+          "instructionPresentInSystemMessage": true
+        },
+        {
+          "position": "last",
+          "requestSha256": "0bb59e4d8290a0277c0de1524157ddba2fa1724740ab9e128881e8fa700f85a3",
+          "instructionPresentInSystemMessage": true
+        }
+      ]
+    },
+    {
+      "run": "replication-v47-output-control-r1-router-strategy-isolation-dc1b2ede",
+      "name": "control",
+      "case": "router-strategy-isolation",
+      "commands": [
+        {
+          "step": 130,
+          "directOutputFilter": true,
+          "logRetentionSyntax": false,
+          "tracebacksDisabled": false,
+          "shortTracebacks": false
+        },
+        {
+          "step": 132,
+          "directOutputFilter": true,
+          "logRetentionSyntax": false,
+          "tracebacksDisabled": false,
+          "shortTracebacks": false
+        },
+        {
+          "step": 134,
+          "directOutputFilter": true,
+          "logRetentionSyntax": false,
+          "tracebacksDisabled": false,
+          "shortTracebacks": false
+        },
+        {
+          "step": 138,
+          "directOutputFilter": true,
+          "logRetentionSyntax": false,
+          "tracebacksDisabled": false,
+          "shortTracebacks": false
+        },
+        {
+          "step": 151,
+          "directOutputFilter": false,
+          "logRetentionSyntax": true,
+          "tracebacksDisabled": false,
+          "shortTracebacks": false
+        },
+        {
+          "step": 167,
+          "directOutputFilter": true,
+          "logRetentionSyntax": false,
+          "tracebacksDisabled": false,
+          "shortTracebacks": false
+        }
+      ],
+      "pytestCommandCount": 6,
+      "directlyFilteredCount": 5,
+      "retentionSyntaxCount": 1,
+      "shortTracebackCount": 0
+    },
+    {
+      "run": "replication-v47-output-control-r2-router-strategy-isolation-809e3c6a",
+      "name": "control",
+      "case": "router-strategy-isolation",
+      "commands": [
+        {
+          "step": 119,
+          "directOutputFilter": true,
+          "logRetentionSyntax": false,
+          "tracebacksDisabled": false,
+          "shortTracebacks": false
+        },
+        {
+          "step": 123,
+          "directOutputFilter": true,
+          "logRetentionSyntax": false,
+          "tracebacksDisabled": false,
+          "shortTracebacks": false
+        },
+        {
+          "step": 134,
+          "directOutputFilter": true,
+          "logRetentionSyntax": false,
+          "tracebacksDisabled": false,
+          "shortTracebacks": false
+        },
+        {
+          "step": 140,
+          "directOutputFilter": true,
+          "logRetentionSyntax": false,
+          "tracebacksDisabled": false,
+          "shortTracebacks": false
+        },
+        {
+          "step": 151,
+          "directOutputFilter": true,
+          "logRetentionSyntax": false,
+          "tracebacksDisabled": false,
+          "shortTracebacks": false
+        },
+        {
+          "step": 155,
+          "directOutputFilter": true,
+          "logRetentionSyntax": false,
+          "tracebacksDisabled": false,
+          "shortTracebacks": false
+        },
+        {
+          "step": 159,
+          "directOutputFilter": true,
+          "logRetentionSyntax": false,
+          "tracebacksDisabled": false,
+          "shortTracebacks": false
+        }
+      ],
+      "pytestCommandCount": 7,
+      "directlyFilteredCount": 7,
+      "retentionSyntaxCount": 0,
+      "shortTracebackCount": 0
+    },
+    {
+      "run": "replication-v47-output-retain-output-r1-legacy-stream-pipeline-202341d4",
+      "name": "retain-output",
+      "case": "legacy-stream-pipeline",
+      "commands": [
+        {
+          "step": 166,
+          "directOutputFilter": true,
+          "logRetentionSyntax": false,
+          "tracebacksDisabled": false,
+          "shortTracebacks": true
+        },
+        {
+          "step": 170,
+          "directOutputFilter": true,
+          "logRetentionSyntax": false,
+          "tracebacksDisabled": false,
+          "shortTracebacks": true
+        },
+        {
+          "step": 184,
+          "directOutputFilter": true,
+          "logRetentionSyntax": false,
+          "tracebacksDisabled": false,
+          "shortTracebacks": true
+        },
+        {
+          "step": 204,
+          "directOutputFilter": true,
+          "logRetentionSyntax": false,
+          "tracebacksDisabled": false,
+          "shortTracebacks": true
+        },
+        {
+          "step": 209,
+          "directOutputFilter": true,
+          "logRetentionSyntax": false,
+          "tracebacksDisabled": false,
+          "shortTracebacks": true
+        },
+        {
+          "step": 225,
+          "directOutputFilter": true,
+          "logRetentionSyntax": false,
+          "tracebacksDisabled": false,
+          "shortTracebacks": true
+        },
+        {
+          "step": 233,
+          "directOutputFilter": true,
+          "logRetentionSyntax": false,
+          "tracebacksDisabled": false,
+          "shortTracebacks": true
+        }
+      ],
+      "pytestCommandCount": 7,
+      "directlyFilteredCount": 7,
+      "retentionSyntaxCount": 0,
+      "shortTracebackCount": 7,
+      "outboundInstructionEvidence": [
+        {
+          "position": "first",
+          "requestSha256": "d1dd65d0d99db7ef44e2197f0fdcace8058864f68dd1653b8abd11583ee414b5",
+          "instructionPresentInSystemMessage": true
+        },
+        {
+          "position": "last",
+          "requestSha256": "b852bdaaeab3c7b0f629eee35c065a48a5bd158063537b5a0f511c12935e7f84",
+          "instructionPresentInSystemMessage": true
+        }
+      ]
+    },
+    {
+      "run": "replication-v47-output-retain-output-r1-router-strategy-isolation-5ee98ff9",
+      "name": "retain-output",
+      "case": "router-strategy-isolation",
+      "commands": [
+        {
+          "step": 98,
+          "directOutputFilter": true,
+          "logRetentionSyntax": false,
+          "tracebacksDisabled": false,
+          "shortTracebacks": true
+        },
+        {
+          "step": 100,
+          "directOutputFilter": true,
+          "logRetentionSyntax": false,
+          "tracebacksDisabled": false,
+          "shortTracebacks": true
+        },
+        {
+          "step": 106,
+          "directOutputFilter": true,
+          "logRetentionSyntax": false,
+          "tracebacksDisabled": false,
+          "shortTracebacks": true
+        },
+        {
+          "step": 118,
+          "directOutputFilter": true,
+          "logRetentionSyntax": false,
+          "tracebacksDisabled": false,
+          "shortTracebacks": false
+        },
+        {
+          "step": 125,
+          "directOutputFilter": false,
+          "logRetentionSyntax": true,
+          "tracebacksDisabled": true,
+          "shortTracebacks": false
+        },
+        {
+          "step": 136,
+          "directOutputFilter": false,
+          "logRetentionSyntax": true,
+          "tracebacksDisabled": true,
+          "shortTracebacks": false
+        },
+        {
+          "step": 138,
+          "directOutputFilter": true,
+          "logRetentionSyntax": false,
+          "tracebacksDisabled": false,
+          "shortTracebacks": true
+        },
+        {
+          "step": 142,
+          "directOutputFilter": true,
+          "logRetentionSyntax": false,
+          "tracebacksDisabled": false,
+          "shortTracebacks": true
+        }
+      ],
+      "pytestCommandCount": 8,
+      "directlyFilteredCount": 6,
+      "retentionSyntaxCount": 2,
+      "shortTracebackCount": 5,
+      "outboundInstructionEvidence": [
+        {
+          "position": "first",
+          "requestSha256": "7f9708e6e313927cb0dc6a897e8eea6c461858282a12824315a477f44ad69a9e",
+          "instructionPresentInSystemMessage": true
+        },
+        {
+          "position": "last",
+          "requestSha256": "007743a470158919ad52c327745be029cca5e6f3264fd568f2413ac34cd0e001",
+          "instructionPresentInSystemMessage": true
+        }
+      ]
+    }
+  ],
+  "candidateLogObservations": "Only router repetition1 retains output, at steps125 and136 after earlier directly filtered test runs. Both retained runs use --tb=no, so the saved output still omits traceback diagnostics. The commands echo the pytest status and then finish with a display command; they do not propagate that status as the shell exit code."
+}

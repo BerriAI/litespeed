@@ -13,11 +13,11 @@
     },
     {
       "variant": "control",
-      "evaluated": 5,
+      "evaluated": 6,
       "expected": 8,
-      "successes": 3,
-      "meanSeconds": 639.966,
-      "tokenPricedUsd": 0.86025051,
+      "successes": 4,
+      "meanSeconds": 575.5654999999999,
+      "tokenPricedUsd": 0.955675288,
       "trialsWithoutTokenPrice": 0
     }
   ],
@@ -718,7 +718,52 @@
       "effort": "medium",
       "kind": "litellm-specific",
       "timeoutSeconds": 900,
-      "evaluated": false
+      "evaluated": true,
+      "success": true,
+      "completed": true,
+      "completionReason": "completed",
+      "seconds": 253.563,
+      "acceptance": {
+        "exit": 0,
+        "tests": 6,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0,
+        "passed": true
+      },
+      "computedUsd": 0.095424778,
+      "activations": {
+        "initialMapNotices": 1,
+        "contextToolCalls": 0,
+        "guideIdsShown": [],
+        "unparsedContextPayloads": 0,
+        "finalReviewNotices": 1,
+        "guidedFinalReviewNotices": 0,
+        "finalReviewGuideIdsShown": [],
+        "batchedEditCalls": 0,
+        "completedBatchedEditCalls": 0,
+        "batchEditsRequested": 0,
+        "batchSizes": [],
+        "backgroundCommandNotices": 0,
+        "testFocusNotices": 1,
+        "explorationFocusNotices": 1,
+        "readCallsByEffectiveLimit": {
+          "300": 1,
+          "90": 2,
+          "120": 1,
+          "160": 2,
+          "30": 2,
+          "70": 1,
+          "50": 1,
+          "100": 1,
+          "80": 1,
+          "14": 1,
+          "12": 1,
+          "10": 1
+        },
+        "defaultWindowReadCalls": null,
+        "readLimitProvenance": "unknown: saved arguments include host-injected defaults"
+      }
     },
     {
       "dataset": "training5",
