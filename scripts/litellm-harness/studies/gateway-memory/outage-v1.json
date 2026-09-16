@@ -354,40 +354,11 @@
       },
       "study": "feature-effort",
       "replacementLabel": "replication-v24-features-high-r2-oom1"
-    },
-    {
-      "dataset": "training2",
-      "run": "replication-v31-jobs-control-r2-bedrock-session-tags-d8c2c980",
-      "label": "replication-v31-jobs-control-r2",
-      "case": "bedrock-session-tags",
-      "seconds": 595.051,
-      "status": "error",
-      "errors": [
-        "Cannot reach provider. Check the base URL, network, and TLS configuration. The request was not retried; it may have reached the provider."
-      ],
-      "timedOut": false,
-      "gatewayAdmittedRequests": 103,
-      "unpricedRequests": 0,
-      "originalAcceptance": {
-        "exit": 1,
-        "tests": 34,
-        "failures": 5,
-        "errors": 0,
-        "skipped": 0,
-        "passed": false
-      },
-      "study": "job-events",
-      "replacementLabel": "replication-v31-jobs-control-r2-oom1"
     }
   ],
   "declaredAt": "2026-09-16T06:34:41.187134+00:00",
   "replacementOrderSeed": 202609160631,
   "ledgerPreserved": true,
   "additionalUnknownRequests": 2,
-  "primaryReportsUseAmendedPlans": true,
-  "revision": 2,
-  "correction": {
-    "at": "2026-09-16T06:44:29.670030+00:00",
-    "reason": "Completion-time audit also found the third active solver, which was between gateway requests at the crash. It had no pending ledger reservation, so the initial pending-request-based selection missed it. All provider-error completions in the outage window are now checked; sixteen affected allocations total."
-  }
+  "primaryReportsUseAmendedPlans": true
 }
