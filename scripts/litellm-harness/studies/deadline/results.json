@@ -1,24 +1,38 @@
 {
-  "status": "interim",
-  "note": "Development selection only. Interim observed-task means can change as slower trials finish. Bootstrap resamples tasks, not attempts; it does not correct adaptive candidate selection or establish future generalization. Token prices exclude requests without usage and do not replace the campaign ledger.",
+  "status": "infrastructure-interrupted",
+  "note": "Development selection only. Interim observed-task means can change as slower trials finish. Bootstrap resamples tasks, not attempts; it does not correct adaptive candidate selection or establish future generalization. Token prices exclude requests without usage and do not replace the campaign ledger. Original variants retain all raw evaluated results. qualityEligibleVariants and paired comparisons exclude every allocation named in the public host-sleep-transport incident regardless of score; those allocations remain in trials. No replacement result is substituted.",
   "variants": [
     {
       "variant": "extended",
-      "evaluated": 2,
+      "evaluated": 4,
       "expected": 4,
       "successes": 1,
-      "meanSeconds": 837.767,
-      "tokenPricedUsd": 0.345843258,
-      "trialsWithoutTokenPrice": 0
+      "meanSeconds": 570.358,
+      "tokenPricedUsd": 0.401968046,
+      "trialsWithoutTokenPrice": 1
     },
     {
       "variant": "standard",
-      "evaluated": 2,
+      "evaluated": 3,
       "expected": 4,
-      "successes": 1,
-      "meanSeconds": 714.841,
-      "tokenPricedUsd": 0.263761162,
+      "successes": 2,
+      "meanSeconds": 604.6006666666667,
+      "tokenPricedUsd": 0.33373162,
       "trialsWithoutTokenPrice": 0
+    }
+  ],
+  "qualityEligibleVariants": [
+    {
+      "variant": "extended",
+      "eligibleEvaluated": 2,
+      "successes": 1,
+      "incidentAllocations": 2
+    },
+    {
+      "variant": "standard",
+      "eligibleEvaluated": 3,
+      "successes": 2,
+      "incidentAllocations": 1
     }
   ],
   "comparisons": [
@@ -42,6 +56,8 @@
       "kind": "litellm-specific",
       "timeoutSeconds": 1800,
       "evaluated": true,
+      "run": "replication-v49-deadline-extended-r1-team-member-budget-105558fe",
+      "infrastructureIncident": null,
       "success": true,
       "completed": true,
       "completionReason": "completed",
@@ -109,6 +125,8 @@
       "kind": "litellm-specific",
       "timeoutSeconds": 900,
       "evaluated": true,
+      "run": "replication-v49-deadline-standard-r1-team-member-budget-c07abf7b",
+      "infrastructureIncident": null,
       "success": true,
       "completed": true,
       "completionReason": "completed",
@@ -172,6 +190,8 @@
       "kind": "litellm-specific",
       "timeoutSeconds": 900,
       "evaluated": true,
+      "run": "replication-v49-deadline-standard-r1-legacy-stream-pipeline-02e7e50f",
+      "infrastructureIncident": null,
       "success": false,
       "completed": false,
       "completionReason": "timeout",
@@ -251,6 +271,8 @@
       "kind": "litellm-specific",
       "timeoutSeconds": 1800,
       "evaluated": true,
+      "run": "replication-v49-deadline-extended-r1-legacy-stream-pipeline-21ab583c",
+      "infrastructureIncident": null,
       "success": false,
       "completed": true,
       "completionReason": "completed",
@@ -330,7 +352,66 @@
       "effort": "medium",
       "kind": "litellm-specific",
       "timeoutSeconds": 900,
-      "evaluated": false
+      "evaluated": true,
+      "run": "replication-v49-deadline-standard-r2-team-member-budget-7c895857",
+      "infrastructureIncident": null,
+      "success": true,
+      "completed": true,
+      "completionReason": "completed",
+      "seconds": 384.12,
+      "acceptance": {
+        "exit": 0,
+        "tests": 5,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0,
+        "passed": true
+      },
+      "computedUsd": 0.069970458,
+      "activations": {
+        "initialMapNotices": 1,
+        "contextToolCalls": 0,
+        "guideIdsShown": [
+          "budget-cache-reconciliation"
+        ],
+        "unparsedContextPayloads": 0,
+        "finalReviewNotices": 1,
+        "guidedFinalReviewNotices": 0,
+        "finalReviewGuideIdsShown": [],
+        "batchedEditCalls": 3,
+        "completedBatchedEditCalls": 3,
+        "batchEditsRequested": 6,
+        "batchSizes": [
+          2,
+          2,
+          2
+        ],
+        "backgroundCommandNotices": 0,
+        "testFocusNotices": 1,
+        "explorationFocusNotices": 1,
+        "readCallsByEffectiveLimit": {
+          "100": 2,
+          "80": 2,
+          "160": 4,
+          "200": 1,
+          "220": 2,
+          "130": 6,
+          "70": 2,
+          "45": 1,
+          "180": 1,
+          "30": 1,
+          "60": 1,
+          "75": 1,
+          "140": 1,
+          "122": 1,
+          "40": 3,
+          "55": 1,
+          "50": 1,
+          "15": 1
+        },
+        "defaultWindowReadCalls": null,
+        "readLimitProvenance": "unknown: saved arguments include host-injected defaults"
+      }
     },
     {
       "dataset": "",
@@ -341,7 +422,55 @@
       "effort": "medium",
       "kind": "litellm-specific",
       "timeoutSeconds": 1800,
-      "evaluated": false
+      "evaluated": true,
+      "run": "replication-v49-deadline-extended-r2-team-member-budget-dfa198a4",
+      "infrastructureIncident": "host-sleep-transport",
+      "success": false,
+      "completed": false,
+      "completionReason": "runner-error",
+      "seconds": 602.948,
+      "acceptance": {
+        "exit": 0,
+        "tests": 5,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0,
+        "passed": true
+      },
+      "computedUsd": 0.056124788,
+      "activations": {
+        "initialMapNotices": 1,
+        "contextToolCalls": 0,
+        "guideIdsShown": [
+          "budget-cache-reconciliation"
+        ],
+        "unparsedContextPayloads": 0,
+        "finalReviewNotices": 0,
+        "guidedFinalReviewNotices": 0,
+        "finalReviewGuideIdsShown": [],
+        "batchedEditCalls": 1,
+        "completedBatchedEditCalls": 1,
+        "batchEditsRequested": 2,
+        "batchSizes": [
+          2
+        ],
+        "backgroundCommandNotices": 2,
+        "testFocusNotices": 0,
+        "explorationFocusNotices": 1,
+        "readCallsByEffectiveLimit": {
+          "120": 3,
+          "160": 4,
+          "340": 1,
+          "480": 1,
+          "200": 2,
+          "220": 1,
+          "130": 2,
+          "150": 1,
+          "260": 1
+        },
+        "defaultWindowReadCalls": null,
+        "readLimitProvenance": "unknown: saved arguments include host-injected defaults"
+      }
     },
     {
       "dataset": "training5",
@@ -352,7 +481,50 @@
       "effort": "medium",
       "kind": "litellm-specific",
       "timeoutSeconds": 1800,
-      "evaluated": false
+      "evaluated": true,
+      "run": "replication-v49-deadline-extended-r2-legacy-stream-pipeline-0a980fc3",
+      "infrastructureIncident": "host-sleep-transport",
+      "success": false,
+      "completed": false,
+      "completionReason": "runner-error",
+      "seconds": 2.95,
+      "acceptance": {
+        "exit": 1,
+        "tests": 16,
+        "failures": 15,
+        "errors": 0,
+        "skipped": 0,
+        "passed": false
+      },
+      "computedUsd": null,
+      "activations": {
+        "initialMapNotices": 1,
+        "contextToolCalls": 0,
+        "guideIdsShown": [],
+        "unparsedContextPayloads": 0,
+        "finalReviewNotices": 0,
+        "guidedFinalReviewNotices": 0,
+        "finalReviewGuideIdsShown": [],
+        "batchedEditCalls": 0,
+        "completedBatchedEditCalls": 0,
+        "batchEditsRequested": 0,
+        "batchSizes": [],
+        "backgroundCommandNotices": 0,
+        "testFocusNotices": 0,
+        "explorationFocusNotices": 0,
+        "readCallsByEffectiveLimit": {},
+        "defaultWindowReadCalls": null,
+        "readLimitProvenance": "unknown: saved arguments include host-injected defaults"
+      },
+      "originalSuccess": false,
+      "supplemental": {
+        "artifact": "real-stream-probe.json",
+        "checks": 24,
+        "expectedChecks": 24,
+        "checksPassed": 0,
+        "exit": 0,
+        "passed": false
+      }
     },
     {
       "dataset": "training5",
@@ -363,7 +535,9 @@
       "effort": "medium",
       "kind": "litellm-specific",
       "timeoutSeconds": 900,
-      "evaluated": false
+      "evaluated": false,
+      "run": "replication-v49-deadline-standard-r2-legacy-stream-pipeline-6ae33b7e",
+      "infrastructureIncident": "host-sleep-transport"
     }
   ]
 }

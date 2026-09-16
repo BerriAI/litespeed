@@ -1,5 +1,7 @@
 # Full-query scope and explicit symbol ranking
 
+**Infrastructure interruption:** 0 unaffected evaluated allocations; 4 allocations affected by the [host-sleep/transport incident](../host-sleep-transport/README.md). Original scores remain in `variants` and `trials`; `qualityEligibleVariants` and paired comparisons exclude every incident allocation regardless of score. No replacements have been substituted. Paid admission is paused.
+
 **Experimental; not promoted.** The first larger billing trace's starting map searched cache and response areas but omitted `litellm/cost_calculator.py`. A later file query named `_calculate_input_cost` explicitly, yet several generic rate matches appeared ahead of it. These are observed navigation outputs, not proof that they caused the run's latency.
 
 The candidate uses the entire bounded query when selecting repository areas, keeps explicit underscore identifiers within the 24-token ranking budget, recognizes pricing/billing language, adds the core billing module to that scope, and prioritizes exact underscore identifiers or a single-term symbol query. Natural-language words that happen to name a function do not get that exact-name boost in a multiword query. Existing scan/output bounds and read protections apply. This is a bundle; its study cannot isolate the contribution of each part.

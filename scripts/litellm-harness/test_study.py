@@ -9,6 +9,28 @@ from completion import completion_reason
 
 
 class StudyTests(unittest.TestCase):
+    def test_incident_keeps_raw_outcomes_but_invalidates_comparison_regardless_of_score(self):
+        with TemporaryDirectory() as temporary:
+            root = Path(temporary)
+            plan = {'protocol': 7, 'repetitions': 1, 'runs': []}
+            analysis = []
+            for name, passed in [('control', True), ('candidate', False)]:
+                plan['runs'].append(dict(dataset='', case='billing', name=name, label=name, commit='abc', effort='medium'))
+                analysis.append(dict(id='billing', run=name, label=name, harnessCommit='abc', evaluationProtocol=7,
+                                     effort='medium', acceptance={'passed': passed}, completed=True, seconds=1))
+            (root/'plan.json').write_text(json.dumps(plan))
+            (root/'analysis.json').write_text(json.dumps(analysis))
+            with patch('sys.argv', ['study.py', str(root), str(root/'plan.json'), str(root/'output.json')]), \
+                 patch('study.incident_runs', return_value={'control':'outage', 'candidate':'outage'}), patch('builtins.print'):
+                main()
+            output = json.loads((root/'output.json').read_text())
+            self.assertEqual(output['status'], 'infrastructure-interrupted')
+            self.assertEqual([r['success'] for r in output['trials']], [True, False])
+            self.assertEqual(sum(r['evaluated'] for r in output['variants']), 2)
+            self.assertEqual(sum(r['eligibleEvaluated'] for r in output['qualityEligibleVariants']), 0)
+            self.assertEqual(sum(r['incidentAllocations'] for r in output['qualityEligibleVariants']), 2)
+            self.assertEqual(output['comparisons'][0]['pairedTasks'], 0)
+
     def test_timeout_override_is_verified_against_the_actual_trial(self):
         with TemporaryDirectory() as temporary:
             root = Path(temporary)

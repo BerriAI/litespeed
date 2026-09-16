@@ -27,13 +27,13 @@ The first Astra High attempt finishes normally in **460.29 seconds**, passing **
 
 That inner-field representation was prescribed by our new probe, although the supplied task explicitly requires omission only of the entirely absent nested split. A separate [seven-check diagnostic](representation_probe.py) tests actual input-billing arithmetic with absent and zero image counts, combined usage billing, partially supplied splits in both orders, and nonzero cached-image aggregation. The historical base passes **0/7**, the merged reference **7/7**, and this Astra patch **7/7**. Both representations produce the requested $0.0015328 input price; the combined-event case also matches its arithmetic. [Results and scope](representation-observations.json).
 
-The original four-check probe, **1/4 score and strict study outcome remain unchanged**. These three failures do not demonstrate three billing defects under the supplied contract. The diagnostic does not prove all consumers consider zero and absent identical. It will be applied unchanged to all four planned attempts. Prequalification catches missing behavior in the base; it does not guarantee that a newly written probe avoids reference-specific assumptions.
+The original four-check probe, **1/4 score and strict study outcome remain unchanged**. These three failures do not demonstrate three billing defects under the supplied contract. The diagnostic does not prove all consumers consider zero and absent identical. It was applied unchanged to all four planned attempts; each passes all seven checks. Prequalification catches missing behavior in the base; it does not guarantee that a newly written probe avoids reference-specific assumptions.
 
 ## First complete model pair
 
 Flash Medium finishes normally in **1,017.86 seconds** for **$0.18754 token-priced usage**, passing **17/17 reference checks**, **1/4 original supplemental checks**, and **7/7 unchanged posthoc diagnostic checks**. Its three original supplemental failures have exactly the same zero-versus-`None` cause as Astra's. [Flash patch](flash-r1.patch).
 
-Astra's first completion is **460.29 seconds**; its account dollar cost is unavailable. This pair supports successful implementation of the tested billing behavior by both models, with Flash taking over twice as long. It cannot establish a quality or dollar-cost advantage. Both second repetitions remain pending, and the strict predeclared study outcomes remain failures because of the supplemental representation requirement.
+Astra's first completion is **460.29 seconds**; its account dollar cost is unavailable. This pair supports successful implementation of the tested billing behavior by both models, with Flash taking over twice as long. It cannot establish a quality or dollar-cost advantage. The completed comparison is summarized below; the original first-pair scores remain unchanged.
 
 Flash makes 141 model requests, with 573.07 recorded model seconds and 386.80 seconds of unioned tool activity. These measurements are not a mutually exhaustive timing partition. The trace includes a structured edit rejected because the 2,395,003-byte price map exceeds the host's 2 MiB limit, then a shell-based fallback. That is a concrete host capability gap; fixing it does not change this recorded trial or establish how much faster a rerun would be.
 
@@ -44,3 +44,18 @@ The run makes 141 model requests and 163 tool calls. Its first edit starts at 17
 Twenty-one check-related requests are not automatically wasted work. Calls 110–119 show broader cost tests exposing a candidate `KeyError` for an absent optional dictionary field, followed by a repair from direct indexing to `get()`. The same selection moves from 78 failed / 371 passed to 448 passed / 1 failed; updating the expected newly expanded rate object then yields 449 passed. A later combined check reports 668 passed. These are recorded execution outputs, with candidate-modified tests, not independent acceptance or complete coverage claims. The initial eight fixture errors are a separate setup issue.
 
 The inspected sequence supports preserving checks that name a remaining compatibility question. It does not justify a hard four-test cutoff. The separate price-map tool failure motivates the reproduced host fix, while the observed navigation outputs motivate a [new controlled comparison](../query-navigation/README.md). Neither should be described as an established end-to-end speedup.
+
+## All four attempts complete
+
+All four finish normally before the infrastructure incident. The unchanged seven-check representation diagnostic passes for every attempt.
+
+| Attempt | Reference checks | Original supplemental | Diagnostic | Seconds | Flash USD |
+|---|---:|---:|---:|---:|---:|
+| Astra 1 | 17/17 | 1/4 | 7/7 | 460.293 | unavailable |
+| Astra 2 | 16/17 | 1/4 | 7/7 | 563.927 | unavailable |
+| Flash 1 | 17/17 | 1/4 | 7/7 | 1017.864 | 0.187538 |
+| Flash 2 | 16/17 | 4/4 | 7/7 | 1083.627 | 0.256533 |
+
+Strict frozen outcomes are **0/2 in both arms**. Flash averages 1,050.75 seconds against Astra's 512.11 seconds, costing $0.44407 across both Flash attempts. This is one known development task, not evidence of general quality or cost superiority. [Second Astra patch](astra-r2.patch), [second Flash patch](flash-r2.patch), [full observations](representation-observations.json).
+
+The second Astra reference failure concerns a missing cached-audio fallback rate in `BilledTokenRates`; the second Flash failure is a direct private-helper call using a dictionary without the new nested key. These are distinct from the three supplemental representation failures. The recorded failures remain; their effect on public billing paths requires a separate behavioral check before claiming an actual request fails.

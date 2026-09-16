@@ -1,0 +1,857 @@
+diff --git a/litellm/cost_calculator.py b/litellm/cost_calculator.py
+index 440d97d..8633c7b 100644
+--- a/litellm/cost_calculator.py
++++ b/litellm/cost_calculator.py
+@@ -2387,6 +2387,7 @@ class BaseTokenUsageProcessor:
+         """
+         Combine multiple Usage objects into a single Usage object, checking model keys for nested values.
+         """
++        from litellm.types.llms.openai import CachedTokensDetails
+         from litellm.types.utils import (
+             CompletionTokensDetailsWrapper,
+             PromptTokensDetailsWrapper,
+@@ -2430,6 +2431,24 @@ class BaseTokenUsageProcessor:
+                                 current_val + new_val,
+                             )
+ 
++                # Handle the optional per-modality split of cached tokens. It is a nested
++                # model (not a scalar), so the summable-field loop above skips it; sum its
++                # fields here and only when an event actually supplied it.
++                incoming_cached_details = getattr(usage.prompt_tokens_details, "cached_tokens_details", None)
++                if incoming_cached_details is not None:
++                    combined_cached_details: Final = (
++                        getattr(combined.prompt_tokens_details, "cached_tokens_details", None) or CachedTokensDetails()
++                    )
++                    combined.prompt_tokens_details.cached_tokens_details = combined_cached_details
++                    for cached_field in ("text_tokens", "audio_tokens", "image_tokens"):
++                        incoming_value = getattr(incoming_cached_details, cached_field, None) or 0
++                        if incoming_value:
++                            setattr(
++                                combined_cached_details,
++                                cached_field,
++                                (getattr(combined_cached_details, cached_field, None) or 0) + incoming_value,
++                            )
++
+             # Handle nested completion_tokens_details
+             if hasattr(usage, "completion_tokens_details") and usage.completion_tokens_details:
+                 if not hasattr(combined, "completion_tokens_details") or not combined.completion_tokens_details:
+diff --git a/litellm/litellm_core_utils/llm_cost_calc/utils.py b/litellm/litellm_core_utils/llm_cost_calc/utils.py
+index e5977ca..24548af 100644
+--- a/litellm/litellm_core_utils/llm_cost_calc/utils.py
++++ b/litellm/litellm_core_utils/llm_cost_calc/utils.py
+@@ -16,6 +16,7 @@ from litellm.litellm_core_utils.llm_cost_calc.tiered_pricing import (
+     select_tier_for_input,
+     tier_rate,
+ )
++from litellm.types.llms.openai import CachedTokensDetails
+ from litellm.types.utils import (
+     CacheCreationTokenDetails,
+     CallTypes,
+@@ -774,6 +775,7 @@ class PromptTokensDetailsResult(TypedDict):
+     cache_hit_tokens: int
+     cache_creation_tokens: int
+     cache_creation_token_details: CacheCreationTokenDetails | None
++    cached_tokens_details: CachedTokensDetails | None
+     text_tokens: int
+     audio_tokens: int
+     image_tokens: int
+@@ -802,6 +804,10 @@ def parse_prompt_tokens_details(usage: Usage) -> PromptTokensDetailsResult:
+         )
+         or None
+     )
++    cached_tokens_details: Final = cast(
++        CachedTokensDetails | None,
++        getattr(usage.prompt_tokens_details, "cached_tokens_details", None),
++    )
+     text_tokens: Final = (
+         cast(int | None, getattr(usage.prompt_tokens_details, "text_tokens", None))
+         or 0  # default to prompt tokens, if this field is not set
+@@ -837,6 +843,7 @@ def parse_prompt_tokens_details(usage: Usage) -> PromptTokensDetailsResult:
+         cache_hit_tokens=cache_hit_tokens,
+         cache_creation_tokens=cache_creation_tokens,
+         cache_creation_token_details=cache_creation_token_details,
++        cached_tokens_details=cached_tokens_details,
+         text_tokens=text_tokens,
+         audio_tokens=audio_tokens,
+         image_tokens=image_tokens,
+@@ -903,6 +910,43 @@ def parse_completion_tokens_details(usage: Usage) -> CompletionTokensDetailsResu
+     )
+ 
+ 
++def _allocate_cached_tokens(
++    cached_tokens_details: CachedTokensDetails,
++    cache_hit_tokens: int,
++    text_tokens: int,
++    audio_tokens: int,
++    image_tokens: int,
++) -> tuple[int, int, int, int]:
++    """Distribute the optional per-modality cached split over the modality buckets.
++
++    Returns ``(cached_text, cached_audio, cached_image, uncategorized)``. Each
++    allocation is capped by its bucket (so removing it can never make the full-rate
++    bucket negative) and by the tokens still unallocated out of the aggregate cached
++    count (so a split can never claim more cached tokens than the provider reported).
++    ``uncategorized`` is the part of the aggregate the split did not attribute.
++    """
++    remaining: Final = max(cache_hit_tokens, 0)
++    allocations: Final[list[int]] = []
++    for field, bucket in (
++        ("text_tokens", text_tokens),
++        ("audio_tokens", audio_tokens),
++        ("image_tokens", image_tokens),
++    ):
++        requested: Final = getattr(cached_tokens_details, field, None) or 0
++        allocated: Final = min(max(requested, 0), max(bucket, 0), remaining)
++        allocations.append(allocated)
++        remaining -= allocated
++    return allocations[0], allocations[1], allocations[2], remaining
++
++
++def _resolve_cached_audio_rate(model_info: ModelInfo, service_tier: str | None, fallback_rate: float) -> float:
++    """Cached audio bills at ``cache_read_input_audio_token_cost`` when the model publishes
++    it, otherwise at the ordinary cache-read rate the rest of the cached tokens use."""
++    audio_cost_key: Final = _get_service_tier_cost_key("cache_read_input_audio_token_cost", service_tier)
++    audio_rate: Final = _get_cost_per_unit(model_info, audio_cost_key, default_value=None)
++    return audio_rate if audio_rate is not None else fallback_rate
++
++
+ def _calculate_input_cost(
+     prompt_tokens_details: PromptTokensDetailsResult,
+     model_info: ModelInfo,
+@@ -915,24 +959,48 @@ def _calculate_input_cost(
+     """
+     Calculates the input cost for a given model, prompt tokens, and completion tokens.
+     """
+-    prompt_cost = float(prompt_tokens_details["text_tokens"]) * prompt_base_cost
++    text_tokens: Final = prompt_tokens_details["text_tokens"]
++    cached_tokens_details: Final = prompt_tokens_details["cached_tokens_details"]
++    if cached_tokens_details is None:
++        cached_text = cached_audio = cached_image = uncategorized_cached = 0
++    else:
++        cached_text, cached_audio, cached_image, uncategorized_cached = _allocate_cached_tokens(
++            cached_tokens_details=cached_tokens_details,
++            cache_hit_tokens=prompt_tokens_details["cache_hit_tokens"],
++            text_tokens=text_tokens,
++            audio_tokens=prompt_tokens_details["audio_tokens"],
++            image_tokens=prompt_tokens_details["image_tokens"],
++        )
++
++    # Cached tokens are a subset of the modality buckets, so the cached part of each
++    # bucket bills at a cache-read rate and only the remainder at the full input rate.
++    prompt_cost = float(max(text_tokens - cached_text, 0)) * prompt_base_cost
+ 
+     ### CACHE READ COST - Now uses tiered pricing
+-    prompt_cost += float(prompt_tokens_details["cache_hit_tokens"]) * cache_read_cost
++    if cached_tokens_details is None:
++        prompt_cost += float(prompt_tokens_details["cache_hit_tokens"]) * cache_read_cost
++    else:
++        cached_audio_rate: Final = _resolve_cached_audio_rate(model_info, service_tier, cache_read_cost)
++        prompt_cost += float(cached_text) * cache_read_cost
++        prompt_cost += float(cached_audio) * cached_audio_rate
++        prompt_cost += float(cached_image) * cache_read_cost
++        prompt_cost += float(uncategorized_cached) * cache_read_cost
+ 
+     ### AUDIO COST
+-    if prompt_tokens_details["audio_tokens"]:
++    billable_audio_tokens: Final = prompt_tokens_details["audio_tokens"] - cached_audio
++    if billable_audio_tokens:
+         audio_cost_key: Final = _get_service_tier_cost_key("input_cost_per_audio_token", service_tier)
+-        prompt_cost += calculate_cost_component(model_info, audio_cost_key, prompt_tokens_details["audio_tokens"])
++        prompt_cost += calculate_cost_component(model_info, audio_cost_key, billable_audio_tokens)
+ 
+     ### IMAGE TOKEN COST
+-    if prompt_tokens_details["image_tokens"]:
++    billable_image_tokens: Final = prompt_tokens_details["image_tokens"] - cached_image
++    if billable_image_tokens:
+         # For image token costs:
+         # First check if input_cost_per_image_token is available. If not, default to generic input_cost_per_token.
+         image_token_cost_key = "input_cost_per_image_token"
+         if model_info.get(image_token_cost_key) is None:
+             image_token_cost_key = "input_cost_per_token"
+-        prompt_cost += calculate_cost_component(model_info, image_token_cost_key, prompt_tokens_details["image_tokens"])
++        prompt_cost += calculate_cost_component(model_info, image_token_cost_key, billable_image_tokens)
+ 
+     ### VIDEO TOKEN COST
+     if prompt_tokens_details["video_tokens"]:
+@@ -1151,6 +1219,7 @@ def generic_cost_per_token(
+         cache_hit_tokens=0,
+         cache_creation_tokens=0,
+         cache_creation_token_details=None,
++        cached_tokens_details=None,
+         text_tokens=usage.prompt_tokens,
+         audio_tokens=0,
+         image_tokens=0,
+@@ -1180,7 +1249,12 @@ def generic_cost_per_token(
+     total_details: Final = text_tokens + cache_hit + audio_tokens + cache_creation + image_tokens + video_tokens
+     has_double_counting: Final = (cache_hit > 0 or cache_creation > 0) and total_details > usage.prompt_tokens
+ 
+-    if has_double_counting:
++    if prompt_tokens_details["cached_tokens_details"] is not None:
++        # The nested split names exactly which cached tokens are text/audio/image, so the
++        # aggregate-overlap heuristic below would mis-attribute them. The split is applied in
++        # _calculate_input_cost instead (cached buckets bill at their cache-read rate).
++        pass
++    elif has_double_counting:
+         # cached and per-modality counts are both subsets of prompt_tokens and may overlap, so a
+         # modality can only bill what the cache did not already cover or the overlap is billed twice
+         uncached_budget: Final = max(usage.prompt_tokens - cache_hit - cache_creation, 0)
+@@ -1319,6 +1393,8 @@ class BilledTokenRates:
+     input_cost_per_token: float
+     output_cost_per_token: float
+     cache_read_input_token_cost: float
++    cache_read_input_audio_token_cost: float
++    """Rate cached audio tokens bill at (``cache_read_input_audio_token_cost``, else the text cache-read rate)."""
+     cache_creation_input_token_cost: float
+     cache_creation_input_token_cost_above_1hr: float
+     output_cost_per_reasoning_token: float
+@@ -1330,6 +1406,7 @@ class BilledTokenRates:
+             input_cost_per_token=self.input_cost_per_token * multiplier,
+             output_cost_per_token=self.output_cost_per_token * multiplier,
+             cache_read_input_token_cost=self.cache_read_input_token_cost * multiplier,
++            cache_read_input_audio_token_cost=self.cache_read_input_audio_token_cost * multiplier,
+             cache_creation_input_token_cost=self.cache_creation_input_token_cost * multiplier,
+             cache_creation_input_token_cost_above_1hr=self.cache_creation_input_token_cost_above_1hr * multiplier,
+             output_cost_per_reasoning_token=self.output_cost_per_reasoning_token * multiplier,
+@@ -1373,10 +1450,13 @@ def _custom_pricing_rates(custom_cost_per_token: CostPerToken) -> BilledTokenRat
+     input_rate: Final = custom_cost_per_token["input_cost_per_token"]
+     output_rate: Final = custom_cost_per_token["output_cost_per_token"]
+     cache_creation_rate: Final = custom_cost_per_token.get("cache_creation_input_token_cost", input_rate)
++    cache_read_rate: Final = custom_cost_per_token.get("cache_read_input_token_cost", input_rate)
+     return BilledTokenRates(
+         input_cost_per_token=input_rate,
+         output_cost_per_token=output_rate,
+-        cache_read_input_token_cost=custom_cost_per_token.get("cache_read_input_token_cost", input_rate),
++        cache_read_input_token_cost=cache_read_rate,
++        # Flat custom pricing has one cached rate for every modality, so the audio rate mirrors it.
++        cache_read_input_audio_token_cost=cache_read_rate,
+         cache_creation_input_token_cost=cache_creation_rate,
+         cache_creation_input_token_cost_above_1hr=cache_creation_rate,
+         output_cost_per_reasoning_token=output_rate,
+@@ -1422,6 +1502,7 @@ def _cost_map_billed_rates(
+         input_cost_per_token=prompt_base_cost,
+         output_cost_per_token=completion_base_cost,
+         cache_read_input_token_cost=cache_read_cost_rate,
++        cache_read_input_audio_token_cost=_resolve_cached_audio_rate(model_info, service_tier, cache_read_cost_rate),
+         cache_creation_input_token_cost=cache_creation_cost_rate,
+         cache_creation_input_token_cost_above_1hr=cache_creation_cost_above_1hr_rate,
+         output_cost_per_reasoning_token=reasoning_rate,
+@@ -1457,6 +1538,31 @@ def get_billed_token_rates(
+     )
+ 
+ 
++def _billed_cache_read_cost(
++    parsed: PromptTokensDetailsResult,
++    cache_read_tokens: int,
++    rates: BilledTokenRates,
++) -> float:
++    """Cache-read cost for the breakdown, allocating the optional per-modality split exactly
++    as the input biller does so the reported line and the total cannot disagree."""
++    cached_tokens_details: Final = parsed["cached_tokens_details"]
++    if cached_tokens_details is None:
++        return float(cache_read_tokens) * rates.cache_read_input_token_cost
++    cached_text, cached_audio, cached_image, uncategorized = _allocate_cached_tokens(
++        cached_tokens_details=cached_tokens_details,
++        cache_hit_tokens=cache_read_tokens,
++        text_tokens=parsed["text_tokens"],
++        audio_tokens=parsed["audio_tokens"],
++        image_tokens=parsed["image_tokens"],
++    )
++    return (
++        float(cached_text) * rates.cache_read_input_token_cost
++        + float(cached_audio) * rates.cache_read_input_audio_token_cost
++        + float(cached_image) * rates.cache_read_input_token_cost
++        + float(uncategorized) * rates.cache_read_input_token_cost
++    )
++
++
+ def get_token_type_cost_breakdown(
+     model: str,
+     custom_llm_provider: str | None,
+@@ -1505,9 +1611,17 @@ def get_token_type_cost_breakdown(
+             cache_creation_cost=rates.cache_creation_input_token_cost,
+         )
+     )
++    parsed_prompt_details: Final = (
++        parse_prompt_tokens_details(usage) if usage.prompt_tokens_details is not None else None
++    )
++    cache_read_cost: Final = (
++        _billed_cache_read_cost(parsed_prompt_details, cache_read_tokens, rates)
++        if parsed_prompt_details is not None
++        else float(cache_read_tokens) * rates.cache_read_input_token_cost
++    )
+     return TokenTypeCostBreakdown(
+         reasoning_cost=float(_reasoning_token_count(usage)) * rates.output_cost_per_reasoning_token,
+-        cache_read_cost=float(cache_read_tokens) * rates.cache_read_input_token_cost,
++        cache_read_cost=cache_read_cost,
+         cache_creation_cost=cache_creation_cost,
+         rates=rates,
+     )
+diff --git a/litellm/model_prices_and_context_window_backup.json b/litellm/model_prices_and_context_window_backup.json
+index 2220d0e..6d63fd8 100644
+--- a/litellm/model_prices_and_context_window_backup.json
++++ b/litellm/model_prices_and_context_window_backup.json
+@@ -5513,7 +5513,8 @@
+     },
+     "azure/gpt-realtime-2025-08-28": {
+         "cache_creation_input_audio_token_cost": 4e-06,
+-        "cache_read_input_token_cost": 4e-06,
++        "cache_read_input_audio_token_cost": 4e-07,
++        "cache_read_input_token_cost": 4e-07,
+         "deprecation_date": "2027-03-02",
+         "input_cost_per_audio_token": 3.2e-05,
+         "input_cost_per_image_token": 5e-06,
+@@ -5546,7 +5547,8 @@
+     },
+     "azure/gpt-realtime-1.5-2026-02-23": {
+         "cache_creation_input_audio_token_cost": 4e-06,
+-        "cache_read_input_token_cost": 4e-06,
++        "cache_read_input_audio_token_cost": 4e-07,
++        "cache_read_input_token_cost": 4e-07,
+         "deprecation_date": "2027-08-24",
+         "input_cost_per_audio_token": 3.2e-05,
+         "input_cost_per_image_token": 5e-06,
+@@ -5683,6 +5685,7 @@
+     },
+     "azure/gpt-realtime-mini": {
+         "cache_creation_input_audio_token_cost": 3e-07,
++        "cache_read_input_audio_token_cost": 3e-07,
+         "cache_read_input_token_cost": 6e-08,
+         "input_cost_per_audio_token": 1e-05,
+         "input_cost_per_image_token": 8e-07,
+@@ -5715,6 +5718,7 @@
+     },
+     "azure/gpt-realtime-mini-2025-10-06": {
+         "cache_creation_input_audio_token_cost": 3e-07,
++        "cache_read_input_audio_token_cost": 3e-07,
+         "cache_read_input_token_cost": 6e-08,
+         "input_cost_per_audio_token": 1e-05,
+         "input_cost_per_image_token": 8e-07,
+@@ -32678,6 +32682,7 @@
+     },
+     "gpt-realtime": {
+         "cache_creation_input_audio_token_cost": 4e-07,
++        "cache_read_input_audio_token_cost": 4e-07,
+         "cache_read_input_token_cost": 4e-07,
+         "deprecation_date": "2027-01-20",
+         "input_cost_per_audio_token": 3.2e-05,
+@@ -32711,6 +32716,7 @@
+     },
+     "gpt-realtime-1.5": {
+         "cache_creation_input_audio_token_cost": 4e-07,
++        "cache_read_input_audio_token_cost": 4e-07,
+         "cache_read_input_token_cost": 4e-07,
+         "input_cost_per_audio_token": 3.2e-05,
+         "input_cost_per_image_token": 5e-06,
+@@ -32847,6 +32853,7 @@
+     "gpt-realtime-mini": {
+         "cache_creation_input_audio_token_cost": 3e-07,
+         "cache_read_input_audio_token_cost": 3e-07,
++        "cache_read_input_token_cost": 6e-08,
+         "deprecation_date": "2027-01-20",
+         "input_cost_per_audio_token": 1e-05,
+         "input_cost_per_token": 6e-07,
+@@ -32878,6 +32885,7 @@
+     },
+     "gpt-realtime-2025-08-28": {
+         "cache_creation_input_audio_token_cost": 4e-07,
++        "cache_read_input_audio_token_cost": 4e-07,
+         "cache_read_input_token_cost": 4e-07,
+         "deprecation_date": "2027-01-20",
+         "input_cost_per_audio_token": 3.2e-05,
+diff --git a/litellm/responses/litellm_completion_transformation/transformation.py b/litellm/responses/litellm_completion_transformation/transformation.py
+index e8aacac..9c8d042 100644
+--- a/litellm/responses/litellm_completion_transformation/transformation.py
++++ b/litellm/responses/litellm_completion_transformation/transformation.py
+@@ -30,7 +30,7 @@ from openai.types.responses.response_create_params import ResponseInputParam
+ from openai.types.responses.tool_choice_custom_param import ToolChoiceCustomParam
+ from openai.types.responses.tool_choice_function_param import ToolChoiceFunctionParam
+ from openai.types.responses.tool_param import FunctionToolParam
+-from pydantic import TypeAdapter, ValidationError
++from pydantic import BaseModel, TypeAdapter, ValidationError
+ from typing_extensions import ReadOnly, TypedDict
+ 
+ from litellm._logging import verbose_logger
+@@ -2816,7 +2816,7 @@ class LiteLLMCompletionResponsesConfig:
+         # Translate prompt_tokens_details to input_tokens_details
+         if hasattr(usage, "prompt_tokens_details") and usage.prompt_tokens_details is not None:
+             prompt_details: Final = usage.prompt_tokens_details
+-            input_details_dict: Final[dict[str, int]] = {}
++            input_details_dict: Final[dict[str, object]] = {}
+ 
+             if hasattr(prompt_details, "cached_tokens") and prompt_details.cached_tokens is not None:
+                 input_details_dict["cached_tokens"] = prompt_details.cached_tokens
+@@ -2835,6 +2835,16 @@ class LiteLLMCompletionResponsesConfig:
+             if cache_write_tokens is not None:
+                 input_details_dict["cache_write_tokens"] = cache_write_tokens
+ 
++            # Only re-emit the optional per-modality split when it was actually supplied:
++            # providers that omit it must keep their usage serialized exactly as before.
++            cached_tokens_details = getattr(prompt_details, "cached_tokens_details", None)
++            if cached_tokens_details is not None:
++                input_details_dict["cached_tokens_details"] = (
++                    cached_tokens_details.model_dump(exclude_none=True)
++                    if isinstance(cached_tokens_details, BaseModel)
++                    else cached_tokens_details
++                )
++
+             if input_details_dict:
+                 response_usage.input_tokens_details = InputTokensDetails(**input_details_dict)
+ 
+diff --git a/litellm/responses/utils.py b/litellm/responses/utils.py
+index 599e978..3d0f9e9 100644
+--- a/litellm/responses/utils.py
++++ b/litellm/responses/utils.py
+@@ -11,6 +11,7 @@ from litellm._logging import verbose_logger
+ from litellm.llms.base_llm.responses.transformation import BaseResponsesAPIConfig
+ from litellm.types.llms.openai import (
+     AllMessageValues,
++    CachedTokensDetails,
+     OutputTokensDetails,
+     ResponseAPIUsage,
+     ResponseInputParam,
+@@ -34,6 +35,25 @@ def _output_token_detail(details: object, field: str) -> int | None:
+     return value if isinstance(value, int) else None
+ 
+ 
++def _cached_tokens_details_from(details: object) -> CachedTokensDetails | None:
++    """Read the optional ``cached_tokens_details`` split off an input-tokens-details blob.
++
++    Accepts the raw wire dict as well as the parsed ``InputTokensDetails`` object and
++    always returns a fresh model, so the caller's usage payload is never aliased into
++    the normalized ``Usage``. Returns ``None`` when no split was supplied.
++    """
++    nested: Final = (
++        details.get("cached_tokens_details")
++        if isinstance(details, Mapping)
++        else getattr(details, "cached_tokens_details", None)
++    )
++    if isinstance(nested, CachedTokensDetails):
++        return nested.model_copy()
++    if isinstance(nested, Mapping):
++        return CachedTokensDetails(**nested)
++    return None
++
++
+ def _is_object_sequence(value: object) -> TypeIs[Sequence[object]]:  # guard-ok: a list is a Sequence of anything
+     return isinstance(value, list)
+ 
+@@ -1171,15 +1191,17 @@ class ResponseAPILoggingUtils:
+         completion_tokens: Final[int] = response_api_usage.output_tokens or 0
+         prompt_tokens_details: PromptTokensDetailsWrapper | None = None
+         if response_api_usage.input_tokens_details:
+-            if isinstance(response_api_usage.input_tokens_details, dict):
+-                prompt_tokens_details = PromptTokensDetailsWrapper(**response_api_usage.input_tokens_details)
++            input_details: Final = response_api_usage.input_tokens_details
++            if isinstance(input_details, dict):
++                prompt_tokens_details = PromptTokensDetailsWrapper(**input_details)
+             else:
+                 prompt_tokens_details = PromptTokensDetailsWrapper(
+-                    cached_tokens=getattr(response_api_usage.input_tokens_details, "cached_tokens", None),
+-                    audio_tokens=getattr(response_api_usage.input_tokens_details, "audio_tokens", None),
+-                    text_tokens=getattr(response_api_usage.input_tokens_details, "text_tokens", None),
+-                    image_tokens=getattr(response_api_usage.input_tokens_details, "image_tokens", None),
+-                    cache_write_tokens=getattr(response_api_usage.input_tokens_details, "cache_write_tokens", None),
++                    cached_tokens=getattr(input_details, "cached_tokens", None),
++                    audio_tokens=getattr(input_details, "audio_tokens", None),
++                    text_tokens=getattr(input_details, "text_tokens", None),
++                    image_tokens=getattr(input_details, "image_tokens", None),
++                    cache_write_tokens=getattr(input_details, "cache_write_tokens", None),
++                    cached_tokens_details=_cached_tokens_details_from(input_details),
+                 )
+         completion_tokens_details: CompletionTokensDetailsWrapper | None = None
+         output_tokens_details: Final[OutputTokensDetails | None] = getattr(
+diff --git a/litellm/types/llms/openai.py b/litellm/types/llms/openai.py
+index dfafe27..13c3999 100644
+--- a/litellm/types/llms/openai.py
++++ b/litellm/types/llms/openai.py
+@@ -1285,11 +1285,31 @@ class OutputTokensDetails(BaseLiteLLMOpenAIResponseObject):
+     model_config = {"extra": "allow"}
+ 
+ 
++class CachedTokensDetails(BaseLiteLLMOpenAIResponseObject):
++    """Per-modality split of the cached input tokens.
++
++    OpenAI reports the cached-token total under ``cached_tokens`` and, when it can
++    attribute them, the text/audio/image split under ``cached_tokens_details``.
++    The split is optional: providers that omit it keep totals-only behavior, and
++    cached audio bills at the audio cache-read rate instead of the text one.
++    """
++
++    text_tokens: int | None = None
++    audio_tokens: int | None = None
++    image_tokens: int | None = None
++
++    model_config = {"extra": "allow"}
++
++
+ class InputTokensDetails(BaseLiteLLMOpenAIResponseObject):
+     audio_tokens: int | None = None
+     cached_tokens: int = 0
+     text_tokens: int | None = None
+ 
++    # ``cached_tokens_details`` is deliberately left as an extra (untyped) field, like
++    # ``cache_write_tokens``: providers that never report the split must keep their usage
++    # serialized exactly as before, with no ``cached_tokens_details: null`` added.
++
+     model_config = {"extra": "allow"}
+ 
+ 
+diff --git a/litellm/types/utils.py b/litellm/types/utils.py
+index 00c55b3..c141abd 100644
+--- a/litellm/types/utils.py
++++ b/litellm/types/utils.py
+@@ -60,6 +60,7 @@ from .llms.base import HiddenParams
+ from .llms.openai import (
+     AllMessageValues,
+     Batch,
++    CachedTokensDetails,
+     ChatCompletionAnnotation,
+     ChatCompletionReasoningItem,
+     ChatCompletionRedactedThinkingBlock,
+@@ -252,6 +253,7 @@ class ModelInfoBase(ProviderSpecificModelInfo, total=False):
+     cache_creation_input_token_cost_priority: float | None  # OpenAI priority service tier pricing
+     cache_creation_input_token_cost_ultrafast: ReadOnly[float | None]  # OpenAI ultrafast service tier pricing
+     cache_read_input_token_cost: float | None
++    cache_read_input_audio_token_cost: float | None  # cached audio input rate (e.g. gpt-realtime)
+     cache_read_input_token_cost_flex: float | None  # OpenAI flex service tier pricing
+     cache_read_input_token_cost_priority: float | None  # OpenAI priority service tier pricing
+     cache_read_input_token_cost_ultrafast: ReadOnly[float | None]  # OpenAI ultrafast service tier pricing
+@@ -1710,6 +1712,9 @@ class PromptTokensDetailsWrapper(
+     cache_creation_token_details: CacheCreationTokenDetails | None = None
+     """Details of cache creation tokens sent to the model. Used for tracking 5m/1h cache creation tokens for Anthropic prompt caching."""
+ 
++    cached_tokens_details: CachedTokensDetails | None = None
++    """Optional per-modality split (text/audio/image) of ``cached_tokens`` reported by realtime/Responses usage."""
++
+     def __setattr__(self, name: str, value: object) -> None:
+         super().__setattr__(name, value)
+         if name == "cache_write_tokens":
+@@ -1756,6 +1761,8 @@ class PromptTokensDetailsWrapper(
+             del self.cache_creation_tokens
+         if self.cache_creation_token_details is None:
+             del self.cache_creation_token_details
++        if self.cached_tokens_details is None:
++            del self.cached_tokens_details
+ 
+ 
+ class ServerToolUse(BaseModel):
+diff --git a/litellm/utils.py b/litellm/utils.py
+index 7732cd8..04139a1 100644
+--- a/litellm/utils.py
++++ b/litellm/utils.py
+@@ -5882,6 +5882,7 @@ def _get_model_info_helper(
+                     "cache_creation_input_token_cost_ultrafast", None
+                 ),
+                 cache_read_input_token_cost=_model_info.get("cache_read_input_token_cost", None),
++                cache_read_input_audio_token_cost=_model_info.get("cache_read_input_audio_token_cost", None),
+                 prompt_cache_min_tokens=_model_info.get("prompt_cache_min_tokens", None),
+                 cache_read_input_token_cost_above_200k_tokens=_model_info.get(
+                     "cache_read_input_token_cost_above_200k_tokens", None
+diff --git a/model_prices_and_context_window.json b/model_prices_and_context_window.json
+index 2220d0e..6d63fd8 100644
+--- a/model_prices_and_context_window.json
++++ b/model_prices_and_context_window.json
+@@ -5513,7 +5513,8 @@
+     },
+     "azure/gpt-realtime-2025-08-28": {
+         "cache_creation_input_audio_token_cost": 4e-06,
+-        "cache_read_input_token_cost": 4e-06,
++        "cache_read_input_audio_token_cost": 4e-07,
++        "cache_read_input_token_cost": 4e-07,
+         "deprecation_date": "2027-03-02",
+         "input_cost_per_audio_token": 3.2e-05,
+         "input_cost_per_image_token": 5e-06,
+@@ -5546,7 +5547,8 @@
+     },
+     "azure/gpt-realtime-1.5-2026-02-23": {
+         "cache_creation_input_audio_token_cost": 4e-06,
+-        "cache_read_input_token_cost": 4e-06,
++        "cache_read_input_audio_token_cost": 4e-07,
++        "cache_read_input_token_cost": 4e-07,
+         "deprecation_date": "2027-08-24",
+         "input_cost_per_audio_token": 3.2e-05,
+         "input_cost_per_image_token": 5e-06,
+@@ -5683,6 +5685,7 @@
+     },
+     "azure/gpt-realtime-mini": {
+         "cache_creation_input_audio_token_cost": 3e-07,
++        "cache_read_input_audio_token_cost": 3e-07,
+         "cache_read_input_token_cost": 6e-08,
+         "input_cost_per_audio_token": 1e-05,
+         "input_cost_per_image_token": 8e-07,
+@@ -5715,6 +5718,7 @@
+     },
+     "azure/gpt-realtime-mini-2025-10-06": {
+         "cache_creation_input_audio_token_cost": 3e-07,
++        "cache_read_input_audio_token_cost": 3e-07,
+         "cache_read_input_token_cost": 6e-08,
+         "input_cost_per_audio_token": 1e-05,
+         "input_cost_per_image_token": 8e-07,
+@@ -32678,6 +32682,7 @@
+     },
+     "gpt-realtime": {
+         "cache_creation_input_audio_token_cost": 4e-07,
++        "cache_read_input_audio_token_cost": 4e-07,
+         "cache_read_input_token_cost": 4e-07,
+         "deprecation_date": "2027-01-20",
+         "input_cost_per_audio_token": 3.2e-05,
+@@ -32711,6 +32716,7 @@
+     },
+     "gpt-realtime-1.5": {
+         "cache_creation_input_audio_token_cost": 4e-07,
++        "cache_read_input_audio_token_cost": 4e-07,
+         "cache_read_input_token_cost": 4e-07,
+         "input_cost_per_audio_token": 3.2e-05,
+         "input_cost_per_image_token": 5e-06,
+@@ -32847,6 +32853,7 @@
+     "gpt-realtime-mini": {
+         "cache_creation_input_audio_token_cost": 3e-07,
+         "cache_read_input_audio_token_cost": 3e-07,
++        "cache_read_input_token_cost": 6e-08,
+         "deprecation_date": "2027-01-20",
+         "input_cost_per_audio_token": 1e-05,
+         "input_cost_per_token": 6e-07,
+@@ -32878,6 +32885,7 @@
+     },
+     "gpt-realtime-2025-08-28": {
+         "cache_creation_input_audio_token_cost": 4e-07,
++        "cache_read_input_audio_token_cost": 4e-07,
+         "cache_read_input_token_cost": 4e-07,
+         "deprecation_date": "2027-01-20",
+         "input_cost_per_audio_token": 3.2e-05,
+diff --git a/tests/test_litellm/litellm_core_utils/llm_cost_calc/test_llm_cost_calc_utils.py b/tests/test_litellm/litellm_core_utils/llm_cost_calc/test_llm_cost_calc_utils.py
+index cbe6fe1..472a0f1 100644
+--- a/tests/test_litellm/litellm_core_utils/llm_cost_calc/test_llm_cost_calc_utils.py
++++ b/tests/test_litellm/litellm_core_utils/llm_cost_calc/test_llm_cost_calc_utils.py
+@@ -2653,6 +2653,7 @@ def test_cache_writing_cost_with_zero_creation_tokens_and_ephemeral_details():
+             ephemeral_5m_input_tokens=100,
+             ephemeral_1h_input_tokens=200,
+         ),
++        "cached_tokens_details": None,
+         "text_tokens": 0,
+         "audio_tokens": 0,
+         "image_tokens": 0,
+@@ -4005,6 +4006,7 @@ def test_billed_token_rates_follow_the_token_tier_the_breakdown_bills_at(monkeyp
+         input_cost_per_token=6e-6,
+         output_cost_per_token=3e-5,
+         cache_read_input_token_cost=6e-7,
++        cache_read_input_audio_token_cost=6e-7,
+         cache_creation_input_token_cost=7.5e-6,
+         cache_creation_input_token_cost_above_1hr=0.0,
+         output_cost_per_reasoning_token=3e-5,
+diff --git a/tests/test_litellm/test_cost_calculator.py b/tests/test_litellm/test_cost_calculator.py
+index f2659ce..b3c9f49 100644
+--- a/tests/test_litellm/test_cost_calculator.py
++++ b/tests/test_litellm/test_cost_calculator.py
+@@ -19,7 +19,7 @@ from litellm.cost_calculator import (
+ )
+ from litellm.litellm_core_utils.litellm_logging import Logging
+ from litellm.llms.base_llm.ocr.transformation import OCRPage, OCRResponse, OCRUsageInfo
+-from litellm.types.llms.openai import OpenAIRealtimeStreamList
++from litellm.types.llms.openai import CachedTokensDetails, OpenAIRealtimeStreamList
+ from litellm.types.rerank import RerankResponse
+ from litellm.types.utils import (
+     CacheCreationTokenDetails,
+@@ -657,6 +657,202 @@ def test_realtime_stream_combines_text_and_audio_token_details():
+     assert combined.completion_tokens_details.audio_tokens == 18
+ 
+ 
++def test_realtime_cached_audio_split_is_preserved_and_billed():
++    """Realtime response.done reports ``cached_tokens_details`` alongside the cached total.
++
++    Dropping that nested split overbills cached audio: it is billed at the text cache-read
++    rate and is still counted in the full-rate audio bucket. The split must survive
++    normalization and be removed from the matching full-rate buckets.
++    """
++    from litellm.litellm_core_utils.llm_cost_calc.utils import get_token_type_cost_breakdown
++
++    provider_usage = {
++        "input_tokens": 283,
++        "output_tokens": 0,
++        "total_tokens": 283,
++        "input_token_details": {
++            "text_tokens": 116,
++            "audio_tokens": 167,
++            "cached_tokens": 192,
++            "cached_tokens_details": {"text_tokens": 64, "audio_tokens": 128},
++        },
++    }
++    results: OpenAIRealtimeStreamList = [
++        {"type": "session.created", "session": {"model": "gpt-realtime"}},
++        {"type": "response.done", "response": {"usage": provider_usage}},
++    ]
++
++    combined = RealtimeAPITokenUsageProcessor.collect_and_combine_usage_from_realtime_stream_results(
++        results=results,
++    )
++
++    assert combined.prompt_tokens_details is not None
++    assert combined.prompt_tokens_details.cached_tokens == 192
++    assert combined.prompt_tokens_details.cached_tokens_details is not None
++    assert combined.prompt_tokens_details.cached_tokens_details.text_tokens == 64
++    assert combined.prompt_tokens_details.cached_tokens_details.audio_tokens == 128
++    # Normalization must not mutate the provider payload it was handed.
++    assert provider_usage["input_token_details"]["cached_tokens_details"] == {
++        "text_tokens": 64,
++        "audio_tokens": 128,
++    }
++
++    total_cost = handle_realtime_stream_cost_calculation(
++        results=results,
++        combined_usage_object=combined,
++        custom_llm_provider="openai",
++        litellm_model_name="gpt-realtime",
++    )
++
++    # 116-64=52 full-rate text, 167-128=39 full-rate audio, then the cached buckets once each.
++    expected_input_cost = 52 * 4e-6 + 39 * 3.2e-5 + 64 * 4e-7 + 128 * 4e-7
++    assert expected_input_cost == pytest.approx(0.0015328)
++    assert total_cost == pytest.approx(expected_input_cost)
++
++    # The reported cache-read line uses the audio rate for cached audio, so it agrees with billing.
++    breakdown = get_token_type_cost_breakdown(model="gpt-realtime", custom_llm_provider="openai", usage=combined)
++    assert breakdown.rates is not None
++    assert breakdown.rates.cache_read_input_audio_token_cost == pytest.approx(4e-7)
++    assert breakdown.cache_read_cost == pytest.approx((64 + 128) * 4e-7)
++
++
++def test_realtime_cached_audio_falls_back_to_the_text_cache_read_rate(monkeypatch: pytest.MonkeyPatch):
++    """When a model has no ``cache_read_input_audio_token_cost``, cached audio bills at the
++    ordinary cache-read rate, and the reported breakdown rate matches."""
++    from litellm.litellm_core_utils.llm_cost_calc.utils import (
++        generic_cost_per_token,
++        get_token_type_cost_breakdown,
++    )
++
++    monkeypatch.setitem(
++        litellm.model_cost,
++        "audio-fallback-model",
++        {
++            "input_cost_per_token": 4e-6,
++            "output_cost_per_token": 1.6e-5,
++            "input_cost_per_audio_token": 3.2e-5,
++            "cache_read_input_token_cost": 4e-7,
++            "litellm_provider": "openai",
++            "mode": "realtime",
++        },
++    )
++    usage = Usage(
++        prompt_tokens=283,
++        completion_tokens=0,
++        total_tokens=283,
++        prompt_tokens_details=PromptTokensDetailsWrapper(
++            text_tokens=116,
++            audio_tokens=167,
++            cached_tokens=192,
++            cached_tokens_details=CachedTokensDetails(text_tokens=64, audio_tokens=128),
++        ),
++    )
++
++    prompt_cost, _ = generic_cost_per_token(
++        model="audio-fallback-model", usage=usage, custom_llm_provider="openai"
++    )
++    assert prompt_cost == pytest.approx(52 * 4e-6 + 39 * 3.2e-5 + 192 * 4e-7)
++
++    breakdown = get_token_type_cost_breakdown(
++        model="audio-fallback-model", custom_llm_provider="openai", usage=usage
++    )
++    assert breakdown.rates is not None
++    assert breakdown.rates.cache_read_input_audio_token_cost == pytest.approx(4e-7)
++    assert breakdown.cache_read_cost == pytest.approx(192 * 4e-7)
++
++
++def test_realtime_cached_split_combines_across_events():
++    """Only some response.done events carry the split; the combined split sums what was supplied
++    and never aliases (or mutates) the per-event usage objects."""
++    first_details = {"text_tokens": 64, "audio_tokens": 128}
++    results: OpenAIRealtimeStreamList = [
++        {"type": "session.created", "session": {"model": "gpt-realtime"}},
++        {
++            "type": "response.done",
++            "response": {
++                "usage": {
++                    "input_tokens": 283,
++                    "output_tokens": 0,
++                    "total_tokens": 283,
++                    "input_token_details": {
++                        "text_tokens": 116,
++                        "audio_tokens": 167,
++                        "cached_tokens": 192,
++                        "cached_tokens_details": first_details,
++                    },
++                }
++            },
++        },
++        {
++            "type": "response.done",
++            "response": {
++                "usage": {
++                    "input_tokens": 20,
++                    "output_tokens": 0,
++                    "total_tokens": 20,
++                    "input_token_details": {
++                        "text_tokens": 10,
++                        "audio_tokens": 10,
++                        "cached_tokens": 5,
++                        "cached_tokens_details": {"audio_tokens": 5},
++                    },
++                }
++            },
++        },
++    ]
++
++    combined = RealtimeAPITokenUsageProcessor.collect_and_combine_usage_from_realtime_stream_results(
++        results=results,
++    )
++
++    assert combined.prompt_tokens_details is not None
++    assert combined.prompt_tokens_details.cached_tokens == 197
++    combined_cached_details = combined.prompt_tokens_details.cached_tokens_details
++    assert combined_cached_details is not None
++    assert combined_cached_details.text_tokens == 64
++    assert combined_cached_details.audio_tokens == 133
++    assert first_details == {"text_tokens": 64, "audio_tokens": 128}
++
++
++def test_cached_split_omitted_from_serialized_usage_when_absent():
++    """A provider that never reports the split must serialize exactly as before, and the
++    Responses usage conversion must not invent the nested key."""
++    from litellm.responses.litellm_completion_transformation.transformation import (
++        LiteLLMCompletionResponsesConfig,
++    )
++
++    without_split = Usage(
++        prompt_tokens=10,
++        completion_tokens=0,
++        total_tokens=10,
++        prompt_tokens_details=PromptTokensDetailsWrapper(text_tokens=10, cached_tokens=4),
++    )
++    assert without_split.prompt_tokens_details is not None
++    assert "cached_tokens_details" not in without_split.prompt_tokens_details.model_dump()
++
++    responses_usage = LiteLLMCompletionResponsesConfig._transform_chat_completion_usage_to_responses_usage(
++        without_split
++    )
++    assert responses_usage.input_tokens_details is not None
++    assert "cached_tokens_details" not in responses_usage.input_tokens_details.model_dump()
++
++    with_split = Usage(
++        prompt_tokens=10,
++        completion_tokens=0,
++        total_tokens=10,
++        prompt_tokens_details=PromptTokensDetailsWrapper(
++            text_tokens=10,
++            cached_tokens=4,
++            cached_tokens_details=CachedTokensDetails(text_tokens=4),
++        ),
++    )
++    responses_with_split = LiteLLMCompletionResponsesConfig._transform_chat_completion_usage_to_responses_usage(
++        with_split
++    )
++    assert responses_with_split.input_tokens_details is not None
++    assert responses_with_split.input_tokens_details.model_dump()["cached_tokens_details"] == {"text_tokens": 4}
++
++
+ def test_realtime_logging_object_allows_null_transcript_in_conversation_item_added():
+     results: OpenAIRealtimeStreamList = [
+         {

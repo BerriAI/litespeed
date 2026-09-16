@@ -10,6 +10,7 @@ from pathlib import Path
 import random
 from statistics import mean
 import sys
+from infrastructure import incident_runs
 
 
 def supplemental_result(directory, specification):
@@ -34,7 +35,7 @@ def supplemental_result(directory, specification):
 def paired_summary(rows, repetitions, control='control'):
     groups = defaultdict(list)
     for row in rows:
-        if row.get('evaluated'):
+        if row.get('evaluated') and not row.get('infrastructureIncident'):
             groups[(row['dataset'], row['case'], row['name'])].append(row)
     variants = sorted({r['name'] for r in rows} - {control})
     cases = sorted({(r['dataset'], r['case']) for r in rows})
@@ -73,6 +74,7 @@ def main():
     if control not in {item['name'] for item in plan['runs']}:
         raise ValueError('Study must name a control variant present in its planned runs.')
     cache = {}
+    incidents = incident_runs()
     rows = []
     identities = set()
     for item in plan['runs']:
@@ -100,6 +102,8 @@ def main():
         row['evaluated'] = False
         if matches:
             result = matches[0]
+            row['run'] = result['run']
+            row['infrastructureIncident'] = incidents.get(result['run'])
             if timeout is not None and result.get('timeoutSeconds') != timeout:
                 raise ValueError('Trial timeout differs from its predeclared configuration.')
             if 'kind' in item and result.get('kind') != item['kind']:
@@ -133,9 +137,19 @@ def main():
                            tokenPricedUsd=sum(prices) if prices else None,
                            trialsWithoutTokenPrice=sum(r.get('computedUsd') is None for r in selected))
         summaries.append(summary)
+    quality_summaries = []
+    for summary in summaries:
+        eligible = [r for r in rows if r['name'] == summary['variant'] and r['evaluated'] and not r.get('infrastructureIncident')]
+        quality_summaries.append({'variant': summary['variant'], 'eligibleEvaluated': len(eligible),
+                                 'successes': sum(r['success'] for r in eligible),
+                                 'incidentAllocations': sum(bool(r.get('infrastructureIncident')) for r in rows if r['name'] == summary['variant'])})
     result = {'status': 'complete' if all(r['evaluated'] for r in rows) else 'interim',
               'note': 'Development selection only. Interim observed-task means can change as slower trials finish. Bootstrap resamples tasks, not attempts; it does not correct adaptive candidate selection or establish future generalization. Token prices exclude requests without usage and do not replace the campaign ledger.',
-              'variants': summaries, 'comparisons': paired_summary(rows, plan['repetitions'], control), 'trials': rows}
+              'variants': summaries, 'qualityEligibleVariants': quality_summaries,
+              'comparisons': paired_summary(rows, plan['repetitions'], control), 'trials': rows}
+    if any(row.get('infrastructureIncident') for row in rows):
+        result['status'] = 'infrastructure-interrupted'
+        result['note'] += ' Original variants retain all raw evaluated results. qualityEligibleVariants and paired comparisons exclude every allocation named in the public host-sleep-transport incident regardless of score; those allocations remain in trials. No replacement result is substituted.'
     output.write_text(json.dumps(result, indent=2) + '\n')
     print(json.dumps({'status': result['status'], 'variants': summaries,
                       'comparisons': [{k: v for k, v in p.items() if k != 'pairs'} for p in result['comparisons']]}))

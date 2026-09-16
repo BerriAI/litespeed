@@ -1,34 +1,59 @@
 {
-  "status": "interim",
+  "status": "complete",
   "note": "Development selection only. Interim observed-task means can change as slower trials finish. Bootstrap resamples tasks, not attempts; it does not correct adaptive candidate selection or establish future generalization. Token prices exclude requests without usage and do not replace the campaign ledger.",
   "variants": [
     {
       "variant": "astra",
-      "evaluated": 1,
+      "evaluated": 2,
       "expected": 2,
       "successes": 0,
-      "meanSeconds": 460.293,
+      "meanSeconds": 512.11,
       "tokenPricedUsd": null,
-      "trialsWithoutTokenPrice": 1
+      "trialsWithoutTokenPrice": 2
     },
     {
       "variant": "flash",
-      "evaluated": 1,
+      "evaluated": 2,
       "expected": 2,
       "successes": 0,
-      "meanSeconds": 1017.864,
-      "tokenPricedUsd": 0.187538058,
+      "meanSeconds": 1050.7455,
+      "tokenPricedUsd": 0.444071438,
       "trialsWithoutTokenPrice": 0
+    }
+  ],
+  "qualityEligibleVariants": [
+    {
+      "variant": "astra",
+      "eligibleEvaluated": 2,
+      "successes": 0,
+      "incidentAllocations": 0
+    },
+    {
+      "variant": "flash",
+      "eligibleEvaluated": 2,
+      "successes": 0,
+      "incidentAllocations": 0
     }
   ],
   "comparisons": [
     {
       "variant": "flash",
       "control": "astra",
-      "pairedTasks": 0,
+      "pairedTasks": 1,
       "expectedTasks": 1,
-      "complete": false,
-      "pairs": []
+      "complete": true,
+      "pairs": [
+        {
+          "dataset": "training7",
+          "case": "realtime-cached-audio-cost",
+          "successDelta": 0,
+          "secondsDelta": 538.6355
+        }
+      ],
+      "successDelta": 0,
+      "secondsDelta": 538.6355,
+      "taskBootstrap95": null,
+      "uncertaintyNote": "One task cannot estimate variation between tasks; no bootstrap interval is reported."
     }
   ],
   "trials": [
@@ -42,6 +67,8 @@
       "kind": "codex",
       "timeoutSeconds": 1800,
       "evaluated": true,
+      "run": "replication-v50-larger-astra-r1-realtime-cached-audio-cost-9b295f3f",
+      "infrastructureIncident": null,
       "success": false,
       "completed": true,
       "completionReason": "completed",
@@ -76,6 +103,8 @@
       "kind": "litellm-specific",
       "timeoutSeconds": 1800,
       "evaluated": true,
+      "run": "replication-v50-larger-flash-r1-realtime-cached-audio-cost-f4875007",
+      "infrastructureIncident": null,
       "success": false,
       "completed": true,
       "completionReason": "completed",
@@ -174,7 +203,98 @@
       "effort": "medium",
       "kind": "litellm-specific",
       "timeoutSeconds": 1800,
-      "evaluated": false
+      "evaluated": true,
+      "run": "replication-v50-larger-flash-r2-realtime-cached-audio-cost-1f7c3b55",
+      "infrastructureIncident": null,
+      "success": false,
+      "completed": true,
+      "completionReason": "completed",
+      "seconds": 1083.627,
+      "acceptance": {
+        "exit": 1,
+        "tests": 17,
+        "failures": 1,
+        "errors": 0,
+        "skipped": 0,
+        "passed": false
+      },
+      "computedUsd": 0.25653338,
+      "activations": {
+        "initialMapNotices": 1,
+        "contextToolCalls": 0,
+        "guideIdsShown": [],
+        "unparsedContextPayloads": 0,
+        "finalReviewNotices": 1,
+        "guidedFinalReviewNotices": 0,
+        "finalReviewGuideIdsShown": [],
+        "batchedEditCalls": 23,
+        "completedBatchedEditCalls": 22,
+        "batchEditsRequested": 44,
+        "batchSizes": [
+          1,
+          4,
+          3,
+          1,
+          2,
+          5,
+          1,
+          1,
+          1,
+          2,
+          1,
+          2,
+          1,
+          8,
+          1,
+          2,
+          1,
+          2,
+          1,
+          1,
+          1,
+          1,
+          1
+        ],
+        "backgroundCommandNotices": 1,
+        "testFocusNotices": 1,
+        "explorationFocusNotices": 1,
+        "readCallsByEffectiveLimit": {
+          "160": 2,
+          "220": 1,
+          "130": 2,
+          "60": 6,
+          "120": 4,
+          "300": 1,
+          "280": 1,
+          "40": 8,
+          "260": 1,
+          "180": 1,
+          "20": 2,
+          "100": 1,
+          "30": 3,
+          "80": 3,
+          "15": 2,
+          "55": 3,
+          "70": 6,
+          "90": 2,
+          "45": 3,
+          "165": 1,
+          "10": 1,
+          "25": 1,
+          "50": 1
+        },
+        "defaultWindowReadCalls": null,
+        "readLimitProvenance": "unknown: saved arguments include host-injected defaults"
+      },
+      "originalSuccess": false,
+      "supplemental": {
+        "artifact": "aggregation-probe.json",
+        "checks": 4,
+        "expectedChecks": 4,
+        "checksPassed": 4,
+        "exit": 0,
+        "passed": true
+      }
     },
     {
       "dataset": "training7",
@@ -185,7 +305,32 @@
       "effort": "high",
       "kind": "codex",
       "timeoutSeconds": 1800,
-      "evaluated": false
+      "evaluated": true,
+      "run": "replication-v50-larger-astra-r2-realtime-cached-audio-cost-90d3beee",
+      "infrastructureIncident": null,
+      "success": false,
+      "completed": true,
+      "completionReason": "completed",
+      "seconds": 563.927,
+      "acceptance": {
+        "exit": 1,
+        "tests": 17,
+        "failures": 1,
+        "errors": 0,
+        "skipped": 0,
+        "passed": false
+      },
+      "computedUsd": null,
+      "activations": null,
+      "originalSuccess": false,
+      "supplemental": {
+        "artifact": "aggregation-probe.json",
+        "checks": 4,
+        "expectedChecks": 4,
+        "checksPassed": 1,
+        "exit": 0,
+        "passed": false
+      }
     }
   ]
 }

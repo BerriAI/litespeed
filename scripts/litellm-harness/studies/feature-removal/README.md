@@ -1,5 +1,7 @@
 # Frozen feature-removal study
 
+**Infrastructure interruption:** 95 unaffected evaluated allocations; 25 allocations affected by the [host-sleep/transport incident](../host-sleep-transport/README.md). Original scores remain in `variants` and `trials`; `qualityEligibleVariants` and paired comparisons exclude every incident allocation regardless of score. No replacements have been substituted. Paid admission is paused.
+
 This is development evidence, not a held-out comparison. The [plan](plan.json)
 was recorded before the 160 solver trials: 16 tasks, five variants and two
 attempts per variant/task. It preserves the seeded launch order. Three shared

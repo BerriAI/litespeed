@@ -1,5 +1,7 @@
 # Focused test guidance on the shell tool
 
+**Infrastructure interruption:** 2 unaffected evaluated allocations; 6 allocations affected by the [host-sleep/transport incident](../host-sleep-transport/README.md). Original scores remain in `variants` and `trials`; `qualityEligibleVariants` and paired comparisons exclude every incident allocation regardless of score. No replacements have been substituted. Paid admission is paused.
+
 **Experimental; not promoted.** The completed [system-instruction comparison](../test-output-retention/README.md) partly changed traceback options but rarely retained logs and delivered no complete fixes. This follow-up tests a shorter instruction attached directly to the advertised `bash` tool: run focused pytest with short tracebacks without piping through `tail`/`grep`, and retain a log when output may exceed the job buffer.
 
 The shell already returns bounded output. Its 64 KiB rolling buffer cannot recover text discarded by a shell filter, and the existing output pager does not undo that loss. The candidate introduces no tool or command rewrite. Permissions, hooks, execution, history and ordinary tool descriptions stay the same. A runner integration test verifies the instruction in the actual outbound schema and its absence from an ordinary session. Type checking and 37 focused runner/harness tests pass.

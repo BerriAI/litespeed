@@ -1,5 +1,7 @@
 # Does more execution time deliver a usable fix?
 
+**Infrastructure interruption:** 5 unaffected evaluated allocations; 3 allocations affected by the [host-sleep/transport incident](../host-sleep-transport/README.md). Original scores remain in `variants` and `trials`; `qualityEligibleVariants` and paired comparisons exclude every incident allocation regardless of score. No replacements have been substituted. Paid admission is paused.
+
 This eight-trial development experiment compares 900-second and 1800-second limits on two known difficult tasks: team-member budget recovery and legacy streaming pipelines. Both arms use exactly the same integrated v46 runtime, Flash Medium, protocol 7 and dependencies. They differ only in the host execution deadline. The task prompt does not tell the model it has extra time.
 
 The [frozen plan](plan.json) declares two repetitions per arm and task, seeded order, the shared three-slot queue and an $78 committed ceiling for queuing additional trials. Selection follows observed timeouts, including a prior streaming candidate whose final patch passed the real-adapter probe at its deadline. This is deliberately a diagnosis of difficult development work; it cannot estimate future task quality or a general speed advantage.
@@ -18,4 +20,4 @@ The first team-member-budget repetition passes all five checks and finishes norm
 
 ## First streaming pair observed
 
-The standard-limit attempt times out at 900.14 seconds ($0.16732); the extended-limit attempt finishes normally at 1,032.97 seconds ($0.24743). Both pass 13/16 original checks and 12/24 real-adapter checks. Extra time allows delivery in this pair, but does not yield a correct complete implementation. This is one attempt per arm on a known difficult task, with the second repetitions still pending.
+The standard-limit attempt times out at 900.14 seconds ($0.16732); the extended-limit attempt finishes normally at 1,032.97 seconds ($0.24743). Both pass 13/16 original checks and 12/24 real-adapter checks. Extra time allows delivery in this pair, but does not satisfy the declared completion criterion. All 12 failed real-adapter checks exercise inherited hooks; the supplied wording about a subclass’s “own” hooks leaves that requirement ambiguous, as the earlier inheritance audit records. These failures should not be described as 12 independently established public defects. This is one attempt per arm on a known difficult task, with the second repetitions still pending.

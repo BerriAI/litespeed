@@ -1,6 +1,8 @@
 # Prepared combined candidate
 
-**Not promoted.** A separately frozen 16-trial development comparison is running; the feature combination remains experimental while component and integration comparisons finish.
+**Infrastructure interruption:** 15 unaffected evaluated allocations; 1 allocations affected by the [host-sleep/transport incident](../host-sleep-transport/README.md). Original scores remain in `variants` and `trials`; `qualityEligibleVariants` and paired comparisons exclude every incident allocation regardless of score. No replacements have been substituted. Paid admission is paused.
+
+**Not promoted.** The frozen 16-trial development comparison was interrupted with 15 unaffected observations; the feature combination remains experimental.
 
 The [patch](candidate.patch) combines grouped edits with chronological background-job notices. It includes the provider gate required for Anthropic and Codex compatibility. It does not add the experimental inspection preference or streaming guide. Browser summaries show the number of edits, and host command notices are collapsed with their full text available in web and terminal.
 
@@ -22,8 +24,14 @@ A separate v46 checkout combines the same feature mechanisms with the independen
 
 This is integration preparation only. The paid 16-trial comparison keeps the earlier declared commits; no version is substituted mid-study.
 
-## Fourteen of sixteen observations
+## Fifteen unaffected observations and one interrupted allocation
 
-Both arms finish both repetitions normally on MCP authentication (52/52 checks each) and Databricks reasoning (6/6 each). The combined arm averages 35.77 seconds faster on MCP and 37.73 seconds slower on Databricks. Neither task has a success-rate difference. These are two of four fully paired tasks; the whole comparison remains incomplete.
+Both arms finish both repetitions normally on MCP authentication (52/52 checks each), Databricks reasoning (6/6 each), and AWS signing (5/5 each). The combined arm averages 35.77 seconds faster on MCP, 37.73 seconds slower on Databricks, and 42.57 seconds slower on AWS. None of these three complete task pairs has a success-rate difference. The mean elapsed difference across those tasks is 14.84 seconds slower with the combined candidate.
 
-The combined arm also has both normal AWS-signing attempts (5/5 each) and one legacy-streaming timeout (12/16 original, 11/24 real-adapter checks). The control has one normal AWS attempt (5/5) and two legacy timeouts (7/16 and 14/16 original; 4/24 and 12/24 real-adapter checks). The remaining AWS control and legacy combined attempts are pending. [Interim results](results.json).
+The candidate's first legacy-streaming attempt times out (12/16 original, 11/24 real-adapter checks); both controls time out (7/16 and 14/16 original, 4/24 and 12/24 adapter checks). The last candidate allocation is interrupted by the documented infrastructure incident. It is retained but cannot complete the quality comparison. [Results](results.json).
+
+## Integration with large price-map editing
+
+Prepared v54 combines the same mechanisms with the production v52 price-map allowance. A regression found the grouped-edit helper still receiving the ordinary file cap; forwarding the validated per-path cap fixes both ordinary and grouped price-map edits. Full-turn command snapshots and exact Undo/Redo are exercised in both cases. Both price-map tests fail before the correction and pass after it.
+
+Type checking, build, **2,151 tests (1 skipped)**, two actual browser flows and the real terminal PTY checks pass. [Pinned preparation record](integration-v54.json), [patch against public main commit 18ac10d](integration-v54.patch). This remains unpromoted integration preparation; no frozen paid-study runtime changes.

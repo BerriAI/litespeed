@@ -1,31 +1,45 @@
 {
-  "status": "interim",
-  "note": "Development selection only. Interim observed-task means can change as slower trials finish. Bootstrap resamples tasks, not attempts; it does not correct adaptive candidate selection or establish future generalization. Token prices exclude requests without usage and do not replace the campaign ledger.",
+  "status": "infrastructure-interrupted",
+  "note": "Development selection only. Interim observed-task means can change as slower trials finish. Bootstrap resamples tasks, not attempts; it does not correct adaptive candidate selection or establish future generalization. Token prices exclude requests without usage and do not replace the campaign ledger. Original variants retain all raw evaluated results. qualityEligibleVariants and paired comparisons exclude every allocation named in the public host-sleep-transport incident regardless of score; those allocations remain in trials. No replacement result is substituted.",
   "variants": [
     {
       "variant": "plain",
-      "evaluated": 4,
+      "evaluated": 7,
       "expected": 17,
-      "successes": 3,
-      "meanSeconds": 434.85,
-      "tokenPricedUsd": 0.41849874000000004,
-      "trialsWithoutTokenPrice": 0
+      "successes": 4,
+      "meanSeconds": 259.2737142857143,
+      "tokenPricedUsd": 0.430785748,
+      "trialsWithoutTokenPrice": 2
     },
     {
       "variant": "specialized",
-      "evaluated": 4,
+      "evaluated": 7,
       "expected": 17,
-      "successes": 3,
-      "meanSeconds": 257.25325,
-      "tokenPricedUsd": 0.154518082,
-      "trialsWithoutTokenPrice": 0
+      "successes": 4,
+      "meanSeconds": 161.97614285714286,
+      "tokenPricedUsd": 0.167175252,
+      "trialsWithoutTokenPrice": 2
+    }
+  ],
+  "qualityEligibleVariants": [
+    {
+      "variant": "plain",
+      "eligibleEvaluated": 5,
+      "successes": 4,
+      "incidentAllocations": 3
+    },
+    {
+      "variant": "specialized",
+      "eligibleEvaluated": 5,
+      "successes": 4,
+      "incidentAllocations": 2
     }
   ],
   "comparisons": [
     {
       "variant": "specialized",
       "control": "plain",
-      "pairedTasks": 4,
+      "pairedTasks": 5,
       "expectedTasks": 17,
       "complete": false,
       "pairs": [
@@ -43,6 +57,12 @@
         },
         {
           "dataset": "training6",
+          "case": "prompt-security-queued",
+          "successDelta": 0,
+          "secondsDelta": 20.057999999999993
+        },
+        {
+          "dataset": "training6",
           "case": "proxy-call-id-header",
           "successDelta": 0,
           "secondsDelta": -344.53000000000003
@@ -55,7 +75,7 @@
         }
       ],
       "successDelta": 0,
-      "secondsDelta": -177.59675000000001,
+      "secondsDelta": -138.0658,
       "taskBootstrap95": [
         0,
         0
@@ -73,6 +93,8 @@
       "kind": "litellm-specific",
       "timeoutSeconds": 900,
       "evaluated": true,
+      "run": "replication-v48-breadth-specialized-r1-correlation-logging-cost-f1105fbb",
+      "infrastructureIncident": null,
       "success": true,
       "completed": true,
       "completionReason": "completed",
@@ -140,6 +162,8 @@
       "kind": "single",
       "timeoutSeconds": 900,
       "evaluated": true,
+      "run": "replication-v48-breadth-plain-r1-correlation-logging-cost-aa3475e5",
+      "infrastructureIncident": null,
       "success": true,
       "completed": true,
       "completionReason": "completed",
@@ -207,6 +231,8 @@
       "kind": "litellm-specific",
       "timeoutSeconds": 900,
       "evaluated": true,
+      "run": "replication-v48-breadth-specialized-r1-proxy-call-id-header-b42948f6",
+      "infrastructureIncident": null,
       "success": true,
       "completed": true,
       "completionReason": "completed",
@@ -258,6 +284,8 @@
       "kind": "single",
       "timeoutSeconds": 900,
       "evaluated": true,
+      "run": "replication-v48-breadth-plain-r1-proxy-call-id-header-c75ae51f",
+      "infrastructureIncident": null,
       "success": true,
       "completed": true,
       "completionReason": "completed",
@@ -314,6 +342,8 @@
       "kind": "litellm-specific",
       "timeoutSeconds": 900,
       "evaluated": true,
+      "run": "replication-v48-breadth-specialized-r1-team-organization-models-75f06949",
+      "infrastructureIncident": null,
       "success": false,
       "completed": true,
       "completionReason": "completed",
@@ -373,6 +403,8 @@
       "kind": "single",
       "timeoutSeconds": 900,
       "evaluated": true,
+      "run": "replication-v48-breadth-plain-r1-team-organization-models-f18af856",
+      "infrastructureIncident": null,
       "success": false,
       "completed": true,
       "completionReason": "completed",
@@ -431,6 +463,8 @@
       "kind": "litellm-specific",
       "timeoutSeconds": 900,
       "evaluated": true,
+      "run": "replication-v48-breadth-specialized-r1-file-extension-allowlist-8c0251cd",
+      "infrastructureIncident": null,
       "success": true,
       "completed": true,
       "completionReason": "completed",
@@ -490,6 +524,8 @@
       "kind": "single",
       "timeoutSeconds": 900,
       "evaluated": true,
+      "run": "replication-v48-breadth-plain-r1-file-extension-allowlist-6e25dbed",
+      "infrastructureIncident": null,
       "success": true,
       "completed": true,
       "completionReason": "completed",
@@ -539,7 +575,47 @@
       "effort": "medium",
       "kind": "single",
       "timeoutSeconds": 900,
-      "evaluated": false
+      "evaluated": true,
+      "run": "replication-v48-breadth-plain-r1-prompt-security-queued-f56c1ec4",
+      "infrastructureIncident": null,
+      "success": true,
+      "completed": true,
+      "completionReason": "completed",
+      "seconds": 71.893,
+      "acceptance": {
+        "exit": 0,
+        "tests": 4,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0,
+        "passed": true
+      },
+      "computedUsd": 0.012287008,
+      "activations": {
+        "initialMapNotices": 0,
+        "contextToolCalls": 0,
+        "guideIdsShown": [],
+        "unparsedContextPayloads": 0,
+        "finalReviewNotices": 0,
+        "guidedFinalReviewNotices": 0,
+        "finalReviewGuideIdsShown": [],
+        "batchedEditCalls": 0,
+        "completedBatchedEditCalls": 0,
+        "batchEditsRequested": 0,
+        "batchSizes": [],
+        "backgroundCommandNotices": 0,
+        "testFocusNotices": 0,
+        "explorationFocusNotices": 0,
+        "readCallsByEffectiveLimit": {
+          "220": 1,
+          "120": 2,
+          "300": 1,
+          "40": 1,
+          "14": 1
+        },
+        "defaultWindowReadCalls": null,
+        "readLimitProvenance": "unknown: saved arguments include host-injected defaults"
+      }
     },
     {
       "dataset": "training6",
@@ -550,7 +626,50 @@
       "effort": "medium",
       "kind": "litellm-specific",
       "timeoutSeconds": 900,
-      "evaluated": false
+      "evaluated": true,
+      "run": "replication-v48-breadth-specialized-r1-prompt-security-queued-fcb2e324",
+      "infrastructureIncident": null,
+      "success": true,
+      "completed": true,
+      "completionReason": "completed",
+      "seconds": 91.951,
+      "acceptance": {
+        "exit": 0,
+        "tests": 4,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0,
+        "passed": true
+      },
+      "computedUsd": 0.01265717,
+      "activations": {
+        "initialMapNotices": 1,
+        "contextToolCalls": 0,
+        "guideIdsShown": [],
+        "unparsedContextPayloads": 0,
+        "finalReviewNotices": 1,
+        "guidedFinalReviewNotices": 0,
+        "finalReviewGuideIdsShown": [],
+        "batchedEditCalls": 1,
+        "completedBatchedEditCalls": 1,
+        "batchEditsRequested": 2,
+        "batchSizes": [
+          2
+        ],
+        "backgroundCommandNotices": 1,
+        "testFocusNotices": 0,
+        "explorationFocusNotices": 0,
+        "readCallsByEffectiveLimit": {
+          "140": 1,
+          "150": 1,
+          "40": 1,
+          "300": 1,
+          "16": 1,
+          "28": 1
+        },
+        "defaultWindowReadCalls": null,
+        "readLimitProvenance": "unknown: saved arguments include host-injected defaults"
+      }
     },
     {
       "dataset": "training6",
@@ -561,7 +680,43 @@
       "effort": "medium",
       "kind": "litellm-specific",
       "timeoutSeconds": 900,
-      "evaluated": false
+      "evaluated": true,
+      "run": "replication-v48-breadth-specialized-r1-team-cooldown-alternatives-1842ac67",
+      "infrastructureIncident": "host-sleep-transport",
+      "success": false,
+      "completed": false,
+      "completionReason": "runner-error",
+      "seconds": 3.39,
+      "acceptance": {
+        "exit": 1,
+        "tests": 3,
+        "failures": 1,
+        "errors": 0,
+        "skipped": 0,
+        "passed": false
+      },
+      "computedUsd": null,
+      "activations": {
+        "initialMapNotices": 1,
+        "contextToolCalls": 0,
+        "guideIdsShown": [
+          "router-resolution-and-request-state"
+        ],
+        "unparsedContextPayloads": 0,
+        "finalReviewNotices": 0,
+        "guidedFinalReviewNotices": 0,
+        "finalReviewGuideIdsShown": [],
+        "batchedEditCalls": 0,
+        "completedBatchedEditCalls": 0,
+        "batchEditsRequested": 0,
+        "batchSizes": [],
+        "backgroundCommandNotices": 0,
+        "testFocusNotices": 0,
+        "explorationFocusNotices": 0,
+        "readCallsByEffectiveLimit": {},
+        "defaultWindowReadCalls": null,
+        "readLimitProvenance": "unknown: saved arguments include host-injected defaults"
+      }
     },
     {
       "dataset": "training6",
@@ -572,7 +727,41 @@
       "effort": "medium",
       "kind": "single",
       "timeoutSeconds": 900,
-      "evaluated": false
+      "evaluated": true,
+      "run": "replication-v48-breadth-plain-r1-team-cooldown-alternatives-b1be76a7",
+      "infrastructureIncident": "host-sleep-transport",
+      "success": false,
+      "completed": false,
+      "completionReason": "runner-error",
+      "seconds": 1.688,
+      "acceptance": {
+        "exit": 1,
+        "tests": 3,
+        "failures": 1,
+        "errors": 0,
+        "skipped": 0,
+        "passed": false
+      },
+      "computedUsd": null,
+      "activations": {
+        "initialMapNotices": 0,
+        "contextToolCalls": 0,
+        "guideIdsShown": [],
+        "unparsedContextPayloads": 0,
+        "finalReviewNotices": 0,
+        "guidedFinalReviewNotices": 0,
+        "finalReviewGuideIdsShown": [],
+        "batchedEditCalls": 0,
+        "completedBatchedEditCalls": 0,
+        "batchEditsRequested": 0,
+        "batchSizes": [],
+        "backgroundCommandNotices": 0,
+        "testFocusNotices": 0,
+        "explorationFocusNotices": 0,
+        "readCallsByEffectiveLimit": {},
+        "defaultWindowReadCalls": null,
+        "readLimitProvenance": "unknown: saved arguments include host-injected defaults"
+      }
     },
     {
       "dataset": "training6",
@@ -583,7 +772,41 @@
       "effort": "medium",
       "kind": "single",
       "timeoutSeconds": 900,
-      "evaluated": false
+      "evaluated": true,
+      "run": "replication-v48-breadth-plain-r1-organization-own-memberships-8ecd6a94",
+      "infrastructureIncident": "host-sleep-transport",
+      "success": false,
+      "completed": false,
+      "completionReason": "runner-error",
+      "seconds": 1.935,
+      "acceptance": {
+        "exit": 1,
+        "tests": 2,
+        "failures": 2,
+        "errors": 0,
+        "skipped": 0,
+        "passed": false
+      },
+      "computedUsd": null,
+      "activations": {
+        "initialMapNotices": 0,
+        "contextToolCalls": 0,
+        "guideIdsShown": [],
+        "unparsedContextPayloads": 0,
+        "finalReviewNotices": 0,
+        "guidedFinalReviewNotices": 0,
+        "finalReviewGuideIdsShown": [],
+        "batchedEditCalls": 0,
+        "completedBatchedEditCalls": 0,
+        "batchEditsRequested": 0,
+        "batchSizes": [],
+        "backgroundCommandNotices": 0,
+        "testFocusNotices": 0,
+        "explorationFocusNotices": 0,
+        "readCallsByEffectiveLimit": {},
+        "defaultWindowReadCalls": null,
+        "readLimitProvenance": "unknown: saved arguments include host-injected defaults"
+      }
     },
     {
       "dataset": "training6",
@@ -594,7 +817,41 @@
       "effort": "medium",
       "kind": "litellm-specific",
       "timeoutSeconds": 900,
-      "evaluated": false
+      "evaluated": true,
+      "run": "replication-v48-breadth-specialized-r1-organization-own-memberships-d0d054b3",
+      "infrastructureIncident": "host-sleep-transport",
+      "success": false,
+      "completed": false,
+      "completionReason": "runner-error",
+      "seconds": 9.479,
+      "acceptance": {
+        "exit": 1,
+        "tests": 2,
+        "failures": 2,
+        "errors": 0,
+        "skipped": 0,
+        "passed": false
+      },
+      "computedUsd": null,
+      "activations": {
+        "initialMapNotices": 1,
+        "contextToolCalls": 0,
+        "guideIdsShown": [],
+        "unparsedContextPayloads": 0,
+        "finalReviewNotices": 0,
+        "guidedFinalReviewNotices": 0,
+        "finalReviewGuideIdsShown": [],
+        "batchedEditCalls": 0,
+        "completedBatchedEditCalls": 0,
+        "batchEditsRequested": 0,
+        "batchSizes": [],
+        "backgroundCommandNotices": 0,
+        "testFocusNotices": 0,
+        "explorationFocusNotices": 0,
+        "readCallsByEffectiveLimit": {},
+        "defaultWindowReadCalls": null,
+        "readLimitProvenance": "unknown: saved arguments include host-injected defaults"
+      }
     },
     {
       "dataset": "training6",
@@ -605,7 +862,9 @@
       "effort": "medium",
       "kind": "single",
       "timeoutSeconds": 900,
-      "evaluated": false
+      "evaluated": false,
+      "run": "replication-v48-breadth-plain-r1-mapped-error-response-headers-6a8ed7e3",
+      "infrastructureIncident": "host-sleep-transport"
     },
     {
       "dataset": "training6",

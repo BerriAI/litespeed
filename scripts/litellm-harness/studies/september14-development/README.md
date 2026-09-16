@@ -1,5 +1,7 @@
 # September 14 development corpus
 
+**Infrastructure interruption:** 10 unaffected evaluated allocations; 5 allocations affected by the [host-sleep/transport incident](../host-sleep-transport/README.md). Original scores remain in `variants` and `trials`; `qualityEligibleVariants` and paired comparisons exclude every incident allocation regardless of score. No replacements have been substituted. Paid admission is paused.
+
 These are additional development tasks, not the reserved final comparison. The selection was declared from Git metadata before reading PR bodies: first-parent changes dated September 11–14 UTC, 1–4 production Python files, 1–3 Python test files, and 20–450 changed lines. All 21 matching changes landed September 14.
 
 The [preparation plan](preparation-plan.json) retains every candidate. The [catalog](catalog.json) freezes retrospective requirements and test exclusions before qualification and before any model allocation. Requirements come from public PRs and acceptance behavior, not original pre-merge issue reports. The recorded reference is the merged patch; authorship is not assumed to be human.
