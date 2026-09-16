@@ -37,6 +37,12 @@ export function replaySandboxProfile(options:{runDirectory:string;runtimeRoot:st
     // Parent metadata is needed for realpath/getcwd; it does not expose contents.
     '(allow file-read-metadata)',
     ...[runtime,python,node].map(root=>`(allow file-read* (subpath ${quote(root)}))`),
+    // A development checkout also contains published benchmark probes, plans,
+    // scores and reference diagnoses. These are not executable solver context.
+    // Keep only the two workbench modules imported by the isolated launcher.
+    ...['docs','tests','scripts'].map(dir=>`(deny file-read* (subpath ${quote(runtime+'/'+dir)}))`),
+    ...['solve.ts','budget.ts'].map(file=>`(allow file-read* (literal ${quote(runtime+'/scripts/litellm-harness/'+file)}))`),
+    `(deny file-read* (literal ${quote(runtime+'/.git')}))`,
     `(allow file-read* file-write* (subpath ${quote(run)}))`,
     // Host-owned records retain hidden test selection and frozen source hashes.
     `(deny file-read* file-write* (literal ${quote(run+'/task.json')}))`,

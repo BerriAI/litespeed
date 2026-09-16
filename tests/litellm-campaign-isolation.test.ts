@@ -26,20 +26,29 @@ it.skipIf(process.platform!=='darwin')('blocks live source and reference data, i
     const outside=join(dirs.sourceRepo,'future.py'),answer=join(dirs.campaignRoot,'reference.patch'),inside=join(dirs.runDirectory,'source.py'),dependency=join(dirs.pythonEnvironment,'dependency'),sharedTemp=join(root,'other-run-probe.py');
     for(const file of [outside,answer,inside,dependency,sharedTemp])writeFileSync(file,'fixture');
     symlinkSync(outside,join(dirs.runDirectory,'link.py'));
+    const runtimeAnswers=['docs/results.json','tests/oracle.py','scripts/litellm-harness/studies/probe.py','scripts/litellm-harness/task-prompts.json','.git'].map(file=>join(dirs.runtimeRoot,file));
+    const runtimeFiles=['server/runner.ts','scripts/litellm-harness/solve.ts','scripts/litellm-harness/budget.ts'].map(file=>join(dirs.runtimeRoot,file));
+    for(const file of [...runtimeAnswers,...runtimeFiles]){mkdirSync(join(file,'..'),{recursive:true});writeFileSync(file,'fixture');}
+    symlinkSync(runtimeAnswers[0],join(dirs.runDirectory,'runtime-link.json'));
     const manifest=join(dirs.runDirectory,'task.json'),sourceRecord=join(dirs.runDirectory,'harness-source.json');
     writeFileSync(manifest,'hidden selection');writeFileSync(sourceRecord,'frozen source');
     const git=execFileSync('/usr/bin/xcrun',['--find','git'],{encoding:'utf8'}).trim();
     const gitEnv={...process.env,...replayGitEnvironment(),TMPDIR:dirs.runDirectory};
     execFileSync(git,['init','-q'],{cwd:dirs.runDirectory,env:gitEnv});
     const profile=join(root,'profile.sb');writeFileSync(profile,replaySandboxProfile(dirs));
-    for(const file of [outside,answer,sharedTemp,manifest,join(dirs.runDirectory,'link.py')]){
+    for(const file of [outside,answer,sharedTemp,manifest,join(dirs.runDirectory,'link.py'),join(dirs.runDirectory,'runtime-link.json'),...runtimeAnswers]){
       expect(spawnSync('/usr/bin/sandbox-exec',['-f',profile,'/bin/cat',file],{encoding:'utf8'}).status).not.toBe(0);
       expect(spawnSync('/usr/bin/sandbox-exec',['-f',profile,'/bin/sh','-c','cat "$1"','shell',file],{encoding:'utf8'}).status).not.toBe(0);
     }
     // A normal diff/status must work without granting access to global Git config.
     const status=spawnSync('/usr/bin/sandbox-exec',['-f',profile,git,'-C',dirs.runDirectory,'status','--short'],{env:gitEnv,encoding:'utf8'});
     expect(status.status).toBe(0);expect(status.stderr).toBe('');
-    for(const file of [inside,dependency])expect(execFileSync('/usr/bin/sandbox-exec',['-f',profile,'/bin/cat',file],{encoding:'utf8'})).toBe('fixture');
+    for(const file of [inside,dependency,...runtimeFiles])expect(execFileSync('/usr/bin/sandbox-exec',['-f',profile,'/bin/cat',file],{encoding:'utf8'})).toBe('fixture');
+    for(const [index,file] of [outside,answer,...runtimeAnswers].entries()){
+      const link=join(dirs.runDirectory,`hardlink-${index}`);
+      const linked=spawnSync('/usr/bin/sandbox-exec',['-f',profile,'/bin/ln',file,link],{encoding:'utf8'});
+      if(linked.status===0)expect(spawnSync('/usr/bin/sandbox-exec',['-f',profile,'/bin/cat',link],{encoding:'utf8'}).status).not.toBe(0);
+    }
     expect(spawnSync('/usr/bin/sandbox-exec',['-f',profile,'/bin/sh','-c','echo changed > "$1"','shell',outside]).status).not.toBe(0);
     expect(spawnSync('/usr/bin/sandbox-exec',['-f',profile,'/bin/sh','-c','echo changed > "$1"','shell',inside]).status).toBe(0);
     expect(spawnSync('/usr/bin/sandbox-exec',['-f',profile,'/bin/sh','-c','echo changed > "$1"','shell',sourceRecord]).status).not.toBe(0);

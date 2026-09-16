@@ -145,3 +145,11 @@ The current [160-trial feature study](studies/feature-removal/README.md) include
 The report reconciles attributed token/cost totals with the recorded request-usage breakdown. Missing or invalid receipts, and positive or negative differences, remain visible. Compaction or canceled requests are not silently allocated to a tool family. Raw arguments, source, commands and reasoning are excluded from the public export.
 
 The [background-retrieval oracle audit](studies/background-router-oracle/README.md) documents a reference test double coupled to one router lookup method. Original scores remain intact; a real-router diagnostic distinguishes the measured failure from an actual missing retrieval behavior.
+
+## Protocol 7: runtime artifact boundary
+
+Protocol 6 permitted the frozen runtime checkout to be read, including its published benchmark documents, study probes and test artifacts. Blocking the live LiteLLM checkout and private campaign references did not close that second route. Historical protocol-6 results retain that limitation; absence of a flagged access is not proof of isolation.
+
+Protocol 7 additionally denies reads of the runtime's `docs`, `tests`, `scripts` and Git pointer. Only the two workbench modules needed by the isolated solver (`solve.ts` and `budget.ts`) are allowed under `scripts`. Application source and dependencies remain readable; learned harness instructions are intentionally part of the architecture. Snapshot source/tests inside the run remain available. Real macOS checks cover direct reads, subprocesses, symlinks and attempted hardlinks, and preserve working Git status and permitted runtime imports. This remains an evaluation filesystem boundary with network access for inference, not a complete adversarial sandbox.
+
+The newly queued combined study had zero allocations when the gap was found. Its original plan is retained, and both arms will receive the same protocol-7 boundary before any paid attempt. Other frozen training studies retain protocol 6 for comparability and are labeled accordingly. The reserved chronological comparison must use protocol 7 or stronger.

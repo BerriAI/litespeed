@@ -97,13 +97,13 @@ Object.assign(process.env,replayGitEnvironment());
 process.env.PATH=executableDirectory+':'+(process.env.PATH??'/usr/bin:/bin');
 const child=spawn('/usr/bin/sandbox-exec',['-f',profile,process.execPath,'--import','tsx',join(import.meta.dirname,'solve.ts'),directory,kind,effort,String(timeoutSeconds),label],{cwd:runtimeRoot,env:process.env,stdio:'inherit',detached:true});
 let outerTimedOut=false;
-writeFileSync(join(directory,'launch.json'),JSON.stringify({id,kind,label,effort,startedAt:started,timeoutSeconds,pid:child.pid,evaluationProtocol:6},null,2));
-const outerTimeout=setTimeout(()=>{outerTimedOut=true;writeFileSync(join(directory,'launch.json'),JSON.stringify({id,kind,label,effort,startedAt:started,timeoutSeconds,pid:child.pid,evaluationProtocol:6,outerTimedOut:true},null,2));if(child.pid)try{process.kill(-child.pid,'SIGKILL');}catch{}},(timeoutSeconds+45)*1000);
+writeFileSync(join(directory,'launch.json'),JSON.stringify({id,kind,label,effort,startedAt:started,timeoutSeconds,pid:child.pid,evaluationProtocol:7},null,2));
+const outerTimeout=setTimeout(()=>{outerTimedOut=true;writeFileSync(join(directory,'launch.json'),JSON.stringify({id,kind,label,effort,startedAt:started,timeoutSeconds,pid:child.pid,evaluationProtocol:7,outerTimedOut:true},null,2));if(child.pid)try{process.kill(-child.pid,'SIGKILL');}catch{}},(timeoutSeconds+45)*1000);
 const exit=await new Promise<number|null>((resolve,reject)=>{child.on('close',resolve);child.on('error',reject);}).finally(()=>clearTimeout(outerTimeout));
 if(!existsSync(join(directory,'result.json'))){
   try{execFileSync(process.env.LITELLM_EVAL_PYTHON!,[join(import.meta.dirname,'recover.py'),directory],{env:process.env,stdio:'pipe'});}catch{}
   const partial=existsSync(join(directory,'result.json'))?JSON.parse(readFileSync(join(directory,'result.json'),'utf8')):{};
-  writeFileSync(join(directory,'result.json'),JSON.stringify({...partial,id,kind,label,effort,promptRevision:task.prompt_revision,snapshotRevision:task.snapshot_revision,evaluationProtocol:6,isolation:'macOS-seatbelt',timeoutSeconds,seconds:(Date.now()-started)/1000,durationIncomplete:false,status:'error',exit,interrupted:true,timedOut:outerTimedOut,errors:['Isolated solver exited without writing a completion artifact. Preserve this failed trial; partial state was recovered when available.']},null,2));
+  writeFileSync(join(directory,'result.json'),JSON.stringify({...partial,id,kind,label,effort,promptRevision:task.prompt_revision,snapshotRevision:task.snapshot_revision,evaluationProtocol:7,isolation:'macOS-seatbelt',timeoutSeconds,seconds:(Date.now()-started)/1000,durationIncomplete:false,status:'error',exit,interrupted:true,timedOut:outerTimedOut,errors:['Isolated solver exited without writing a completion artifact. Preserve this failed trial; partial state was recovered when available.']},null,2));
 }
 if(exit!==0){
   const failed=JSON.parse(readFileSync(join(directory,'result.json'),'utf8'));
