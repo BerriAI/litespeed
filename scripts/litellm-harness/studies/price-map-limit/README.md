@@ -16,3 +16,9 @@ Before the fix, three new regression checks failed on the old 2 MiB edit, histor
 A separate check copied both real price maps from LiteLLM base `9e1ed40db3376dc8e7b9392aa104653ca22d3fdb`, edited a model's cached-input price using the normal tool, then verified exact Undo and Redo. Both maps passed. [Validation and source hashes](validation.json) record this check; its timings are observations on one desktop, not a performance comparison. The source checkout was not modified.
 
 This removes an observed tool limitation. It does not establish better model quality, and no previous frozen trial is relabeled as using version 52.
+
+## Complete terminal approval previews
+
+A subsequent review found that the terminal fetched only the ordinary 256 KiB browsing prefix before constructing its approval diff. An edit near the end of an otherwise supported price map appeared unavailable; a replacement near the beginning could be checked against incomplete content. Edit previews now request the complete file within the same edit cap, retain existing path/credential checks, and refuse a truncated response from an older server. Ordinary file browsing is unchanged.
+
+The new API regression fails before the change. It verifies a complete 2.4 MB map, ordinary browsing truncation, oversized ordinary-file rejection and protected-file denial. All 145 focused API/tool/permission tests pass, with type checking and build. A real terminal PTY opens approval details, displays the diff at line 300001, permits the edit and verifies exact final bytes. [Preview evidence](preview-validation.json).

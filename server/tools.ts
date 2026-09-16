@@ -487,9 +487,13 @@ async function readAbsoluteText(absolute: string, maxBytes: number, complete = f
   } finally { await handle.close(); }
 }
 
-export async function readFile(workspace: string, filePath: string): Promise<{ path: string; content: string; truncated?: boolean }> {
-  const result = await readTextFile(workspace, filePath, READ_LIMIT);
-  return { path: portable(path.relative(await fs.realpath(workspace), result.absolute)), content: result.content, ...(result.truncated ? { truncated: true } : {}) };
+export async function readFile(workspace: string, filePath: string, options: { editPreview?: boolean } = {}): Promise<{ path: string; content: string; truncated?: boolean }> {
+  const absolute = await assertReadablePath(workspace, filePath);
+  const relative = portable(path.relative(await fs.realpath(workspace), absolute));
+  // An approval diff must use the whole file, within the same cap as its edit.
+  const limit = options.editPreview ? sourceFileByteLimit(relative, EDIT_LIMIT) : READ_LIMIT;
+  const result = await readAbsoluteText(absolute, limit, options.editPreview);
+  return { path: relative, content: result.content, ...(result.truncated ? { truncated: true } : {}) };
 }
 
 export async function shuntSource(workspace: string, args: Record<string, unknown>, access: ToolPathAccess | undefined, signal: AbortSignal, maxBytes: number) {

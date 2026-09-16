@@ -41,6 +41,20 @@ describe('local API and agent loop',()=>{
   });
   afterEach(async()=>{runner.stopAll();await until(()=>!store.sessions().some(s=>runner.active(s.id))).catch(()=>{});await close(server);await close(provider);store.close();await rm(dir,{recursive:true,force:true});});
   it('serves health and never exposes configured keys',async()=>{expect((await request('/health')).data.ok).toBe(true);const result=await request('/settings');expect(JSON.stringify(result.data)).not.toContain('test-private-secret');expect(result.data.providers[0].configured).toBe(true);});
+  it('reads the complete editable price map for approval while keeping ordinary file previews bounded',async()=>{
+    const content='padding\n'.repeat(300_000)+'target near the end\n';
+    await writeFile(join(dir,'model_prices_and_context_window.json'),content);
+    const query=`/file?workspace=${encodeURIComponent(dir)}&path=model_prices_and_context_window.json`;
+    const ordinary=await request(query);expect(ordinary.data.truncated).toBe(true);
+    const edit=await request(query+'&preview=edit');
+    expect(edit.status).toBe(200);expect(edit.data.truncated).not.toBe(true);expect(edit.data.content).toBe(content);
+    await writeFile(join(dir,'ordinary.json'),content);
+    const tooLarge=await request(`/file?workspace=${encodeURIComponent(dir)}&path=ordinary.json&preview=edit`);
+    expect(tooLarge.status).toBeGreaterThanOrEqual(400);expect(JSON.stringify(tooLarge.data)).toContain('too large');
+    await writeFile(join(dir,'.env'),'test-only-secret');
+    const protectedFile=await request(`/file?workspace=${encodeURIComponent(dir)}&path=.env&preview=edit`);
+    expect(protectedFile.status).toBeGreaterThanOrEqual(400);expect(JSON.stringify(protectedFile.data)).not.toContain('test-only-secret');
+  });
   it('blocks cross-origin and DNS-rebinding requests',async()=>{
     const foreign=await fetch(base+'/api/settings',{headers:{Origin:'https://evil.example'}});expect(foreign.status).toBe(403);
     const rebound=await new Promise<number>(resolve=>{httpRequest(base+'/api/settings',{headers:{Host:'evil.example'}},res=>{res.resume();resolve(res.statusCode!);}).end();});expect(rebound).toBe(403);

@@ -53,7 +53,7 @@ The review can add work and latency. It runs once per changed turn; it does not 
 
 On large checkouts, command history prioritizes files already edited in the current turn. This keeps subsequent shell edits to those files connected to Undo and later structured edits. Snapshots remain bounded; the history notice identifies incomplete coverage of other command effects.
 
-**Edit the price maps normally.** The root `model_prices_and_context_window.json` and `litellm/model_prices_and_context_window_backup.json` support structured edits, command snapshots, and Undo/Redo up to 4 MiB each. The shared limit follows the file path even if you change architectures. Other files retain their existing limit; command snapshots still have a 12 MiB total bound.
+**Edit the price maps normally.** The root `model_prices_and_context_window.json` and `litellm/model_prices_and_context_window_backup.json` support structured edits, command snapshots, and Undo/Redo up to 4 MiB each. The shared limit follows the file path even if you change architectures. Other files retain their existing limit; command snapshots still have a 12 MiB total bound. Terminal approval details read the complete editable file, so the proposed diff can show changes near the end of either map. Ordinary file browsing remains bounded.
 
 ## Permissions and limits
 

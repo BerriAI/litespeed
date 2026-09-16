@@ -36,6 +36,10 @@ const mock=createServer(async(req,res)=>{
     emit({content:'The fixture exports a greeting. Shunt kept the source out of the caller context.'});
     if(prompt.includes('LIVE_SHUNT'))await new Promise<void>(resolve=>{const release=()=>{pendingDelegations.delete(release);res.off('close',release);resolve();};pendingDelegations.add(release);res.once('close',release);});
     if(res.destroyed)return;
+  }else if(prompt.includes('LITELLM_PRICE_PREVIEW')) {
+    if(!data.messages.some((message:any)=>message.tool_calls?.some((call:any)=>call.id==='litellm-price-edit'))){
+      toolCall=true;emit({tool_calls:[{index:0,id:'litellm-price-edit',type:'function',function:{name:'edit_file',arguments:JSON.stringify({path:'model_prices_and_context_window.json',old_string:'target near the end',new_string:'updated near the end'})}}]});
+    }else emit({content:'Price-map preview fixture complete.'});
   }else if(prompt.includes('LITELLM_BROWSER')) {
     if(!data.messages.some((message:any)=>message.role==='tool')) {
       toolCall=true;emit({tool_calls:[{index:0,id:'litellm-navigation',type:'function',function:{name:'litellm_context',arguments:JSON.stringify({path:'litellm/example.py',symbol:'transform_request'})}}]});

@@ -28,7 +28,11 @@ export function PermissionPrompt({ request, controller, disabled, onOverlayChang
           if (child.delegation.id !== request.invocationId || child.delegation.parentSessionId !== root.session.id) throw new Error('Worker could not be verified.');
           workspace = child.session.workspace;
         }
-        try { before = (await controller.client.api<{ content: string }>(`/file?workspace=${encodeURIComponent(workspace)}&path=${encodeURIComponent(args.path as string)}`)).content; }
+        try {
+          const file = await controller.client.api<{ content: string; truncated?: boolean }>(`/file?workspace=${encodeURIComponent(workspace)}&path=${encodeURIComponent(args.path as string)}&preview=edit`);
+          if (file.truncated) throw new Error('The file preview is incomplete. Review the requested replacements under Tool arguments.');
+          before = file.content;
+        }
         catch (error) { if (request.tool !== 'write_file' || (error as { status?: number }).status !== 404) throw error; }
         const endings = (text: string) => before.includes('\r\n') ? text.replace(/\r?\n/g, '\r\n') : text.replace(/\r\n/g, '\n');
         const old = typeof args.old_string === 'string' ? endings(args.old_string) : '';

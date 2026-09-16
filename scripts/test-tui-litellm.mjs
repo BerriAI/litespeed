@@ -1,6 +1,6 @@
 /** Local-only acceptance of the LiteLLM picker and navigator in a real PTY. */
 import { spawn } from 'node:child_process';
-import { mkdtemp, mkdir, writeFile, rm, realpath } from 'node:fs/promises';
+import { mkdtemp, mkdir, writeFile, readFile, rm, realpath } from 'node:fs/promises';
 import { join, resolve } from 'node:path';
 import { tmpdir } from 'node:os';
 import assert from 'node:assert/strict';
@@ -20,7 +20,7 @@ server.stdout.on('data',data=>log+=data);server.stderr.on('data',data=>log+=data
 const delay=ms=>new Promise(resolve=>setTimeout(resolve,ms));
 const screen=()=>emulator?Array.from({length:emulator.rows},(_,row)=>emulator.buffer.active.getLine(emulator.buffer.active.viewportY+row)?.translateToString(true,0,emulator.cols)??'').join('\n'):'';
 async function waitFor(check,label){const end=Date.now()+20000;while(Date.now()<end){if(await check())return;await delay(50);}throw new Error(`${label}\n${screen()}\n${log.slice(-1000)}`);}
-async function api(path,body){const response=await fetch(base+'/api'+path,{method:body===undefined?'GET':'POST',...(body===undefined?{}:{headers:{'Content-Type':'application/json'},body:JSON.stringify(body)})});const data=await response.json();assert(response.ok,JSON.stringify(data));return data;}
+async function api(path,body,method){const response=await fetch(base+'/api'+path,{method:method??(body===undefined?'GET':'POST'),...(body===undefined?{}:{headers:{'Content-Type':'application/json'},body:JSON.stringify(body)})});const data=await response.json();assert(response.ok,JSON.stringify(data));return data;}
 function click(marker){const lines=screen().split('\n'),row=lines.findIndex(line=>line.includes(marker));assert(row>=0,screen());const column=lines[row].indexOf(marker)+2;terminal.write(`\x1b[<0;${column};${row+1}M\x1b[<0;${column};${row+1}m`);}
 try{
   await waitFor(()=>/Litespeed E2E ready at (http:\/\/[^\s]+)/.test(log),'fixture ready');base=log.match(/Litespeed E2E ready at (http:\/\/[^\s]+)/)[1];
@@ -45,7 +45,19 @@ try{
   assert.equal(calls.length,1);assert.equal(calls[0].name,'litellm_context');assert.equal(calls[0].status,'completed');assert(calls[0].output.includes('def transform_request'));
   terminal.resize(80,24);emulator.resize(80,24);await delay(200);
   assert(screen().includes('· LiteLLM'));assert(!/^\s*Driver\s*$/m.test(screen()));await writeFile(join(artifacts,'narrow.txt'),screen());
-  console.log('LiteLLM PTY passed: picker, one saved model, Plan navigation, no workers, and narrow header.');
+  const priceMap=join(workspace,'model_prices_and_context_window.json');
+  const before='padding\n'.repeat(300_000)+'target near the end\n';await writeFile(priceMap,before);
+  await api(`/sessions/${session.id}`,{mode:'build',permissionMode:'ask'},'PATCH');
+  terminal.resize(120,50);emulator.resize(120,50);
+  terminal.write('LITELLM_PRICE_PREVIEW update the last entry.\r');
+  await waitFor(()=>screen().includes('wants to edit')&&screen().includes('Allow once'),'edit approval appears');
+  terminal.write('\x06');
+  await waitFor(()=>screen().includes('@@')&&screen().includes('+updated near the end'),'full-file approval diff');
+  assert(!screen().includes('Preview unavailable'));await writeFile(join(artifacts,'price-map-preview.txt'),screen());
+  terminal.write('\x1b');await waitFor(()=>!screen().includes('Review ·'),'close details');
+  terminal.write('1');await waitFor(()=>screen().includes('Price-map preview fixture complete.'),'approved edit completes');
+  assert.equal(await readFile(priceMap,'utf8'),before.replace('target near the end','updated near the end'));
+  console.log('LiteLLM PTY passed: picker, saved model, Plan navigation, narrow header, and full large-price-map approval preview/edit.');
 }finally{
   if(session&&base)await api(`/sessions/${session.id}/cancel`,{}).catch(()=>{});
   terminal?.kill();emulator?.dispose();server.kill('SIGTERM');await rm(config,{recursive:true,force:true});

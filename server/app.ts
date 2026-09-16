@@ -450,7 +450,7 @@ export function createApp(options:AppOptions = {}) {
   app.post('/api/sessions/:id/compact',async(req,res)=>{await runner.compact(req.params.id);res.json({ok:true});});
   app.get('/api/sessions/:id/export',(req,res)=>{const id=req.params.id;res.setHeader('Content-Disposition',`attachment; filename="litespeed-session-${id}.json"`);res.json({session:store.session(id),messages:store.messages(id),todos:store.todos(id)});});
   app.get('/api/files',async(req,res)=>res.json({entries:await listFiles(await workspace(req.query.workspace),queryString(req.query.path))}));
-  app.get('/api/file',async(req,res)=>res.json(await readFile(await workspace(req.query.workspace),queryString(req.query.path))));
+  app.get('/api/file',async(req,res)=>res.json(await readFile(await workspace(req.query.workspace),queryString(req.query.path),{editPreview:req.query.preview==='edit'})));
   app.get('/api/search',async(req,res)=>res.json({files:await searchFiles(await workspace(req.query.workspace),queryString(req.query.q))}));
   app.get('/api/git',async(req,res)=>res.json(await gitStatus(await workspace(req.query.workspace))));
   app.get('/api/sessions/:id/changes',(req,res)=>{store.session(req.params.id);res.json({changes:store.changes(req.params.id)});});
