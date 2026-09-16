@@ -1,0 +1,26 @@
+diff --git a/server/litellm-harness.ts b/server/litellm-harness.ts
+index c62e923..59d9008 100644
+--- a/server/litellm-harness.ts
++++ b/server/litellm-harness.ts
+@@ -4,7 +4,7 @@ import path from 'node:path';
+ import fg from 'fast-glob';
+ import type { ToolDefinition } from '../shared/types.js';
+ 
+-export const LITELLM_HARNESS_VERSION='2026-09-15.17';
++export const LITELLM_HARNESS_VERSION='2026-09-15.17-ablate-no-preload';
+ export const litellmContextTool:ToolDefinition={type:'function',function:{name:'litellm_context',description:'Navigate the current LiteLLM checkout. Give a task query to find relevant definitions, inline conditions and existing tests. Give a source path to see its symbol outline and test partners; add a symbol name to read that definition with numbered lines, or callers to find functions invoking a named helper in that file. Reads only this workspace, never Git history or remote answers.',parameters:{type:'object',properties:{query:{type:'string',maxLength:1000},path:{type:'string',maxLength:500},symbol:{type:'string',maxLength:200},callers:{type:'string',maxLength:200,description:'Python helper name whose call sites and enclosing functions to find; requires path.'}},additionalProperties:false}}};
+ 
+ const playbooks = [
+diff --git a/server/runner.ts b/server/runner.ts
+index dabfd76..6784102 100644
+--- a/server/runner.ts
++++ b/server/runner.ts
+@@ -1550,7 +1550,7 @@ export class Runner {
+     // Give a repository-specific starting map without spending a model round.
+     // Automatic navigation must not bypass even generic tool interception. With
+     // hooks, sidecars or scoped read decisions, the model uses recorded tools.
+-    if(allowed('litellm_context')&&policy.hooks.hooks.length===0
++    if(false&&allowed('litellm_context')&&policy.hooks.hooks.length===0
+       &&![...policy.rules.project,...policy.rules.app].some(rule=>rule.tool==='litellm_context'&&rule.decision!=='allow')) {
+       const query=(this.store.messages(id).find(item=>item.id===run.turnId)?.content??'').slice(0,1000);
+       if(query.trim())try {

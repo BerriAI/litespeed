@@ -1,0 +1,1343 @@
+{
+  "createdAt": "2026-09-15T17:15:27.690204-07:00",
+  "protocol": 6,
+  "model": "fireworks_ai/deepseek-v4p1-flash",
+  "repetitions": 2,
+  "seed": 17062026,
+  "purpose": "One feature removed/changed at a time: guides, initial navigation, final review, read-window size. Training/development only; reserved outcomes remain unused for candidate selection.",
+  "globalConcurrency": 3,
+  "baseCommit": "f75ab327c649cec9719ac03847f171854d2e32ae",
+  "variants": [
+    {
+      "name": "control",
+      "recordedCommit": "f75ab327c649cec9719ac03847f171854d2e32ae",
+      "sourceSha256": {
+        "server/litellm-harness.ts": "5345334fd3857c4066361947afb7c2c10aa106055e396f02e703ded5ac883cbd",
+        "server/runner.ts": "9b5b6c025206aff9431ece168423448301a8da3cee0a7186df8ca2a2cdda0569"
+      }
+    },
+    {
+      "name": "no-guides",
+      "recordedCommit": "6d7fbe3e3c5192b6675c2bea2dc0af3913bd1480",
+      "patch": "no-guides.patch",
+      "patchSha256": "359a3d2030fd045b6eac22aee6f06b27d73f0cf180075579143b3f6581cdb034",
+      "sourceSha256": {
+        "server/litellm-harness.ts": "81d15381f183df7910fc169021e44c40477618549df43e058ea4cf82af6b1fa1",
+        "server/runner.ts": "9b5b6c025206aff9431ece168423448301a8da3cee0a7186df8ca2a2cdda0569"
+      }
+    },
+    {
+      "name": "no-preload",
+      "recordedCommit": "9b7cffd3ff2ca5a5c078321e879c9ee728b9a70c",
+      "patch": "no-preload.patch",
+      "patchSha256": "bc087641f5f6a4bc0745f7531e0ca1e65a684b221e3c6bd0df65d44af60e27a1",
+      "sourceSha256": {
+        "server/litellm-harness.ts": "3257f174e07edebbc038153bade0d305bb046640754847018736790c0fe512b2",
+        "server/runner.ts": "85e0f34999c34d51bebad4b581036731d6c78506c6afeeac6d641f8c3b8db73d"
+      }
+    },
+    {
+      "name": "no-review",
+      "recordedCommit": "33a4ed86b414245c0b87546551b693ff216888e3",
+      "patch": "no-review.patch",
+      "patchSha256": "d2a1c789108f730839d7b6b83a5542d349ea091448040ba0586c4e46c11652a0",
+      "sourceSha256": {
+        "server/litellm-harness.ts": "2e60952595162db91e787d2ee5b87924a8e15d10ca8c81bd9e72439c7f3bd202",
+        "server/runner.ts": "b2b86d8cbe682337f339ac4c05cff3298dd70b1548129436287eacebf9e38979"
+      }
+    },
+    {
+      "name": "read-480",
+      "recordedCommit": "9e4af4bde94625d6eeca72efb0b9436e9d4fb43b",
+      "patch": "read-480.patch",
+      "patchSha256": "493c51c177f62d935d0bc3084e5a4dbe653063f7c9270b9f10c426a44ad343c9",
+      "sourceSha256": {
+        "server/litellm-harness.ts": "c07f8ae8dc7877e7a2382178ab5287a6de3fe32eba8c0ca7f2c04513051e686a",
+        "server/runner.ts": "a9626486d73b8d589c1ba60b8c979aec2193da140f53cf4f9a594d80e7bbbbbd"
+      }
+    }
+  ],
+  "runs": [
+    {
+      "dataset": "",
+      "case": "vertex-version-path",
+      "name": "no-guides",
+      "label": "replication-p6-ablation-no-guides-r1",
+      "commit": "6d7fbe3e3c5192b6675c2bea2dc0af3913bd1480",
+      "effort": "medium"
+    },
+    {
+      "dataset": "",
+      "case": "vertex-version-path",
+      "name": "no-preload",
+      "label": "replication-p6-ablation-no-preload-r1",
+      "commit": "9b7cffd3ff2ca5a5c078321e879c9ee728b9a70c",
+      "effort": "medium"
+    },
+    {
+      "dataset": "",
+      "case": "vertex-version-path",
+      "name": "no-review",
+      "label": "replication-p6-ablation-no-review-r1",
+      "commit": "33a4ed86b414245c0b87546551b693ff216888e3",
+      "effort": "medium"
+    },
+    {
+      "dataset": "",
+      "case": "vertex-version-path",
+      "name": "control",
+      "label": "replication-p6-ablation-control-r1",
+      "commit": "f75ab327c649cec9719ac03847f171854d2e32ae",
+      "effort": "medium"
+    },
+    {
+      "dataset": "",
+      "case": "vertex-version-path",
+      "name": "read-480",
+      "label": "replication-p6-ablation-read-480-r1",
+      "commit": "9e4af4bde94625d6eeca72efb0b9436e9d4fb43b",
+      "effort": "medium"
+    },
+    {
+      "dataset": "training2",
+      "case": "langfuse-session-traces",
+      "name": "no-guides",
+      "label": "replication-p6-ablation-no-guides-r1",
+      "commit": "6d7fbe3e3c5192b6675c2bea2dc0af3913bd1480",
+      "effort": "medium"
+    },
+    {
+      "dataset": "training2",
+      "case": "langfuse-session-traces",
+      "name": "read-480",
+      "label": "replication-p6-ablation-read-480-r1",
+      "commit": "9e4af4bde94625d6eeca72efb0b9436e9d4fb43b",
+      "effort": "medium"
+    },
+    {
+      "dataset": "training2",
+      "case": "langfuse-session-traces",
+      "name": "control",
+      "label": "replication-p6-ablation-control-r1",
+      "commit": "f75ab327c649cec9719ac03847f171854d2e32ae",
+      "effort": "medium"
+    },
+    {
+      "dataset": "training2",
+      "case": "langfuse-session-traces",
+      "name": "no-review",
+      "label": "replication-p6-ablation-no-review-r1",
+      "commit": "33a4ed86b414245c0b87546551b693ff216888e3",
+      "effort": "medium"
+    },
+    {
+      "dataset": "training2",
+      "case": "langfuse-session-traces",
+      "name": "no-preload",
+      "label": "replication-p6-ablation-no-preload-r1",
+      "commit": "9b7cffd3ff2ca5a5c078321e879c9ee728b9a70c",
+      "effort": "medium"
+    },
+    {
+      "dataset": "",
+      "case": "converse-config",
+      "name": "read-480",
+      "label": "replication-p6-ablation-read-480-r1",
+      "commit": "9e4af4bde94625d6eeca72efb0b9436e9d4fb43b",
+      "effort": "medium"
+    },
+    {
+      "dataset": "",
+      "case": "converse-config",
+      "name": "no-review",
+      "label": "replication-p6-ablation-no-review-r1",
+      "commit": "33a4ed86b414245c0b87546551b693ff216888e3",
+      "effort": "medium"
+    },
+    {
+      "dataset": "",
+      "case": "converse-config",
+      "name": "no-guides",
+      "label": "replication-p6-ablation-no-guides-r1",
+      "commit": "6d7fbe3e3c5192b6675c2bea2dc0af3913bd1480",
+      "effort": "medium"
+    },
+    {
+      "dataset": "",
+      "case": "converse-config",
+      "name": "no-preload",
+      "label": "replication-p6-ablation-no-preload-r1",
+      "commit": "9b7cffd3ff2ca5a5c078321e879c9ee728b9a70c",
+      "effort": "medium"
+    },
+    {
+      "dataset": "",
+      "case": "converse-config",
+      "name": "control",
+      "label": "replication-p6-ablation-control-r1",
+      "commit": "f75ab327c649cec9719ac03847f171854d2e32ae",
+      "effort": "medium"
+    },
+    {
+      "dataset": "",
+      "case": "dashscope-rerank",
+      "name": "no-review",
+      "label": "replication-p6-ablation-no-review-r1",
+      "commit": "33a4ed86b414245c0b87546551b693ff216888e3",
+      "effort": "medium"
+    },
+    {
+      "dataset": "",
+      "case": "dashscope-rerank",
+      "name": "control",
+      "label": "replication-p6-ablation-control-r1",
+      "commit": "f75ab327c649cec9719ac03847f171854d2e32ae",
+      "effort": "medium"
+    },
+    {
+      "dataset": "",
+      "case": "dashscope-rerank",
+      "name": "no-guides",
+      "label": "replication-p6-ablation-no-guides-r1",
+      "commit": "6d7fbe3e3c5192b6675c2bea2dc0af3913bd1480",
+      "effort": "medium"
+    },
+    {
+      "dataset": "",
+      "case": "dashscope-rerank",
+      "name": "no-preload",
+      "label": "replication-p6-ablation-no-preload-r1",
+      "commit": "9b7cffd3ff2ca5a5c078321e879c9ee728b9a70c",
+      "effort": "medium"
+    },
+    {
+      "dataset": "",
+      "case": "dashscope-rerank",
+      "name": "read-480",
+      "label": "replication-p6-ablation-read-480-r1",
+      "commit": "9e4af4bde94625d6eeca72efb0b9436e9d4fb43b",
+      "effort": "medium"
+    },
+    {
+      "dataset": "training2",
+      "case": "bedrock-session-tags",
+      "name": "control",
+      "label": "replication-p6-ablation-control-r1",
+      "commit": "f75ab327c649cec9719ac03847f171854d2e32ae",
+      "effort": "medium"
+    },
+    {
+      "dataset": "training2",
+      "case": "bedrock-session-tags",
+      "name": "no-preload",
+      "label": "replication-p6-ablation-no-preload-r1",
+      "commit": "9b7cffd3ff2ca5a5c078321e879c9ee728b9a70c",
+      "effort": "medium"
+    },
+    {
+      "dataset": "training2",
+      "case": "bedrock-session-tags",
+      "name": "no-review",
+      "label": "replication-p6-ablation-no-review-r1",
+      "commit": "33a4ed86b414245c0b87546551b693ff216888e3",
+      "effort": "medium"
+    },
+    {
+      "dataset": "training2",
+      "case": "bedrock-session-tags",
+      "name": "read-480",
+      "label": "replication-p6-ablation-read-480-r1",
+      "commit": "9e4af4bde94625d6eeca72efb0b9436e9d4fb43b",
+      "effort": "medium"
+    },
+    {
+      "dataset": "training2",
+      "case": "bedrock-session-tags",
+      "name": "no-guides",
+      "label": "replication-p6-ablation-no-guides-r1",
+      "commit": "6d7fbe3e3c5192b6675c2bea2dc0af3913bd1480",
+      "effort": "medium"
+    },
+    {
+      "dataset": "",
+      "case": "router-candidates",
+      "name": "no-preload",
+      "label": "replication-p6-ablation-no-preload-r1",
+      "commit": "9b7cffd3ff2ca5a5c078321e879c9ee728b9a70c",
+      "effort": "medium"
+    },
+    {
+      "dataset": "",
+      "case": "router-candidates",
+      "name": "no-guides",
+      "label": "replication-p6-ablation-no-guides-r1",
+      "commit": "6d7fbe3e3c5192b6675c2bea2dc0af3913bd1480",
+      "effort": "medium"
+    },
+    {
+      "dataset": "",
+      "case": "router-candidates",
+      "name": "control",
+      "label": "replication-p6-ablation-control-r1",
+      "commit": "f75ab327c649cec9719ac03847f171854d2e32ae",
+      "effort": "medium"
+    },
+    {
+      "dataset": "",
+      "case": "router-candidates",
+      "name": "no-review",
+      "label": "replication-p6-ablation-no-review-r1",
+      "commit": "33a4ed86b414245c0b87546551b693ff216888e3",
+      "effort": "medium"
+    },
+    {
+      "dataset": "",
+      "case": "router-candidates",
+      "name": "read-480",
+      "label": "replication-p6-ablation-read-480-r1",
+      "commit": "9e4af4bde94625d6eeca72efb0b9436e9d4fb43b",
+      "effort": "medium"
+    },
+    {
+      "dataset": "training2",
+      "case": "mcp-optional-discovery",
+      "name": "control",
+      "label": "replication-p6-ablation-control-r1",
+      "commit": "f75ab327c649cec9719ac03847f171854d2e32ae",
+      "effort": "medium"
+    },
+    {
+      "dataset": "training2",
+      "case": "mcp-optional-discovery",
+      "name": "read-480",
+      "label": "replication-p6-ablation-read-480-r1",
+      "commit": "9e4af4bde94625d6eeca72efb0b9436e9d4fb43b",
+      "effort": "medium"
+    },
+    {
+      "dataset": "training2",
+      "case": "mcp-optional-discovery",
+      "name": "no-preload",
+      "label": "replication-p6-ablation-no-preload-r1",
+      "commit": "9b7cffd3ff2ca5a5c078321e879c9ee728b9a70c",
+      "effort": "medium"
+    },
+    {
+      "dataset": "training2",
+      "case": "mcp-optional-discovery",
+      "name": "no-guides",
+      "label": "replication-p6-ablation-no-guides-r1",
+      "commit": "6d7fbe3e3c5192b6675c2bea2dc0af3913bd1480",
+      "effort": "medium"
+    },
+    {
+      "dataset": "training2",
+      "case": "mcp-optional-discovery",
+      "name": "no-review",
+      "label": "replication-p6-ablation-no-review-r1",
+      "commit": "33a4ed86b414245c0b87546551b693ff216888e3",
+      "effort": "medium"
+    },
+    {
+      "dataset": "",
+      "case": "databricks-reasoning",
+      "name": "read-480",
+      "label": "replication-p6-ablation-read-480-r1",
+      "commit": "9e4af4bde94625d6eeca72efb0b9436e9d4fb43b",
+      "effort": "medium"
+    },
+    {
+      "dataset": "",
+      "case": "databricks-reasoning",
+      "name": "no-review",
+      "label": "replication-p6-ablation-no-review-r1",
+      "commit": "33a4ed86b414245c0b87546551b693ff216888e3",
+      "effort": "medium"
+    },
+    {
+      "dataset": "",
+      "case": "databricks-reasoning",
+      "name": "control",
+      "label": "replication-p6-ablation-control-r1",
+      "commit": "f75ab327c649cec9719ac03847f171854d2e32ae",
+      "effort": "medium"
+    },
+    {
+      "dataset": "",
+      "case": "databricks-reasoning",
+      "name": "no-guides",
+      "label": "replication-p6-ablation-no-guides-r1",
+      "commit": "6d7fbe3e3c5192b6675c2bea2dc0af3913bd1480",
+      "effort": "medium"
+    },
+    {
+      "dataset": "",
+      "case": "databricks-reasoning",
+      "name": "no-preload",
+      "label": "replication-p6-ablation-no-preload-r1",
+      "commit": "9b7cffd3ff2ca5a5c078321e879c9ee728b9a70c",
+      "effort": "medium"
+    },
+    {
+      "dataset": "",
+      "case": "router-strategy-isolation",
+      "name": "no-guides",
+      "label": "replication-p6-ablation-no-guides-r1",
+      "commit": "6d7fbe3e3c5192b6675c2bea2dc0af3913bd1480",
+      "effort": "medium"
+    },
+    {
+      "dataset": "",
+      "case": "router-strategy-isolation",
+      "name": "read-480",
+      "label": "replication-p6-ablation-read-480-r1",
+      "commit": "9e4af4bde94625d6eeca72efb0b9436e9d4fb43b",
+      "effort": "medium"
+    },
+    {
+      "dataset": "",
+      "case": "router-strategy-isolation",
+      "name": "control",
+      "label": "replication-p6-ablation-control-r1",
+      "commit": "f75ab327c649cec9719ac03847f171854d2e32ae",
+      "effort": "medium"
+    },
+    {
+      "dataset": "",
+      "case": "router-strategy-isolation",
+      "name": "no-review",
+      "label": "replication-p6-ablation-no-review-r1",
+      "commit": "33a4ed86b414245c0b87546551b693ff216888e3",
+      "effort": "medium"
+    },
+    {
+      "dataset": "",
+      "case": "router-strategy-isolation",
+      "name": "no-preload",
+      "label": "replication-p6-ablation-no-preload-r1",
+      "commit": "9b7cffd3ff2ca5a5c078321e879c9ee728b9a70c",
+      "effort": "medium"
+    },
+    {
+      "dataset": "training2",
+      "case": "responses-custom-guardrail",
+      "name": "no-review",
+      "label": "replication-p6-ablation-no-review-r1",
+      "commit": "33a4ed86b414245c0b87546551b693ff216888e3",
+      "effort": "medium"
+    },
+    {
+      "dataset": "training2",
+      "case": "responses-custom-guardrail",
+      "name": "control",
+      "label": "replication-p6-ablation-control-r1",
+      "commit": "f75ab327c649cec9719ac03847f171854d2e32ae",
+      "effort": "medium"
+    },
+    {
+      "dataset": "training2",
+      "case": "responses-custom-guardrail",
+      "name": "no-guides",
+      "label": "replication-p6-ablation-no-guides-r1",
+      "commit": "6d7fbe3e3c5192b6675c2bea2dc0af3913bd1480",
+      "effort": "medium"
+    },
+    {
+      "dataset": "training2",
+      "case": "responses-custom-guardrail",
+      "name": "read-480",
+      "label": "replication-p6-ablation-read-480-r1",
+      "commit": "9e4af4bde94625d6eeca72efb0b9436e9d4fb43b",
+      "effort": "medium"
+    },
+    {
+      "dataset": "training2",
+      "case": "responses-custom-guardrail",
+      "name": "no-preload",
+      "label": "replication-p6-ablation-no-preload-r1",
+      "commit": "9b7cffd3ff2ca5a5c078321e879c9ee728b9a70c",
+      "effort": "medium"
+    },
+    {
+      "dataset": "",
+      "case": "anthropic-image-guardrail",
+      "name": "no-preload",
+      "label": "replication-p6-ablation-no-preload-r1",
+      "commit": "9b7cffd3ff2ca5a5c078321e879c9ee728b9a70c",
+      "effort": "medium"
+    },
+    {
+      "dataset": "",
+      "case": "anthropic-image-guardrail",
+      "name": "control",
+      "label": "replication-p6-ablation-control-r1",
+      "commit": "f75ab327c649cec9719ac03847f171854d2e32ae",
+      "effort": "medium"
+    },
+    {
+      "dataset": "",
+      "case": "anthropic-image-guardrail",
+      "name": "no-review",
+      "label": "replication-p6-ablation-no-review-r1",
+      "commit": "33a4ed86b414245c0b87546551b693ff216888e3",
+      "effort": "medium"
+    },
+    {
+      "dataset": "",
+      "case": "anthropic-image-guardrail",
+      "name": "no-guides",
+      "label": "replication-p6-ablation-no-guides-r1",
+      "commit": "6d7fbe3e3c5192b6675c2bea2dc0af3913bd1480",
+      "effort": "medium"
+    },
+    {
+      "dataset": "",
+      "case": "anthropic-image-guardrail",
+      "name": "read-480",
+      "label": "replication-p6-ablation-read-480-r1",
+      "commit": "9e4af4bde94625d6eeca72efb0b9436e9d4fb43b",
+      "effort": "medium"
+    },
+    {
+      "dataset": "",
+      "case": "empty-choices",
+      "name": "read-480",
+      "label": "replication-p6-ablation-read-480-r1",
+      "commit": "9e4af4bde94625d6eeca72efb0b9436e9d4fb43b",
+      "effort": "medium"
+    },
+    {
+      "dataset": "",
+      "case": "empty-choices",
+      "name": "no-review",
+      "label": "replication-p6-ablation-no-review-r1",
+      "commit": "33a4ed86b414245c0b87546551b693ff216888e3",
+      "effort": "medium"
+    },
+    {
+      "dataset": "",
+      "case": "empty-choices",
+      "name": "no-preload",
+      "label": "replication-p6-ablation-no-preload-r1",
+      "commit": "9b7cffd3ff2ca5a5c078321e879c9ee728b9a70c",
+      "effort": "medium"
+    },
+    {
+      "dataset": "",
+      "case": "empty-choices",
+      "name": "control",
+      "label": "replication-p6-ablation-control-r1",
+      "commit": "f75ab327c649cec9719ac03847f171854d2e32ae",
+      "effort": "medium"
+    },
+    {
+      "dataset": "",
+      "case": "empty-choices",
+      "name": "no-guides",
+      "label": "replication-p6-ablation-no-guides-r1",
+      "commit": "6d7fbe3e3c5192b6675c2bea2dc0af3913bd1480",
+      "effort": "medium"
+    },
+    {
+      "dataset": "",
+      "case": "team-member-budget",
+      "name": "no-preload",
+      "label": "replication-p6-ablation-no-preload-r1",
+      "commit": "9b7cffd3ff2ca5a5c078321e879c9ee728b9a70c",
+      "effort": "medium"
+    },
+    {
+      "dataset": "",
+      "case": "team-member-budget",
+      "name": "control",
+      "label": "replication-p6-ablation-control-r1",
+      "commit": "f75ab327c649cec9719ac03847f171854d2e32ae",
+      "effort": "medium"
+    },
+    {
+      "dataset": "",
+      "case": "team-member-budget",
+      "name": "read-480",
+      "label": "replication-p6-ablation-read-480-r1",
+      "commit": "9e4af4bde94625d6eeca72efb0b9436e9d4fb43b",
+      "effort": "medium"
+    },
+    {
+      "dataset": "",
+      "case": "team-member-budget",
+      "name": "no-review",
+      "label": "replication-p6-ablation-no-review-r1",
+      "commit": "33a4ed86b414245c0b87546551b693ff216888e3",
+      "effort": "medium"
+    },
+    {
+      "dataset": "",
+      "case": "team-member-budget",
+      "name": "no-guides",
+      "label": "replication-p6-ablation-no-guides-r1",
+      "commit": "6d7fbe3e3c5192b6675c2bea2dc0af3913bd1480",
+      "effort": "medium"
+    },
+    {
+      "dataset": "training2",
+      "case": "mcp-auth-challenge",
+      "name": "control",
+      "label": "replication-p6-ablation-control-r1",
+      "commit": "f75ab327c649cec9719ac03847f171854d2e32ae",
+      "effort": "medium"
+    },
+    {
+      "dataset": "training2",
+      "case": "mcp-auth-challenge",
+      "name": "no-guides",
+      "label": "replication-p6-ablation-no-guides-r1",
+      "commit": "6d7fbe3e3c5192b6675c2bea2dc0af3913bd1480",
+      "effort": "medium"
+    },
+    {
+      "dataset": "training2",
+      "case": "mcp-auth-challenge",
+      "name": "no-review",
+      "label": "replication-p6-ablation-no-review-r1",
+      "commit": "33a4ed86b414245c0b87546551b693ff216888e3",
+      "effort": "medium"
+    },
+    {
+      "dataset": "training2",
+      "case": "mcp-auth-challenge",
+      "name": "read-480",
+      "label": "replication-p6-ablation-read-480-r1",
+      "commit": "9e4af4bde94625d6eeca72efb0b9436e9d4fb43b",
+      "effort": "medium"
+    },
+    {
+      "dataset": "training2",
+      "case": "mcp-auth-challenge",
+      "name": "no-preload",
+      "label": "replication-p6-ablation-no-preload-r1",
+      "commit": "9b7cffd3ff2ca5a5c078321e879c9ee728b9a70c",
+      "effort": "medium"
+    },
+    {
+      "dataset": "training2",
+      "case": "mock-input-tokens",
+      "name": "read-480",
+      "label": "replication-p6-ablation-read-480-r1",
+      "commit": "9e4af4bde94625d6eeca72efb0b9436e9d4fb43b",
+      "effort": "medium"
+    },
+    {
+      "dataset": "training2",
+      "case": "mock-input-tokens",
+      "name": "control",
+      "label": "replication-p6-ablation-control-r1",
+      "commit": "f75ab327c649cec9719ac03847f171854d2e32ae",
+      "effort": "medium"
+    },
+    {
+      "dataset": "training2",
+      "case": "mock-input-tokens",
+      "name": "no-review",
+      "label": "replication-p6-ablation-no-review-r1",
+      "commit": "33a4ed86b414245c0b87546551b693ff216888e3",
+      "effort": "medium"
+    },
+    {
+      "dataset": "training2",
+      "case": "mock-input-tokens",
+      "name": "no-guides",
+      "label": "replication-p6-ablation-no-guides-r1",
+      "commit": "6d7fbe3e3c5192b6675c2bea2dc0af3913bd1480",
+      "effort": "medium"
+    },
+    {
+      "dataset": "training2",
+      "case": "mock-input-tokens",
+      "name": "no-preload",
+      "label": "replication-p6-ablation-no-preload-r1",
+      "commit": "9b7cffd3ff2ca5a5c078321e879c9ee728b9a70c",
+      "effort": "medium"
+    },
+    {
+      "dataset": "",
+      "case": "anthropic-tool-document",
+      "name": "control",
+      "label": "replication-p6-ablation-control-r1",
+      "commit": "f75ab327c649cec9719ac03847f171854d2e32ae",
+      "effort": "medium"
+    },
+    {
+      "dataset": "",
+      "case": "anthropic-tool-document",
+      "name": "read-480",
+      "label": "replication-p6-ablation-read-480-r1",
+      "commit": "9e4af4bde94625d6eeca72efb0b9436e9d4fb43b",
+      "effort": "medium"
+    },
+    {
+      "dataset": "",
+      "case": "anthropic-tool-document",
+      "name": "no-review",
+      "label": "replication-p6-ablation-no-review-r1",
+      "commit": "33a4ed86b414245c0b87546551b693ff216888e3",
+      "effort": "medium"
+    },
+    {
+      "dataset": "",
+      "case": "anthropic-tool-document",
+      "name": "no-preload",
+      "label": "replication-p6-ablation-no-preload-r1",
+      "commit": "9b7cffd3ff2ca5a5c078321e879c9ee728b9a70c",
+      "effort": "medium"
+    },
+    {
+      "dataset": "",
+      "case": "anthropic-tool-document",
+      "name": "no-guides",
+      "label": "replication-p6-ablation-no-guides-r1",
+      "commit": "6d7fbe3e3c5192b6675c2bea2dc0af3913bd1480",
+      "effort": "medium"
+    },
+    {
+      "dataset": "training2",
+      "case": "mcp-optional-discovery",
+      "name": "read-480",
+      "label": "replication-p6-ablation-read-480-r2",
+      "commit": "9e4af4bde94625d6eeca72efb0b9436e9d4fb43b",
+      "effort": "medium"
+    },
+    {
+      "dataset": "training2",
+      "case": "mcp-optional-discovery",
+      "name": "no-review",
+      "label": "replication-p6-ablation-no-review-r2",
+      "commit": "33a4ed86b414245c0b87546551b693ff216888e3",
+      "effort": "medium"
+    },
+    {
+      "dataset": "training2",
+      "case": "mcp-optional-discovery",
+      "name": "no-preload",
+      "label": "replication-p6-ablation-no-preload-r2",
+      "commit": "9b7cffd3ff2ca5a5c078321e879c9ee728b9a70c",
+      "effort": "medium"
+    },
+    {
+      "dataset": "training2",
+      "case": "mcp-optional-discovery",
+      "name": "control",
+      "label": "replication-p6-ablation-control-r2",
+      "commit": "f75ab327c649cec9719ac03847f171854d2e32ae",
+      "effort": "medium"
+    },
+    {
+      "dataset": "training2",
+      "case": "mcp-optional-discovery",
+      "name": "no-guides",
+      "label": "replication-p6-ablation-no-guides-r2",
+      "commit": "6d7fbe3e3c5192b6675c2bea2dc0af3913bd1480",
+      "effort": "medium"
+    },
+    {
+      "dataset": "training2",
+      "case": "mcp-auth-challenge",
+      "name": "read-480",
+      "label": "replication-p6-ablation-read-480-r2",
+      "commit": "9e4af4bde94625d6eeca72efb0b9436e9d4fb43b",
+      "effort": "medium"
+    },
+    {
+      "dataset": "training2",
+      "case": "mcp-auth-challenge",
+      "name": "no-review",
+      "label": "replication-p6-ablation-no-review-r2",
+      "commit": "33a4ed86b414245c0b87546551b693ff216888e3",
+      "effort": "medium"
+    },
+    {
+      "dataset": "training2",
+      "case": "mcp-auth-challenge",
+      "name": "no-guides",
+      "label": "replication-p6-ablation-no-guides-r2",
+      "commit": "6d7fbe3e3c5192b6675c2bea2dc0af3913bd1480",
+      "effort": "medium"
+    },
+    {
+      "dataset": "training2",
+      "case": "mcp-auth-challenge",
+      "name": "control",
+      "label": "replication-p6-ablation-control-r2",
+      "commit": "f75ab327c649cec9719ac03847f171854d2e32ae",
+      "effort": "medium"
+    },
+    {
+      "dataset": "training2",
+      "case": "mcp-auth-challenge",
+      "name": "no-preload",
+      "label": "replication-p6-ablation-no-preload-r2",
+      "commit": "9b7cffd3ff2ca5a5c078321e879c9ee728b9a70c",
+      "effort": "medium"
+    },
+    {
+      "dataset": "",
+      "case": "anthropic-tool-document",
+      "name": "no-preload",
+      "label": "replication-p6-ablation-no-preload-r2",
+      "commit": "9b7cffd3ff2ca5a5c078321e879c9ee728b9a70c",
+      "effort": "medium"
+    },
+    {
+      "dataset": "",
+      "case": "anthropic-tool-document",
+      "name": "no-guides",
+      "label": "replication-p6-ablation-no-guides-r2",
+      "commit": "6d7fbe3e3c5192b6675c2bea2dc0af3913bd1480",
+      "effort": "medium"
+    },
+    {
+      "dataset": "",
+      "case": "anthropic-tool-document",
+      "name": "control",
+      "label": "replication-p6-ablation-control-r2",
+      "commit": "f75ab327c649cec9719ac03847f171854d2e32ae",
+      "effort": "medium"
+    },
+    {
+      "dataset": "",
+      "case": "anthropic-tool-document",
+      "name": "no-review",
+      "label": "replication-p6-ablation-no-review-r2",
+      "commit": "33a4ed86b414245c0b87546551b693ff216888e3",
+      "effort": "medium"
+    },
+    {
+      "dataset": "",
+      "case": "anthropic-tool-document",
+      "name": "read-480",
+      "label": "replication-p6-ablation-read-480-r2",
+      "commit": "9e4af4bde94625d6eeca72efb0b9436e9d4fb43b",
+      "effort": "medium"
+    },
+    {
+      "dataset": "",
+      "case": "empty-choices",
+      "name": "no-preload",
+      "label": "replication-p6-ablation-no-preload-r2",
+      "commit": "9b7cffd3ff2ca5a5c078321e879c9ee728b9a70c",
+      "effort": "medium"
+    },
+    {
+      "dataset": "",
+      "case": "empty-choices",
+      "name": "no-review",
+      "label": "replication-p6-ablation-no-review-r2",
+      "commit": "33a4ed86b414245c0b87546551b693ff216888e3",
+      "effort": "medium"
+    },
+    {
+      "dataset": "",
+      "case": "empty-choices",
+      "name": "no-guides",
+      "label": "replication-p6-ablation-no-guides-r2",
+      "commit": "6d7fbe3e3c5192b6675c2bea2dc0af3913bd1480",
+      "effort": "medium"
+    },
+    {
+      "dataset": "",
+      "case": "empty-choices",
+      "name": "read-480",
+      "label": "replication-p6-ablation-read-480-r2",
+      "commit": "9e4af4bde94625d6eeca72efb0b9436e9d4fb43b",
+      "effort": "medium"
+    },
+    {
+      "dataset": "",
+      "case": "empty-choices",
+      "name": "control",
+      "label": "replication-p6-ablation-control-r2",
+      "commit": "f75ab327c649cec9719ac03847f171854d2e32ae",
+      "effort": "medium"
+    },
+    {
+      "dataset": "",
+      "case": "vertex-version-path",
+      "name": "read-480",
+      "label": "replication-p6-ablation-read-480-r2",
+      "commit": "9e4af4bde94625d6eeca72efb0b9436e9d4fb43b",
+      "effort": "medium"
+    },
+    {
+      "dataset": "",
+      "case": "vertex-version-path",
+      "name": "no-review",
+      "label": "replication-p6-ablation-no-review-r2",
+      "commit": "33a4ed86b414245c0b87546551b693ff216888e3",
+      "effort": "medium"
+    },
+    {
+      "dataset": "",
+      "case": "vertex-version-path",
+      "name": "no-guides",
+      "label": "replication-p6-ablation-no-guides-r2",
+      "commit": "6d7fbe3e3c5192b6675c2bea2dc0af3913bd1480",
+      "effort": "medium"
+    },
+    {
+      "dataset": "",
+      "case": "vertex-version-path",
+      "name": "no-preload",
+      "label": "replication-p6-ablation-no-preload-r2",
+      "commit": "9b7cffd3ff2ca5a5c078321e879c9ee728b9a70c",
+      "effort": "medium"
+    },
+    {
+      "dataset": "",
+      "case": "vertex-version-path",
+      "name": "control",
+      "label": "replication-p6-ablation-control-r2",
+      "commit": "f75ab327c649cec9719ac03847f171854d2e32ae",
+      "effort": "medium"
+    },
+    {
+      "dataset": "",
+      "case": "databricks-reasoning",
+      "name": "no-preload",
+      "label": "replication-p6-ablation-no-preload-r2",
+      "commit": "9b7cffd3ff2ca5a5c078321e879c9ee728b9a70c",
+      "effort": "medium"
+    },
+    {
+      "dataset": "",
+      "case": "databricks-reasoning",
+      "name": "control",
+      "label": "replication-p6-ablation-control-r2",
+      "commit": "f75ab327c649cec9719ac03847f171854d2e32ae",
+      "effort": "medium"
+    },
+    {
+      "dataset": "",
+      "case": "databricks-reasoning",
+      "name": "no-guides",
+      "label": "replication-p6-ablation-no-guides-r2",
+      "commit": "6d7fbe3e3c5192b6675c2bea2dc0af3913bd1480",
+      "effort": "medium"
+    },
+    {
+      "dataset": "",
+      "case": "databricks-reasoning",
+      "name": "read-480",
+      "label": "replication-p6-ablation-read-480-r2",
+      "commit": "9e4af4bde94625d6eeca72efb0b9436e9d4fb43b",
+      "effort": "medium"
+    },
+    {
+      "dataset": "",
+      "case": "databricks-reasoning",
+      "name": "no-review",
+      "label": "replication-p6-ablation-no-review-r2",
+      "commit": "33a4ed86b414245c0b87546551b693ff216888e3",
+      "effort": "medium"
+    },
+    {
+      "dataset": "",
+      "case": "converse-config",
+      "name": "control",
+      "label": "replication-p6-ablation-control-r2",
+      "commit": "f75ab327c649cec9719ac03847f171854d2e32ae",
+      "effort": "medium"
+    },
+    {
+      "dataset": "",
+      "case": "converse-config",
+      "name": "no-guides",
+      "label": "replication-p6-ablation-no-guides-r2",
+      "commit": "6d7fbe3e3c5192b6675c2bea2dc0af3913bd1480",
+      "effort": "medium"
+    },
+    {
+      "dataset": "",
+      "case": "converse-config",
+      "name": "no-preload",
+      "label": "replication-p6-ablation-no-preload-r2",
+      "commit": "9b7cffd3ff2ca5a5c078321e879c9ee728b9a70c",
+      "effort": "medium"
+    },
+    {
+      "dataset": "",
+      "case": "converse-config",
+      "name": "no-review",
+      "label": "replication-p6-ablation-no-review-r2",
+      "commit": "33a4ed86b414245c0b87546551b693ff216888e3",
+      "effort": "medium"
+    },
+    {
+      "dataset": "",
+      "case": "converse-config",
+      "name": "read-480",
+      "label": "replication-p6-ablation-read-480-r2",
+      "commit": "9e4af4bde94625d6eeca72efb0b9436e9d4fb43b",
+      "effort": "medium"
+    },
+    {
+      "dataset": "training2",
+      "case": "responses-custom-guardrail",
+      "name": "no-review",
+      "label": "replication-p6-ablation-no-review-r2",
+      "commit": "33a4ed86b414245c0b87546551b693ff216888e3",
+      "effort": "medium"
+    },
+    {
+      "dataset": "training2",
+      "case": "responses-custom-guardrail",
+      "name": "read-480",
+      "label": "replication-p6-ablation-read-480-r2",
+      "commit": "9e4af4bde94625d6eeca72efb0b9436e9d4fb43b",
+      "effort": "medium"
+    },
+    {
+      "dataset": "training2",
+      "case": "responses-custom-guardrail",
+      "name": "control",
+      "label": "replication-p6-ablation-control-r2",
+      "commit": "f75ab327c649cec9719ac03847f171854d2e32ae",
+      "effort": "medium"
+    },
+    {
+      "dataset": "training2",
+      "case": "responses-custom-guardrail",
+      "name": "no-preload",
+      "label": "replication-p6-ablation-no-preload-r2",
+      "commit": "9b7cffd3ff2ca5a5c078321e879c9ee728b9a70c",
+      "effort": "medium"
+    },
+    {
+      "dataset": "training2",
+      "case": "responses-custom-guardrail",
+      "name": "no-guides",
+      "label": "replication-p6-ablation-no-guides-r2",
+      "commit": "6d7fbe3e3c5192b6675c2bea2dc0af3913bd1480",
+      "effort": "medium"
+    },
+    {
+      "dataset": "",
+      "case": "dashscope-rerank",
+      "name": "no-preload",
+      "label": "replication-p6-ablation-no-preload-r2",
+      "commit": "9b7cffd3ff2ca5a5c078321e879c9ee728b9a70c",
+      "effort": "medium"
+    },
+    {
+      "dataset": "",
+      "case": "dashscope-rerank",
+      "name": "control",
+      "label": "replication-p6-ablation-control-r2",
+      "commit": "f75ab327c649cec9719ac03847f171854d2e32ae",
+      "effort": "medium"
+    },
+    {
+      "dataset": "",
+      "case": "dashscope-rerank",
+      "name": "read-480",
+      "label": "replication-p6-ablation-read-480-r2",
+      "commit": "9e4af4bde94625d6eeca72efb0b9436e9d4fb43b",
+      "effort": "medium"
+    },
+    {
+      "dataset": "",
+      "case": "dashscope-rerank",
+      "name": "no-review",
+      "label": "replication-p6-ablation-no-review-r2",
+      "commit": "33a4ed86b414245c0b87546551b693ff216888e3",
+      "effort": "medium"
+    },
+    {
+      "dataset": "",
+      "case": "dashscope-rerank",
+      "name": "no-guides",
+      "label": "replication-p6-ablation-no-guides-r2",
+      "commit": "6d7fbe3e3c5192b6675c2bea2dc0af3913bd1480",
+      "effort": "medium"
+    },
+    {
+      "dataset": "",
+      "case": "team-member-budget",
+      "name": "no-review",
+      "label": "replication-p6-ablation-no-review-r2",
+      "commit": "33a4ed86b414245c0b87546551b693ff216888e3",
+      "effort": "medium"
+    },
+    {
+      "dataset": "",
+      "case": "team-member-budget",
+      "name": "no-guides",
+      "label": "replication-p6-ablation-no-guides-r2",
+      "commit": "6d7fbe3e3c5192b6675c2bea2dc0af3913bd1480",
+      "effort": "medium"
+    },
+    {
+      "dataset": "",
+      "case": "team-member-budget",
+      "name": "control",
+      "label": "replication-p6-ablation-control-r2",
+      "commit": "f75ab327c649cec9719ac03847f171854d2e32ae",
+      "effort": "medium"
+    },
+    {
+      "dataset": "",
+      "case": "team-member-budget",
+      "name": "no-preload",
+      "label": "replication-p6-ablation-no-preload-r2",
+      "commit": "9b7cffd3ff2ca5a5c078321e879c9ee728b9a70c",
+      "effort": "medium"
+    },
+    {
+      "dataset": "",
+      "case": "team-member-budget",
+      "name": "read-480",
+      "label": "replication-p6-ablation-read-480-r2",
+      "commit": "9e4af4bde94625d6eeca72efb0b9436e9d4fb43b",
+      "effort": "medium"
+    },
+    {
+      "dataset": "training2",
+      "case": "langfuse-session-traces",
+      "name": "no-guides",
+      "label": "replication-p6-ablation-no-guides-r2",
+      "commit": "6d7fbe3e3c5192b6675c2bea2dc0af3913bd1480",
+      "effort": "medium"
+    },
+    {
+      "dataset": "training2",
+      "case": "langfuse-session-traces",
+      "name": "read-480",
+      "label": "replication-p6-ablation-read-480-r2",
+      "commit": "9e4af4bde94625d6eeca72efb0b9436e9d4fb43b",
+      "effort": "medium"
+    },
+    {
+      "dataset": "training2",
+      "case": "langfuse-session-traces",
+      "name": "no-preload",
+      "label": "replication-p6-ablation-no-preload-r2",
+      "commit": "9b7cffd3ff2ca5a5c078321e879c9ee728b9a70c",
+      "effort": "medium"
+    },
+    {
+      "dataset": "training2",
+      "case": "langfuse-session-traces",
+      "name": "no-review",
+      "label": "replication-p6-ablation-no-review-r2",
+      "commit": "33a4ed86b414245c0b87546551b693ff216888e3",
+      "effort": "medium"
+    },
+    {
+      "dataset": "training2",
+      "case": "langfuse-session-traces",
+      "name": "control",
+      "label": "replication-p6-ablation-control-r2",
+      "commit": "f75ab327c649cec9719ac03847f171854d2e32ae",
+      "effort": "medium"
+    },
+    {
+      "dataset": "",
+      "case": "anthropic-image-guardrail",
+      "name": "no-preload",
+      "label": "replication-p6-ablation-no-preload-r2",
+      "commit": "9b7cffd3ff2ca5a5c078321e879c9ee728b9a70c",
+      "effort": "medium"
+    },
+    {
+      "dataset": "",
+      "case": "anthropic-image-guardrail",
+      "name": "control",
+      "label": "replication-p6-ablation-control-r2",
+      "commit": "f75ab327c649cec9719ac03847f171854d2e32ae",
+      "effort": "medium"
+    },
+    {
+      "dataset": "",
+      "case": "anthropic-image-guardrail",
+      "name": "no-review",
+      "label": "replication-p6-ablation-no-review-r2",
+      "commit": "33a4ed86b414245c0b87546551b693ff216888e3",
+      "effort": "medium"
+    },
+    {
+      "dataset": "",
+      "case": "anthropic-image-guardrail",
+      "name": "read-480",
+      "label": "replication-p6-ablation-read-480-r2",
+      "commit": "9e4af4bde94625d6eeca72efb0b9436e9d4fb43b",
+      "effort": "medium"
+    },
+    {
+      "dataset": "",
+      "case": "anthropic-image-guardrail",
+      "name": "no-guides",
+      "label": "replication-p6-ablation-no-guides-r2",
+      "commit": "6d7fbe3e3c5192b6675c2bea2dc0af3913bd1480",
+      "effort": "medium"
+    },
+    {
+      "dataset": "training2",
+      "case": "mock-input-tokens",
+      "name": "no-review",
+      "label": "replication-p6-ablation-no-review-r2",
+      "commit": "33a4ed86b414245c0b87546551b693ff216888e3",
+      "effort": "medium"
+    },
+    {
+      "dataset": "training2",
+      "case": "mock-input-tokens",
+      "name": "no-guides",
+      "label": "replication-p6-ablation-no-guides-r2",
+      "commit": "6d7fbe3e3c5192b6675c2bea2dc0af3913bd1480",
+      "effort": "medium"
+    },
+    {
+      "dataset": "training2",
+      "case": "mock-input-tokens",
+      "name": "no-preload",
+      "label": "replication-p6-ablation-no-preload-r2",
+      "commit": "9b7cffd3ff2ca5a5c078321e879c9ee728b9a70c",
+      "effort": "medium"
+    },
+    {
+      "dataset": "training2",
+      "case": "mock-input-tokens",
+      "name": "control",
+      "label": "replication-p6-ablation-control-r2",
+      "commit": "f75ab327c649cec9719ac03847f171854d2e32ae",
+      "effort": "medium"
+    },
+    {
+      "dataset": "training2",
+      "case": "mock-input-tokens",
+      "name": "read-480",
+      "label": "replication-p6-ablation-read-480-r2",
+      "commit": "9e4af4bde94625d6eeca72efb0b9436e9d4fb43b",
+      "effort": "medium"
+    },
+    {
+      "dataset": "",
+      "case": "router-candidates",
+      "name": "no-preload",
+      "label": "replication-p6-ablation-no-preload-r2",
+      "commit": "9b7cffd3ff2ca5a5c078321e879c9ee728b9a70c",
+      "effort": "medium"
+    },
+    {
+      "dataset": "",
+      "case": "router-candidates",
+      "name": "no-guides",
+      "label": "replication-p6-ablation-no-guides-r2",
+      "commit": "6d7fbe3e3c5192b6675c2bea2dc0af3913bd1480",
+      "effort": "medium"
+    },
+    {
+      "dataset": "",
+      "case": "router-candidates",
+      "name": "read-480",
+      "label": "replication-p6-ablation-read-480-r2",
+      "commit": "9e4af4bde94625d6eeca72efb0b9436e9d4fb43b",
+      "effort": "medium"
+    },
+    {
+      "dataset": "",
+      "case": "router-candidates",
+      "name": "no-review",
+      "label": "replication-p6-ablation-no-review-r2",
+      "commit": "33a4ed86b414245c0b87546551b693ff216888e3",
+      "effort": "medium"
+    },
+    {
+      "dataset": "",
+      "case": "router-candidates",
+      "name": "control",
+      "label": "replication-p6-ablation-control-r2",
+      "commit": "f75ab327c649cec9719ac03847f171854d2e32ae",
+      "effort": "medium"
+    },
+    {
+      "dataset": "",
+      "case": "router-strategy-isolation",
+      "name": "no-guides",
+      "label": "replication-p6-ablation-no-guides-r2",
+      "commit": "6d7fbe3e3c5192b6675c2bea2dc0af3913bd1480",
+      "effort": "medium"
+    },
+    {
+      "dataset": "",
+      "case": "router-strategy-isolation",
+      "name": "no-preload",
+      "label": "replication-p6-ablation-no-preload-r2",
+      "commit": "9b7cffd3ff2ca5a5c078321e879c9ee728b9a70c",
+      "effort": "medium"
+    },
+    {
+      "dataset": "",
+      "case": "router-strategy-isolation",
+      "name": "no-review",
+      "label": "replication-p6-ablation-no-review-r2",
+      "commit": "33a4ed86b414245c0b87546551b693ff216888e3",
+      "effort": "medium"
+    },
+    {
+      "dataset": "",
+      "case": "router-strategy-isolation",
+      "name": "control",
+      "label": "replication-p6-ablation-control-r2",
+      "commit": "f75ab327c649cec9719ac03847f171854d2e32ae",
+      "effort": "medium"
+    },
+    {
+      "dataset": "",
+      "case": "router-strategy-isolation",
+      "name": "read-480",
+      "label": "replication-p6-ablation-read-480-r2",
+      "commit": "9e4af4bde94625d6eeca72efb0b9436e9d4fb43b",
+      "effort": "medium"
+    },
+    {
+      "dataset": "training2",
+      "case": "bedrock-session-tags",
+      "name": "no-review",
+      "label": "replication-p6-ablation-no-review-r2",
+      "commit": "33a4ed86b414245c0b87546551b693ff216888e3",
+      "effort": "medium"
+    },
+    {
+      "dataset": "training2",
+      "case": "bedrock-session-tags",
+      "name": "control",
+      "label": "replication-p6-ablation-control-r2",
+      "commit": "f75ab327c649cec9719ac03847f171854d2e32ae",
+      "effort": "medium"
+    },
+    {
+      "dataset": "training2",
+      "case": "bedrock-session-tags",
+      "name": "no-guides",
+      "label": "replication-p6-ablation-no-guides-r2",
+      "commit": "6d7fbe3e3c5192b6675c2bea2dc0af3913bd1480",
+      "effort": "medium"
+    },
+    {
+      "dataset": "training2",
+      "case": "bedrock-session-tags",
+      "name": "no-preload",
+      "label": "replication-p6-ablation-no-preload-r2",
+      "commit": "9b7cffd3ff2ca5a5c078321e879c9ee728b9a70c",
+      "effort": "medium"
+    },
+    {
+      "dataset": "training2",
+      "case": "bedrock-session-tags",
+      "name": "read-480",
+      "label": "replication-p6-ablation-read-480-r2",
+      "commit": "9e4af4bde94625d6eeca72efb0b9436e9d4fb43b",
+      "effort": "medium"
+    }
+  ],
+  "runNote": "Recorded commits identify the original frozen runs. Patches reconstruct equivalent source from baseCommit without requiring the private experiment branches. New runs must record their own actual checkout commits/source hashes and new labels."
+}

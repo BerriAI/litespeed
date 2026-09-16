@@ -1,0 +1,143 @@
+[
+  {
+    "id": "converse-config",
+    "split": "train",
+    "revision": "a73e77079818a74d8bb54db591766a71de727301",
+    "prompt": "Fix Bedrock Converse request mapping: request-level configuration such as guardrailConfig and performanceConfig must not also appear inside inferenceConfig. Preserve guarded-text behavior and ordinary inference parameters.",
+    "include_test_names": [
+      "test_config_blocks_do_not_leak_into_inference_config",
+      "test_guarded_text_guardrail_config_preserved"
+    ],
+    "oracle_note": "Tests directly calling newly introduced helper names are excluded; alternate implementations may satisfy the public behavior."
+  },
+  {
+    "id": "vertex-version-path",
+    "split": "train",
+    "revision": "1249f84b10e39f1ad7ddfffb0fe11069abe0d2f1",
+    "prompt": "Vertex requests fail when api_base ends with /v1 or /v1beta1: the generated URL omits project, location and model. Make these version-only bases work for streaming and non-streaming requests. Preserve bare hosts, full custom paths and Gemini behavior.",
+    "include_test_names": [
+      "test_check_custom_proxy_vertex_api_base_with_non_version_path_keeps_endpoint_append",
+      "test_check_custom_proxy_vertex_api_base_with_version_path_and_query_grafts_before_query",
+      "test_check_custom_proxy_vertex_api_base_with_version_path_and_query_streaming_appends_alt_sse",
+      "test_check_custom_proxy_vertex_api_base_with_version_path_grafts_default_path",
+      "test_check_custom_proxy_vertex_api_base_with_version_path_trailing_slash_grafts_default_path",
+      "test_check_custom_proxy_vertex_api_base_without_projects_in_default_url_keeps_endpoint_append"
+    ],
+    "oracle_note": "Tests directly calling newly introduced helper names are excluded; alternate implementations may satisfy the public behavior."
+  },
+  {
+    "id": "anthropic-image-guardrail",
+    "split": "train",
+    "revision": "0c127caedb3438ebe7f82d04fc51024d534cce6d",
+    "prompt": "Anthropic message guardrails drop image blocks whose source type is url. Forward URL sources as URL strings, including images nested in tool results. For base64 sources with media_type, supply a data URL preserving that MIME type; keep raw base64 as a fallback when media_type is absent. Ignore malformed sources and unsupported file sources. Preserve the original message content.",
+    "include_test_names": [
+      "test_a_malformed_source_is_dropped_rather_than_passed_on",
+      "test_base64_source_carries_its_media_type",
+      "test_base64_source_without_a_media_type_is_passed_through",
+      "test_file_source_yields_nothing",
+      "test_url_source_reaches_the_guardrail"
+    ],
+    "oracle_note": "Tests directly calling newly introduced helper names are excluded; alternate implementations may satisfy the public behavior."
+  },
+  {
+    "id": "anthropic-tool-document",
+    "split": "train",
+    "revision": "141185268450a248cb5bb251da3ac503273a1648",
+    "prompt": "The Anthropic /v1/messages compatibility bridge loses document blocks inside tool_result content. Translate supported document blocks using the same document handling as ordinary user content, preserving mixed text and document content.",
+    "include_test_names": [
+      "test_tool_result_single_document_kept_as_pdf_data_url",
+      "test_tool_result_text_and_document_reach_bedrock_converse_tool_result"
+    ],
+    "oracle_note": "Tests directly calling newly introduced helper names are excluded; alternate implementations may satisfy the public behavior."
+  },
+  {
+    "id": "databricks-reasoning",
+    "split": "dev",
+    "revision": "8b2983bd909ef408e59072fb77ff87cb0f9865e5",
+    "prompt": "Databricks chat responses can carry thinking in reasoning_content, its reasoning alias, structured reasoning content blocks, or <think> tags inside string content. Preserve reasoning_content and visible answer text in normal and streaming responses, including reasoning-only chunks. Existing structured reasoning blocks take precedence over top-level fields. A string with <think> tags must separate reasoning from the visible answer. Preserve existing tool and citation behavior.",
+    "include_test_names": [
+      "test_chunk_parser_surfaces_top_level_reasoning_delta",
+      "test_transform_choices_parses_think_tags_in_string_content",
+      "test_transform_choices_prefers_reasoning_blocks_over_top_level_field",
+      "test_transform_choices_surfaces_top_level_reasoning_content"
+    ],
+    "oracle_note": "Tests directly calling newly introduced helper names are excluded; alternate implementations may satisfy the public behavior."
+  },
+  {
+    "id": "empty-choices",
+    "split": "dev",
+    "revision": "b7dad8b44e30e87e6ae174ea6f58054e17cfc8a5",
+    "prompt": "Treat an explicit empty choices list as a valid upstream response, including in shared dictionary-to-response conversion, sync/async conversion to streaming, stream response construction and the Anthropic compatibility adapter. Return an empty choices list without raising APIError or IndexError and without fabricating an assistant choice. Preserve usage-only responses. Missing choices and choices of the wrong type (including null) remain malformed and should raise APIError with a useful diagnostic identifying choices and the supplied type. Existing tests that deliberately reject [] encode the old behavior and must be updated for this change.",
+    "include_test_names": [
+      "test_cached_response_without_choices_streams_a_single_stop_chunk",
+      "test_completion_missing_role",
+      "test_convert_empty_choices_response",
+      "test_convert_empty_choices_response_async",
+      "test_convert_missing_choices_raises_api_error",
+      "test_convert_non_list_choices_raises_api_error",
+      "test_convert_to_model_response_object_empty_choices_returns_empty_list",
+      "test_convert_to_model_response_object_null_choices_raises_api_error",
+      "test_dispatch_cached_response_without_choices_is_an_empty_chunk",
+      "test_translate_openai_response_to_anthropic_empty_choices"
+    ],
+    "oracle_note": "Tests directly calling newly introduced helper names are excluded; alternate implementations may satisfy the public behavior."
+  },
+  {
+    "id": "dashscope-rerank",
+    "split": "dev",
+    "revision": "e907e5ee9b562ab0160eab8cd6245eb4f40c9256",
+    "prompt": "DashScope rerank calls should use the native text-rerank service path rather than the OpenAI-compatible path. Fix DashScope and its Qwen brand aliases while respecting explicitly configured API bases and existing chat behavior.",
+    "include_test_names": [
+      "test_chat_shaped_base_remaps_to_rerank_route",
+      "test_chat_shaped_base_with_trailing_slash_remaps",
+      "test_dashscope_rerank_chat_env_base_keeps_host_and_rerank_route",
+      "test_dashscope_rerank_defaults_to_live_rerank_route",
+      "test_dashscope_rerank_explicit_api_base_wins",
+      "test_intl_chat_shaped_base_remaps_to_intl_rerank_route",
+      "test_non_aliyun_chat_path_base_not_remapped",
+      "test_rerank_env_var_wins_over_chat_shaped_base",
+      "test_rerank_remaps_chat_shaped_default_base"
+    ],
+    "oracle_note": "Tests directly calling newly introduced helper names are excluded; alternate implementations may satisfy the public behavior."
+  },
+  {
+    "id": "router-candidates",
+    "split": "train",
+    "revision": "2000642592670baf38c46f4c6e3bcb851c59d79e",
+    "prompt": "Router candidate deployment IDs must resolve unprefixed model names against provider-qualified wildcard deployments. Use the router's existing resolution semantics, preserving direct group names and team-scoped resolution.",
+    "include_test_names": [
+      "test_get_candidate_model_ids_for_route_covers_model_name_and_pattern"
+    ],
+    "oracle_note": "Tests directly calling newly introduced helper names are excluded; alternate implementations may satisfy the public behavior."
+  },
+  {
+    "id": "router-strategy-isolation",
+    "split": "dev",
+    "revision": "b0071f363f8dd55a3a252e61f51f088ac5bab73c",
+    "prompt": "A per-request routing_strategy override registers its selector in global callbacks and affects unrelated requests. Isolate override selectors while retaining their per-call rate-limit accounting across sync, async and pass-through routing.",
+    "include_test_names": [
+      "test_async_early_return_paths_run_the_override_pre_call_check",
+      "test_override_selector_pre_call_check_only_runs_for_override_selectors",
+      "test_override_selectors_are_not_registered_process_wide",
+      "test_strategy_reinit_unregisters_override_selectors",
+      "test_sync_pass_through_specific_deployment_runs_the_override_pre_call_check",
+      "test_sync_usage_based_v2_override_enforces_rpm_when_a_specific_deployment_is_requested",
+      "test_sync_usage_based_v2_override_stays_scoped_to_the_request_that_asked_for_it",
+      "test_usage_based_v2_override_enforces_rpm_when_a_specific_deployment_is_requested",
+      "test_usage_based_v2_override_stays_scoped_to_the_request_that_asked_for_it"
+    ],
+    "oracle_note": "Tests directly calling newly introduced helper names are excluded; alternate implementations may satisfy the public behavior."
+  },
+  {
+    "id": "team-member-budget",
+    "split": "dev",
+    "revision": "d963e9fa6e770e359bdf17bbf2c47c729667e1b6",
+    "prompt": "Team member budget enforcement allows a request at the exact cap and can lose enforcement after Redis counters expire. Enforce the boundary and retain correct accumulated spend when rebuilding expired counters. Preserve ordinary team/user budget behavior.",
+    "include_test_names": [
+      "test_cached_key_team_member_budget_blocks_at_exact_cap",
+      "test_increment_spend_counters_reseeds_from_db_on_bad_reserved_counter",
+      "test_reconcile_after_redis_counter_expiry_keeps_request_cost_enforced"
+    ],
+    "oracle_note": "Tests directly calling newly introduced helper names are excluded; alternate implementations may satisfy the public behavior."
+  }
+]
