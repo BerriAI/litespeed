@@ -13,11 +13,11 @@
     },
     {
       "variant": "control",
-      "evaluated": 1,
+      "evaluated": 2,
       "expected": 4,
       "successes": 1,
-      "meanSeconds": 453.706,
-      "tokenPricedUsd": 0.23396181800000002,
+      "meanSeconds": 501.148,
+      "tokenPricedUsd": 0.333062424,
       "trialsWithoutTokenPrice": 0
     }
   ],
@@ -61,6 +61,10 @@
         "finalReviewNotices": 1,
         "guidedFinalReviewNotices": 0,
         "finalReviewGuideIdsShown": [],
+        "batchedEditCalls": 0,
+        "completedBatchedEditCalls": 0,
+        "batchEditsRequested": 0,
+        "batchSizes": [],
         "testFocusNotices": 0,
         "explorationFocusNotices": 1,
         "readCallsByEffectiveLimit": {
@@ -113,6 +117,10 @@
         "finalReviewNotices": 1,
         "guidedFinalReviewNotices": 0,
         "finalReviewGuideIdsShown": [],
+        "batchedEditCalls": 0,
+        "completedBatchedEditCalls": 0,
+        "batchEditsRequested": 0,
+        "batchSizes": [],
         "testFocusNotices": 1,
         "explorationFocusNotices": 1,
         "readCallsByEffectiveLimit": {
@@ -140,7 +148,55 @@
       "label": "replication-v22-effort-medium-r1",
       "commit": "3fee39e7c56d02575cecf74c87a774ee83b6f1a9",
       "effort": "medium",
-      "evaluated": false
+      "evaluated": true,
+      "success": false,
+      "completed": true,
+      "completionReason": "completed",
+      "seconds": 548.59,
+      "acceptance": {
+        "exit": 1,
+        "tests": 9,
+        "failures": 4,
+        "errors": 0,
+        "skipped": 0,
+        "passed": false
+      },
+      "computedUsd": 0.09910060600000001,
+      "activations": {
+        "initialMapNotices": 1,
+        "contextToolCalls": 0,
+        "guideIdsShown": [
+          "router-resolution-and-request-state"
+        ],
+        "unparsedContextPayloads": 0,
+        "finalReviewNotices": 1,
+        "guidedFinalReviewNotices": 0,
+        "finalReviewGuideIdsShown": [],
+        "batchedEditCalls": 0,
+        "completedBatchedEditCalls": 0,
+        "batchEditsRequested": 0,
+        "batchSizes": [],
+        "testFocusNotices": 0,
+        "explorationFocusNotices": 1,
+        "readCallsByEffectiveLimit": {
+          "340": 1,
+          "130": 2,
+          "120": 4,
+          "160": 1,
+          "140": 1,
+          "40": 1,
+          "70": 1,
+          "45": 2,
+          "60": 1,
+          "18": 2,
+          "14": 1,
+          "15": 1,
+          "115": 1,
+          "50": 1
+        },
+        "defaultWindowReadCalls": null,
+        "readLimitProvenance": "unknown: saved arguments include host-injected defaults"
+      }
     },
     {
       "dataset": "",
@@ -173,6 +229,10 @@
         "finalReviewNotices": 0,
         "guidedFinalReviewNotices": 0,
         "finalReviewGuideIdsShown": [],
+        "batchedEditCalls": 0,
+        "completedBatchedEditCalls": 0,
+        "batchEditsRequested": 0,
+        "batchSizes": [],
         "testFocusNotices": 1,
         "explorationFocusNotices": 1,
         "readCallsByEffectiveLimit": {
@@ -233,6 +293,10 @@
         "finalReviewNotices": 1,
         "guidedFinalReviewNotices": 0,
         "finalReviewGuideIdsShown": [],
+        "batchedEditCalls": 0,
+        "completedBatchedEditCalls": 0,
+        "batchEditsRequested": 0,
+        "batchSizes": [],
         "testFocusNotices": 0,
         "explorationFocusNotices": 1,
         "readCallsByEffectiveLimit": {
@@ -294,6 +358,10 @@
         "finalReviewNotices": 1,
         "guidedFinalReviewNotices": 0,
         "finalReviewGuideIdsShown": [],
+        "batchedEditCalls": 0,
+        "completedBatchedEditCalls": 0,
+        "batchEditsRequested": 0,
+        "batchSizes": [],
         "testFocusNotices": 0,
         "explorationFocusNotices": 1,
         "readCallsByEffectiveLimit": {

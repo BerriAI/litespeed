@@ -9,6 +9,14 @@ from completion import completion_reason
 
 
 class StudyTests(unittest.TestCase):
+    def test_missing_control_cannot_silently_produce_empty_comparisons(self):
+        with TemporaryDirectory() as temporary:
+            root = Path(temporary)
+            (root/'plan.json').write_text(json.dumps({'runs': [{'name': 'medium'}, {'name': 'high'}]}))
+            with patch('sys.argv', ['study.py', str(root), str(root/'plan.json'), str(root/'output.json')]):
+                with self.assertRaisesRegex(ValueError, 'control variant'):
+                    main()
+
     def test_per_trial_supplement_does_not_block_unrelated_cases(self):
         with TemporaryDirectory() as temporary:
             root = Path(temporary)
@@ -60,7 +68,7 @@ class StudyTests(unittest.TestCase):
         self.assertEqual(completion_reason(result), 'timeout')
 
     def test_activation_requires_observed_payload(self):
-        messages = [{'role': 'system', 'content': 'LiteLLM starting locations\n<workspace_reference>\n{"playbooks":[{"id":"router"}]}\n</workspace_reference>'},
+        messages = [{'role': 'system', 'content': 'Background command completion: job-1 finished'}, {'role': 'system', 'content': 'LiteLLM starting locations\n<workspace_reference>\n{"playbooks":[{"id":"router"}]}\n</workspace_reference>'},
                     {'role': 'system', 'content': 'LiteLLM change review.\nRelevant repository lessons for this final audit: [{"id":"review-only"}]\n'}]
         calls = [{'name': 'read_file', 'args': {}}, {'name': 'read_file', 'args': {'limit': 20}},
                  {'name': 'litellm_context', 'output': '{"playbooks":[{"id":"router"}]}'},
@@ -70,6 +78,7 @@ class StudyTests(unittest.TestCase):
         result = activations(messages, calls)
         self.assertEqual(result['guideIdsShown'], ['router'])
         self.assertEqual(result['finalReviewNotices'], 1)
+        self.assertEqual(result['backgroundCommandNotices'], 1)
         self.assertEqual(result['guidedFinalReviewNotices'], 1)
         self.assertEqual(result['finalReviewGuideIdsShown'], ['review-only'])
         self.assertEqual(result['batchedEditCalls'], 2)

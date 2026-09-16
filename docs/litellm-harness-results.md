@@ -1,6 +1,6 @@
 # LiteLLM harness campaign results
 
-Interim snapshot: 2026-09-16T03:17:25.205881+00:00. Current harness: **2026-09-15.28**.
+Interim snapshot: 2026-09-16T04:04:28.509231+00:00. Current harness: **2026-09-15.30**.
 
 **The campaign is still running. It has not established a quality win over Astra/Codex or production replacement readiness.**
 
@@ -8,7 +8,7 @@ The selectable architecture and replay workbench are implemented. The current wo
 
 ## Spending
 
-Confirmed token/header-priced charges: **$25.2526**. Missing receipts retain **$29.2684** across 116 requests; active requests reserve another **$0.5046**. The committed upper bound is **$55.0256** against the authorized **$100.00** ceiling. Reservations are not actual charges. Astra account billing is unavailable.
+Confirmed token/header-priced charges: **$27.1147**. Missing receipts retain **$29.2684** across 116 requests; active requests reserve another **$0.2523**. The committed upper bound is **$56.6354** against the authorized **$100.00** ceiling. Reservations are not actual charges. Astra account billing is unavailable.
 
 ## Controlled development observations
 
@@ -48,6 +48,10 @@ A provenance audit corrected the initial supplemental reference imports: a tests
 A later routing run recorded 21 pytest-related jobs without a test-focus notice: the reminder incorrectly depended on conservative check verdicts that excluded its command wrappers. Version 24 counts completed test-like activity separately, deduplicates job polling, and keeps pass/fail receipts conservative. Frozen earlier runs are unchanged.
 
 A follow-up activation audit found eight 10–13 second pytest jobs in the second v24 MCP trial but no reminder: yielded jobs update their original command receipt, while polling calls have no execution receipt. Version 28 scans completed calls for the current turn and deduplicates job IDs; a real background-job regression test verifies activation. This is a mechanism fix, not a demonstrated quality gain.
+
+A [background-retrieval oracle audit](../scripts/litellm-harness/studies/background-router-oracle/README.md) found a failed assertion coupled to a mock configured for one router lookup method. Replacing only that mock with a real Router reproduces base failure, reference success and candidate success. The original 6/7 score stays unchanged; this candidate does not have a demonstrated retrieval defect from that assertion.
+
+Request-level cost analysis found that completed background jobs repeatedly changed the runtime envelope before the original user message, invalidating reuse of subsequent tool history despite unchanged system/tool hashes. A [chronological job-event candidate](../scripts/litellm-harness/studies/job-events/README.md) and a separate [session-affinity transport pilot](../scripts/litellm-harness/studies/cache-affinity/README.md) are predeclared and unpromoted. Per-action usage assigns the entire model request to its chosen next action, not marginal tool cost; reconciliation gaps remain visible.
 
 ## Evaluation status
 

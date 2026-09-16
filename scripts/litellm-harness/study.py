@@ -69,6 +69,9 @@ def main():
     root, plan_path, output = map(Path, sys.argv[1:])
     root = root.resolve()
     plan = json.loads(plan_path.read_text())
+    control = plan.get('control', 'control')
+    if control not in {item['name'] for item in plan['runs']}:
+        raise ValueError('Study must name a control variant present in its planned runs.')
     cache = {}
     rows = []
     identities = set()
@@ -120,7 +123,7 @@ def main():
         summaries.append(summary)
     result = {'status': 'complete' if all(r['evaluated'] for r in rows) else 'interim',
               'note': 'Development selection only. Interim observed-task means can change as slower trials finish. Bootstrap resamples tasks, not attempts; it does not correct adaptive candidate selection or establish future generalization. Token prices exclude requests without usage and do not replace the campaign ledger.',
-              'variants': summaries, 'comparisons': paired_summary(rows, plan['repetitions'], plan.get('control', 'control')), 'trials': rows}
+              'variants': summaries, 'comparisons': paired_summary(rows, plan['repetitions'], control), 'trials': rows}
     output.write_text(json.dumps(result, indent=2) + '\n')
     print(json.dumps({'status': result['status'], 'variants': summaries,
                       'comparisons': [{k: v for k, v in p.items() if k != 'pairs'} for p in result['comparisons']]}))

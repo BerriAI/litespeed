@@ -51,6 +51,7 @@ def activations(messages, calls):
         'completedBatchedEditCalls': sum(c.get('status') == 'completed' for c in batches),
         'batchEditsRequested': sum(len(c['args']['edits']) for c in batches),
         'batchSizes': [len(c['args']['edits']) for c in batches],
+        'backgroundCommandNotices': sum(s.startswith('Background command completion:') for s in system),
         'testFocusNotices': sum(s.startswith('LiteLLM verification checkpoint:') for s in system),
         'explorationFocusNotices': sum(s.startswith('LiteLLM exploration checkpoint:') for s in system),
         # The runner fills the default BEFORE saving tool arguments. Historical
