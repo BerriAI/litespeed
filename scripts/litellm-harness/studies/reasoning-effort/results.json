@@ -1,14 +1,14 @@
 {
-  "status": "interim",
+  "status": "complete",
   "note": "Development selection only. Interim observed-task means can change as slower trials finish. Bootstrap resamples tasks, not attempts; it does not correct adaptive candidate selection or establish future generalization. Token prices exclude requests without usage and do not replace the campaign ledger.",
   "variants": [
     {
       "variant": "high",
-      "evaluated": 7,
+      "evaluated": 8,
       "expected": 8,
-      "successes": 4,
-      "meanSeconds": 658.4458571428571,
-      "tokenPricedUsd": 1.058215204,
+      "successes": 5,
+      "meanSeconds": 652.543125,
+      "tokenPricedUsd": 1.166862454,
       "trialsWithoutTokenPrice": 0
     },
     {
@@ -25,9 +25,9 @@
     {
       "variant": "high",
       "control": "medium",
-      "pairedTasks": 3,
+      "pairedTasks": 4,
       "expectedTasks": 4,
-      "complete": false,
+      "complete": true,
       "pairs": [
         {
           "dataset": "",
@@ -43,15 +43,21 @@
         },
         {
           "dataset": "training2",
+          "case": "mcp-auth-challenge",
+          "successDelta": 0,
+          "secondsDelta": -34.01249999999993
+        },
+        {
+          "dataset": "training2",
           "case": "responses-custom-guardrail",
           "successDelta": 0,
           "secondsDelta": 94.17200000000003
         }
       ],
-      "successDelta": -0.16666666666666666,
-      "secondsDelta": 105.50316666666667,
+      "successDelta": -0.125,
+      "secondsDelta": 70.62425000000002,
       "taskBootstrap95": [
-        -0.5,
+        -0.375,
         0
       ]
     }
@@ -962,7 +968,56 @@
       "label": "replication-v22-effort-high-r2",
       "commit": "3fee39e7c56d02575cecf74c87a774ee83b6f1a9",
       "effort": "high",
-      "evaluated": false
+      "evaluated": true,
+      "success": true,
+      "completed": true,
+      "completionReason": "completed",
+      "seconds": 611.224,
+      "acceptance": {
+        "exit": 0,
+        "tests": 52,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0,
+        "passed": true
+      },
+      "computedUsd": 0.10864725,
+      "activations": {
+        "initialMapNotices": 1,
+        "contextToolCalls": 0,
+        "guideIdsShown": [],
+        "unparsedContextPayloads": 0,
+        "finalReviewNotices": 1,
+        "guidedFinalReviewNotices": 0,
+        "finalReviewGuideIdsShown": [],
+        "batchedEditCalls": 0,
+        "completedBatchedEditCalls": 0,
+        "batchEditsRequested": 0,
+        "batchSizes": [],
+        "backgroundCommandNotices": 0,
+        "testFocusNotices": 0,
+        "explorationFocusNotices": 1,
+        "readCallsByEffectiveLimit": {
+          "160": 3,
+          "180": 1,
+          "330": 1,
+          "120": 5,
+          "200": 1,
+          "100": 2,
+          "60": 5,
+          "80": 6,
+          "290": 1,
+          "70": 1,
+          "260": 1,
+          "130": 1,
+          "360": 1,
+          "40": 2,
+          "30": 2,
+          "14": 2
+        },
+        "defaultWindowReadCalls": null,
+        "readLimitProvenance": "unknown: saved arguments include host-injected defaults"
+      }
     }
   ]
 }

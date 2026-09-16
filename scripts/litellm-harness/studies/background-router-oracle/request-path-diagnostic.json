@@ -47,6 +47,16 @@
       "errors": 0,
       "skipped": 0,
       "passed": true
+    },
+    {
+      "name": "replication-v29-edits-control-r1-background-responses-pipeline-8c4360a4",
+      "exit": 0,
+      "tests": 1,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "passed": true,
+      "packageOriginsAsserted": true
     }
   ]
 }
