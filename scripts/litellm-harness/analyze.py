@@ -4,6 +4,7 @@ import json
 import os
 import re
 from pathlib import Path
+from trace_metrics import activations
 
 ROOT=Path(os.environ['LITELLM_CAMPAIGN_DIR'])
 records=[]
@@ -32,6 +33,7 @@ for p in sorted((ROOT/'runs').glob('*/result.json')):
             unique[key]=message
         messages=sorted(unique.values(),key=lambda m:m['createdAt'])
         calls=list({c['id']:c for m in messages for c in m.get('toolCalls',[])}.values())
+        record['activations']=activations(messages,calls)
         usage=result.get('usage',{})
         record['reportedRequests']=usage.get('reportedRequests')
         units=[r['usage'] for r in usage.get('breakdown',[]) if r.get('usage')]

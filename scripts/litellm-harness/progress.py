@@ -20,7 +20,7 @@ fields = ['run', 'id', 'kind', 'label', 'promptRevision', 'snapshotRevision', 'h
           'recovered', 'durationIncomplete', 'repairParent', 'requests', 'reportedRequests',
           'inputTokens', 'cachedTokens', 'outputTokens', 'computedUsd', 'acceptance',
           'toolCounts', 'exactRepeatedCalls', 'toolOutputCharacters', 'toolActiveSeconds',
-          'modelSeconds', 'timeToFirstEditSeconds', 'reviewStartedSeconds', 'reviewModelRequests']
+          'modelSeconds', 'timeToFirstEditSeconds', 'reviewStartedSeconds', 'reviewModelRequests', 'activations']
 runs = []
 for dataset in datasets:
     for record in json.loads((dataset / 'analysis.json').read_text()):
