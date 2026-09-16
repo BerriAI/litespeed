@@ -5,6 +5,7 @@ import type { PermissionDecision, PermissionRuleSet } from '../../shared/permiss
 import { PERMISSION_LIMITS } from '../../shared/permissions';
 import { api, errorMessage, patch, post, query } from './api';
 import { CopyButton, Modal, LiteSpeed } from './ui';
+import { McpImporter } from './McpImporter';
 
 import type { McpServerStatus } from '../../shared/mcp';
 import type { MemoryFactSummary } from '../../shared/memory';
@@ -50,7 +51,7 @@ function parseContextRows(rows: ContextLimitRow[]): Record<string, number> {
   }
   return Object.fromEntries(entries);
 }
-export function Settings({ settings, onClose, onSave, onProfiles, profilesDisabled, profiles }: { profiles?: ReactNode; onProfiles?: () => void; profilesDisabled?: boolean; settings: SettingsType; onClose: () => void; onSave: (settings: SettingsType) => void }) {
+export function Settings({ settings, workspace, onClose, onSave, onProfiles, profilesDisabled, profiles }: { workspace?: string; profiles?: ReactNode; onProfiles?: () => void; profilesDisabled?: boolean; settings: SettingsType; onClose: () => void; onSave: (settings: SettingsType) => void }) {
   const [draft, setDraft] = useState<SettingsType>(() => ({ ...settings, providers: settings.providers.map(({ apiKey: _key, ...p }) => p) }));
   const [contextRows, setContextRows] = useState(() => contextRowsFor(settings.providers));
   const [ruleRows, setRuleRows] = useState(() => ruleRowsFor(settings.permissionRules));
@@ -70,6 +71,7 @@ export function Settings({ settings, onClose, onSave, onProfiles, profilesDisabl
   const [mcpFeedback, setMcpFeedback] = useState<Record<string, string>>({});
   const [mcpActions, setMcpActions] = useState(new Set<string>());
   const [mcpReview, setMcpReview] = useState<McpReview | null>(null);
+  const [importingMcp, setImportingMcp] = useState(false);
   const [reviewLoading, setReviewLoading] = useState(false);
   const reviewedRevision = useRef(settings.mcpConfigRevision);
   const savedMcp = useRef(settings.mcpServers);
@@ -329,6 +331,24 @@ export function Settings({ settings, onClose, onSave, onProfiles, profilesDisabl
     const p: Provider = { id: `provider-${crypto.randomUUID().slice(0, 8)}`, name: 'Custom provider', kind: 'openai', baseUrl: '', models: [] };
     setDraft(s => ({ ...s, defaultProvider: s.providers.length ? s.defaultProvider : p.id, providers: [...s.providers, p] })); setSelected(p.id); setShowKey(false);
   }
+  const importedMcp = (result: import('../../shared/mcp-import').McpImportResult) => {
+    setImportingMcp(false); setBusy(true); saving.current = true;
+    setNotice(`Imported ${result.imported.length} disabled MCP server${result.imported.length === 1 ? '' : 's'}${result.skipped.length ? `; skipped ${result.skipped.length}` : ''}.`);
+    void (async () => {
+      try {
+        const saved = await api<SettingsType>('/settings');
+        if (!alive.current) return;
+        onSave(saved); savedMcp.current = saved.mcpServers; reviewedRevision.current = saved.mcpConfigRevision;
+        initialMcp.current = JSON.stringify(saved.mcpServers, null, 2); currentMcp.current = initialMcp.current;
+        setMcp(initialMcp.current);
+        setDraft(current => ({ ...current, mcpServers: saved.mcpServers, mcpConfigRevision: saved.mcpConfigRevision }));
+        await refreshMcp(true);
+      } catch (error) {
+        if (alive.current) setError(`Import saved, but settings refresh failed. Reopen Settings before editing MCP configuration: ${errorMessage(error)}`);
+      } finally { saving.current = false; if (alive.current) setBusy(false); }
+    })();
+  };
+  if (importingMcp) return <McpImporter workspace={workspace || draft.workspace} onClose={() => setImportingMcp(false)} onImported={importedMcp} />;
   return <Modal title="Settings" onClose={onClose} wide>
     <div className="settings-layout"><nav className="settings-nav" aria-label="Settings sections">
       <button className={tab === 'providers' ? 'selected' : ''} onClick={() => setTab('providers')}><Server size={16} />Providers</button>
@@ -411,6 +431,8 @@ export function Settings({ settings, onClose, onSave, onProfiles, profilesDisabl
         <div className="quiet-callout"><ShieldCheck size={18} /><p>Pattern matching is a documented convenience, not a sandbox. A bash command containing shell control operators never auto-allows through a pattern rule unless the full command text matches.</p></div>
       </div>}
       {tab === 'integrations' && <div className="form-stack"><div className="section-heading"><div><h3>Extend your workspace.</h3><p>Connect tools through Model Context Protocol.</p></div></div>
+        <button className="button secondary" type="button" disabled={busy || anyMcpAction || mcpDirty || !reviewedRevision.current} onClick={() => setImportingMcp(true)}>Import Claude/Codex MCP servers…</button>
+        <p className="field-hint">Choose multiple compatible configurations from fixed Claude Code/Codex files. They import into global settings disabled; no server is connected automatically.</p>
         <p className="field-hint">Tool search and TypeScript execution are enabled by default for connected servers. The agent discovers relevant tools and can process their results in a script before returning a summary. Each tool call keeps your normal approval settings. Set <code>advertise: true</code> on a server to expose its tools directly instead.</p>
         <label>MCP servers<textarea className="code-input" rows={12} value={mcp} disabled={busy} onChange={e => { currentMcp.current = e.target.value; setMcp(e.target.value); }} spellCheck={false} aria-label="MCP servers" aria-describedby="mcp-hint" /><span className="field-hint" id="mcp-hint">A JSON object keyed by server name. Each entry supports command, args, env, or url, and enabled. Masked environment values are kept when saved unchanged.</span></label>
         <div className="mcp-cache-heading"><div><strong>Saved server connections</strong><p>Cache-only status · checked every 3 seconds while this tab is open. Viewing status never starts a server.</p></div><button className="button secondary" disabled={mcpLoading || busy} onClick={() => void refreshMcp(true)}>Refresh status</button></div>

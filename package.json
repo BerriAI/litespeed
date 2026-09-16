@@ -1,6 +1,6 @@
 {
   "name": "@litellm/litespeed",
-  "version": "0.1.17",
+  "version": "0.1.18",
   "private": true,
   "license": "Apache-2.0",
   "type": "module",
@@ -61,6 +61,7 @@
     "react-dom": "^19.2.4",
     "react-markdown": "^10.1.0",
     "remark-gfm": "^4.0.1",
+    "toml": "3.0.0",
     "typescript": "5.9.3",
     "ws": "^8.21.3",
     "zod": "^4.3.6"

@@ -27,6 +27,7 @@ import { modelCatalog } from './budget.js';
 import { readProfileCatalog, readEditableProfile, saveProjectProfile, saveProjectProfileSchema, resolveProfileChoice, profileSourceStatus, type ProfileSnapshot } from './profiles.js';
 import { skillInvocationSchema, snapshotSkillInvocation } from './skill-invocation.js';
 import { skillDiscover, skillPlan, skillApply } from './skill-import.js';
+import { mcpImportDiscover, mcpImportPlan, mcpImportApply } from './mcp-import.js';
 import { validateRuleSet } from './permissions.js';
 import { validateHooks } from './hooks.js';
 import { validateSidecars } from './sidecars.js';
@@ -105,6 +106,12 @@ export function createApp(options:AppOptions = {}) {
   app.get('/api/skills/discover',async(req,res)=>{const root=await workspace(req.query.workspace);res.json(await skillDiscover(root));});
   app.post('/api/skills/plan',async(req,res)=>{const input=z.object({workspace:z.string().max(4096).optional(),rootId:skillRootSchema,id:z.string().regex(/^[a-z0-9][a-z0-9-]{0,63}$/)}).strict().parse(req.body);const root=await workspace(input.workspace);res.json(await skillPlan(root,input.rootId,input.id));});
   app.post('/api/skills/import',async(req,res)=>{const input=z.object({workspace:z.string().max(4096).optional(),rootId:skillRootSchema,id:z.string().regex(/^[a-z0-9][a-z0-9-]{0,63}$/),sourceHash:z.string().regex(/^[a-f0-9]{64}$/)}).strict().parse(req.body);const root=await workspace(input.workspace);res.json(await skillApply(root,input.rootId,input.id,input.sourceHash));});
+  // MCP import intentionally reads only fixed Claude Code/Codex config files.
+  // Its responses contain metadata only: never raw config, paths, URLs, args, or credentials.
+  const mcpImportIds=z.array(z.string().regex(/^[a-f0-9]{32}$/)).min(1).max(30).refine(value=>new Set(value).size===value.length);
+  app.get('/api/mcp/import/discover',async(req,res)=>{const root=await workspace(req.query.workspace);res.json(await mcpImportDiscover(root,store.settings().mcpServers));});
+  app.post('/api/mcp/import/plan',async(req,res)=>{const input=z.object({workspace:z.string().max(4096).optional(),ids:mcpImportIds}).strict().parse(req.body);const root=await workspace(input.workspace);res.json(await mcpImportPlan(root,store.settings().mcpServers,input.ids));});
+  app.post('/api/mcp/import/apply',async(req,res)=>{const input=z.object({workspace:z.string().max(4096).optional(),ids:mcpImportIds,sourceHash:z.string().regex(/^[a-f0-9]{64}$/),expectedMcpConfigRevision:z.string().min(1).max(128)}).strict().parse(req.body);const root=await workspace(input.workspace);res.json(await mcpImportApply(root,store,input.ids,input.sourceHash,input.expectedMcpConfigRevision,mcpConfigRevision));});
   app.get('/api/health',(_req,res)=>res.json({ok:true,name:'litespeed',version:VERSION,...(options.updates?.installation?{installation:options.updates.installation,pid:process.pid}:{})}));
   app.get('/api/updates',async(req,res)=>res.json(options.updates?await options.updates.status(req.query.check==='true'):{currentVersion:VERSION,available:false,packaged:false,restartRequired:false,releaseUrl:'https://github.com/BerriAI/litespeed/releases',command:'Update your source checkout and rebuild.'}));
   app.post('/api/updates/install',async(_req,res)=>{if(!options.updates)throw httpError(409,'Packaged updates are unavailable on this server.');res.json(await options.updates.install());});
