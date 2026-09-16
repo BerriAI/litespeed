@@ -1,0 +1,29 @@
+{
+  "at": "2026-09-16T20:30:08.558172+00:00",
+  "priorHead": "3920dfb19da2e1e30163368ba095a6442af91bed",
+  "upstream": "e49493b969ac921d809865412662ea05aec8b6ce",
+  "resolution": "Use the upstream MCP CPU-limit handling, including evaluation/job-drain disposal and parent error precedence. Retain the additional actual-guest TypeError test. All upstream tests and documentation retained.",
+  "validation": {
+    "focusedMcpTestsPassed": 25,
+    "typecheck": "passed",
+    "fullSuite": {
+      "passed": 2158,
+      "skipped": 1,
+      "failed": 0,
+      "maxWorkers": 2
+    },
+    "build": "passed"
+  },
+  "files": {
+    "server/mcp-code-worker.ts": "2899eb3cf1c7f303209f366595b7b9f4200ba0a67c433e3248ba7089c9e9b2cf",
+    "server/mcp-code.ts": "72d9979bc4208488317ec3be3eee557d61e0cba7478d48a8d215fc8a3ad8c705",
+    "tests/mcp-code-worker.test.ts": "c51dc7df9834e779ad8a974ce5f84a3394eb8fc7aed93f2d1a9edf65c17fc69a",
+    "tests/mcp-code.test.ts": "ea470ed0666e563f432d8c79aba1f338e28e754eac631c6dcbd6921f44e20ed2",
+    "docs/mcp.md": "7bc070cb05d305b8e42458cfb3cd8e0a23e3c8b87030f1fcbe0ccb3c6ff44811"
+  },
+  "logs": {
+    "main-merge-full-tests.log": "024411c68e6e4e2135191a038a81d8ba8d6b9bbe1000f1d5e2872e5c3f1ee97f",
+    "main-merge-build.log": "78ca123918bfca43df740f1eb73e16c4033c41b3055186c99939205adc1685c0"
+  },
+  "experimentalBoundary": "Previously frozen candidate/control worktrees and study plans are unchanged, including the prepared unallocated v55 comparison. No paid request or billing adjustment occurred."
+}

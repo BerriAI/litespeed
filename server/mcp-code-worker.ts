@@ -9,11 +9,10 @@ const engine = await getQuickJS();
 const runtime = engine.newRuntime();
 runtime.setMemoryLimit(limits.memoryBytes);
 runtime.setMaxStackSize(512 * 1024);
-let spent = 0, sliceStart = performance.now(), done = false, nextId = 0, output = '', cpuInterrupted = false;
-runtime.setInterruptHandler(() => {
-  if (spent + performance.now() - sliceStart > limits.cpuMs) cpuInterrupted = true;
-  return cpuInterrupted;
-});
+const cpuLimitError = 'MCP code execution exceeded the CPU time limit.';
+let spent = 0, sliceStart = performance.now(), interrupted = false, done = false, nextId = 0, output = '';
+// QuickJS can stop between jobs without returning an error. Keep the cause.
+runtime.setInterruptHandler(() => interrupted ||= spent + performance.now() - sliceStart > limits.cpuMs);
 const vm = runtime.newContext();
 const pending = new Map<number, QuickJSDeferredPromise>();
 const append = (text: string) => {
@@ -22,9 +21,7 @@ const append = (text: string) => {
 };
 function finish(error?: string) {
   if (done) return; done = true;
-  // QuickJS can surface a secondary guest error while unwinding an interrupt.
-  // Preserve the actual host stop reason rather than asking the agent to debug it.
-  if (cpuInterrupted) error = 'MCP code execution interrupted by its CPU limit.';
+  if (interrupted) error = cpuLimitError;
   const bytes = Buffer.from(output), truncated = bytes.length > limits.outputBytes;
   let end = limits.outputBytes;
   if (truncated) while (end > 0 && (bytes[end] & 0xc0) === 0x80) end--;
@@ -34,6 +31,7 @@ function evaluate(source: string) {
   sliceStart = performance.now();
   const result = vm.evalCode(source, 'mcp-workflow.js');
   spent += performance.now() - sliceStart;
+  if (interrupted) { result.dispose(); throw new Error(cpuLimitError); }
   if (result.error) { const error = vm.dump(result.error); result.error.dispose(); throw new Error(error?.message ?? 'TypeScript execution failed.'); }
   result.value.dispose();
 }
@@ -41,6 +39,7 @@ function pump() {
   sliceStart = performance.now();
   const result = runtime.executePendingJobs();
   spent += performance.now() - sliceStart;
+  if (interrupted) { result.dispose(); finish(cpuLimitError); return; }
   if (result.error) { const error = vm.dump(result.error); result.error.dispose(); finish(error?.message ?? 'TypeScript execution failed.'); }
   else if (!done && !pending.size) finish('Script is waiting on a promise that cannot resolve.');
 }

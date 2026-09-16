@@ -47,10 +47,12 @@ describe('isolated TypeScript MCP execution', () => {
     expect(invoke).not.toHaveBeenCalled();
   });
 
-  it('interrupts CPU loops including endless promise microtasks', async () => {
-    for (const code of ['while (true) {}', 'while (true) { await Promise.resolve(); }']) {
-      await expect(run(code, { limits: { cpuMs: 20, timeoutMs: 3000 } })).rejects.toThrow(/interrupted|limit/i);
-    }
+  it.each([
+    'while (true) {}',
+    'while (true) { await Promise.resolve(); }',
+    'await tools.read({}); while (true) { await Promise.resolve(); }',
+  ])('reports CPU exhaustion for %s', async code => {
+    await expect(run(code, { names: ['read'], signal: AbortSignal.timeout(10_000), limits: { cpuMs: 20 } })).rejects.toThrow('MCP code execution exceeded the CPU time limit.');
     expect(await run('return "still usable";')).toContain('still usable');
   });
 
@@ -58,11 +60,30 @@ describe('isolated TypeScript MCP execution', () => {
     await expect(run('({}).missing();')).rejects.toThrow(/not a function/i);
   });
 
-  it('bounds guest memory and reports invalid syntax without making calls', async () => {
+  it('preserves the CPU-limit error and cancels a pending host call', async () => {
+    let aborted = false;
+    const invoke: McpCodeOptions['invoke'] = async (_name, _args, signal) => new Promise((_resolve, reject) => {
+      signal.addEventListener('abort', () => { aborted = true; reject(new Error('cancelled')); }, { once: true });
+    });
+    await expect(run('tools.read({}); while (true) { await Promise.resolve(); }', {
+      names: ['read'], invoke, signal: AbortSignal.timeout(10_000), limits: { cpuMs: 100 },
+    })).rejects.toThrow('MCP code execution exceeded the CPU time limit.');
+    expect(aborted).toBe(true);
+  });
+
+  it('reports invalid syntax without making calls', async () => {
     const invoke = vi.fn<McpCodeOptions['invoke']>();
-    await expect(run('const x = ; await tools.write({});', { names: ['write'], invoke })).rejects.toThrow();
-    await expect(run('const x = []; while (true) x.push(new Array(100000).fill("x"));', { limits: { memoryBytes: 2 * 1024 * 1024 } })).rejects.toThrow();
+    await expect(run('const x = ; await tools.write({});', { names: ['write'], invoke })).rejects.toThrow(/Expression expected/);
     expect(invoke).not.toHaveBeenCalled();
+  });
+
+  it('rejects an allocation above the guest memory limit but permits it with sufficient memory', async () => {
+    const code = 'const bytes = new ArrayBuffer(8 * 1024 * 1024); await tools.write({}); return bytes.byteLength;';
+    const invoke = vi.fn<McpCodeOptions['invoke']>(async () => ({ content: [] }));
+    await expect(run(code, { names: ['write'], invoke, limits: { memoryBytes: 2 * 1024 * 1024 } })).rejects.toThrow(/out of memory/i);
+    expect(invoke).not.toHaveBeenCalled();
+    expect(JSON.parse(await run(code, { names: ['write'], invoke }))).toBe(8 * 1024 * 1024);
+    expect(invoke).toHaveBeenCalledTimes(1);
   });
 
   it('stops unawaited calls and promises with no possible completion', async () => {
@@ -82,11 +103,32 @@ describe('isolated TypeScript MCP execution', () => {
   });
 
   it('expires the execution deadline and cancels a pending host call', async () => {
+    const controller = new AbortController();
+    let markStarted!: () => void;
+    const started = new Promise<void>(resolve => { markStarted = resolve; });
     let aborted = false;
-    const invoke: McpCodeOptions['invoke'] = async (_name, _args, signal) => new Promise((_resolve, reject) => signal.addEventListener('abort', () => { aborted = true; reject(new Error('cancelled')); }, { once: true }));
-    await expect(run('await tools.read({});', { names: ['read'], invoke, limits: { timeoutMs: 1000 } })).rejects.toThrow(/timed out/);
-    expect(aborted).toBe(true);
-  });
+    const invoke: McpCodeOptions['invoke'] = async (_name, _args, signal) => new Promise((_resolve, reject) => {
+      signal.addEventListener('abort', () => { aborted = true; reject(new Error('cancelled')); }, { once: true });
+      markStarted();
+    });
+    vi.useFakeTimers({ toFake: ['setTimeout', 'clearTimeout'] });
+    const execution = run('await tools.read({});', {
+      names: ['read'], invoke, limits: { timeoutMs: 1000 },
+      signal: AbortSignal.any([controller.signal, AbortSignal.timeout(20_000)]),
+    }).then(output => output, (error: Error) => error);
+    try {
+      await Promise.race([started, execution.then(result => { throw new Error(`Execution ended before the host call started: ${result}`); })]);
+      vi.advanceTimersByTime(999);
+      expect(aborted).toBe(false);
+      vi.advanceTimersByTime(1);
+      expect(aborted).toBe(true);
+      expect(await execution).toEqual(expect.objectContaining({ message: expect.stringMatching(/timed out/) }));
+    } finally {
+      controller.abort();
+      await execution;
+      vi.useRealTimers();
+    }
+  }, 30_000);
 
   it('limits call count, argument size, result size, and emitted UTF-8 output', async () => {
     const invoke = vi.fn<McpCodeOptions['invoke']>(async () => ({ content: [{ type: 'text', text: 'large result' }] }));
