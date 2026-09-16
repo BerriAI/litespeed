@@ -32,6 +32,30 @@ beforeEach(async () => {
 afterEach(async () => { vi.restoreAllMocks(); store.close(); await rm(directory, { recursive: true, force: true }); });
 
 describe('turn checkpoint history', () => {
+  it('keeps LiteLLM price maps undoable across structured edits and subsequent shell edits', async () => {
+    const names=['model_prices_and_context_window.json','litellm/model_prices_and_context_window_backup.json'];
+    const before=JSON.stringify({padding:'x'.repeat(2*1024*1024),model:{input_cost_per_token:1}},null,2)+'\n';
+    const edited=before.replace('"input_cost_per_token": 1','"input_cost_per_token": 2');
+    const after=edited.replace('"input_cost_per_token": 2','"input_cost_per_token": 3');
+    await mkdir(join(workspace,'litellm'));
+    for(const name of names)await writeFile(join(workspace,name),before);
+    history.accept(id,user('Update the two price maps.'));
+    for(const name of names)await executeTool('edit_file',{path:name,old_string:'"input_cost_per_token": 1',new_string:'"input_cost_per_token": 2'},{
+      workspace,sessionId:id,signal:new AbortController().signal,
+      prepareChange:change=>history.prepareChange(id,change),onChange:change=>history.commitChange(id,change),
+      getTodos:()=>[],onTodos:()=>{},
+    });
+    const command=await history.beginCommand(id,workspace);
+    for(const name of names)await writeFile(join(workspace,name),after);
+    expect((await history.finishCommand(command)).map(change=>change.path).sort()).toEqual([...names].sort());
+    store.saveMessage(answer());history.seal(id);
+    expect(current().canUndo).toBe(true);
+    await history.undo(id,current().undoId!);
+    for(const name of names)expect(await readFile(join(workspace,name),'utf8')).toBe(before);
+    await history.redo(id,current().redoId!);
+    for(const name of names)expect(await readFile(join(workspace,name),'utf8')).toBe(after);
+  });
+
   it('round-trips multiple turns, exact file bytes, todos, metadata and aggregate changes', async () => {
     await writeFile(join(workspace, 'file.txt'), 'original\r\n');
     history.accept(id, user('First'));

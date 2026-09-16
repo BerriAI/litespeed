@@ -1,3 +1,4 @@
+import { sourceFileByteLimit } from '../shared/source-file-limits.js';
 import { LEGACY_NAMES } from '../bin/legacy.mjs';
 import { constants } from 'node:fs';
 import { createHash } from 'node:crypto';
@@ -24,10 +25,11 @@ export async function snapshotWorkspace(workspace: string, excluded: string[] = 
     visited.add(path);return true;
   };
   async function capture(path:string,key:string,stat:Awaited<ReturnType<typeof lstat>>):Promise<void>{
+    const fileLimit=sourceFileByteLimit(key,SNAPSHOT_LIMITS.fileBytes);
     if(stat.isSymbolicLink()){snapshot.omitted[key]=`symlink:${await readlink(path)}`;return;}
-    if(!stat.isFile()||stat.size>SNAPSHOT_LIMITS.fileBytes) {snapshot.omitted[key]=`${stat.mode}:${stat.size}:${stat.mtimeMs}`;return;}
+    if(!stat.isFile()||stat.size>fileLimit) {snapshot.omitted[key]=`${stat.mode}:${stat.size}:${stat.mtimeMs}`;return;}
     const data=await readFile(path,{flag:constants.O_RDONLY|constants.O_NOFOLLOW|constants.O_NONBLOCK}), text=data.toString('utf8');
-    if(data.length>SNAPSHOT_LIMITS.fileBytes||data.includes(0)||!Buffer.from(text).equals(data)||bytes+data.length>SNAPSHOT_LIMITS.bytes) {
+    if(data.length>fileLimit||data.includes(0)||!Buffer.from(text).equals(data)||bytes+data.length>SNAPSHOT_LIMITS.bytes) {
       snapshot.omitted[key]=createHash('sha256').update(data).digest('hex');return;
     }
     bytes+=data.length;snapshot.files[key]=text;

@@ -776,3 +776,15 @@ describe('git status', () => {
     await expect(gitStatus(workspace)).rejects.toThrow(/symlinks/);
   });
 });
+
+it('keeps the larger price-map exception bounded and exact-path only',async()=>{
+  const tooLarge='x'.repeat(4*1024*1024+1);
+  await put('model_prices_and_context_window.json',tooLarge);
+  await expect(tool('write_file',{path:'model_prices_and_context_window.json',content:'{}'})).rejects.toThrow(/maximum 4194304/);
+  expect(await fs.readFile(path.join(workspace,'model_prices_and_context_window.json'),'utf8')).toBe(tooLarge);
+  await put('other/model_prices_and_context_window.json','x'.repeat(2*1024*1024+1));
+  await expect(tool('write_file',{path:'other/model_prices_and_context_window.json',content:'{}'})).rejects.toThrow(/maximum 2097152/);
+  await put('model_prices_and_context_window.json','{}');
+  await expect(tool('write_file',{path:'model_prices_and_context_window.json',content:tooLarge})).rejects.toThrow(/maximum 4194304/);
+  expect(await fs.readFile(path.join(workspace,'model_prices_and_context_window.json'),'utf8')).toBe('{}');
+});

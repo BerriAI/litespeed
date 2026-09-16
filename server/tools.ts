@@ -1,3 +1,4 @@
+import { sourceFileByteLimit } from '../shared/source-file-limits.js';
 import { litellmContext } from './litellm-harness.js';
 import { LEGACY_NAMES } from '../bin/legacy.mjs';
 import { shellInspection } from './shell-inspection.js';
@@ -751,8 +752,9 @@ async function mutateFile(args: Record<string, unknown>, context: ToolContext, e
     try { identity = fileIdentity(await fs.stat(absolute, { bigint: true })); } catch (error) { if (!hasCode(error, 'ENOENT')) throw error; }
     if (absolute !== context.expectedFile.absolute || identity !== context.expectedFile.identity) throw new Error('The target changed while Shunt was generating. Read the current file and retry; no generated content was written.');
   }
+  const editLimit=sourceFileByteLimit(portable(path.relative(await fs.realpath(context.workspace),absolute)),EDIT_LIMIT);
   let before: string | null = null;
-  try { before = (await readTextFile(context.workspace, absolute, EDIT_LIMIT, true)).content; }
+  try { before = (await readTextFile(context.workspace, absolute, editLimit, true)).content; }
   catch (error) { if (edit || !hasCode(error, 'ENOENT')) throw error; }
   let after: string;
   let replacements = 0;
@@ -771,7 +773,7 @@ async function mutateFile(args: Record<string, unknown>, context: ToolContext, e
       after = parts.join(newString);
     } else { replacements = 1; after = original.slice(0, index) + newString + original.slice(index + oldString.length); }
   } else { after = withFileEndings(textArg(args, 'content', true), before ?? ''); }
-  if (Buffer.byteLength(after) > EDIT_LIMIT) throw new Error(`Content is too large (maximum ${EDIT_LIMIT} bytes).`);
+  if (Buffer.byteLength(after) > editLimit) throw new Error(`Content is too large (maximum ${editLimit} bytes).`);
   if (after.includes('\0')) throw new Error('Binary content is not supported.');
   if (after === before) return 'No changes: the file already has the requested content.';
   checkAbort(context.signal);
@@ -793,7 +795,7 @@ async function mutateFile(args: Record<string, unknown>, context: ToolContext, e
     if (stat.nlink > 1) throw new Error('Refusing to modify a hard-linked file; it may have aliases outside the workspace.');
     if (before !== null) {
       if (context.expectedFile && fileIdentity(await handle.stat({ bigint: true })) !== context.expectedFile.identity) throw new Error('The target changed while Shunt was generating. Read the current file and retry; no generated content was written.');
-      const latest = await readTextFile(context.workspace, absolute, EDIT_LIMIT, true);
+      const latest = await readTextFile(context.workspace, absolute, editLimit, true);
       const latestStat = await fs.stat(absolute);
       if (latest.content !== before || latestStat.ino !== stat.ino || latestStat.dev !== stat.dev) throw new Error('File changed while preparing this edit. Read it again and retry.');
     }
@@ -812,7 +814,7 @@ async function mutateFile(args: Record<string, unknown>, context: ToolContext, e
 export async function readRestoreTarget(workspace: string, filePath: string): Promise<string | null> {
   const root = await fs.realpath(workspace);
   const absolute = await restorePath(root, filePath);
-  try { return (await readAbsoluteText(absolute, EDIT_LIMIT, true)).content; }
+  try { return (await readAbsoluteText(absolute, sourceFileByteLimit(filePath,EDIT_LIMIT), true)).content; }
   catch (error) { if (hasCode(error, 'ENOENT')) return null; throw error; }
 }
 
@@ -827,8 +829,9 @@ async function restorePath(root: string, filePath: string): Promise<string> {
 }
 async function checkRestoreDescriptor(handle: Awaited<ReturnType<typeof fs.open>>, target: RestoreTarget): Promise<void> {
   const stat = await handle.stat();
-  if (!stat.isFile() || stat.nlink !== 1 || stat.size > EDIT_LIMIT || (target.identity && (target.identity.dev !== stat.dev || target.identity.ino !== stat.ino))) throw restoreConflict(target.change.path);
-  const bytes = Buffer.alloc(EDIT_LIMIT + 1);
+  const restoreLimit=sourceFileByteLimit(target.change.path,EDIT_LIMIT);
+  if (!stat.isFile() || stat.nlink !== 1 || stat.size > restoreLimit || (target.identity && (target.identity.dev !== stat.dev || target.identity.ino !== stat.ino))) throw restoreConflict(target.change.path);
+  const bytes = Buffer.alloc(restoreLimit + 1);
   let length = 0;
   while (length < bytes.length) {
     const { bytesRead } = await handle.read(bytes, length, bytes.length - length, length);
@@ -849,7 +852,7 @@ export async function restoreChanges(workspace: string, changes: FileChange[], o
   const targets: RestoreTarget[] = [];
   const seen = new Set<string>();
   for (const value of changes) {
-    if (!value || typeof value.path !== 'string' || !value.path || [value.before, value.after].some(text => text !== null && (typeof text !== 'string' || Buffer.byteLength(text) > EDIT_LIMIT || text.includes('\0')))) throw new Error('Invalid file-change snapshot.');
+    if (!value || typeof value.path !== 'string' || !value.path || [value.before, value.after].some(text => text !== null && (typeof text !== 'string' || Buffer.byteLength(text) > sourceFileByteLimit(value.path,EDIT_LIMIT) || text.includes('\0')))) throw new Error('Invalid file-change snapshot.');
     const change = { path: value.path, before: value.before, after: value.after };
     const absolute = await restorePath(root, change.path);
     if (seen.has(absolute)) throw new Error('Duplicate restore targets are not allowed.');

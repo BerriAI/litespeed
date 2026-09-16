@@ -1,3 +1,4 @@
+import { sourceFileByteLimit } from '../shared/source-file-limits.js';
 import { snapshotWorkspace, snapshotChanges, type WorkspaceSnapshot } from './workspace-snapshot.js';
 import { randomUUID } from 'node:crypto';
 import { isAbsolute } from 'node:path';
@@ -222,7 +223,7 @@ export class History {
     return changes;
   }
   private validateChange(change: FileChange): void {
-    if (!change || typeof change.path !== 'string' || !change.path || isAbsolute(change.path) || change.path.includes('\\') || change.path.split('/').some(part => !part || part === '.' || part === '..') || [change.before, change.after].some(text => text !== null && (typeof text !== 'string' || text.includes('\0') || Buffer.byteLength(text) > HISTORY_LIMITS.fileBytes))) throw invalid('Invalid recorded file change.');
+    if (!change || typeof change.path !== 'string' || !change.path || isAbsolute(change.path) || change.path.includes('\\') || change.path.split('/').some(part => !part || part === '.' || part === '..') || [change.before, change.after].some(text => text !== null && (typeof text !== 'string' || text.includes('\0') || Buffer.byteLength(text) > sourceFileByteLimit(change.path,HISTORY_LIMITS.fileBytes)))) throw invalid('Invalid recorded file change.');
   }
   prepareChange(id: string, change: FileChange): void {
     this.validateChange(change);

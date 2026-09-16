@@ -53,3 +53,16 @@ it('never lets priority paths bypass symlink, generated-directory, external-path
     expect(snapshotChanges(before,snapshot)).toEqual({changes:[],incomplete:true});
   }finally{await rm(root,{recursive:true,force:true});await rm(outside,{recursive:true,force:true});}
 });
+
+it('captures large price maps within the existing whole-snapshot budget',async()=>{
+  const root=await mkdtemp(join(tmpdir(),'snapshot-price-map-')),limit=SNAPSHOT_LIMITS.bytes;
+  try{
+    const text='x'.repeat(2*1024*1024+1);SNAPSHOT_LIMITS.bytes=text.length;
+    await writeFile(join(root,'model_prices_and_context_window.json'),text);
+    await writeFile(join(root,'a-other.txt'),'other');
+    const snapshot=await snapshotWorkspace(root,[],['model_prices_and_context_window.json']);
+    expect(snapshot.files['model_prices_and_context_window.json']===text).toBe(true);
+    expect(snapshot.files['a-other.txt']).toBeUndefined();
+    expect(Object.values(snapshot.files).reduce((sum,value)=>sum+Buffer.byteLength(value),0)).toBeLessThanOrEqual(SNAPSHOT_LIMITS.bytes);
+  }finally{SNAPSHOT_LIMITS.bytes=limit;await rm(root,{recursive:true,force:true});}
+});

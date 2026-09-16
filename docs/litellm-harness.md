@@ -53,6 +53,8 @@ The review can add work and latency. It runs once per changed turn; it does not 
 
 On large checkouts, command history prioritizes files already edited in the current turn. This keeps subsequent shell edits to those files connected to Undo and later structured edits. Snapshots remain bounded; the history notice identifies incomplete coverage of other command effects.
 
+**Edit the price maps normally.** The root `model_prices_and_context_window.json` and `litellm/model_prices_and_context_window_backup.json` support structured edits, command snapshots, and Undo/Redo up to 4 MiB each. The shared limit follows the file path even if you change architectures. Other files retain their existing limit; command snapshots still have a 12 MiB total bound.
+
 ## Permissions and limits
 
 The navigator is available only when the underlying read, glob and grep capabilities are available. Any ask/deny rule or explicitly matched hook on those tools disables the composite navigator, leaving ordinary tools to enforce the configured policy. Configured sidecars also use this fallback so that navigation cannot skip their interception. This intentionally conservative behavior prevents a repository-navigation shortcut from bypassing a scoped file restriction.
