@@ -1,0 +1,33 @@
+{
+  "createdAt": "2026-09-16T10:17:57.768655+00:00",
+  "purpose": "Whole-architecture development comparison across every September 14 task that passes the frozen base/reference qualification. Breadth first: one attempt per arm per task. Not the reserved Astra final comparison.",
+  "protocol": 7,
+  "model": "fireworks_ai/deepseek-v4p1-flash",
+  "harnessCommit": "370f6fc500002b3e35ea7ac474107b2bb2a693b9",
+  "control": "plain",
+  "arms": [
+    {
+      "name": "plain",
+      "kind": "single"
+    },
+    {
+      "name": "specialized",
+      "kind": "litellm-specific"
+    }
+  ],
+  "effort": "medium",
+  "repetitions": 1,
+  "timeoutSeconds": 900,
+  "globalConcurrency": 3,
+  "seed": 48160926,
+  "stopNewTrialsAtCommittedUsd": 82,
+  "selection": "Include all and only cases valid in the first complete qualification pass of the frozen catalog. Retain invalid cases and explanations; no case removal or requalification based on solver outcomes. Both arms share the same integrated v46 runtime and dependencies.",
+  "catalogSha256": "73e5f18f6c7c6d06503bb45cb4dcf9fd6083ced11ba5cf8419c36f4c4084f696",
+  "qualificationInputHashes": {
+    "catalog.json": "73e5f18f6c7c6d06503bb45cb4dcf9fd6083ced11ba5cf8419c36f4c4084f696",
+    "cases.json": "1b8a549cddfcfa486ef8770384f3531f9eaf16f7c82e14c62f1a7a1dc1314386",
+    "curation-record.json": "099b0dcdd2a3fc309aa28b323c3caf7c8e58a0d63a83a189e3cb597ec71fbbd3"
+  },
+  "candidateScope": "Existing LiteLLM specialization plus grouped edits, adapter-compatible chronological command notices, and v45 final-output bookkeeping. The separate v47 instruction is not included. Candidate remains unpromoted.",
+  "analysis": "Report strict success (normal completion plus unchanged selected acceptance), cost with missing charges marked, elapsed time, tool calls, and activation. Report whole paired tasks only. One attempt per arm cannot measure within-task stochastic variance; task bootstrap is descriptive and does not correct development selection. No aggregate production readiness inference from these regression tests."
+}

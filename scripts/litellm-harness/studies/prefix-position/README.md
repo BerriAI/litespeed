@@ -6,10 +6,19 @@ The Flash solver task is simply to reply OK, so this experiment measures transpo
 
 Run `prefix_study.py CAMPAIGN_DIRECTORY STUDY_DIRECTORY` using the frozen plan. The runner shares the three campaign slots and authoritative gateway budget. It refuses existing request markers rather than silently retrying; missing receipts retain their reservation. It stops admitting new work at a $90 committed campaign balance to preserve evaluation funds. Export complete paired measurements with `cache_study.py STUDY_DIRECTORY OUTPUT_JSON`. The source hashes and runner hash are recorded before launch.
 
-## First five paired scenarios (interim)
+## Completed results: six paired scenarios
 
-Five of six planned scenarios are complete, with 120 OK responses. All three scenarios using 480,000 characters of source are complete. Excluding the first warm-up request, early-envelope replacement has zero cached input in those three repetitions, while chronological events have 99.85% cached input. Across each arm's 11 follow-ups, input cost is about $0.2530 versus $0.00842. Mean request latency is 2.65, 2.65 and 3.09 seconds for the early envelope versus 1.29, 1.24 and 2.41 seconds for chronological events. [Measurements](results.json).
+All six scenarios completed, with 144 OK responses. Excluding each arm's first warm-up request:
 
-The two completed 160,000-character scenarios also have zero cached input with early replacement. Chronological events have 90.50% and 99.57%, so preserving the prefix does not guarantee a cache hit on every request. Input cost is $0.08664 per control sequence versus $0.01075 and $0.00313; mean request latency is 1.78/1.52 seconds versus 0.99/1.07 seconds. One repetition at this size remains queued.
+| Source characters | Repetition | Cached input, early / chronological | Input cost, early / chronological | Mean seconds, early / chronological |
+| --- | --- | --- | --- | --- |
+| 160,000 | 1 | 0.00% / 90.50% | $0.08664 / $0.01075 | 1.78 / 0.99 |
+| 160,000 | 2 | 0.00% / 99.57% | $0.08665 / $0.00313 | 2.00 / 1.09 |
+| 160,000 | 3 | 0.00% / 99.57% | $0.08665 / $0.00313 | 1.52 / 1.07 |
+| 480,000 | 1 | 0.00% / 99.85% | $0.25298 / $0.00842 | 2.65 / 1.29 |
+| 480,000 | 2 | 0.00% / 99.85% | $0.25299 / $0.00842 | 2.65 / 1.24 |
+| 480,000 | 3 | 0.00% / 99.85% | $0.25299 / $0.00842 | 3.09 / 2.41 |
 
-These controlled responses only say OK; they do not establish coding quality or the cache hit rate of real sessions. The difference supports the prefix-placement mechanism, while promotion still requires the independent coding/integration evidence.
+[Full measurements](results.json). Preserving the prefix did not guarantee a cache hit on every request: the first smaller chronological scenario retained 90.50% cached input rather than approximately 99.57% in its other two repetitions.
+
+These controlled responses only say OK; they do not establish coding quality or the cache hit rate of real sessions. The difference supports the prefix-placement mechanism. The separate coding study reports both benefits and regressions, and the combined candidate still requires evaluation.

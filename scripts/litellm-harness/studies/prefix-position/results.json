@@ -1,5 +1,5 @@
 {
-  "status": "interim",
+  "status": "complete",
   "scope": "Synthetic transport pilot. Deltas are chronological-event minus early-envelope within each source-size/repetition. Warm-up is separate. Only complete paired scenarios enter comparisons. No coding-quality or production cache guarantee; request latencies share a live service and are not independent samples.",
   "trials": [
     {
@@ -69,62 +69,62 @@
       "rep": 2,
       "arm": "early-envelope",
       "attempt": "original",
-      "completedRequests": 0,
+      "completedRequests": 12,
       "expectedRequests": 12,
       "warmup": {
-        "requests": 0,
-        "validMeasurements": 0,
-        "completeMeasurements": false,
-        "inputTokens": null,
-        "cachedTokens": null,
-        "cacheRatio": null,
-        "inputEstimatedUsd": null,
-        "meanSeconds": null,
-        "allResponsesOK": null
+        "requests": 1,
+        "validMeasurements": 1,
+        "completeMeasurements": true,
+        "inputTokens": 35725,
+        "cachedTokens": 0,
+        "cacheRatio": 0.0,
+        "inputEstimatedUsd": 0.0078595,
+        "meanSeconds": 1.8511496670544147,
+        "allResponsesOK": true
       },
       "postInitial": {
-        "requests": 0,
-        "validMeasurements": 0,
-        "completeMeasurements": false,
-        "inputTokens": null,
-        "cachedTokens": null,
-        "cacheRatio": null,
-        "inputEstimatedUsd": null,
-        "meanSeconds": null,
-        "allResponsesOK": null
+        "requests": 11,
+        "validMeasurements": 11,
+        "completeMeasurements": true,
+        "inputTokens": 393855,
+        "cachedTokens": 0,
+        "cacheRatio": 0.0,
+        "inputEstimatedUsd": 0.0866481,
+        "meanSeconds": 1.9995678032071076,
+        "allResponsesOK": true
       },
-      "complete": false
+      "complete": true
     },
     {
       "sourceCharacters": 160000,
       "rep": 2,
       "arm": "chronological-event",
       "attempt": "original",
-      "completedRequests": 0,
+      "completedRequests": 12,
       "expectedRequests": 12,
       "warmup": {
-        "requests": 0,
-        "validMeasurements": 0,
-        "completeMeasurements": false,
-        "inputTokens": null,
-        "cachedTokens": null,
-        "cacheRatio": null,
-        "inputEstimatedUsd": null,
-        "meanSeconds": null,
-        "allResponsesOK": null
+        "requests": 1,
+        "validMeasurements": 1,
+        "completeMeasurements": true,
+        "inputTokens": 35725,
+        "cachedTokens": 0,
+        "cacheRatio": 0.0,
+        "inputEstimatedUsd": 0.0078595,
+        "meanSeconds": 1.5262821250362322,
+        "allResponsesOK": true
       },
       "postInitial": {
-        "requests": 0,
-        "validMeasurements": 0,
-        "completeMeasurements": false,
-        "inputTokens": null,
-        "cachedTokens": null,
-        "cacheRatio": null,
-        "inputEstimatedUsd": null,
-        "meanSeconds": null,
-        "allResponsesOK": null
+        "requests": 11,
+        "validMeasurements": 11,
+        "completeMeasurements": true,
+        "inputTokens": 394691,
+        "cachedTokens": 392986,
+        "cacheRatio": 0.9956801649898275,
+        "inputEstimatedUsd": 0.003126002,
+        "meanSeconds": 1.0865381968059493,
+        "allResponsesOK": true
       },
-      "complete": false
+      "complete": true
     },
     {
       "sourceCharacters": 160000,
@@ -382,6 +382,13 @@
       "cacheRatioDelta": 0.9049663933034888,
       "inputEstimatedUsdDelta": -0.075890426,
       "meanSecondsDelta": -0.7963297197976236
+    },
+    {
+      "sourceCharacters": 160000,
+      "rep": 2,
+      "cacheRatioDelta": 0.9956801649898275,
+      "inputEstimatedUsdDelta": -0.083522098,
+      "meanSecondsDelta": -0.9130296064011583
     },
     {
       "sourceCharacters": 160000,

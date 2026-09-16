@@ -4,47 +4,47 @@
   "variants": [
     {
       "variant": "control",
-      "evaluated": 14,
+      "evaluated": 16,
       "expected": 32,
-      "successes": 8,
-      "meanSeconds": 392.574,
-      "tokenPricedUsd": 1.14287385,
+      "successes": 10,
+      "meanSeconds": 363.1184375,
+      "tokenPricedUsd": 1.226460008,
       "trialsWithoutTokenPrice": 0
     },
     {
       "variant": "no-guides",
-      "evaluated": 14,
+      "evaluated": 15,
       "expected": 32,
-      "successes": 9,
-      "meanSeconds": 396.6952857142857,
-      "tokenPricedUsd": 1.97021394,
+      "successes": 10,
+      "meanSeconds": 383.19933333333336,
+      "tokenPricedUsd": 2.0132757420000003,
       "trialsWithoutTokenPrice": 0
     },
     {
       "variant": "no-preload",
-      "evaluated": 14,
+      "evaluated": 15,
       "expected": 32,
-      "successes": 10,
-      "meanSeconds": 389.255,
-      "tokenPricedUsd": 1.223582926,
+      "successes": 11,
+      "meanSeconds": 376.61353333333335,
+      "tokenPricedUsd": 1.254308562,
       "trialsWithoutTokenPrice": 0
     },
     {
       "variant": "no-review",
-      "evaluated": 14,
+      "evaluated": 15,
       "expected": 32,
-      "successes": 11,
-      "meanSeconds": 368.18114285714285,
-      "tokenPricedUsd": 1.4276386,
+      "successes": 12,
+      "meanSeconds": 359.15566666666666,
+      "tokenPricedUsd": 1.461830802,
       "trialsWithoutTokenPrice": 0
     },
     {
       "variant": "read-480",
-      "evaluated": 15,
+      "evaluated": 16,
       "expected": 32,
-      "successes": 11,
-      "meanSeconds": 389.06533333333334,
-      "tokenPricedUsd": 1.4306037520000001,
+      "successes": 12,
+      "meanSeconds": 372.0213125,
+      "tokenPricedUsd": 1.459096948,
       "trialsWithoutTokenPrice": 0
     }
   ],
@@ -3983,7 +3983,54 @@
       "label": "replication-p6-ablation-control-r1",
       "commit": "f75ab327c649cec9719ac03847f171854d2e32ae",
       "effort": "medium",
-      "evaluated": false
+      "evaluated": true,
+      "success": true,
+      "completed": true,
+      "completionReason": "completed",
+      "seconds": 151.308,
+      "acceptance": {
+        "exit": 0,
+        "tests": 6,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0,
+        "passed": true
+      },
+      "computedUsd": 0.050462820000000005,
+      "activations": {
+        "initialMapNotices": 1,
+        "contextToolCalls": 1,
+        "guideIdsShown": [
+          "budget-cache-reconciliation"
+        ],
+        "unparsedContextPayloads": 1,
+        "finalReviewNotices": 1,
+        "guidedFinalReviewNotices": 0,
+        "finalReviewGuideIdsShown": [],
+        "batchedEditCalls": 0,
+        "completedBatchedEditCalls": 0,
+        "batchEditsRequested": 0,
+        "batchSizes": [],
+        "backgroundCommandNotices": 0,
+        "testFocusNotices": 0,
+        "explorationFocusNotices": 1,
+        "readCallsByEffectiveLimit": {
+          "120": 3,
+          "60": 1,
+          "70": 2,
+          "22": 1,
+          "80": 1,
+          "30": 1,
+          "90": 1,
+          "25": 1,
+          "42": 1,
+          "160": 1,
+          "45": 1,
+          "40": 2
+        },
+        "defaultWindowReadCalls": null,
+        "readLimitProvenance": "unknown: saved arguments include host-injected defaults"
+      }
     },
     {
       "dataset": "training2",
@@ -3992,7 +4039,41 @@
       "label": "replication-p6-ablation-no-review-r1",
       "commit": "33a4ed86b414245c0b87546551b693ff216888e3",
       "effort": "medium",
-      "evaluated": false
+      "evaluated": true,
+      "success": true,
+      "completed": true,
+      "completionReason": "completed",
+      "seconds": 232.799,
+      "acceptance": {
+        "exit": 0,
+        "tests": 6,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0,
+        "passed": true
+      },
+      "computedUsd": 0.034192202,
+      "activations": {
+        "initialMapNotices": 1,
+        "contextToolCalls": 0,
+        "guideIdsShown": [
+          "budget-cache-reconciliation"
+        ],
+        "unparsedContextPayloads": 0,
+        "finalReviewNotices": 0,
+        "guidedFinalReviewNotices": 0,
+        "finalReviewGuideIdsShown": [],
+        "batchedEditCalls": 0,
+        "completedBatchedEditCalls": 0,
+        "batchEditsRequested": 0,
+        "batchSizes": [],
+        "backgroundCommandNotices": 0,
+        "testFocusNotices": 0,
+        "explorationFocusNotices": 1,
+        "readCallsByEffectiveLimit": {},
+        "defaultWindowReadCalls": null,
+        "readLimitProvenance": "unknown: saved arguments include host-injected defaults"
+      }
     },
     {
       "dataset": "training2",
@@ -4001,7 +4082,51 @@
       "label": "replication-p6-ablation-no-guides-r1",
       "commit": "6d7fbe3e3c5192b6675c2bea2dc0af3913bd1480",
       "effort": "medium",
-      "evaluated": false
+      "evaluated": true,
+      "success": true,
+      "completed": true,
+      "completionReason": "completed",
+      "seconds": 194.256,
+      "acceptance": {
+        "exit": 0,
+        "tests": 6,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0,
+        "passed": true
+      },
+      "computedUsd": 0.043061802,
+      "activations": {
+        "initialMapNotices": 1,
+        "contextToolCalls": 0,
+        "guideIdsShown": [],
+        "unparsedContextPayloads": 0,
+        "finalReviewNotices": 1,
+        "guidedFinalReviewNotices": 0,
+        "finalReviewGuideIdsShown": [],
+        "batchedEditCalls": 0,
+        "completedBatchedEditCalls": 0,
+        "batchEditsRequested": 0,
+        "batchSizes": [],
+        "backgroundCommandNotices": 0,
+        "testFocusNotices": 0,
+        "explorationFocusNotices": 1,
+        "readCallsByEffectiveLimit": {
+          "120": 2,
+          "180": 1,
+          "55": 1,
+          "160": 1,
+          "40": 4,
+          "130": 1,
+          "50": 1,
+          "150": 1,
+          "25": 2,
+          "60": 1,
+          "70": 1
+        },
+        "defaultWindowReadCalls": null,
+        "readLimitProvenance": "unknown: saved arguments include host-injected defaults"
+      }
     },
     {
       "dataset": "training2",
@@ -4010,7 +4135,48 @@
       "label": "replication-p6-ablation-no-preload-r1",
       "commit": "9b7cffd3ff2ca5a5c078321e879c9ee728b9a70c",
       "effort": "medium",
-      "evaluated": false
+      "evaluated": true,
+      "success": true,
+      "completed": true,
+      "completionReason": "completed",
+      "seconds": 199.633,
+      "acceptance": {
+        "exit": 0,
+        "tests": 6,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0,
+        "passed": true
+      },
+      "computedUsd": 0.030725636,
+      "activations": {
+        "initialMapNotices": 0,
+        "contextToolCalls": 0,
+        "guideIdsShown": [],
+        "unparsedContextPayloads": 0,
+        "finalReviewNotices": 1,
+        "guidedFinalReviewNotices": 0,
+        "finalReviewGuideIdsShown": [],
+        "batchedEditCalls": 0,
+        "completedBatchedEditCalls": 0,
+        "batchEditsRequested": 0,
+        "batchSizes": [],
+        "backgroundCommandNotices": 0,
+        "testFocusNotices": 0,
+        "explorationFocusNotices": 1,
+        "readCallsByEffectiveLimit": {
+          "160": 1,
+          "150": 2,
+          "120": 1,
+          "40": 5,
+          "30": 2,
+          "130": 1,
+          "60": 1,
+          "50": 1
+        },
+        "defaultWindowReadCalls": null,
+        "readLimitProvenance": "unknown: saved arguments include host-injected defaults"
+      }
     },
     {
       "dataset": "",
@@ -4019,7 +4185,48 @@
       "label": "replication-p6-ablation-control-r1",
       "commit": "f75ab327c649cec9719ac03847f171854d2e32ae",
       "effort": "medium",
-      "evaluated": false
+      "evaluated": true,
+      "success": true,
+      "completed": true,
+      "completionReason": "completed",
+      "seconds": 162.551,
+      "acceptance": {
+        "exit": 0,
+        "tests": 2,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0,
+        "passed": true
+      },
+      "computedUsd": 0.033123338,
+      "activations": {
+        "initialMapNotices": 1,
+        "contextToolCalls": 1,
+        "guideIdsShown": [],
+        "unparsedContextPayloads": 1,
+        "finalReviewNotices": 1,
+        "guidedFinalReviewNotices": 0,
+        "finalReviewGuideIdsShown": [],
+        "batchedEditCalls": 0,
+        "completedBatchedEditCalls": 0,
+        "batchEditsRequested": 0,
+        "batchSizes": [],
+        "backgroundCommandNotices": 0,
+        "testFocusNotices": 0,
+        "explorationFocusNotices": 1,
+        "readCallsByEffectiveLimit": {
+          "100": 1,
+          "180": 1,
+          "80": 1,
+          "90": 2,
+          "40": 2,
+          "30": 1,
+          "20": 1,
+          "45": 1
+        },
+        "defaultWindowReadCalls": null,
+        "readLimitProvenance": "unknown: saved arguments include host-injected defaults"
+      }
     },
     {
       "dataset": "",
@@ -4028,7 +4235,45 @@
       "label": "replication-p6-ablation-read-480-r1",
       "commit": "9e4af4bde94625d6eeca72efb0b9436e9d4fb43b",
       "effort": "medium",
-      "evaluated": false
+      "evaluated": true,
+      "success": true,
+      "completed": true,
+      "completionReason": "completed",
+      "seconds": 116.361,
+      "acceptance": {
+        "exit": 0,
+        "tests": 2,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0,
+        "passed": true
+      },
+      "computedUsd": 0.028493196000000002,
+      "activations": {
+        "initialMapNotices": 1,
+        "contextToolCalls": 0,
+        "guideIdsShown": [],
+        "unparsedContextPayloads": 0,
+        "finalReviewNotices": 1,
+        "guidedFinalReviewNotices": 0,
+        "finalReviewGuideIdsShown": [],
+        "batchedEditCalls": 0,
+        "completedBatchedEditCalls": 0,
+        "batchEditsRequested": 0,
+        "batchSizes": [],
+        "backgroundCommandNotices": 0,
+        "testFocusNotices": 0,
+        "explorationFocusNotices": 1,
+        "readCallsByEffectiveLimit": {
+          "320": 1,
+          "80": 3,
+          "200": 1,
+          "180": 1,
+          "70": 1
+        },
+        "defaultWindowReadCalls": null,
+        "readLimitProvenance": "unknown: saved arguments include host-injected defaults"
+      }
     },
     {
       "dataset": "",

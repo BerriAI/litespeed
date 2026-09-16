@@ -1,0 +1,53 @@
+{
+  "createdAt": "2026-09-16T10:16:58.994459+00:00",
+  "status": "first completed candidate observation; not a full-study verdict",
+  "run": "replication-v47-output-retain-output-r2-router-strategy-isolation-b21e08d3",
+  "harnessCommit": "4b8173f85aeb0e31416545f403da3853b5ce560a",
+  "instructionVerifiedInFrozenSource": true,
+  "pytestCommands": 8,
+  "directTailCommands": 8,
+  "retentionSyntaxDetected": 0,
+  "checks": [
+    {
+      "messageIndex": 105,
+      "directTail": true,
+      "retentionSyntaxDetected": false
+    },
+    {
+      "messageIndex": 107,
+      "directTail": true,
+      "retentionSyntaxDetected": false
+    },
+    {
+      "messageIndex": 109,
+      "directTail": true,
+      "retentionSyntaxDetected": false
+    },
+    {
+      "messageIndex": 115,
+      "directTail": true,
+      "retentionSyntaxDetected": false
+    },
+    {
+      "messageIndex": 118,
+      "directTail": true,
+      "retentionSyntaxDetected": false
+    },
+    {
+      "messageIndex": 122,
+      "directTail": true,
+      "retentionSyntaxDetected": false
+    },
+    {
+      "messageIndex": 128,
+      "directTail": true,
+      "retentionSyntaxDetected": false
+    },
+    {
+      "messageIndex": 134,
+      "directTail": true,
+      "retentionSyntaxDetected": false
+    }
+  ],
+  "scope": "Static command syntax inspection. No nested-script/runtime behavioral inference. Commands and private paths withheld; message indices identify private trace evidence. Original acceptance and scores unchanged."
+}

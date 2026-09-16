@@ -1,6 +1,6 @@
 # LiteLLM harness campaign results
 
-Interim snapshot: 2026-09-16T09:55:59.344703+00:00. Current harness: **2026-09-16.45**.
+Interim snapshot: 2026-09-16T10:21:45.900954+00:00. Current harness: **2026-09-16.45**.
 
 **The campaign is still running. It has not established a quality win over Astra/Codex or production replacement readiness.**
 
@@ -8,7 +8,7 @@ The selectable architecture and replay workbench are implemented. The current wo
 
 ## Spending
 
-Confirmed token/header-priced charges: **$45.2055**. Missing receipts retain **$15.1388** across 60 requests; active requests reserve another **$0.5046**. The committed upper bound is **$60.8490** against the authorized **$100.00** ceiling. Reservations are not actual charges. Astra account billing is unavailable.
+Confirmed token/header-priced charges: **$46.4862**. Missing receipts retain **$15.1388** across 60 requests; active requests reserve another **$0.7569**. The committed upper bound is **$62.3820** against the authorized **$100.00** ceiling. Reservations are not actual charges. Astra account billing is unavailable.
 
 An [offline receipt reconciliation](../scripts/litellm-harness/studies/runner-receipt-recovery/README.md) subsequently matched 58 missing gateway records to independently persisted runner usage. Exact round binding agreed with 3,359 known receipts. It restored $0.07678 in token-priced charges and released $14.55740 in excess reservations; unmatched requests remain reserved. The original ledger and per-request reservation history are preserved.
 
@@ -43,11 +43,11 @@ The following are training/development trials under protocol 5, after enforcing 
 
 A [large-repository command-history audit](../scripts/litellm-harness/studies/command-history/README.md) reproduced a host defect: bounded snapshots omitted an already edited adapter, so legitimate shell writes caused later structured edits to fail. Version 33 prioritizes tracked paths within the same limits and preserves Undo/Redo and external-change guards. The deterministic regression and full suite pass; frozen solver studies retain their original code and scores.
 
-A separate [router-accounting diagnostic](../scripts/litellm-harness/studies/router-accounting/README.md) qualifies eight public-entrypoint/callback checks: base 2/8, human reference 8/8, and two training candidates 8/8. Both candidates retain their original 8/9 acceptance scores because of a new private-helper assertion; one remains a timeout. This diagnostic does not choose a read-window variant or replace the frozen oracle.
+A separate [router-accounting diagnostic](../scripts/litellm-harness/studies/router-accounting/README.md) qualifies eight public-entrypoint/callback checks: base 2/8, merged reference 8/8, and two training candidates 8/8. Both candidates retain their original 8/9 acceptance scores because of a new private-helper assertion; one remains a timeout. This diagnostic does not choose a read-window variant or replace the frozen oracle.
 
 A [four-call focused-review pilot](../scripts/litellm-harness/studies/focused-review/README.md) delivered one verified router precedence finding from Medium reasoning, together with a false allegation about an omitted helper. Neither Langfuse attempt supplied a verified witness; one exhausted its output allowance. Prompts, inputs, final answers and executable witness results are included. The reviewer remains unpromoted.
 
-A [supplemental Langfuse training probe](../scripts/litellm-harness/studies/identity-precedence/README.md) confirmed a missed, explicitly requested keep condition in a candidate that passed all 60 original cases: the candidate satisfies 4/6 new checks, the base 2/6 and the human reference 6/6. Original study scores remain unchanged.
+A [supplemental Langfuse training probe](../scripts/litellm-harness/studies/identity-precedence/README.md) confirmed a missed, explicitly requested keep condition in a candidate that passed all 60 original cases: the candidate satisfies 4/6 new checks, the base 2/6 and the merged reference 6/6. Original study scores remain unchanged.
 
 A [router precedence probe](../scripts/litellm-harness/studies/router-precedence/README.md) also found that ten completed protocol-6 candidate-ID attempts passed original acceptance but failed supplemental checks against actual request selection. The recorded control fixes unprefixed wildcard names while introducing a named-team precedence regression. This is posthoc training evidence; original scores remain intact.
 
@@ -59,13 +59,13 @@ A follow-up activation audit found eight 10–13 second pytest jobs in the secon
 
 A [background-retrieval oracle audit](../scripts/litellm-harness/studies/background-router-oracle/README.md) found a failed assertion coupled to a mock configured for one router lookup method. Replacing only that mock with a real Router reproduces base failure, reference success and candidate success. The original 6/7 score stays unchanged; this candidate does not have a demonstrated retrieval defect from that assertion.
 
-Request-level cost analysis found that completed background jobs repeatedly changed the runtime envelope before the original user message, invalidating reuse of subsequent tool history despite unchanged system/tool hashes. A [chronological job-event candidate](../scripts/litellm-harness/studies/job-events/README.md) is under evaluation. The separate [session-affinity transport pilot](../scripts/litellm-harness/studies/cache-affinity/README.md) completed all six paired scenarios with no useful improvement from a stable user hint; that change is not promoted. Per-action usage assigns the entire model request to its chosen next action, not marginal tool cost; reconciliation gaps remain visible.
+Request-level cost analysis found that completed background jobs repeatedly changed the runtime envelope before the original user message, invalidating reuse of subsequent tool history despite unchanged system/tool hashes. The completed [chronological job-event comparison](../scripts/litellm-harness/studies/job-events/README.md) has 2/4 strict successes in each arm and 45.3% lower token-priced spend with the candidate, but one additional timeout. The completed [six-pair transport experiment](../scripts/litellm-harness/studies/prefix-position/README.md) supports the cache mechanism without establishing coding quality. The separate [session-affinity transport pilot](../scripts/litellm-harness/studies/cache-affinity/README.md) completed all six paired scenarios with no useful improvement from a stable user hint; that change is not promoted. Per-action usage assigns the entire model request to its chosen next action, not marginal tool cost; reconciliation gaps remain visible.
 
 A [real streaming-adapter audit](../scripts/litellm-harness/studies/feature-effort/legacy-inheritance/README.md#real-endpoint-check) qualifies 24 hook/stream checks across Chat Completions, Anthropic Messages and Responses. It narrows a critic's diagnosis: two patches handle direct hooks through chat and Messages but fail real Responses behavior differently. The completed [endpoint-aware guide comparison](../scripts/litellm-harness/studies/streaming-contract/README.md) delivers zero strict successes in either arm and costs more with the guide; it is not promoted. No held-out result was used to design that guide.
 
 The completed [inspection-preference comparison](../scripts/litellm-harness/studies/native-inspection/README.md) delivers 2/4 strict successes in each arm, with slightly higher mean time and cost for the preference; it is not promoted. The completed [grouped-edit comparison](../scripts/litellm-harness/studies/batched-edits/README.md) shows lower time and cost on three known tasks, but its raw pass-rate difference is coupled to the background-test design. The [combined comparison](../scripts/litellm-harness/studies/combined-candidate/README.md) remains in progress.
 
-An [empty-choices oracle audit](../scripts/litellm-harness/studies/empty-choices-oracle/README.md) identifies five exact diagnostic-phrase assertions absent from the task contract. Eighteen independent conversion checks give base 3/18, human reference 18/18 and candidate 18/18. Separate cached-stream observations expose a usage difference in the reference itself and are not treated as a qualified replacement suite; the candidate retains its original 8/13 score.
+An [empty-choices oracle audit](../scripts/litellm-harness/studies/empty-choices-oracle/README.md) identifies five exact diagnostic-phrase assertions absent from the task contract. Eighteen independent conversion checks give base 3/18, merged reference 18/18 and candidate 18/18. Separate cached-stream observations expose a usage difference in the reference itself and are not treated as a qualified replacement suite; the candidate retains its original 8/13 score.
 
 ## Evaluation status
 
@@ -74,6 +74,8 @@ A [feature-removal study](../scripts/litellm-harness/studies/feature-removal/REA
 The Bedrock session-tags oracle requires exact error wording absent from the solver prompt. In one 27/34 run, six failures were this wording mismatch; the remaining failure was tuple versus list, which the prompt did specify. Its host oracle note had incorrectly claimed both contracts were supplied. The active study retains its original inputs and raw scores, with this interpretation correction. The router-strategy oracle also includes a new private-helper assertion.
 
 A later [Bedrock tag-order audit](../scripts/litellm-harness/studies/bedrock-tag-order/README.md) found a stronger contradiction: four direct-helper tests require the original unsorted tags, while the curated task asks for sorting at those boundaries. A candidate that sorts correctly fails their order-sensitive STS mocks. The diagnostic confirms intact tag values and assumed credentials; it does not rewrite the raw 24/34 score or its timeout.
+
+A [September 14 development corpus](../scripts/litellm-harness/studies/september14-development/README.md) qualifies 17 of 21 deterministically selected changes, with 97 reference checks. Four new-symbol test-import failures stay excluded. A frozen 34-trial comparison tests the integrated specialization against ordinary Litespeed using the same Flash model/runtime/effort; these are development outcomes, and the training cutoff advances to September 14.
 
 A separate corpus selects 20 recent September 15 Python changes by explicit file-count and diff-size criteria. Fourteen pass base/reference qualification; six have environment, new-private-API, or reference failures and are excluded before solver outcomes. Its outcomes remain reserved. Earlier September 9 reserved tasks predate some training snapshots, so they cannot establish chronological generalization.
 

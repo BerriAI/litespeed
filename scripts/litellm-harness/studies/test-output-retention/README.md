@@ -15,3 +15,7 @@ The [patch](candidate.patch) suggests `pytest --tb=short -q`, retaining full out
 Type checking and 33 existing harness/runner/isolation tests pass. This validates integration, not the instruction's effect on model behavior. The experiment measures normal delivery and unchanged acceptance first, then elapsed time, token cost, output volume and filter-only reruns. Legacy streaming also requires the already qualified 24 real-adapter checks, declared before allocation. Router helper-name coupling and legacy inheritance wording retain their existing caveats. A reduction in the heuristic alone does not justify promotion.
 
 Reconstruct the control at the pinned public main commit, apply the candidate patch on a separate checkout, install physical dependencies within each runtime, and use fresh trial labels with `batch.py` and `study.py`. Exact private worktree paths and raw model transcripts are excluded. No reserved evaluation task or outcome was used to prepare this comparison.
+
+## First observed activation
+
+The first completed candidate (`b21e08d3`, router strategy isolation) has eight pytest commands, all piped directly into `tail`, with no retained-log syntax detected. The instruction is present in its frozen harness source. It finishes normally in 580.96 seconds but passes 5/9 original checks; known early-return behavior is still missed. [Audit](first-activation-audit.json). This is one candidate observation, not a complete paired comparison or a causal verdict. It makes instruction adherence an explicit question for the remaining trials.

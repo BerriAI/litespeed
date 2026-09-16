@@ -1,0 +1,368 @@
+{
+  "status": "interim",
+  "note": "Development selection only. Interim observed-task means can change as slower trials finish. Bootstrap resamples tasks, not attempts; it does not correct adaptive candidate selection or establish future generalization. Token prices exclude requests without usage and do not replace the campaign ledger.",
+  "variants": [
+    {
+      "variant": "plain",
+      "evaluated": 0,
+      "expected": 17
+    },
+    {
+      "variant": "specialized",
+      "evaluated": 0,
+      "expected": 17
+    }
+  ],
+  "comparisons": [
+    {
+      "variant": "specialized",
+      "control": "plain",
+      "pairedTasks": 0,
+      "expectedTasks": 17,
+      "complete": false,
+      "pairs": []
+    }
+  ],
+  "trials": [
+    {
+      "dataset": "training6",
+      "case": "correlation-logging-cost",
+      "name": "specialized",
+      "label": "replication-v48-breadth-specialized-r1",
+      "commit": "370f6fc500002b3e35ea7ac474107b2bb2a693b9",
+      "effort": "medium",
+      "kind": "litellm-specific",
+      "evaluated": false
+    },
+    {
+      "dataset": "training6",
+      "case": "correlation-logging-cost",
+      "name": "plain",
+      "label": "replication-v48-breadth-plain-r1",
+      "commit": "370f6fc500002b3e35ea7ac474107b2bb2a693b9",
+      "effort": "medium",
+      "kind": "single",
+      "evaluated": false
+    },
+    {
+      "dataset": "training6",
+      "case": "proxy-call-id-header",
+      "name": "specialized",
+      "label": "replication-v48-breadth-specialized-r1",
+      "commit": "370f6fc500002b3e35ea7ac474107b2bb2a693b9",
+      "effort": "medium",
+      "kind": "litellm-specific",
+      "evaluated": false
+    },
+    {
+      "dataset": "training6",
+      "case": "proxy-call-id-header",
+      "name": "plain",
+      "label": "replication-v48-breadth-plain-r1",
+      "commit": "370f6fc500002b3e35ea7ac474107b2bb2a693b9",
+      "effort": "medium",
+      "kind": "single",
+      "evaluated": false
+    },
+    {
+      "dataset": "training6",
+      "case": "team-organization-models",
+      "name": "specialized",
+      "label": "replication-v48-breadth-specialized-r1",
+      "commit": "370f6fc500002b3e35ea7ac474107b2bb2a693b9",
+      "effort": "medium",
+      "kind": "litellm-specific",
+      "evaluated": false
+    },
+    {
+      "dataset": "training6",
+      "case": "team-organization-models",
+      "name": "plain",
+      "label": "replication-v48-breadth-plain-r1",
+      "commit": "370f6fc500002b3e35ea7ac474107b2bb2a693b9",
+      "effort": "medium",
+      "kind": "single",
+      "evaluated": false
+    },
+    {
+      "dataset": "training6",
+      "case": "file-extension-allowlist",
+      "name": "specialized",
+      "label": "replication-v48-breadth-specialized-r1",
+      "commit": "370f6fc500002b3e35ea7ac474107b2bb2a693b9",
+      "effort": "medium",
+      "kind": "litellm-specific",
+      "evaluated": false
+    },
+    {
+      "dataset": "training6",
+      "case": "file-extension-allowlist",
+      "name": "plain",
+      "label": "replication-v48-breadth-plain-r1",
+      "commit": "370f6fc500002b3e35ea7ac474107b2bb2a693b9",
+      "effort": "medium",
+      "kind": "single",
+      "evaluated": false
+    },
+    {
+      "dataset": "training6",
+      "case": "prompt-security-queued",
+      "name": "plain",
+      "label": "replication-v48-breadth-plain-r1",
+      "commit": "370f6fc500002b3e35ea7ac474107b2bb2a693b9",
+      "effort": "medium",
+      "kind": "single",
+      "evaluated": false
+    },
+    {
+      "dataset": "training6",
+      "case": "prompt-security-queued",
+      "name": "specialized",
+      "label": "replication-v48-breadth-specialized-r1",
+      "commit": "370f6fc500002b3e35ea7ac474107b2bb2a693b9",
+      "effort": "medium",
+      "kind": "litellm-specific",
+      "evaluated": false
+    },
+    {
+      "dataset": "training6",
+      "case": "team-cooldown-alternatives",
+      "name": "specialized",
+      "label": "replication-v48-breadth-specialized-r1",
+      "commit": "370f6fc500002b3e35ea7ac474107b2bb2a693b9",
+      "effort": "medium",
+      "kind": "litellm-specific",
+      "evaluated": false
+    },
+    {
+      "dataset": "training6",
+      "case": "team-cooldown-alternatives",
+      "name": "plain",
+      "label": "replication-v48-breadth-plain-r1",
+      "commit": "370f6fc500002b3e35ea7ac474107b2bb2a693b9",
+      "effort": "medium",
+      "kind": "single",
+      "evaluated": false
+    },
+    {
+      "dataset": "training6",
+      "case": "organization-own-memberships",
+      "name": "plain",
+      "label": "replication-v48-breadth-plain-r1",
+      "commit": "370f6fc500002b3e35ea7ac474107b2bb2a693b9",
+      "effort": "medium",
+      "kind": "single",
+      "evaluated": false
+    },
+    {
+      "dataset": "training6",
+      "case": "organization-own-memberships",
+      "name": "specialized",
+      "label": "replication-v48-breadth-specialized-r1",
+      "commit": "370f6fc500002b3e35ea7ac474107b2bb2a693b9",
+      "effort": "medium",
+      "kind": "litellm-specific",
+      "evaluated": false
+    },
+    {
+      "dataset": "training6",
+      "case": "mapped-error-response-headers",
+      "name": "plain",
+      "label": "replication-v48-breadth-plain-r1",
+      "commit": "370f6fc500002b3e35ea7ac474107b2bb2a693b9",
+      "effort": "medium",
+      "kind": "single",
+      "evaluated": false
+    },
+    {
+      "dataset": "training6",
+      "case": "mapped-error-response-headers",
+      "name": "specialized",
+      "label": "replication-v48-breadth-specialized-r1",
+      "commit": "370f6fc500002b3e35ea7ac474107b2bb2a693b9",
+      "effort": "medium",
+      "kind": "litellm-specific",
+      "evaluated": false
+    },
+    {
+      "dataset": "training6",
+      "case": "session-read-and-statusline",
+      "name": "specialized",
+      "label": "replication-v48-breadth-specialized-r1",
+      "commit": "370f6fc500002b3e35ea7ac474107b2bb2a693b9",
+      "effort": "medium",
+      "kind": "litellm-specific",
+      "evaluated": false
+    },
+    {
+      "dataset": "training6",
+      "case": "session-read-and-statusline",
+      "name": "plain",
+      "label": "replication-v48-breadth-plain-r1",
+      "commit": "370f6fc500002b3e35ea7ac474107b2bb2a693b9",
+      "effort": "medium",
+      "kind": "single",
+      "evaluated": false
+    },
+    {
+      "dataset": "training6",
+      "case": "health-read-failure",
+      "name": "plain",
+      "label": "replication-v48-breadth-plain-r1",
+      "commit": "370f6fc500002b3e35ea7ac474107b2bb2a693b9",
+      "effort": "medium",
+      "kind": "single",
+      "evaluated": false
+    },
+    {
+      "dataset": "training6",
+      "case": "health-read-failure",
+      "name": "specialized",
+      "label": "replication-v48-breadth-specialized-r1",
+      "commit": "370f6fc500002b3e35ea7ac474107b2bb2a693b9",
+      "effort": "medium",
+      "kind": "litellm-specific",
+      "evaluated": false
+    },
+    {
+      "dataset": "training6",
+      "case": "issuer-virtual-key-policy",
+      "name": "plain",
+      "label": "replication-v48-breadth-plain-r1",
+      "commit": "370f6fc500002b3e35ea7ac474107b2bb2a693b9",
+      "effort": "medium",
+      "kind": "single",
+      "evaluated": false
+    },
+    {
+      "dataset": "training6",
+      "case": "issuer-virtual-key-policy",
+      "name": "specialized",
+      "label": "replication-v48-breadth-specialized-r1",
+      "commit": "370f6fc500002b3e35ea7ac474107b2bb2a693b9",
+      "effort": "medium",
+      "kind": "litellm-specific",
+      "evaluated": false
+    },
+    {
+      "dataset": "training6",
+      "case": "login-credentials-hint",
+      "name": "specialized",
+      "label": "replication-v48-breadth-specialized-r1",
+      "commit": "370f6fc500002b3e35ea7ac474107b2bb2a693b9",
+      "effort": "medium",
+      "kind": "litellm-specific",
+      "evaluated": false
+    },
+    {
+      "dataset": "training6",
+      "case": "login-credentials-hint",
+      "name": "plain",
+      "label": "replication-v48-breadth-plain-r1",
+      "commit": "370f6fc500002b3e35ea7ac474107b2bb2a693b9",
+      "effort": "medium",
+      "kind": "single",
+      "evaluated": false
+    },
+    {
+      "dataset": "training6",
+      "case": "async-success-once",
+      "name": "specialized",
+      "label": "replication-v48-breadth-specialized-r1",
+      "commit": "370f6fc500002b3e35ea7ac474107b2bb2a693b9",
+      "effort": "medium",
+      "kind": "litellm-specific",
+      "evaluated": false
+    },
+    {
+      "dataset": "training6",
+      "case": "async-success-once",
+      "name": "plain",
+      "label": "replication-v48-breadth-plain-r1",
+      "commit": "370f6fc500002b3e35ea7ac474107b2bb2a693b9",
+      "effort": "medium",
+      "kind": "single",
+      "evaluated": false
+    },
+    {
+      "dataset": "training6",
+      "case": "all-deployments-cooldown",
+      "name": "specialized",
+      "label": "replication-v48-breadth-specialized-r1",
+      "commit": "370f6fc500002b3e35ea7ac474107b2bb2a693b9",
+      "effort": "medium",
+      "kind": "litellm-specific",
+      "evaluated": false
+    },
+    {
+      "dataset": "training6",
+      "case": "all-deployments-cooldown",
+      "name": "plain",
+      "label": "replication-v48-breadth-plain-r1",
+      "commit": "370f6fc500002b3e35ea7ac474107b2bb2a693b9",
+      "effort": "medium",
+      "kind": "single",
+      "evaluated": false
+    },
+    {
+      "dataset": "training6",
+      "case": "internal-param-filter",
+      "name": "plain",
+      "label": "replication-v48-breadth-plain-r1",
+      "commit": "370f6fc500002b3e35ea7ac474107b2bb2a693b9",
+      "effort": "medium",
+      "kind": "single",
+      "evaluated": false
+    },
+    {
+      "dataset": "training6",
+      "case": "internal-param-filter",
+      "name": "specialized",
+      "label": "replication-v48-breadth-specialized-r1",
+      "commit": "370f6fc500002b3e35ea7ac474107b2bb2a693b9",
+      "effort": "medium",
+      "kind": "litellm-specific",
+      "evaluated": false
+    },
+    {
+      "dataset": "training6",
+      "case": "forwarded-http-headers",
+      "name": "plain",
+      "label": "replication-v48-breadth-plain-r1",
+      "commit": "370f6fc500002b3e35ea7ac474107b2bb2a693b9",
+      "effort": "medium",
+      "kind": "single",
+      "evaluated": false
+    },
+    {
+      "dataset": "training6",
+      "case": "forwarded-http-headers",
+      "name": "specialized",
+      "label": "replication-v48-breadth-specialized-r1",
+      "commit": "370f6fc500002b3e35ea7ac474107b2bb2a693b9",
+      "effort": "medium",
+      "kind": "litellm-specific",
+      "evaluated": false
+    },
+    {
+      "dataset": "training6",
+      "case": "prometheus-rate-limit-provider",
+      "name": "plain",
+      "label": "replication-v48-breadth-plain-r1",
+      "commit": "370f6fc500002b3e35ea7ac474107b2bb2a693b9",
+      "effort": "medium",
+      "kind": "single",
+      "evaluated": false
+    },
+    {
+      "dataset": "training6",
+      "case": "prometheus-rate-limit-provider",
+      "name": "specialized",
+      "label": "replication-v48-breadth-specialized-r1",
+      "commit": "370f6fc500002b3e35ea7ac474107b2bb2a693b9",
+      "effort": "medium",
+      "kind": "litellm-specific",
+      "evaluated": false
+    }
+  ]
+}

@@ -1,0 +1,294 @@
+{
+  "createdAt": "2026-09-16T10:01:32.228782+00:00",
+  "purpose": "Additional development coverage before the September 15 reserved final comparison. No solver outcomes exist for this corpus yet. Qualify all deterministically selected candidates before allocating solvers.",
+  "selection": "Origin main first-parent commits, 2026-09-11 through 2026-09-14 UTC; 1-4 production Python and 1-3 Python test files, total diff 20-450 lines. Metadata only; not yet a training plan or corpus.",
+  "candidates": [
+    {
+      "sha": "d1fc231545d31566b8a2a2f11901ff335836c832",
+      "date": "2026-09-14T16:48:47-07:00",
+      "title": "Merge pull request #41145 from BerriAI/litellm_health_check_skip_save_on_failed_read_main",
+      "lines": 52,
+      "production": [
+        "litellm/proxy/db/health_check_latest.py",
+        "litellm/proxy/health_endpoints/_health_endpoints.py"
+      ],
+      "tests": [
+        "tests/test_litellm/proxy/db/test_health_check_latest.py",
+        "tests/test_litellm/proxy/test_health_check_functions.py"
+      ]
+    },
+    {
+      "sha": "99245f93231649cbb30dc7abfb0b9ffac987baec",
+      "date": "2026-09-14T16:43:37-07:00",
+      "title": "Merge pull request #41131 from BerriAI/litellm_prompt_security_created_status",
+      "lines": 111,
+      "production": [
+        "litellm/proxy/guardrails/guardrail_hooks/prompt_security/prompt_security.py"
+      ],
+      "tests": [
+        "tests/test_litellm/proxy/guardrails/test_prompt_security_guardrails.py"
+      ]
+    },
+    {
+      "sha": "9cbd2394884189c32ea88daebd1d9283fac50cb4",
+      "date": "2026-09-14T16:14:13-07:00",
+      "title": "Merge pull request #41056 from BerriAI/litellm_moderation_call_id_header",
+      "lines": 89,
+      "production": [
+        "litellm/proxy/common_request_processing.py"
+      ],
+      "tests": [
+        "tests/test_litellm/proxy/test_common_request_processing.py",
+        "tests/test_litellm/proxy/test_proxy_server.py"
+      ]
+    },
+    {
+      "sha": "de55e22899eca90d2b5c0c5a5311fe8741030371",
+      "date": "2026-09-14T15:52:31-07:00",
+      "title": "Merge pull request #41141 from BerriAI/litellm_lit7694_forwarded_headers_body_leak",
+      "lines": 61,
+      "production": [
+        "litellm/main.py"
+      ],
+      "tests": [
+        "tests/test_litellm/test_main.py"
+      ]
+    },
+    {
+      "sha": "1f46e584947fb259dc7272c996c2bbe4d2e09305",
+      "date": "2026-09-14T15:51:23-07:00",
+      "title": "Merge pull request #41018 from BerriAI/litellm_fix_model_alias_map_leak",
+      "lines": 31,
+      "production": [
+        "litellm/types/utils.py"
+      ],
+      "tests": [
+        "tests/test_litellm/test_utils.py"
+      ]
+    },
+    {
+      "sha": "7b6d2231052791eee316150e658805daa2198554",
+      "date": "2026-09-14T15:05:01-07:00",
+      "title": "Merge pull request #40196 from BerriAI/litellm_team_admin_all_proxy_models",
+      "lines": 407,
+      "production": [
+        "litellm/proxy/_types.py",
+        "litellm/proxy/management_endpoints/team_endpoints.py"
+      ],
+      "tests": [
+        "tests/test_litellm/proxy/management_endpoints/test_team_endpoints.py"
+      ]
+    },
+    {
+      "sha": "e7662778462c5170caacb919263a61c09924eacf",
+      "date": "2026-09-14T14:57:07-07:00",
+      "title": "Merge pull request #40991 from BerriAI/litellm_team_model_cooldown_siblings",
+      "lines": 121,
+      "production": [
+        "litellm/router.py",
+        "litellm/router_utils/cooldown_handlers.py"
+      ],
+      "tests": [
+        "tests/test_litellm/router_utils/test_cooldown_handlers.py",
+        "tests/test_litellm/test_router.py"
+      ]
+    },
+    {
+      "sha": "3e417fa6e0b2ba8a4d2c028b90f5ef1bfb727bc9",
+      "date": "2026-09-14T14:56:11-07:00",
+      "title": "Merge pull request #41113 from BerriAI/litellm_realtime_release_max_parallel_slot",
+      "lines": 225,
+      "production": [
+        "litellm/constants.py",
+        "litellm/litellm_core_utils/realtime_streaming.py",
+        "litellm/llms/bedrock/realtime/handler.py",
+        "litellm/proxy/proxy_server.py"
+      ],
+      "tests": [
+        "tests/test_litellm/litellm_core_utils/test_realtime_streaming.py",
+        "tests/test_litellm/llms/bedrock/realtime/test_bedrock_realtime_handler.py",
+        "tests/test_litellm/proxy/test_proxy_server.py"
+      ]
+    },
+    {
+      "sha": "c6e4c5582d11b7434c7d296604bc4f2ebb21da9e",
+      "date": "2026-09-14T14:20:36-07:00",
+      "title": "Merge pull request #41093 from BerriAI/litellm_fallback_backfill_opt_in_main",
+      "lines": 311,
+      "production": [
+        "litellm/litellm_core_utils/fallback_generalizations.py",
+        "litellm/utils.py"
+      ],
+      "tests": [
+        "tests/test_litellm/litellm_core_utils/test_fallback_generalizations.py"
+      ]
+    },
+    {
+      "sha": "4123b4bc2b203a2e0c3ef1610c80eab44a423739",
+      "date": "2026-09-14T13:57:08-07:00",
+      "title": "Merge pull request #41086 from BerriAI/litellm_team_list_org_admin_membership_lit3723",
+      "lines": 371,
+      "production": [
+        "litellm/proxy/auth/auth_checks.py",
+        "litellm/proxy/auth/resolvers/grants.py",
+        "litellm/proxy/management_endpoints/team_endpoints.py",
+        "litellm/types/proxy/auth/auth_checks.py"
+      ],
+      "tests": [
+        "tests/test_litellm/proxy/management_endpoints/test_team_endpoints.py"
+      ]
+    },
+    {
+      "sha": "2cad7a49af3c893e6cb57982ea4185da6f5de8c5",
+      "date": "2026-09-14T13:49:03-07:00",
+      "title": "Merge pull request #41116 from BerriAI/litellm_auto_router_session_api_access",
+      "lines": 111,
+      "production": [
+        "litellm/proxy/auth/route_checks.py",
+        "litellm/proxy/client/cli/commands/statusline_script.py"
+      ],
+      "tests": [
+        "tests/test_litellm/proxy/auth/test_route_checks.py",
+        "tests/test_litellm/proxy/client/cli/test_statusline_script.py"
+      ]
+    },
+    {
+      "sha": "161ae2f3b4962b7b355716447c3f6e4412e9124e",
+      "date": "2026-09-14T13:44:09-07:00",
+      "title": "Merge pull request #41107 from BerriAI/litellm_hide_credentials_hint_when_ui_password_set",
+      "lines": 92,
+      "production": [
+        "litellm/proxy/common_utils/html_forms/default_credentials_hint.py",
+        "litellm/proxy/discovery_endpoints/ui_discovery_endpoints.py",
+        "litellm/proxy/management_endpoints/ui_sso.py",
+        "litellm/proxy/proxy_server.py"
+      ],
+      "tests": [
+        "tests/test_litellm/proxy/discovery_endpoints/test_ui_discovery_endpoints.py",
+        "tests/test_litellm/proxy/management_endpoints/test_ui_sso.py",
+        "tests/test_litellm/proxy/proxy_server/test_routes_login_sso.py"
+      ]
+    },
+    {
+      "sha": "ab09abc3c887684328158a3e103928b38fe4cc07",
+      "date": "2026-09-14T13:28:16-07:00",
+      "title": "Merge pull request #41115 from BerriAI/litellm_fix_wrapper_async_double_sync_success_handler_main",
+      "lines": 61,
+      "production": [
+        "litellm/utils.py"
+      ],
+      "tests": [
+        "tests/test_litellm/test_utils.py"
+      ]
+    },
+    {
+      "sha": "34fe9f71d561f3cd86238b5a2fe7cd8a32127ae8",
+      "date": "2026-09-14T13:02:07-07:00",
+      "title": "Merge pull request #41059 from BerriAI/litellm_prometheus_pre_call_rate_limit_api_provider",
+      "lines": 85,
+      "production": [
+        "litellm/integrations/prometheus.py"
+      ],
+      "tests": [
+        "tests/test_litellm/integrations/test_prometheus_labels.py"
+      ]
+    },
+    {
+      "sha": "b94b8bca211e366328bcee3acd57d859fd35e52c",
+      "date": "2026-09-14T12:41:34-07:00",
+      "title": "Merge pull request #41096 from BerriAI/litellm_disable_access_log_paths",
+      "lines": 101,
+      "production": [
+        "litellm/_logging.py"
+      ],
+      "tests": [
+        "tests/test_litellm/test_logging.py"
+      ]
+    },
+    {
+      "sha": "f67cc62032609faa8ae714e38f884ec841c0a133",
+      "date": "2026-09-14T12:39:42-07:00",
+      "title": "Merge pull request #40995 from BerriAI/litellm_all_deployments_cooldown_error",
+      "lines": 128,
+      "production": [
+        "litellm/router.py",
+        "litellm/router_utils/handle_error.py",
+        "litellm/types/router.py"
+      ],
+      "tests": [
+        "tests/test_litellm/proxy/test_common_request_processing.py",
+        "tests/test_litellm/test_router.py"
+      ]
+    },
+    {
+      "sha": "7c55c4ba7d7beee93dfa2f0cc33c83cadc7da7a7",
+      "date": "2026-09-14T12:36:59-07:00",
+      "title": "Merge pull request #40925 from BerriAI/litellm_proxy_error_headers_from_litellm_response_headers",
+      "lines": 45,
+      "production": [
+        "litellm/proxy/common_request_processing.py"
+      ],
+      "tests": [
+        "tests/test_litellm/proxy/test_common_request_processing.py"
+      ]
+    },
+    {
+      "sha": "d541792b30b3b281bbc2ccdc1b1dc5ebb6983558",
+      "date": "2026-09-14T12:34:19-07:00",
+      "title": "Merge pull request #41106 from BerriAI/litellm_allowed_file_extensions",
+      "lines": 264,
+      "production": [
+        "litellm/proxy/_types.py",
+        "litellm/proxy/openai_files_endpoints/files_endpoints.py",
+        "litellm/proxy/openai_files_endpoints/general_upload_validation.py",
+        "litellm/proxy/proxy_server.py"
+      ],
+      "tests": [
+        "tests/test_litellm/proxy/openai_files_endpoint/test_files_endpoint.py",
+        "tests/test_litellm/proxy/openai_files_endpoint/test_general_upload_validation.py",
+        "tests/test_litellm/proxy/proxy_server/test_proxy_config.py"
+      ]
+    },
+    {
+      "sha": "cae4a655454a05750098c459a27a01f18f4c4a29",
+      "date": "2026-09-14T11:55:37-07:00",
+      "title": "Merge pull request #40562 from BerriAI/litellm_otel_openinference_message_cap",
+      "lines": 207,
+      "production": [
+        "litellm/integrations/otel/mappers/openinference.py",
+        "litellm/integrations/otel/mappers/utils.py"
+      ],
+      "tests": [
+        "tests/test_litellm/integrations/otel/test_otel_v2_emitter.py"
+      ]
+    },
+    {
+      "sha": "08a78a39826759c26a8e08b853d52af75ecbfc1d",
+      "date": "2026-09-14T11:14:44-07:00",
+      "title": "Merge pull request #41054 from BerriAI/litellm_gate_correlation_contextvar_stamp",
+      "lines": 122,
+      "production": [
+        "litellm/litellm_core_utils/litellm_logging.py"
+      ],
+      "tests": [
+        "tests/test_litellm/litellm_core_utils/test_litellm_logging.py",
+        "tests/test_litellm/litellm_core_utils/test_streaming_handler.py"
+      ]
+    },
+    {
+      "sha": "9e1ed40db3376dc8e7b9392aa104653ca22d3fdb",
+      "date": "2026-09-14T08:00:25-07:00",
+      "title": "Merge pull request #40927 from BerriAI/litellm_per_issuer_virtual_key_claim_field",
+      "lines": 332,
+      "production": [
+        "litellm/proxy/_types.py",
+        "litellm/proxy/auth/user_api_key_auth.py"
+      ],
+      "tests": [
+        "tests/test_litellm/proxy/auth/test_user_api_key_auth.py",
+        "tests/test_litellm/proxy/test__types.py"
+      ]
+    }
+  ],
+  "qualificationRule": "Require actual failing base assertions without collection/import errors, positive passing reference tests, exclude new-private-helper-name assertions and document exclusions before solver runs. Retain any invalid candidate and reason; do not repair qualification after seeing solver scores."
+}

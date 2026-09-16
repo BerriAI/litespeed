@@ -12,14 +12,18 @@ Adapter scope: this experiment uses the OpenAI-compatible chat adapter. Anthropi
 
 A [compatible implementation](compatible-candidate.patch) is now prepared separately on the v34 runtime and is **not promoted**. Both job-drain locations limit chronological events to OpenAI-compatible providers. New real-background-job tests with mocked model responses verify that Anthropic and Codex keep completion notices in the latest user envelope, avoid persisted system events, and do not repeat the notice on the next turn. Both tests fail without the provider gate and pass with it; 29 selected tests and type checking pass. [The preparation record](compatible-candidate.json) distinguishes this implementation from the frozen paid study.
 
-## Result interpretation
+## Completed results: eight coding trials
 
-The first appended-job Bedrock trial has high cache reuse but times out. Its raw
-24/34 includes the separately documented [tag-order contradiction](../bedrock-tag-order/README.md)
-and six unstated error-wording requirements. These diagnostics do not change the
-frozen scores, count the timeout as completion, or establish a quality benefit.
+Both arms pass 2/4 strict trials, all on MCP authentication. Mean elapsed time is 631.91 seconds for chronological notices versus 626.45 for control. Token-priced totals are $0.57158 versus $1.04509 across four runs each, a 45.3% reduction in this development sample. This is not an invoice, a general cost guarantee, or evidence of higher coding quality. [Full results](results.json).
 
-Both appended-job MCP-auth repetitions finish normally with 52/52 checks (382.27 and 480.94 seconds; token-priced costs $0.0738 and $0.0982). The completed control repetition finishes in 545.40 seconds with 52/52 at $0.3122. The other control repetition is still pending. These partial observations are promising, but differences in task length and provider caching require complete matched reporting; the candidate remains unpromoted.
+| Task | Chronological notices | Control |
+| --- | --- | --- |
+| MCP authentication | 52/52 twice, normal completion; 382.27 / 480.94 seconds; $0.17197 total | 52/52 twice, normal completion; 545.40 / 548.82 seconds; $0.62452 total |
+| Bedrock session tags | 24/34 at timeout (901.02 seconds), 26/34 with normal completion (763.41 seconds); $0.39961 total | 24/34 twice, normal completion; 674.05 / 737.52 seconds; $0.42057 total |
+
+Bedrock's [tag-order contradiction](../bedrock-tag-order/README.md) and unstated error wording remain disclosed; neither scores nor timeout outcomes are replaced. The added timeout is a regression in normal completion, despite the lower total cost. Two development tasks are too few to establish performance across LiteLLM.
+
+The independent [six-pair transport study](../prefix-position/README.md) is complete and supports the cache mechanism under controlled OK-only responses. The compatible implementation remains prepared for combined evaluation, not promoted from these results alone.
 
 ## Metering-gateway outage
 
