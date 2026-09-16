@@ -121,6 +121,11 @@ These are campaign observations, not claims that each corresponding intervention
 6. **More testing is not automatically better.** A whole provider directory can contain live-service tests and unrelated failures. Exact nodes and small discriminating probes often answer the actual question with less cost and confusion.
 7. **Observe activation accurately.** Initial maps and review notices are visible in saved messages. Read-window defaults are inserted before arguments are saved, so historical traces cannot always distinguish host defaults from explicit model choices. The analyzer reports that uncertainty instead of inventing an activation count.
 
+
+8. **Human PR tests can miss an explicit requirement.** A Langfuse candidate passed all 60 original cases but missed a stated keep condition for different trace/session IDs. A reference-aware critic suggested the gap; a public-entrypoint probe confirmed candidate 4/6, base 2/6 and reference 6/6. The original scores remain unchanged. [Reproducible probe and candidate](../scripts/litellm-harness/studies/identity-precedence/README.md).
+9. **A feature must actually activate.** The timed-out routing run recorded 21 pytest-related jobs but no test-focus reminder. Its environment-prefixed commands lacked a safely attributable check verdict, and the reminder incorrectly depended on that verdict. Version 24 separately counts completed test-like activity without claiming it passed.
+10. **A blind judge is a separate capability to evaluate.** On the Langfuse candidate, a fresh reviewer given the task, diff and source but no reference or test results failed at all three tested settings: Medium and Low exhausted 8,000 output tokens without an answer; no reasoning completed but missed the confirmed defect after retracting several false accusations. This is one exploratory case, not a universal result. The reference-aware critic helped build a better training probe; it did not establish a reliable production judge.
+
 This is the practical meaning of inspecting every tool call: find the first wrong decision and the missing information at that moment. Repeating the final error message usually does not reveal the useful intervention.
 
 ## 6. Prompting the improving agent
