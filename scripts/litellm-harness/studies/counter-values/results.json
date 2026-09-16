@@ -1,0 +1,64 @@
+{
+  "status": "interim",
+  "note": "Development selection only. Interim observed-task means can change as slower trials finish. Bootstrap resamples tasks, not attempts; it does not correct adaptive candidate selection or establish future generalization. Token prices exclude requests without usage and do not replace the campaign ledger.",
+  "variants": [
+    {
+      "variant": "control",
+      "evaluated": 0,
+      "expected": 2
+    },
+    {
+      "variant": "counter-values",
+      "evaluated": 0,
+      "expected": 2
+    }
+  ],
+  "comparisons": [
+    {
+      "variant": "counter-values",
+      "control": "control",
+      "pairedTasks": 0,
+      "expectedTasks": 1,
+      "complete": false,
+      "pairs": []
+    }
+  ],
+  "trials": [
+    {
+      "dataset": "",
+      "case": "team-member-budget",
+      "name": "control",
+      "label": "replication-v32-counters-control-r2",
+      "commit": "a37b3d38fc7bb39e9b16e460af7db4fca8843ada",
+      "effort": "medium",
+      "evaluated": false
+    },
+    {
+      "dataset": "",
+      "case": "team-member-budget",
+      "name": "counter-values",
+      "label": "replication-v32-counters-counter-values-r2",
+      "commit": "60abb3ac9a289f528dbff82940280e18e4dc5940",
+      "effort": "medium",
+      "evaluated": false
+    },
+    {
+      "dataset": "",
+      "case": "team-member-budget",
+      "name": "counter-values",
+      "label": "replication-v32-counters-counter-values-r1",
+      "commit": "60abb3ac9a289f528dbff82940280e18e4dc5940",
+      "effort": "medium",
+      "evaluated": false
+    },
+    {
+      "dataset": "",
+      "case": "team-member-budget",
+      "name": "control",
+      "label": "replication-v32-counters-control-r1",
+      "commit": "a37b3d38fc7bb39e9b16e460af7db4fca8843ada",
+      "effort": "medium",
+      "evaluated": false
+    }
+  ]
+}
