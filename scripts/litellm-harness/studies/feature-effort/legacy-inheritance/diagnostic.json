@@ -1,0 +1,14 @@
+{
+  "scope": "Posthoc host-authored training diagnosis; candidate patch plus one change on an independent copy. Original timed-out 14/16 result unchanged. Not a model repair, new acceptance oracle, or held-out score.",
+  "sourceRun": "replication-v24-features-high-r1-legacy-stream-pipeline-0fb33cb0",
+  "change": {
+    "old": "return \"async_post_call_success_hook\" in type(callback).__dict__",
+    "new": "return type(callback).async_post_call_success_hook is not CustomGuardrail.async_post_call_success_hook"
+  },
+  "exit": 0,
+  "tests": 16,
+  "failures": 0,
+  "errors": 0,
+  "skipped": 0,
+  "packageOriginsAsserted": true
+}

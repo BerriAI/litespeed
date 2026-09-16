@@ -1,0 +1,61 @@
+[
+  {
+    "name": "creation",
+    "before": {
+      "files": {
+        "a": "A"
+      },
+      "omitted": {},
+      "truncated": false
+    },
+    "after": {
+      "files": {
+        "a": "A",
+        "z": "Z"
+      },
+      "omitted": {},
+      "truncated": false
+    },
+    "diff": {
+      "changes": [
+        {
+          "path": "z",
+          "before": null,
+          "after": "Z"
+        }
+      ],
+      "incomplete": false
+    }
+  },
+  {
+    "name": "deletion",
+    "before": {
+      "files": {
+        "a": "A",
+        "z": "Z"
+      },
+      "omitted": {},
+      "truncated": false
+    },
+    "after": {
+      "files": {
+        "a": "A"
+      },
+      "omitted": {},
+      "truncated": false,
+      "absent": [
+        "z"
+      ]
+    },
+    "diff": {
+      "changes": [
+        {
+          "path": "z",
+          "before": "Z",
+          "after": null
+        }
+      ],
+      "incomplete": false
+    }
+  }
+]

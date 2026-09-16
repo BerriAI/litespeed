@@ -1,0 +1,18 @@
+{
+  "finish": "stop",
+  "usage": {
+    "completion_tokens": 1554,
+    "prompt_tokens": 8067,
+    "total_tokens": 9621,
+    "completion_tokens_details": {
+      "reasoning_tokens": 0
+    },
+    "prompt_tokens_details": {
+      "cached_tokens": 0
+    },
+    "output_tokens_details": {
+      "reasoning_tokens": 0
+    }
+  },
+  "validation": "Neither claimed reproduction confirmed the alleged defect. Both changes were captured with complete coverage under the supplied two-entry limit."
+}

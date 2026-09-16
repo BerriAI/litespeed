@@ -1,0 +1,10 @@
+{
+  "createdAt": "2026-09-16T04:34:26.548303+00:00",
+  "commit": "fe83339",
+  "effort": "none",
+  "maxTokens": 5000,
+  "calls": 1,
+  "retries": 0,
+  "inputSha256": "e325d52fbef51cfff293362a420b608406d8a3556da297c85d1ed6e9e6889bb7",
+  "success": "Only reproduced defects count; no findings is not proof of correctness."
+}
