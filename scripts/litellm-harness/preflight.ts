@@ -1,3 +1,12 @@
+/** Resolve a replay-only deadline before allocating work; product turns are unchanged. */
+export function replayTimeoutSeconds(kind:string,label:string,override?:string):number {
+  if(override===undefined)return kind==='codex'||label.startsWith('comparison-')||label.startsWith('replication-')?900:600;
+  if(!/^[1-9]\d*$/.test(override))throw new Error('Replay timeout must be an integer from 60 to 3600 seconds.');
+  const seconds=Number(override);
+  if(!Number.isSafeInteger(seconds)||seconds<60||seconds>3600)throw new Error('Replay timeout must be an integer from 60 to 3600 seconds.');
+  return seconds;
+}
+
 /** Fail before allocating a replay when its local metering gateway is offline. */
 export async function assertCampaignGatewayReady(connection:{baseUrl:string;apiKey:string}):Promise<void> {
   const url=new URL('/status',connection.baseUrl);

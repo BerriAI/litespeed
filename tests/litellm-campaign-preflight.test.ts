@@ -1,6 +1,15 @@
 import {createServer} from 'node:http';
 import {expect,it} from 'vitest';
-import {assertCampaignGatewayReady} from '../scripts/litellm-harness/preflight.js';
+import {assertCampaignGatewayReady,replayTimeoutSeconds} from '../scripts/litellm-harness/preflight.js';
+
+it('keeps historical deadlines and rejects unsafe replay overrides before allocation',()=>{
+  expect(replayTimeoutSeconds('single','pilot')).toBe(600);
+  expect(replayTimeoutSeconds('single','comparison-pilot')).toBe(900);
+  expect(replayTimeoutSeconds('litellm-specific','replication-pilot')).toBe(900);
+  expect(replayTimeoutSeconds('codex','pilot')).toBe(900);
+  expect(replayTimeoutSeconds('litellm-specific','replication-pilot','1800')).toBe(1800);
+  for(const value of ['', '0','-1','59','3601','Infinity','900.5','1e3','900x',' 900','900 '])expect(()=>replayTimeoutSeconds('single','pilot',value)).toThrow('integer');
+});
 
 it('requires an authenticated healthy local meter before allocating Flash trials',async()=>{
   let status=200,payload:unknown={limitUsd:100,committedUsd:30,requests:120};

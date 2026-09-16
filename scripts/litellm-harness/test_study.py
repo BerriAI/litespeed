@@ -9,6 +9,33 @@ from completion import completion_reason
 
 
 class StudyTests(unittest.TestCase):
+    def test_timeout_override_is_verified_against_the_actual_trial(self):
+        with TemporaryDirectory() as temporary:
+            root = Path(temporary)
+            row = dict(dataset='', case='stream', name='control', label='study',
+                       commit='abc', effort='medium', timeoutSeconds=1800)
+            plan = {'protocol': 7, 'repetitions': 1, 'timeoutSeconds': 900, 'runs': [row]}
+            record = dict(id='stream', run='stream', label='study', harnessCommit='abc',
+                          evaluationProtocol=7, effort='medium', timeoutSeconds=900,
+                          acceptance={'passed': True}, completed=True, seconds=1)
+            (root/'plan.json').write_text(json.dumps(plan))
+            for actual in [900, None]:
+                record['timeoutSeconds'] = actual
+                (root/'analysis.json').write_text(json.dumps([record]))
+                with patch('sys.argv', ['study.py', str(root), str(root/'plan.json'), str(root/'output.json')]):
+                    with self.assertRaisesRegex(ValueError, 'Trial timeout'):
+                        main()
+            record['timeoutSeconds'] = 1800
+            (root/'analysis.json').write_text(json.dumps([record]))
+            with patch('sys.argv', ['study.py', str(root), str(root/'plan.json'), str(root/'output.json')]), patch('builtins.print'):
+                main()
+            self.assertEqual(json.loads((root/'output.json').read_text())['trials'][0]['timeoutSeconds'], 1800)
+            del row['timeoutSeconds']
+            (root/'plan.json').write_text(json.dumps(plan))
+            with patch('sys.argv', ['study.py', str(root), str(root/'plan.json'), str(root/'output.json')]):
+                with self.assertRaisesRegex(ValueError, 'Trial timeout'):
+                    main()
+
     def test_declared_codex_route_rejects_a_flash_trial_with_the_same_label(self):
         with TemporaryDirectory() as temporary:
             root = Path(temporary)

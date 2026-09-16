@@ -92,9 +92,16 @@ def main():
         row = {k: item[k] for k in ['dataset', 'case', 'name', 'label', 'commit', 'effort']}
         if 'kind' in item:
             row['kind'] = item['kind']
+        timeout = item.get('timeoutSeconds', plan.get('timeoutSeconds'))
+        if timeout is not None:
+            if type(timeout) is not int or not 60 <= timeout <= 3600:
+                raise ValueError('Study timeout must be an integer from 60 to 3600 seconds.')
+            row['timeoutSeconds'] = timeout
         row['evaluated'] = False
         if matches:
             result = matches[0]
+            if timeout is not None and result.get('timeoutSeconds') != timeout:
+                raise ValueError('Trial timeout differs from its predeclared configuration.')
             if 'kind' in item and result.get('kind') != item['kind']:
                 raise ValueError('Trial solver route differs from its predeclared configuration.')
             if result['harnessCommit'] != item['commit'] or result['evaluationProtocol'] != plan['protocol'] or result['effort'] != item['effort']:
