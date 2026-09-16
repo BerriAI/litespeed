@@ -64,12 +64,18 @@ class StudyTests(unittest.TestCase):
                     {'role': 'system', 'content': 'LiteLLM change review.\nRelevant repository lessons for this final audit: [{"id":"review-only"}]\n'}]
         calls = [{'name': 'read_file', 'args': {}}, {'name': 'read_file', 'args': {'limit': 20}},
                  {'name': 'litellm_context', 'output': '{"playbooks":[{"id":"router"}]}'},
-                 {'name': 'litellm_context', 'output': 'truncated'}]
+                 {'name': 'litellm_context', 'output': 'truncated'},
+                 {'name': 'edit_file', 'status': 'completed', 'args': {'edits': [{}, {}]}},
+                 {'name': 'edit_file', 'status': 'error', 'args': {'edits': [{}, {}, {}]}}]
         result = activations(messages, calls)
         self.assertEqual(result['guideIdsShown'], ['router'])
         self.assertEqual(result['finalReviewNotices'], 1)
         self.assertEqual(result['guidedFinalReviewNotices'], 1)
         self.assertEqual(result['finalReviewGuideIdsShown'], ['review-only'])
+        self.assertEqual(result['batchedEditCalls'], 2)
+        self.assertEqual(result['completedBatchedEditCalls'], 1)
+        self.assertEqual(result['batchEditsRequested'], 5)
+        self.assertEqual(result['batchSizes'], [2, 3])
         self.assertIsNone(result['defaultWindowReadCalls'])
         self.assertEqual(result['readCallsByEffectiveLimit'], {'missing': 1, '20': 1})
         self.assertEqual(result['unparsedContextPayloads'], 1)

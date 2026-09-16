@@ -1,0 +1,336 @@
+diff --git a/scripts/litellm-harness/run.ts b/scripts/litellm-harness/run.ts
+index d73721c..0a92059 100644
+--- a/scripts/litellm-harness/run.ts
++++ b/scripts/litellm-harness/run.ts
+@@ -73,7 +73,7 @@ writeFileSync(join(directory,'task.json'),JSON.stringify(task,null,2));
+ if(repairParent)writeFileSync(join(directory,'repair.json'),JSON.stringify({parentRun:repairParent.split('/').at(-1),feedback:repairFeedback,workflow:'post-hoc train/dev refinement; report parent plus repair cost and time'},null,2));
+ // The solver needs identifiers, not reference revisions or hidden test names.
+ writeFileSync(join(directory,'solver-task.json'),JSON.stringify({id:task.id,prompt_revision:task.prompt_revision,snapshot_revision:task.snapshot_revision}));
+-writeFileSync(join(directory,'harness-source.json'),JSON.stringify({base:execFileSync('git',['rev-parse','HEAD'],{cwd:resolve(import.meta.dirname,'../..'),encoding:'utf8'}).trim(),node:process.version,files:Object.fromEntries(['server/runner.ts','server/tools.ts','server/litellm-harness.ts','scripts/litellm-harness/run.ts','scripts/litellm-harness/solve.ts','scripts/litellm-harness/isolation.ts'].map(file=>{const source=readFileSync(resolve(import.meta.dirname,'../..',file),'utf8');return [file,{sha256:createHash('sha256').update(source).digest('hex'),source}];}))},null,2));
++writeFileSync(join(directory,'harness-source.json'),JSON.stringify({base:execFileSync('git',['rev-parse','HEAD'],{cwd:resolve(import.meta.dirname,'../..'),encoding:'utf8'}).trim(),node:process.version,files:Object.fromEntries(['server/runner.ts','server/tools.ts','shared/file-edits.ts','server/litellm-harness.ts','scripts/litellm-harness/run.ts','scripts/litellm-harness/solve.ts','scripts/litellm-harness/isolation.ts'].map(file=>{const source=readFileSync(resolve(import.meta.dirname,'../..',file),'utf8');return [file,{sha256:createHash('sha256').update(source).digest('hex'),source}];}))},null,2));
+ const started=Date.now();
+ const timeoutSeconds=kind==='codex'||label.startsWith('comparison-')||label.startsWith('replication-')?900:600;
+ const runtimeRoot=resolve(import.meta.dirname,'../..');
+diff --git a/server/litellm-harness.ts b/server/litellm-harness.ts
+index 1439de3..a1c4a3c 100644
+--- a/server/litellm-harness.ts
++++ b/server/litellm-harness.ts
+@@ -4,7 +4,14 @@ import path from 'node:path';
+ import fg from 'fast-glob';
+ import type { ToolDefinition } from '../shared/types.js';
+ 
+-export const LITELLM_HARNESS_VERSION='2026-09-15.28';
++export const LITELLM_HARNESS_VERSION='2026-09-15.29';
++export function litellmEditTool(tool:ToolDefinition):ToolDefinition {
++  if(tool.function.name!=='edit_file')return tool;
++  return {...tool,function:{...tool.function,
++    description:tool.function.description+' You may instead supply edits: 1–32 ordered exact replacements in this one file. Each match sees the result of earlier entries. All matches and size limits are validated before any content is written; a failed match leaves the file unchanged. Group already-understood edits to the same file in one call. Use either old_string/new_string/replace_all or edits, never both.',
++    parameters:{...tool.function.parameters,required:['path'],properties:{...(tool.function.parameters.properties as object),edits:{type:'array',minItems:1,maxItems:32,items:{type:'object',additionalProperties:false,properties:{old_string:{type:'string',minLength:1},new_string:{type:'string'},replace_all:{type:'boolean'}},required:['old_string','new_string']}}}}
++  }};
++}
+ export const litellmContextTool:ToolDefinition={type:'function',function:{name:'litellm_context',description:'Navigate the current LiteLLM checkout. Give a task query to find relevant definitions, inline conditions and existing tests. Give a source path to see its symbol outline and test partners; add a symbol name to read that definition with numbered lines, or callers to find functions invoking a named helper in that file. Reads only this workspace, never Git history or remote answers.',parameters:{type:'object',properties:{query:{type:'string',maxLength:1000},path:{type:'string',maxLength:500},symbol:{type:'string',maxLength:200},callers:{type:'string',maxLength:200,description:'Python helper name whose call sites and enclosing functions to find; requires path.'}},additionalProperties:false}}};
+ 
+ const playbooks = [
+@@ -78,7 +85,7 @@ function learnedContext(query:string,files:string[]) {
+ }
+ 
+ export const litellmInstructions=`LiteLLM-specific harness ${LITELLM_HARNESS_VERSION}.
+-The host may supply an initial navigation note from the current checkout. Use its source locations to start a focused investigation. When available, use litellm_context to find the right source and existing tests before broad exploration. Its relevant playbooks summarize prior LiteLLM fixes; verify those hypotheses in the current source. Pass path to inspect a symbol outline, path + query to filter a large outline, then path + symbol to read the definition. Use path + callers to enumerate uses of a shared helper before changing its contract; this catches thin endpoint wrappers whose names do not match the bug report. For router retries and fallbacks, inspect both common wrappers and the endpoint-specific adapters they dispatch, including async batch operations when they use that machinery. A plain read_file defaults to 160 lines in this architecture; choose a range around the relevant definition. Batch independent reads. Once the causal code path and a relevant test are clear, implement and test instead of continuing a broad survey. Apply a complete small edit rather than repeatedly revising comments or speculative helpers. When the cause is uncertain, use the smallest allowed executable probe to distinguish hypotheses; do not repeatedly reconsider the same code without new evidence. Solve the requested behavior instead of trying to reconstruct an imagined upstream patch. Shared helpers can be bypassed by cache-hit or fast paths: trace the actual entrypoint for the reported symptom.
++The host may supply an initial navigation note from the current checkout. Use its source locations to start a focused investigation. When available, use litellm_context to find the right source and existing tests before broad exploration. Its relevant playbooks summarize prior LiteLLM fixes; verify those hypotheses in the current source. Pass path to inspect a symbol outline, path + query to filter a large outline, then path + symbol to read the definition. Use path + callers to enumerate uses of a shared helper before changing its contract; this catches thin endpoint wrappers whose names do not match the bug report. For router retries and fallbacks, inspect both common wrappers and the endpoint-specific adapters they dispatch, including async batch operations when they use that machinery. A plain read_file defaults to 160 lines in this architecture; choose a range around the relevant definition. Batch independent reads. Once the causal code path and a relevant test are clear, implement and test instead of continuing a broad survey. Apply a complete small edit rather than repeatedly revising comments or speculative helpers. When several known replacements touch one file, pass them together in edit_file.edits; entries apply in order and are validated before writing. When the cause is uncertain, use the smallest allowed executable probe to distinguish hypotheses; do not repeatedly reconsider the same code without new evidence. Solve the requested behavior instead of trying to reconstruct an imagined upstream patch. Shared helpers can be bypassed by cache-hit or fast paths: trace the actual entrypoint for the reported symptom.
+ Repository map: litellm/llms/<provider>/<endpoint>/transformation.py translates provider requests/responses; common_utils.py and handler.py handle shared protocol and transport. litellm/types/llms contains provider schemas. litellm/litellm_core_utils contains shared streaming, response conversion, prompt templates and routing helpers. litellm/proxy contains gateway/auth/spend/guardrails; enterprise contains paid features. tests/test_litellm mirrors the source tree. UI source is ui/litellm-dashboard, not litellm/proxy/_experimental/out (generated output). Model capabilities/prices live in model_prices_and_context_window.json.
+ Read CLAUDE.md when AGENTS.md references it. Prefer extending an existing mapped test. Test intended behavior and the relevant unaffected behavior; a bug fix may require changing an assertion that encoded the bug. Check sync/async and streaming/non-streaming counterparts when the changed behavior crosses them. Preserve caller-owned inputs and existing public interfaces.
+ Before finalizing a protocol change, check the representation at its boundary. For URLs, compose parsed path/query components rather than appending a path to an arbitrary base string; preserve existing query parameters and add streaming parameters correctly. For images/documents, preserve source kind and MIME metadata, and verify the downstream adapter's expected representation (raw base64 and a data URL are different). For shared parameters, distinguish absent, null and explicit false; preserve caller-owned inputs. These are review heuristics, not instructions to add unrelated behavior.\nFor a running background command, use bash_output with wait_ms between 10000 and 30000, or use wait. Short repeated polls spend a model round without advancing the task and can trigger the repeated-tool guard. Read the completed output once before deciding what to do next. Do not treat a running command as a failed check.
+diff --git a/server/runner.ts b/server/runner.ts
+index 84604d4..db0390a 100644
+--- a/server/runner.ts
++++ b/server/runner.ts
+@@ -1,4 +1,4 @@
+-import { litellmContext, litellmContextTool, litellmInstructions, litellmReview, litellmTestFocus, litellmExplorationFocus } from './litellm-harness.js';
++import { litellmContext, litellmContextTool, litellmEditTool, litellmInstructions, litellmReview, litellmTestFocus, litellmExplorationFocus } from './litellm-harness.js';
+ import { LiteFusionDiscovery } from './litefusion-discovery.js';
+ import { liteFusionReadiness, type LiteFusionReadiness } from '../shared/litefusion-readiness.js';
+ import { unavailableRoute } from './litefusion-availability.js';
+@@ -1528,7 +1528,8 @@ export class Runner {
+     // the plain-tool path in allowed() (hidden under a profile allowlist, which
+     // can only name PROFILE_TOOLS; visible in Plan; inside the child ceiling —
+     // a deliberate ceiling expansion recorded in docs/delegation.md).
+-    const readTools = policy.shuntProvider ? toolDefinitions.map(tool => tool.function.name==='read_file' ? {...tool,function:{...tool.function,parameters:{...tool.function.parameters,properties:{...(tool.function.parameters.properties as object),direct_reason:{type:'string',minLength:1,maxLength:1000,description:'Why you need source directly for exact reasoning, debugging or recovery instead of a Shunt answer.'}}}}} : tool) : toolDefinitions;
++    const architectureTools=session.architecture?.kind==='litellm-specific'&&!run.child?toolDefinitions.map(litellmEditTool):toolDefinitions;
++    const readTools = policy.shuntProvider ? architectureTools.map(tool => tool.function.name==='read_file' ? {...tool,function:{...tool.function,parameters:{...tool.function.parameters,properties:{...(tool.function.parameters.properties as object),direct_reason:{type:'string',minLength:1,maxLength:1000,description:'Why you need source directly for exact reasoning, debugging or recovery instead of a Shunt answer.'}}}}} : tool) : architectureTools;
+     const availableTools = [...readTools,...(session.architecture?.kind==='litellm-specific'&&!run.child?[litellmContextTool]:[]), ...(policy.shuntProvider?shuntTools:[]), ...(session.architecture&&session.architecture.kind!=='litellm-specific'&&!run.child?(policy.litefusion?[liteFusionDelegateTool,waitTasksTool,resolveTaskTool,verifyTool]:session.architecture.kind==='sidekick-fusion'?[sidekickTool]:[delegateTool,verifyTool,takeoverTool]):[]), historySearchTool, toolOutputPageTool, bashOutputTool, killShellTool, waitTool, viewImageTool, webSearchTool, updateGoalTool, ...(run.litefusionRole?[workerRequestTool,...(run.litefusionRole.execution==='review'?[verifyTool]:[])]:[]), ...(gateway.size?[capabilityTool]:[]), ...(policy.memory&&!run.child?memoryToolDefinitions:[]), questionTool, ...externalTools.filter(t => t.function.name !== 'ask_user')].filter(t=>allowed(t.function.name)||(strictDriver&&['write_file','edit_file','code_write'].includes(t.function.name)&&policyAllows(t.function.name==='code_write'?'write_file':t.function.name)&&(t.function.name!=='code_write'||baseAllowed('read_file'))));
+     // An ignored invalid rules file must be visible in the session detail, not
+     // only when a prompt happens to occur. The child transcript inherits the
+@@ -1954,6 +1955,7 @@ export class Runner {
+             }
+             output = call.name==='takeover' ? 'Bounded driver takeover recorded: up to three file edits on the listed paths. Run verification afterward.' : call.name==='update_goal' ? this.executeUpdateGoal(id,run,call.args) : call.name==='history_search' ? this.executeHistorySearch(id,call.args) : call.name==='tool_output_page' ? executeToolOutputPage(this.store,id,call.args) : call.name==='bash_output' ? await executeBashOutput(this.jobs,id,call.args) : call.name==='kill_shell' ? await executeKillShell(this.jobs,id,call.args) : call.name==='wait' ? await executeWait(this.jobs,id,call.args) : call.name.startsWith('memory_') ? this.executeMemory(session.workspace,call.name,call.args) : call.name==='capability' ? await this.executeCapability(id,run,message,call,content=>hookNotices.push(content)) : call.name.startsWith('mcp_') ? await run.external!.execute(call.name,call.args,signal) : await executeTool(call.name==='verify'?'bash':call.name,call.name==='verify'?verificationCommand(call.args):call.args,{
+               workspace:session.workspace,sessionId:id,signal,fileAccess:this.approvedPaths.get(call),
++              allowEditBatch:session.architecture?.kind==='litellm-specific'&&!run.child,
+               executeShell: (command, cwd, waitMs) => this.executeCommand(id, run, message, call, command, cwd, waitMs),
+               onExecution: execution => { call.execution = execution; },
+               prepareChange:change => { const owner=run.child?.role&&!run.child.isolated?run.child.delegation.parentSessionId:id;if(this.approvedPaths.get(call)?.external){this.history.noteEffects(owner,`External file changes are not covered by workspace Undo: ${change.path}`);return;}this.history.prepareChange(owner,run.child?.role?{...change,actorSessionId:id,invocationId:run.child.delegation.id}:change); },
+diff --git a/server/tools.ts b/server/tools.ts
+index a8655a7..9b088e9 100644
+--- a/server/tools.ts
++++ b/server/tools.ts
+@@ -1,3 +1,4 @@
++import { applyFileEdits, fileEndings as withFileEndings } from '../shared/file-edits.js';
+ import { litellmContext } from './litellm-harness.js';
+ import { LEGACY_NAMES } from '../bin/legacy.mjs';
+ import { shellInspection } from './shell-inspection.js';
+@@ -16,6 +17,7 @@ import { createPatch } from 'diff';
+ import type { Attachment, FileChange, FileEntry, Todo, ToolDefinition } from '../shared/types.js';
+ 
+ export interface ToolContext {
++  allowEditBatch?: boolean;
+   executeShell?: (command: string, cwd: string, waitMs: number) => Promise<string>;
+   onExecution?: (execution: import('../shared/receipts.js').CommandExecution) => void;
+   expectedFile?: { absolute: string; identity: string | null };
+@@ -730,10 +732,6 @@ function globPattern(value: string): string {
+   if (value.length > 1000 || path.isAbsolute(value) || value.includes('\0') || value.includes('\\') || value.split('/').includes('..')) throw new Error('Glob patterns must be relative workspace patterns without parent traversal.');
+   return value.replace(/^\.\//, '');
+ }
+-function withFileEndings(value: string, before: string): string {
+-  const ending = before.match(/\r\n|\n|\r/)?.[0];
+-  return ending ? value.replace(/\r\n|\n|\r/g, ending) : value;
+-}
+ async function writablePath(workspace: string, filePath: string): Promise<string> {
+   const root = await fs.realpath(workspace);
+   const absolute = await resolveWorkspacePath(workspace, filePath, { allowMissing: true });
+@@ -757,19 +755,7 @@ async function mutateFile(args: Record<string, unknown>, context: ToolContext, e
+   let after: string;
+   let replacements = 0;
+   if (edit) {
+-    const original = before!;
+-    const oldString = withFileEndings(textArg(args, 'old_string', true), original);
+-    if (!oldString.length) throw new Error('old_string must be a non-empty string.');
+-    const newString = withFileEndings(textArg(args, 'new_string', true), original);
+-    const replaceAll = boolArg(args, 'replace_all');
+-    let index = original.indexOf(oldString);
+-    if (index < 0) throw new Error('old_string was not found. Read the current file and provide an exact match.');
+-    if (!replaceAll && original.indexOf(oldString, index + 1) >= 0) throw new Error('old_string matches more than once. Include more context or set replace_all to true.');
+-    if (replaceAll) {
+-      const parts = original.split(oldString);
+-      replacements = parts.length - 1;
+-      after = parts.join(newString);
+-    } else { replacements = 1; after = original.slice(0, index) + newString + original.slice(index + oldString.length); }
++    ({after,replacements}=applyFileEdits(before!,args,context.allowEditBatch,EDIT_LIMIT));
+   } else { after = withFileEndings(textArg(args, 'content', true), before ?? ''); }
+   if (Buffer.byteLength(after) > EDIT_LIMIT) throw new Error(`Content is too large (maximum ${EDIT_LIMIT} bytes).`);
+   if (after.includes('\0')) throw new Error('Binary content is not supported.');
+diff --git a/shared/file-edits.ts b/shared/file-edits.ts
+new file mode 100644
+index 0000000..f52a791
+--- /dev/null
++++ b/shared/file-edits.ts
+@@ -0,0 +1,35 @@
++/** Pure edit calculation shared by execution and the approval preview. */
++export function fileEndings(value:string,before:string):string {
++  const ending=before.match(/\r\n|\n|\r/)?.[0];
++  return ending?value.replace(/\r\n|\n|\r/g,ending):value;
++}
++
++export function applyFileEdits(before:string,args:Record<string,unknown>,allowBatch=false,maxBytes=2*1024*1024):{after:string;replacements:number} {
++  let edits:Record<string,unknown>[]=[args];
++  if(args.edits!==undefined) {
++    if(!allowBatch)throw new Error('Batched edits are available only in the LiteLLM-specific architecture.');
++    if(['old_string','new_string','replace_all'].some(key=>args[key]!==undefined))throw new Error('Use either edits or one old_string/new_string replacement, not both.');
++    if(!Array.isArray(args.edits)||!args.edits.length||args.edits.length>32)throw new Error('Supply 1–32 edits for one file.');
++    edits=args.edits.map(value=>{
++      if(!value||typeof value!=='object'||Array.isArray(value)||Object.keys(value).some(key=>!['old_string','new_string','replace_all'].includes(key)))throw new Error('Each edit supports only old_string, new_string and optional replace_all.');
++      return value as Record<string,unknown>;
++    });
++  }
++  let after=before,replacements=0;
++  for(const item of edits) {
++    if(typeof item.old_string!=='string'||!item.old_string.length)throw new Error('old_string must be a non-empty string.');
++    if(typeof item.new_string!=='string')throw new Error('new_string must be a string.');
++    const replaceAll=item.replace_all??false;
++    if(typeof replaceAll!=='boolean')throw new Error('replace_all must be a boolean.');
++    const oldString=fileEndings(item.old_string,after),newString=fileEndings(item.new_string,after);
++    const index=after.indexOf(oldString);
++    if(index<0)throw new Error('old_string was not found. Read the current file and provide an exact match. No content was written.');
++    if(!replaceAll&&after.indexOf(oldString,index+1)>=0)throw new Error('old_string matches more than once. Include more context or set replace_all to true. No content was written.');
++    if(replaceAll) {
++      const parts=after.split(oldString);replacements+=parts.length-1;after=parts.join(newString);
++    } else {replacements++;after=after.slice(0,index)+newString+after.slice(index+oldString.length);}
++    if(new TextEncoder().encode(after).byteLength>maxBytes)throw new Error(`Content is too large (maximum ${maxBytes} bytes). No content was written.`);
++    if(after.includes('\0'))throw new Error('Binary content is not supported. No content was written.');
++  }
++  return {after,replacements};
++}
+diff --git a/tests/litellm-harness-runner.test.ts b/tests/litellm-harness-runner.test.ts
+index a18be60..f9acfdc 100644
+--- a/tests/litellm-harness-runner.test.ts
++++ b/tests/litellm-harness-runner.test.ts
+@@ -1,5 +1,5 @@
+ import { afterEach, beforeEach, describe, expect, it } from 'vitest';
+-import { mkdtemp, mkdir, writeFile, rm } from 'node:fs/promises';
++import { mkdtemp, mkdir, writeFile, readFile, rm } from 'node:fs/promises';
+ import { join } from 'node:path';
+ import { tmpdir } from 'node:os';
+ import { createServer, type Server } from 'node:http';
+@@ -119,4 +119,27 @@ describe('LiteLLM-specific runner integration',()=>{
+     expect(messages.filter(message=>message.content.startsWith('LiteLLM verification checkpoint:'))).toHaveLength(1);
+     expect(requests).toHaveLength(14);
+   });
++  it('advertises grouped edits only in LiteLLM and records a reversible whole-file change',async()=>{
++    await writeFile(join(root,'litellm/example.py'),'one\ntwo\n');
++    const session=store.createSession({workspace:root,providerId:'test',model:'model',permissionMode:'auto',architecture:{kind:'litellm-specific'}});
++    action={name:'edit_file',args:{path:'litellm/example.py',edits:[{old_string:'one',new_string:'first'},{old_string:'two',new_string:'second'}]}};
++    runner.start(session.id,'Update the two values.');await runner.whenIdle();
++    expect(requests[0].tools.find((tool:any)=>tool.function.name==='edit_file').function.parameters.properties.edits.maxItems).toBe(32);
++    expect(await readFile(join(root,'litellm/example.py'),'utf8')).toBe('first\nsecond\n');
++    await runner.exclusive(session.id,()=>runner.history.undo(session.id,runner.history.state(session.id).undoId!));
++    expect(await readFile(join(root,'litellm/example.py'),'utf8')).toBe('one\ntwo\n');
++    requests=[];
++    const plain=store.createSession({workspace:root,providerId:'test',model:'model',permissionMode:'auto'});
++    runner.start(plain.id,'Explain the task.');await runner.whenIdle();
++    expect(requests[0].tools.find((tool:any)=>tool.function.name==='edit_file').function.parameters.properties.edits).toBeUndefined();
++  });
++  it.each(['hook','rule'])('preserves %s restrictions for grouped edits',async(kind)=>{
++    await writeFile(join(root,'litellm/example.py'),'original\n');
++    store.saveSettings(kind==='hook'?{hooks:[{event:'PreToolUse',matcher:'edit_file',command:'exit 2'}]}:{permissionRules:{version:1,rules:[{tool:'edit_file',decision:'deny',patterns:['litellm/example.py']}]}});
++    const session=store.createSession({workspace:root,providerId:'test',model:'model',permissionMode:'auto',architecture:{kind:'litellm-specific'}});
++    action={name:'edit_file',args:{path:'litellm/example.py',edits:[{old_string:'original',new_string:'blocked'}]}};
++    runner.start(session.id,'Update the value.');await runner.whenIdle();
++    expect(await readFile(join(root,'litellm/example.py'),'utf8')).toBe('original\n');
++    expect(store.messages(session.id).flatMap(message=>message.toolCalls??[])[0].status).not.toBe('completed');
++  });
+ });
+diff --git a/tests/tools.test.ts b/tests/tools.test.ts
+index 8652253..053517d 100644
+--- a/tests/tools.test.ts
++++ b/tests/tools.test.ts
+@@ -249,6 +249,41 @@ describe('file reads and reversible edits', () => {
+     await put('overlap', 'aaa');
+     await expect(tool('edit_file', { path: 'overlap', old_string: 'aa', new_string: 'b' })).rejects.toThrow(/more than once/);
+   });
++  it('validates an ordered edit batch before writing one before/after change',async()=>{
++    context.allowEditBatch=true;
++    await put('batch.py','first\r\nsecond\r\n');
++    await tool('edit_file',{path:'batch.py',edits:[
++      {old_string:'first\n',new_string:'middle\n'},
++      {old_string:'middle\nsecond',new_string:'$&\nlast'},
++    ]});
++    expect(await fs.readFile(path.join(workspace,'batch.py'),'utf8')).toBe('$&\r\nlast\r\n');
++    expect(changes).toEqual([{path:'batch.py',before:'first\r\nsecond\r\n',after:'$&\r\nlast\r\n'}]);
++  });
++  it('leaves all batch edits unwritten when a later match or input is invalid',async()=>{
++    context.allowEditBatch=true;
++    await put('batch.py','original\n');
++    for(const edits of [
++      [{old_string:'original',new_string:'changed'},{old_string:'missing',new_string:'bad'}],
++      [{old_string:'original',new_string:'changed'},{old_string:'changed',new_string:'\0'}],
++      [{old_string:'original',new_string:'changed',path:'elsewhere'}],
++      [],Array.from({length:33},()=>({old_string:'original',new_string:'same'})),
++    ]) {
++      await expect(tool('edit_file',{path:'batch.py',edits})).rejects.toThrow();
++      expect(await fs.readFile(path.join(workspace,'batch.py'),'utf8')).toBe('original\n');
++      expect(changes).toEqual([]);
++    }
++    await expect(tool('edit_file',{path:'batch.py',old_string:'original',new_string:'single',edits:[{old_string:'original',new_string:'batch'}]})).rejects.toThrow(/not both/);
++  });
++  it('requires the LiteLLM batch capability and preserves concurrent-edit protection',async()=>{
++    await put('batch.py','original\n');
++    const args={path:'batch.py',edits:[{old_string:'original',new_string:'model'}]};
++    await expect(tool('edit_file',args)).rejects.toThrow(/LiteLLM-specific/);
++    context.allowEditBatch=true;
++    context.prepareChange=async()=>{await put('batch.py','user edit\n');};
++    await expect(tool('edit_file',args)).rejects.toThrow(/File changed/);
++    expect(await fs.readFile(path.join(workspace,'batch.py'),'utf8')).toBe('user edit\n');
++    expect(changes).toEqual([]);
++  });
+   it('allows an exact whitespace-only edit', async () => {
+     await put('spaces', 'a  b');
+     await tool('edit_file', { path: 'spaces', old_string: '  ', new_string: ' ' });
+diff --git a/tests/tui-permission-presentation.test.ts b/tests/tui-permission-presentation.test.ts
+index 051296a..1b6cb70 100644
+--- a/tests/tui-permission-presentation.test.ts
++++ b/tests/tui-permission-presentation.test.ts
+@@ -1,6 +1,7 @@
+ import { expect, it } from 'vitest';
+ import type { PermissionRequest } from '../shared/types.js';
+ import { permissionPresentation } from '../tui/permissionPresentation.js';
++import { applyFileEdits } from '../shared/file-edits.js';
+ 
+ const request = (tool: string, args: Record<string, unknown>, scopePath?: string) => ({ tool, args, scopePath }) as PermissionRequest;
+ it('shows the exact command, working directory, and requesting actor', () => {
+@@ -17,6 +18,15 @@ it('distinguishes replacing one match from replacing every match', () => {
+ it('presents the handoff assignment without serializing its prompt', () => {
+   expect(permissionPresentation(request('sidekick', {description: 'Inspect the project', prompt: 'Read the sources.\nReport the findings.'}), 'Driver')).toEqual({title: 'Driver wants to ask Sidekick', target: 'Inspect the project', body: 'Read the sources.\nReport the findings.'});
+ });
++it('shows every grouped replacement and uses the execution calculation for preview',()=>{
++  const args={path:'note.txt',edits:[{old_string:'first',new_string:'middle'},{old_string:'middle\nsecond',new_string:'final\nvalue'}]};
++  const presentation=permissionPresentation(request('edit_file',args),'Driver');
++  expect(presentation.title).toContain('2 edits in one file');
++  expect(presentation.body).toContain('Edit 1:\nReplace:\nfirst\nWith:\nmiddle');
++  expect(presentation.body).toContain('Edit 2:\nReplace:\nmiddle\nsecond\nWith:\nfinal\nvalue');
++  expect(applyFileEdits('first\r\nsecond\r\n',args,true).after).toBe('final\r\nvalue\r\n');
++  expect(()=>applyFileEdits('unmatched',args,true)).toThrow(/not found/);
++});
+ it('renders task state as a checklist', () => {
+   const body = permissionPresentation(request('todo_write', {todos: [{id: '1', content: 'Inspect', status: 'completed'}, {id: '2', content: 'Implement', status: 'in_progress'}, {id: '3', content: 'Verify', status: 'pending'}]}), 'Sidekick').body;
+   expect(body).toBe('✓ Inspect\n● Implement\n○ Verify');
+diff --git a/tests/tui-transcript.test.ts b/tests/tui-transcript.test.ts
+index 6220711..affa14f 100644
+--- a/tests/tui-transcript.test.ts
++++ b/tests/tui-transcript.test.ts
+@@ -205,6 +205,10 @@ describe('toolRow', () => {
+     const row = toolRow(call({ name: 'edit_file', status: 'running', args: { path: 'a.ts', replace_all: true, old_string: 'x', new_string: 'y' } }));
+     expect(row.text).toBe('Edit a.ts · replace all yes');
+   });
++  it('summarizes grouped edits without putting replacement source in the inline label',()=>{
++    const row=toolRow(call({name:'edit_file',status:'running',args:{path:'a.ts',edits:[{old_string:'private source',new_string:'changed'},{old_string:'next',new_string:'last'}]}}));
++    expect(row.text).toBe('Edit a.ts (2 edits)');
++  });
+ 
+   it('labels search tools with match counts once complete', () => {
+     expect(toolRow(call({ name: 'glob', args: { pattern: '*.ts', path: 'src' }, output: 'a.ts\nb.ts' })).text)
+diff --git a/tui/permissionPresentation.ts b/tui/permissionPresentation.ts
+index 690b37b..b255a3e 100644
+--- a/tui/permissionPresentation.ts
++++ b/tui/permissionPresentation.ts
+@@ -11,6 +11,7 @@ export function permissionPresentation(request: PermissionRequest, actor: string
+     case 'write_file':
+       return { title: `${actor} wants to write a file`, target: path, body: value('content') };
+     case 'edit_file':
++      if(Array.isArray(args.edits))return {title:`${actor} wants to make ${args.edits.length} edits in one file`,target:path,body:args.edits.map((edit,index)=>`Edit ${index+1}:\n${edit&&typeof edit==='object'?`Replace${edit.replace_all?' every match':''}:\n${typeof edit.old_string==='string'?edit.old_string:''}\nWith:\n${typeof edit.new_string==='string'?edit.new_string:''}`:JSON.stringify(edit)}`).join('\n\n')};
+       return { title: `${actor} wants to edit a file`, target: path, body: `Replace${args.replace_all ? ' every match' : ''}:\n${value('old_string')}\nWith:\n${value('new_string')}` };
+     case 'read_file':
+       return { title: `${actor} wants to read a file`, target: path, body: '' };
+diff --git a/tui/prompts.tsx b/tui/prompts.tsx
+index d3c0436..ef080ce 100644
+--- a/tui/prompts.tsx
++++ b/tui/prompts.tsx
+@@ -1,4 +1,5 @@
+ /** @jsxImportSource @opentui/react */
++import { applyFileEdits, fileEndings } from '../shared/file-edits.js';
+ import { useEffect, useState } from 'react';
+ import { useKeyboard, useTerminalDimensions } from '@opentui/react';
+ import type { PermissionRequest, QuestionRequest } from '../shared/types.js';
+@@ -30,11 +31,7 @@ export function PermissionPrompt({ request, controller, disabled, onOverlayChang
+         }
+         try { before = (await controller.client.api<{ content: string }>(`/file?workspace=${encodeURIComponent(workspace)}&path=${encodeURIComponent(args.path as string)}`)).content; }
+         catch (error) { if (request.tool !== 'write_file' || (error as { status?: number }).status !== 404) throw error; }
+-        const endings = (text: string) => before.includes('\r\n') ? text.replace(/\r?\n/g, '\r\n') : text.replace(/\r\n/g, '\n');
+-        const old = typeof args.old_string === 'string' ? endings(args.old_string) : '';
+-        if (request.tool === 'edit_file' && (!old || !before.includes(old) || (!args.replace_all && before.indexOf(old, before.indexOf(old) + 1) >= 0))) throw new Error('The edit does not uniquely match the current file. Review the original arguments below.');
+-        const replacement = typeof args.new_string === 'string' ? endings(args.new_string) : '';
+-        const after = request.tool === 'write_file' ? String(args.content ?? '') : args.replace_all ? before.split(old).join(replacement) : before.replace(old, () => replacement);
++        const after = request.tool === 'write_file' ? fileEndings(String(args.content ?? ''),before) : applyFileEdits(before,args,true).after;
+         if (live) setPreviewText('Proposed edit · current file at preview time\n\n' + createTwoFilesPatch(args.path as string, args.path as string, before, after));
+       })().catch(error => { if (live) setPreviewText(`Preview unavailable: ${error.message}`); });
+     }
+diff --git a/tui/transcriptModel.ts b/tui/transcriptModel.ts
+index 3085a4b..73ad483 100644
+--- a/tui/transcriptModel.ts
++++ b/tui/transcriptModel.ts
+@@ -234,7 +234,7 @@ export function toolRow(call: ToolCall): ToolRowModel {
+     }
+     case 'edit_file': {
+       const filePath = baseName(str(args.path));
+-      const label = `Edit ${filePath} ${inlineArgs(args, ['path', 'old_string', 'new_string'])}`.trimEnd();
++      const label = `Edit ${filePath}${Array.isArray(args.edits)?` (${args.edits.length} edits)`:''} ${inlineArgs(args, ['path', 'old_string', 'new_string', 'edits'])}`.trimEnd();
+       const diff = completed ? extractUnifiedDiff(call.output ?? '') : null;
+       if (!diff) return { ...base, icon: '←', text: label, pending: 'Preparing edit…' };
+       return {

@@ -24,6 +24,7 @@ def activations(messages, calls):
                 if isinstance(card, dict) and isinstance(card.get('id'), str):
                     guide_ids.add(card['id'])
     reads = [c for c in calls if c['name'] == 'read_file']
+    batches = [c for c in calls if c['name'] == 'edit_file' and isinstance(c.get('args', {}).get('edits'), list)]
     system = [m.get('content', '') for m in messages if m['role'] == 'system']
     review_guides = set()
     guided_reviews = 0
@@ -46,6 +47,10 @@ def activations(messages, calls):
         'finalReviewNotices': sum(s.startswith('LiteLLM change review.') for s in system),
         'guidedFinalReviewNotices': guided_reviews,
         'finalReviewGuideIdsShown': sorted(review_guides),
+        'batchedEditCalls': len(batches),
+        'completedBatchedEditCalls': sum(c.get('status') == 'completed' for c in batches),
+        'batchEditsRequested': sum(len(c['args']['edits']) for c in batches),
+        'batchSizes': [len(c['args']['edits']) for c in batches],
         'testFocusNotices': sum(s.startswith('LiteLLM verification checkpoint:') for s in system),
         'explorationFocusNotices': sum(s.startswith('LiteLLM exploration checkpoint:') for s in system),
         # The runner fills the default BEFORE saving tool arguments. Historical
