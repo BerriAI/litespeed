@@ -11,6 +11,8 @@ def completion_reason(result):
     if result.get('status') != 'idle':
         return 'runner-error'
     final = result.get('final') or ''
+    if not final.strip():
+        return 'empty-handoff'
     if final.startswith('I stopped because the model requested the same tools three times in a row.'):
         return 'repeated-tools-guard'
     if '[Stopped: several rounds produced no new information.' in final:

@@ -11,6 +11,8 @@ class StudyTests(unittest.TestCase):
         self.assertEqual(completion_reason(result), 'repeated-tools-guard')
         result['final'] = '[Stopped: several rounds produced no new information. Summarize what was learned and what is blocking.]'
         self.assertEqual(completion_reason(result), 'no-progress-guard')
+        result['final'] = '   '
+        self.assertEqual(completion_reason(result), 'empty-handoff')
         result['final'] = 'Implemented and verified the change.'
         self.assertEqual(completion_reason(result), 'completed')
         result['timedOut'] = True
