@@ -25,6 +25,8 @@ The gateway runs in its own terminal. It accepts only `fireworks_ai/deepseek-v4p
 
 Missing usage and interrupted requests retain their full reservation. **Committed dollars are an upper accounting bound, not measured spend.** Do not report unpriced reservations as actual charges. An exclusive lock prevents two gateway processes from separately admitting requests against the same ledger. After a crash, verify that the recorded process is gone before removing `gateway.lock`. Do not reset a ledger to obtain more budget.
 
+Streaming headers can be sent before the final cost is known; a zero cost header is not proof of a free request ([LiteLLM issue](https://github.com/BerriAI/litellm/issues/30816)). Without usable token usage, the gateway retains the reservation for streaming calls regardless of that header. A positive non-streaming cost header can settle a request; zero alone stays unknown. When both usage and a header are available, accounting uses the greater reported/token-priced amount.
+
 ## Run and score
 
 In another terminal with the same environment:

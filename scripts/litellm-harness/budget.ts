@@ -45,12 +45,14 @@ export function usageCost(usage:unknown):number|undefined {
   return (u.prompt_tokens!-cached)*FLASH_PRICES.input+cached*FLASH_PRICES.cachedInput+u.completion_tokens!*FLASH_PRICES.output;
 }
 
-/** An explicit gateway charge is useful even if a stream omits token usage.
- * A missing/empty header is unknown; Number(null) must never turn it into zero.
+/** Streaming headers are emitted before final usage and can contain a zero
+ * placeholder. They cannot release a missing-usage reservation. Non-streaming
+ * positive headers can supply a charge; zero alone is still ambiguous.
  */
-export function responseCharge(usage:unknown,header:string|null):{costUsd?:number;responseCostUsd?:number;pricingSource?:Charge['pricingSource']} {
+export function responseCharge(usage:unknown,header:string|null,streaming=false):{costUsd?:number;responseCostUsd?:number;pricingSource?:Charge['pricingSource']} {
   const calculated=usageCost(usage),parsed=header?.trim()?Number(header):undefined;
   const reported=parsed!==undefined&&Number.isFinite(parsed)&&parsed>=0?parsed:undefined;
   if(calculated===undefined&&reported===undefined)return {};
+  if(calculated===undefined&&(streaming||reported===0))return {responseCostUsd:reported};
   return {costUsd:Math.max(calculated??0,reported??0),responseCostUsd:reported,pricingSource:calculated===undefined?'header':reported===undefined?'tokens':'tokens-and-header'};
 }

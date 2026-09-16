@@ -28,12 +28,16 @@ describe('paid harness campaign admission',()=>{
     expect(usageCost({prompt_tokens:-1,completion_tokens:0})).toBeUndefined();
     expect(usageCost({prompt_tokens:10,completion_tokens:1,prompt_tokens_details:{cached_tokens:NaN}})).toBeUndefined();
   });
-  it('accepts an explicit zero-cost header but retains uncertainty when the header is absent or invalid',()=>{
+  it('retains reservations for zero placeholders and streaming headers without final usage',()=>{
     expect(responseCharge(undefined,null)).toEqual({});
     for(const header of ['', ' ', '-1', 'NaN', 'Infinity'])expect(responseCharge(undefined,header)).toEqual({});
-    expect(responseCharge(undefined,'0')).toMatchObject({costUsd:0,pricingSource:'header'});
+    expect(responseCharge(undefined,'0')).toEqual({responseCostUsd:0});
+    expect(responseCharge(undefined,'0',true)).toEqual({responseCostUsd:0});
+    expect(responseCharge(undefined,'0.017',true)).toEqual({responseCostUsd:0.017});
+    expect(responseCharge({prompt_tokens:0,completion_tokens:0},'0',true)).toMatchObject({costUsd:0,pricingSource:'tokens-and-header'});
     expect(responseCharge(undefined,'0.017')).toMatchObject({costUsd:0.017,pricingSource:'header'});
     expect(responseCharge({prompt_tokens:1e6,completion_tokens:0},'0.10')).toMatchObject({costUsd:0.22,pricingSource:'tokens-and-header'});
     expect(responseCharge({prompt_tokens:1e6,completion_tokens:0},'0.30')).toMatchObject({costUsd:0.30,pricingSource:'tokens-and-header'});
+    expect(responseCharge({prompt_tokens:1e6,completion_tokens:0},'0',true)).toMatchObject({costUsd:0.22,pricingSource:'tokens-and-header'});
   });
 });

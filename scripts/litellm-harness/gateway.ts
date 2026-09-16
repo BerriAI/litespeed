@@ -58,7 +58,7 @@ const server=createServer(async(req,res)=>{
     let usage:unknown;
     if(body.stream){for(const line of text.split('\n'))if(line.startsWith('data: ')){try{const part=JSON.parse(line.slice(6));if(part.usage)usage=part.usage;}catch{}}}
     else {try{usage=JSON.parse(text).usage;}catch{}}
-    const {costUsd:charge,...pricing}=responseCharge(usage,upstream.headers.get('x-litellm-response-cost'));
+    const {costUsd:charge,...pricing}=responseCharge(usage,upstream.headers.get('x-litellm-response-cost'),Boolean(body.stream));
     budget.settle(requestId,charge,{usage,...pricing,httpStatus:upstream.status,seconds:(Date.now()-started)/1000});requestId=undefined;
     appendFileSync(join(directory,'events.jsonl'),JSON.stringify({at:new Date().toISOString(),label,status:upstream.status,chargeUsd:charge,committedUsd:budget.committedUsd})+'\n',{mode:0o600});
     if(!res.destroyed)res.end();
