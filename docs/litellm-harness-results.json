@@ -1,7 +1,7 @@
 {
   "schemaVersion": 3,
   "status": "campaign-paused",
-  "generatedAt": "2026-09-16T19:59:36.630024+00:00",
+  "generatedAt": "2026-09-16T20:13:47.867373+00:00",
   "currentHarnessVersion": "2026-09-16.52",
   "gatewayAccounting": {
     "limitUsd": 100,

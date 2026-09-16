@@ -1,6 +1,6 @@
 # LiteLLM harness campaign results
 
-Interim snapshot: 2026-09-16T19:59:36.630024+00:00. Current harness: **2026-09-16.52**.
+Interim snapshot: 2026-09-16T20:13:47.867373+00:00. Current harness: **2026-09-16.52**.
 
 **Paid trial admission is paused after unpriced request failures. The campaign has not established a quality win over Astra/Codex or production replacement readiness.**
 
@@ -70,6 +70,8 @@ A [real streaming-adapter audit](../scripts/litellm-harness/studies/feature-effo
 The completed [inspection-preference comparison](../scripts/litellm-harness/studies/native-inspection/README.md) delivers 2/4 strict successes in each arm, with slightly higher mean time and cost for the preference; it is not promoted. The completed [grouped-edit comparison](../scripts/litellm-harness/studies/batched-edits/README.md) shows lower time and cost on three known tasks, but its raw pass-rate difference is coupled to the background-test design. The [combined comparison](../scripts/litellm-harness/studies/combined-candidate/README.md) has 15 unaffected observations and one infrastructure-interrupted allocation.
 
 An [empty-choices oracle audit](../scripts/litellm-harness/studies/empty-choices-oracle/README.md) identifies five exact diagnostic-phrase assertions absent from the task contract. Eighteen independent conversion checks give base 3/18, merged reference 18/18 and candidate 18/18. Separate cached-stream observations expose a usage difference in the reference itself and are not treated as a qualified replacement suite; the candidate retains its original 8/13 score.
+
+A completed [larger billing comparison](../scripts/litellm-harness/studies/multi-module-development/README.md) has two normal deliveries per model. Both models score 17/17 then 16/17 reference checks; Flash averages 1,050.75 seconds and costs $0.44407 total, versus Astra at 512.11 seconds with dollar cost unavailable. A representation-only supplemental assertion is reported separately. All four patches pass seven billing/aggregation diagnostics, but a further qualified public-path probe finds both Flash patches double-bill cache-creation tokens when combined with cached audio; both Astra patches and the reference pass. These are posthoc development observations, not revised primary scores.
 
 ## Evaluation status
 

@@ -48,3 +48,7 @@ The historical base passes **3/22**, the merged reference **22/22**, and **both 
 ## Fourth completed pair: file-extension allowlist
 
 Both arms finish normally and pass 8/8 frozen checks. Specialization takes 218.75 seconds and $0.03068; ordinary Litespeed takes 260.59 seconds and $0.07941. Across the first four of 17 task pairs, raw success outcomes match, but the context-restoration gap and organization-test coupling above still qualify those scores. Single attempts on this partial corpus do not establish final quality or stable speed advantages. [Interim results](results.json).
+
+## Fifth unaffected pair
+
+Queued prompt-security handling passes all four reference checks in both arms. Plain Litespeed finishes in **71.893 seconds / $0.012287**, and the specialized harness in **91.951 seconds / $0.012657**. This pair supplies no observed correctness gain and is slower with specialization. Across the five unaffected pairs, the raw strict counts are 4/5 in each arm; the separate team-organization oracle diagnosis remains applicable. Later outage allocations do not change these quality counts. Five development pairs do not complete the declared 17-task comparison.

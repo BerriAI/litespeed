@@ -1,0 +1,349 @@
+{
+  "status": "posthoc behavioral diagnostic; frozen study scores unchanged",
+  "probeSha256": "905ed09c0533edbe24699b8b660a3c7976718acc456fa07b608c8ff937864be6",
+  "sourceFilesVerified": [
+    "litellm/cost_calculator.py",
+    "litellm/litellm_core_utils/llm_cost_calc/utils.py",
+    "litellm/model_prices_and_context_window_backup.json",
+    "litellm/responses/litellm_completion_transformation/transformation.py",
+    "litellm/responses/utils.py",
+    "litellm/types/llms/base.py",
+    "litellm/types/llms/openai.py",
+    "litellm/types/utils.py",
+    "litellm/utils.py",
+    "model_prices_and_context_window.json"
+  ],
+  "observations": {
+    "base": {
+      "rows": [
+        {
+          "name": "text-only",
+          "pass": true,
+          "inputCost": 0.435,
+          "expectedInputCost": 0.435,
+          "cacheReadCost": 0.12,
+          "expectedCacheReadCost": 0.12,
+          "reportedCachedAudioRate": null
+        },
+        {
+          "name": "audio-fallback",
+          "pass": false,
+          "inputCost": 1.4749999999999999,
+          "expectedInputCost": 0.955,
+          "cacheReadCost": 0.12,
+          "expectedCacheReadCost": 0.12,
+          "reportedCachedAudioRate": null
+        },
+        {
+          "name": "audio-free",
+          "pass": false,
+          "inputCost": 1.4749999999999999,
+          "expectedInputCost": 0.9069999999999999,
+          "cacheReadCost": 0.12,
+          "expectedCacheReadCost": 0.072,
+          "reportedCachedAudioRate": null
+        },
+        {
+          "name": "audio-explicit",
+          "pass": false,
+          "inputCost": 1.4749999999999999,
+          "expectedInputCost": 0.939,
+          "cacheReadCost": 0.12,
+          "expectedCacheReadCost": 0.104,
+          "reportedCachedAudioRate": null
+        },
+        {
+          "name": "ephemeral-creation-public-path",
+          "pass": true,
+          "inputCost": 0.001575,
+          "creationCost": 0.001575,
+          "expectedCost": 0.001575
+        }
+      ],
+      "passed": false,
+      "imports": {
+        "packageOrigin": "litellm/__init__.py",
+        "allLiteLLMModulesWithinWorkspace": true,
+        "moduleCount": 813
+      },
+      "bytecodePolicy": "fresh cache path; reads from adjacent caches and all writes disabled",
+      "exit": 0
+    },
+    "reference": {
+      "rows": [
+        {
+          "name": "text-only",
+          "pass": true,
+          "inputCost": 0.435,
+          "expectedInputCost": 0.435,
+          "cacheReadCost": 0.12,
+          "expectedCacheReadCost": 0.12,
+          "reportedCachedAudioRate": 6e-07
+        },
+        {
+          "name": "audio-fallback",
+          "pass": true,
+          "inputCost": 0.955,
+          "expectedInputCost": 0.955,
+          "cacheReadCost": 0.12,
+          "expectedCacheReadCost": 0.12,
+          "reportedCachedAudioRate": 6e-07
+        },
+        {
+          "name": "audio-free",
+          "pass": true,
+          "inputCost": 0.907,
+          "expectedInputCost": 0.9069999999999999,
+          "cacheReadCost": 0.072,
+          "expectedCacheReadCost": 0.072,
+          "reportedCachedAudioRate": 0.0
+        },
+        {
+          "name": "audio-explicit",
+          "pass": true,
+          "inputCost": 0.939,
+          "expectedInputCost": 0.939,
+          "cacheReadCost": 0.104,
+          "expectedCacheReadCost": 0.104,
+          "reportedCachedAudioRate": 4e-07
+        },
+        {
+          "name": "ephemeral-creation-public-path",
+          "pass": true,
+          "inputCost": 0.001575,
+          "creationCost": 0.001575,
+          "expectedCost": 0.001575
+        }
+      ],
+      "passed": true,
+      "imports": {
+        "packageOrigin": "litellm/__init__.py",
+        "allLiteLLMModulesWithinWorkspace": true,
+        "moduleCount": 813
+      },
+      "bytecodePolicy": "fresh cache path; reads from adjacent caches and all writes disabled",
+      "exit": 0
+    },
+    "astra-r1": {
+      "rows": [
+        {
+          "name": "text-only",
+          "pass": true,
+          "inputCost": 0.435,
+          "expectedInputCost": 0.435,
+          "cacheReadCost": 0.12,
+          "expectedCacheReadCost": 0.12,
+          "reportedCachedAudioRate": 6e-07
+        },
+        {
+          "name": "audio-fallback",
+          "pass": true,
+          "inputCost": 0.955,
+          "expectedInputCost": 0.955,
+          "cacheReadCost": 0.12,
+          "expectedCacheReadCost": 0.12,
+          "reportedCachedAudioRate": 6e-07
+        },
+        {
+          "name": "audio-free",
+          "pass": true,
+          "inputCost": 0.907,
+          "expectedInputCost": 0.9069999999999999,
+          "cacheReadCost": 0.072,
+          "expectedCacheReadCost": 0.072,
+          "reportedCachedAudioRate": 0
+        },
+        {
+          "name": "audio-explicit",
+          "pass": true,
+          "inputCost": 0.939,
+          "expectedInputCost": 0.939,
+          "cacheReadCost": 0.104,
+          "expectedCacheReadCost": 0.104,
+          "reportedCachedAudioRate": 4e-07
+        },
+        {
+          "name": "ephemeral-creation-public-path",
+          "pass": true,
+          "inputCost": 0.001575,
+          "creationCost": 0.001575,
+          "expectedCost": 0.001575
+        }
+      ],
+      "passed": true,
+      "imports": {
+        "packageOrigin": "litellm/__init__.py",
+        "allLiteLLMModulesWithinWorkspace": true,
+        "moduleCount": 813
+      },
+      "bytecodePolicy": "fresh cache path; reads from adjacent caches and all writes disabled",
+      "exit": 0
+    },
+    "astra-r2": {
+      "rows": [
+        {
+          "name": "text-only",
+          "pass": true,
+          "inputCost": 0.435,
+          "expectedInputCost": 0.435,
+          "cacheReadCost": 0.12,
+          "expectedCacheReadCost": 0.12,
+          "reportedCachedAudioRate": null
+        },
+        {
+          "name": "audio-fallback",
+          "pass": true,
+          "inputCost": 0.955,
+          "expectedInputCost": 0.955,
+          "cacheReadCost": 0.12,
+          "expectedCacheReadCost": 0.12,
+          "reportedCachedAudioRate": null
+        },
+        {
+          "name": "audio-free",
+          "pass": true,
+          "inputCost": 0.907,
+          "expectedInputCost": 0.9069999999999999,
+          "cacheReadCost": 0.072,
+          "expectedCacheReadCost": 0.072,
+          "reportedCachedAudioRate": 0.0
+        },
+        {
+          "name": "audio-explicit",
+          "pass": true,
+          "inputCost": 0.939,
+          "expectedInputCost": 0.939,
+          "cacheReadCost": 0.104,
+          "expectedCacheReadCost": 0.104,
+          "reportedCachedAudioRate": 4e-07
+        },
+        {
+          "name": "ephemeral-creation-public-path",
+          "pass": true,
+          "inputCost": 0.001575,
+          "creationCost": 0.001575,
+          "expectedCost": 0.001575
+        }
+      ],
+      "passed": true,
+      "imports": {
+        "packageOrigin": "litellm/__init__.py",
+        "allLiteLLMModulesWithinWorkspace": true,
+        "moduleCount": 813
+      },
+      "bytecodePolicy": "fresh cache path; reads from adjacent caches and all writes disabled",
+      "exit": 0
+    },
+    "flash-r1": {
+      "rows": [
+        {
+          "name": "text-only",
+          "pass": true,
+          "inputCost": 0.435,
+          "expectedInputCost": 0.435,
+          "cacheReadCost": 0.12,
+          "expectedCacheReadCost": 0.12,
+          "reportedCachedAudioRate": 6e-07
+        },
+        {
+          "name": "audio-fallback",
+          "pass": false,
+          "inputCost": 1.015,
+          "expectedInputCost": 0.955,
+          "cacheReadCost": 0.12,
+          "expectedCacheReadCost": 0.12,
+          "reportedCachedAudioRate": 6e-07
+        },
+        {
+          "name": "audio-free",
+          "pass": false,
+          "inputCost": 0.967,
+          "expectedInputCost": 0.9069999999999999,
+          "cacheReadCost": 0.072,
+          "expectedCacheReadCost": 0.072,
+          "reportedCachedAudioRate": 0.0
+        },
+        {
+          "name": "audio-explicit",
+          "pass": false,
+          "inputCost": 0.999,
+          "expectedInputCost": 0.939,
+          "cacheReadCost": 0.104,
+          "expectedCacheReadCost": 0.104,
+          "reportedCachedAudioRate": 4e-07
+        },
+        {
+          "name": "ephemeral-creation-public-path",
+          "pass": true,
+          "inputCost": 0.001575,
+          "creationCost": 0.001575,
+          "expectedCost": 0.001575
+        }
+      ],
+      "passed": false,
+      "imports": {
+        "packageOrigin": "litellm/__init__.py",
+        "allLiteLLMModulesWithinWorkspace": true,
+        "moduleCount": 813
+      },
+      "bytecodePolicy": "fresh cache path; reads from adjacent caches and all writes disabled",
+      "exit": 0
+    },
+    "flash-r2": {
+      "rows": [
+        {
+          "name": "text-only",
+          "pass": true,
+          "inputCost": 0.435,
+          "expectedInputCost": 0.435,
+          "cacheReadCost": 0.12,
+          "expectedCacheReadCost": 0.12,
+          "reportedCachedAudioRate": 6e-07
+        },
+        {
+          "name": "audio-fallback",
+          "pass": false,
+          "inputCost": 1.015,
+          "expectedInputCost": 0.955,
+          "cacheReadCost": 0.12,
+          "expectedCacheReadCost": 0.12,
+          "reportedCachedAudioRate": 6e-07
+        },
+        {
+          "name": "audio-free",
+          "pass": false,
+          "inputCost": 0.967,
+          "expectedInputCost": 0.9069999999999999,
+          "cacheReadCost": 0.072,
+          "expectedCacheReadCost": 0.072,
+          "reportedCachedAudioRate": 0.0
+        },
+        {
+          "name": "audio-explicit",
+          "pass": false,
+          "inputCost": 0.999,
+          "expectedInputCost": 0.939,
+          "cacheReadCost": 0.104,
+          "expectedCacheReadCost": 0.104,
+          "reportedCachedAudioRate": 4e-07
+        },
+        {
+          "name": "ephemeral-creation-public-path",
+          "pass": true,
+          "inputCost": 0.001575,
+          "creationCost": 0.001575,
+          "expectedCost": 0.001575
+        }
+      ],
+      "passed": false,
+      "imports": {
+        "packageOrigin": "litellm/__init__.py",
+        "allLiteLLMModulesWithinWorkspace": true,
+        "moduleCount": 813
+      },
+      "bytecodePolicy": "fresh cache path; reads from adjacent caches and all writes disabled",
+      "exit": 0
+    }
+  },
+  "interpretation": "All candidates pass the isolated text-only tier case and actual public ephemeral cache-write case. Astra2 returns null metadata for a missing audio rate but fallback arithmetic and breakdown are correct in this sample. Both Flash attempts overbill three mixed cached-audio/cache-creation cases by0.06USD (10000 creation tokens at6e-6 regular text rate). Actual costs1.015/0.967/0.999 instead of0.955/0.907/0.939 for fallback/free/explicit audio rates. Reference and both Astra attempts pass5/5; Flash both2/5; base2/5. This is synthetic supported usage and historical rates, not an observed production invoice. Full production correctness remains unestablished."
+}
