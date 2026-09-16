@@ -1,0 +1,116 @@
+{
+  "createdAt": "2026-09-16T20:21:57.706395+00:00",
+  "statusAtFreeze": "Prepared only; paid admission paused pending billing reconciliation. No trial allocated.",
+  "protocol": 7,
+  "model": "fireworks_ai/deepseek-v4p1-flash",
+  "control": "control",
+  "repetitions": 2,
+  "globalConcurrency": 3,
+  "seed": 55160926,
+  "stopNewTrialsAtCommittedUsd": 90,
+  "purpose": "Test one scoped initial/explicit-query billing playbook after both Flash development attempts bypassed cache-write subtraction in a new nested-modality branch. Final-review text, tools, scheduling, navigation ranks and ordinary architecture remain unchanged. Candidate does not add experimental grouped edits, chronological notices or v53 navigation.",
+  "selectionRule": "Require all four predeclared allocations and report normal completion, the unchanged17 reference checks, and12 public-contract checks. Strict success retains the existing reporter definition: normal completion plus reference acceptance plus all12 supplemental checks. Inspect mixed-bucket failures separately from known representation/private-helper couplings; do not rewrite scores. Compare cost and latency among correct delivered work; retain all failures. One known development task cannot establish future generalization or Astra superiority. No promotion solely from activation tests.",
+  "budgetAdmission": "Do not start while gateway is paused or billing is unresolved. Preserve unknown reservations; this plan grants no additional budget and does not amend interrupted studies.",
+  "versions": {
+    "control": {
+      "commit": "f658678e104aa9a7b1f2a9ea5c415979c38b5aaf",
+      "files": {
+        "server/litellm-harness.ts": "b64d4cfb2eaf5861eec5c83c167bf070e3aba93f78c8ba33550265fa296b3bbd",
+        "server/runner.ts": "2cb8061f9a6a808d4478e3ee2acc495f5c2ad73d3892c3c1b2f046c37ca4e6d7",
+        "server/tools.ts": "d9fd789faaeda1db2d17634ae27d56099149057132b149e76a1ac2310791625f",
+        "server/mcp-code-worker.ts": "ae63081e08e8e2739194bcfbaf16796176dd32c0429eedf34efb674e8401055f",
+        "shared/source-file-limits.ts": "bdcc3cee8c7eefd493afaec60e3e4d1e18ec32f2ff11d872b2670ffb8bf0f42f",
+        "scripts/litellm-harness/run.ts": "e6d86688ec0a321256ae8deb7290576450706c5b119195c0a00ed9a59b0eba5f",
+        "scripts/litellm-harness/solve.ts": "3d56881002d5b84233b895a9c2bb90094a33bef5c2d5ec6c3fdff927788e0a73",
+        "package-lock.json": "b0615d83c0d9f21a68abacb97c16777dc1eb4f42daa2b5496da51f787d394e88"
+      }
+    },
+    "billing-invariants": {
+      "commit": "dc4c7fc761183b8e20726dc845ee5c4d4fa929d4",
+      "files": {
+        "server/litellm-harness.ts": "91c1349a4a8fd0657da2e578b81aa6af0cb2773ed96462be026522b68ba536fb",
+        "server/runner.ts": "2cb8061f9a6a808d4478e3ee2acc495f5c2ad73d3892c3c1b2f046c37ca4e6d7",
+        "server/tools.ts": "d9fd789faaeda1db2d17634ae27d56099149057132b149e76a1ac2310791625f",
+        "server/mcp-code-worker.ts": "ae63081e08e8e2739194bcfbaf16796176dd32c0429eedf34efb674e8401055f",
+        "shared/source-file-limits.ts": "bdcc3cee8c7eefd493afaec60e3e4d1e18ec32f2ff11d872b2670ffb8bf0f42f",
+        "scripts/litellm-harness/run.ts": "e6d86688ec0a321256ae8deb7290576450706c5b119195c0a00ed9a59b0eba5f",
+        "scripts/litellm-harness/solve.ts": "3d56881002d5b84233b895a9c2bb90094a33bef5c2d5ec6c3fdff927788e0a73",
+        "package-lock.json": "b0615d83c0d9f21a68abacb97c16777dc1eb4f42daa2b5496da51f787d394e88"
+      }
+    }
+  },
+  "patchSha256": "f2cf9e0b61607010736c7cd03e8cfe5fea915cf75f9e0648b8544bfb8c2f03c7",
+  "supplementalSource": {
+    "path": "scripts/litellm-harness/studies/billing-invariants/contract_probe.py",
+    "sha256": "0e63eed42478d3b33600dcaba9d34ee1f6f1d2b650d6eb3755eb5d760faec775",
+    "components": {
+      "scripts/litellm-harness/studies/multi-module-development/representation_probe.py": "43440ad587358382faab2e5fd12807b7daac86bb152c6ede0d1b5919ee719a48",
+      "scripts/litellm-harness/studies/multi-module-development/public_path_probe.py": "905ed09c0533edbe24699b8b660a3c7976718acc456fa07b608c8ff937864be6"
+    },
+    "qualification": "qualification.json (base2/12; reference12/12)"
+  },
+  "validation": {
+    "typecheck": "passed",
+    "focusedTestsPassed": 33,
+    "negativeControlsFailed": 2,
+    "activation": "Actual historical-base query before first request:0control cards vs1candidate billing card; candidate10,231bytes within24,000-byte host note budget. Synthetic real-provider-boundary test confirms no extra model round or leakage into Single model."
+  },
+  "runs": [
+    {
+      "dataset": "training7",
+      "case": "realtime-cached-audio-cost",
+      "name": "billing-invariants",
+      "kind": "litellm-specific",
+      "label": "replication-v55-billing-billing-invariants-r1",
+      "commit": "dc4c7fc761183b8e20726dc845ee5c4d4fa929d4",
+      "effort": "medium",
+      "timeoutSeconds": 1800,
+      "supplemental": {
+        "artifact": "billing-contract-probe.json",
+        "expectedChecks": 12
+      }
+    },
+    {
+      "dataset": "training7",
+      "case": "realtime-cached-audio-cost",
+      "name": "control",
+      "kind": "litellm-specific",
+      "label": "replication-v55-billing-control-r2",
+      "commit": "f658678e104aa9a7b1f2a9ea5c415979c38b5aaf",
+      "effort": "medium",
+      "timeoutSeconds": 1800,
+      "supplemental": {
+        "artifact": "billing-contract-probe.json",
+        "expectedChecks": 12
+      }
+    },
+    {
+      "dataset": "training7",
+      "case": "realtime-cached-audio-cost",
+      "name": "control",
+      "kind": "litellm-specific",
+      "label": "replication-v55-billing-control-r1",
+      "commit": "f658678e104aa9a7b1f2a9ea5c415979c38b5aaf",
+      "effort": "medium",
+      "timeoutSeconds": 1800,
+      "supplemental": {
+        "artifact": "billing-contract-probe.json",
+        "expectedChecks": 12
+      }
+    },
+    {
+      "dataset": "training7",
+      "case": "realtime-cached-audio-cost",
+      "name": "billing-invariants",
+      "kind": "litellm-specific",
+      "label": "replication-v55-billing-billing-invariants-r2",
+      "commit": "dc4c7fc761183b8e20726dc845ee5c4d4fa929d4",
+      "effort": "medium",
+      "timeoutSeconds": 1800,
+      "supplemental": {
+        "artifact": "billing-contract-probe.json",
+        "expectedChecks": 12
+      }
+    }
+  ]
+}

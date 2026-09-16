@@ -1,0 +1,11 @@
+{
+  "base": "f658678e104aa9a7b1f2a9ea5c415979c38b5aaf",
+  "candidate": "dc4c7fc761183b8e20726dc845ee5c4d4fa929d4",
+  "patchSha256": "f2cf9e0b61607010736c7cd03e8cfe5fea915cf75f9e0648b8544bfb8c2f03c7",
+  "freshPublicArchivePatchApplied": true,
+  "changedFilesByteMatched": [
+    "server/litellm-harness.ts",
+    "tests/litellm-harness-runner.test.ts",
+    "tests/litellm-harness.test.ts"
+  ]
+}
