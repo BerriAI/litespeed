@@ -25,12 +25,27 @@ def activations(messages, calls):
                     guide_ids.add(card['id'])
     reads = [c for c in calls if c['name'] == 'read_file']
     system = [m.get('content', '') for m in messages if m['role'] == 'system']
+    review_guides = set()
+    guided_reviews = 0
+    for text in system:
+        marker = 'Relevant repository lessons for this final audit: '
+        if text.startswith('LiteLLM change review.') and marker in text:
+            try:
+                cards = json.loads(text.split(marker, 1)[1].split('\n', 1)[0])
+                if isinstance(cards, list):
+                    ids = {card['id'] for card in cards if isinstance(card, dict) and isinstance(card.get('id'), str)}
+                    review_guides.update(ids)
+                    guided_reviews += bool(ids)
+            except (ValueError, TypeError):
+                pass
     return {
         'initialMapNotices': len(starting),
         'contextToolCalls': len(contexts),
         'guideIdsShown': sorted(guide_ids),
         'unparsedContextPayloads': malformed,
         'finalReviewNotices': sum(s.startswith('LiteLLM change review.') for s in system),
+        'guidedFinalReviewNotices': guided_reviews,
+        'finalReviewGuideIdsShown': sorted(review_guides),
         'testFocusNotices': sum(s.startswith('LiteLLM verification checkpoint:') for s in system),
         'explorationFocusNotices': sum(s.startswith('LiteLLM exploration checkpoint:') for s in system),
         # The runner fills the default BEFORE saving tool arguments. Historical

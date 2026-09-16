@@ -1,0 +1,79 @@
+diff --git a/server/litellm-harness.ts b/server/litellm-harness.ts
+index 2f9b128..fffd1d2 100644
+--- a/server/litellm-harness.ts
++++ b/server/litellm-harness.ts
+@@ -4,7 +4,7 @@ import path from 'node:path';
+ import fg from 'fast-glob';
+ import type { ToolDefinition } from '../shared/types.js';
+ 
+-export const LITELLM_HARNESS_VERSION='2026-09-15.26';
++export const LITELLM_HARNESS_VERSION='2026-09-15.27';
+ export const litellmContextTool:ToolDefinition={type:'function',function:{name:'litellm_context',description:'Navigate the current LiteLLM checkout. Give a task query to find relevant definitions, inline conditions and existing tests. Give a source path to see its symbol outline and test partners; add a symbol name to read that definition with numbered lines, or callers to find functions invoking a named helper in that file. Reads only this workspace, never Git history or remote answers.',parameters:{type:'object',properties:{query:{type:'string',maxLength:1000},path:{type:'string',maxLength:500},symbol:{type:'string',maxLength:200},callers:{type:'string',maxLength:200,description:'Python helper name whose call sites and enclosing functions to find; requires path.'}},additionalProperties:false}}};
+ 
+ const playbooks = [
+@@ -90,11 +90,14 @@ export const litellmExplorationFocus='LiteLLM exploration checkpoint: you have m
+ 
+ const ignored=['**/.*/**','**/node_modules/**','**/__pycache__/**','**/_experimental/out/**','**/dist/**','**/build/**','**/vendor/**'];
+ 
+-export function litellmReview(files:string[],checks:string[]):string {
++export function litellmReview(files:string[],checks:string[],query=''):string {
++  const guides=learnedContext(query,files);
+   return `LiteLLM change review. Follow the user's scope and verification constraints. First compare the requested behavior with the patch and checks already recorded, using the source you have read. If that evidence covers the requirement and its relevant counterpart, finish now with the actual results. This is a final audit, not a request to start another implementation or testing cycle.
+ Only investigate further when you can name a specific uncovered requirement or concrete defect. Select the one existing caller or exact test node that resolves that uncertainty; fix demonstrated problems and rerun the affected check. An old assertion can encode the behavior the user asked to change. Do not rerun a passing selection for reassurance, expand to a whole provider/router test directory, or add speculative cases after the required behavior has been verified.
+ Never remove the working fix to demonstrate a baseline failure. If a baseline check is necessary, use a separate temporary copy and keep the current patch intact; cancellation must not strand the checkout without its fix. A baseline check is not required just to finish this review. Report unresolved unrelated failures with the evidence available instead of chasing them indefinitely.
+ Relevant boundary audit: URLs preserve parsed path/query components; image/document adapters preserve source type and MIME; request configuration avoids shared-state mutation and distinguishes absent from explicit false. Apply only what the requested change touches. Then finish.
++${guides.length?`Relevant repository lessons for this final audit: ${JSON.stringify(guides)}
++For each applicable lesson, identify the existing check or traced path that covers the user's requirement. A test of only one matching branch cannot establish precedence when two branches match. If that concrete distinction is uncovered, compare the smallest overlapping-input case through the existing public entrypoints. Do not count a new assertion that merely repeats the patch's assumption as independent evidence. Use current source and the user's scope; these lessons do not require changing unrelated behavior.\n`:''}
+ Host-recorded changed paths: ${JSON.stringify(files.slice(0,30))}
+ Host-recorded commands mentioning test tools (execution is not proof of coverage or passing): ${JSON.stringify(checks.slice(-5))}`;
+ }
+diff --git a/server/runner.ts b/server/runner.ts
+index d553270..28be6f1 100644
+--- a/server/runner.ts
++++ b/server/runner.ts
+@@ -1550,9 +1550,10 @@ export class Runner {
+     // Give a repository-specific starting map without spending a model round.
+     // Automatic navigation must not bypass even generic tool interception. With
+     // hooks, sidecars or scoped read decisions, the model uses recorded tools.
++    const litellmTaskQuery=(this.store.messages(id).find(item=>item.id===run.turnId)?.content??'').slice(0,1000);
+     if(allowed('litellm_context')&&policy.hooks.hooks.length===0
+       &&![...policy.rules.project,...policy.rules.app].some(rule=>rule.tool==='litellm_context'&&rule.decision!=='allow')) {
+-      const query=(this.store.messages(id).find(item=>item.id===run.turnId)?.content??'').slice(0,1000);
++      const query=litellmTaskQuery;
+       if(query.trim())try {
+         const context=await litellmContext(session.workspace,{query},signal);
+         signal.throwIfAborted();
+@@ -1758,7 +1759,7 @@ export class Runner {
+         const evidence=computeReceipts(run.child?this.store.messages(id):this.delegations.evidence(id),run.turnId);
+         if(!run.child&&session.mode==='build'&&session.architecture?.kind==='litellm-specific'&&!litellmReviewed&&evidence.filesChanged.length) {
+           litellmReviewed=true;
+-          this.save({id:randomUUID(),sessionId:id,role:'system',content:litellmReview(evidence.filesChanged,evidence.commandsRun.filter(command=>isCheckCommand(command))),createdAt:Date.now()});
++          this.save({id:randomUUID(),sessionId:id,role:'system',content:litellmReview(evidence.filesChanged,evidence.commandsRun.filter(command=>isCheckCommand(command)),litellmTaskQuery),createdAt:Date.now()});
+           continue;
+         }
+         if(run.toolFailures?.size||evidence.unresolvedChecks?.length) {
+diff --git a/tests/litellm-harness-runner.test.ts b/tests/litellm-harness-runner.test.ts
+index e5e951f..a7cfc0c 100644
+--- a/tests/litellm-harness-runner.test.ts
++++ b/tests/litellm-harness-runner.test.ts
+@@ -82,8 +82,20 @@ describe('LiteLLM-specific runner integration',()=>{
+     const reviews=store.messages(session.id).filter(m=>m.role==='system'&&m.content.startsWith('LiteLLM change review.'));
+     expect(reviews).toHaveLength(1);expect(reviews[0].content).toContain('litellm/new.py');
+     expect(reviews[0].content).toContain("Follow the user's scope and verification constraints");
++    expect(reviews[0].content).not.toContain('Relevant repository lessons for this final audit');
+     expect(requests).toHaveLength(3);expect(store.session(session.id).status).toBe('idle');
+   });
++  it('repeats only lessons matching the current task and recorded changed source at final review',async()=>{
++    const session=store.createSession({workspace:root,providerId:'test',model:'model',permissionMode:'auto',architecture:{kind:'litellm-specific'}});
++    action={name:'write_file',args:{path:'litellm/router.py',content:'def candidates(): return []\n'}};
++    runner.start(session.id,'Fix router candidate deployment resolution.');await runner.whenIdle();
++    const reviews=store.messages(session.id).filter(m=>m.role==='system'&&m.content.startsWith('LiteLLM change review.'));
++    expect(reviews).toHaveLength(1);
++    expect(reviews[0].content).toContain('router-resolution-and-request-state');
++    expect(reviews[0].content).toContain('smallest overlapping-input case');
++    expect(reviews[0].content).not.toContain('budget-cache-reconciliation');
++    expect(requests).toHaveLength(3);
++  });
+   it.each(['','LITELLM_LOCAL_MODEL_COST_MAP=True '])('reminds once after test activity with prefix %s without inventing a check verdict',async(prefix)=>{
+     await writeFile(join(root,'package.json'),JSON.stringify({scripts:{test:'node -e "process.exit(0)"'}}));
+     const session=store.createSession({workspace:root,providerId:'test',model:'model',permissionMode:'auto',architecture:{kind:'litellm-specific'}});

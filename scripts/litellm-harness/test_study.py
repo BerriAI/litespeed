@@ -1,13 +1,35 @@
 import unittest
 import json
+from unittest.mock import patch
 from pathlib import Path
 from tempfile import TemporaryDirectory
-from study import paired_summary, supplemental_result
+from study import main, paired_summary, supplemental_result
 from trace_metrics import activations
 from completion import completion_reason
 
 
 class StudyTests(unittest.TestCase):
+    def test_per_trial_supplement_does_not_block_unrelated_cases(self):
+        with TemporaryDirectory() as temporary:
+            root = Path(temporary)
+            plan = {'protocol': 6, 'repetitions': 1, 'runs': []}
+            analysis = []
+            for case in ['router', 'budget']:
+                row = dict(dataset='', case=case, name='control', label='study', commit='abc', effort='medium')
+                if case == 'router':
+                    row['supplemental'] = {'artifact': 'probe.json', 'expectedChecks': 1}
+                plan['runs'].append(row)
+                analysis.append(dict(id=case, run=case, label='study', harnessCommit='abc', evaluationProtocol=6, effort='medium', acceptance={'passed': True}, completed=True, seconds=1))
+                (root/'runs'/case).mkdir(parents=True)
+            (root/'analysis.json').write_text(json.dumps(analysis))
+            (root/'plan.json').write_text(json.dumps(plan))
+            with patch('sys.argv', ['study.py', str(root), str(root/'plan.json'), str(root/'output.json')]), patch('builtins.print'):
+                main()
+            rows = json.loads((root/'output.json').read_text())['trials']
+            self.assertFalse(rows[0]['evaluated'])
+            self.assertTrue(rows[1]['evaluated'])
+            self.assertTrue(rows[1]['success'])
+
     def test_supplemental_probe_requires_every_declared_check(self):
         with TemporaryDirectory() as temporary:
             root = Path(temporary)
@@ -39,13 +61,15 @@ class StudyTests(unittest.TestCase):
 
     def test_activation_requires_observed_payload(self):
         messages = [{'role': 'system', 'content': 'LiteLLM starting locations\n<workspace_reference>\n{"playbooks":[{"id":"router"}]}\n</workspace_reference>'},
-                    {'role': 'system', 'content': 'LiteLLM change review.'}]
+                    {'role': 'system', 'content': 'LiteLLM change review.\nRelevant repository lessons for this final audit: [{"id":"review-only"}]\n'}]
         calls = [{'name': 'read_file', 'args': {}}, {'name': 'read_file', 'args': {'limit': 20}},
                  {'name': 'litellm_context', 'output': '{"playbooks":[{"id":"router"}]}'},
                  {'name': 'litellm_context', 'output': 'truncated'}]
         result = activations(messages, calls)
         self.assertEqual(result['guideIdsShown'], ['router'])
         self.assertEqual(result['finalReviewNotices'], 1)
+        self.assertEqual(result['guidedFinalReviewNotices'], 1)
+        self.assertEqual(result['finalReviewGuideIdsShown'], ['review-only'])
         self.assertIsNone(result['defaultWindowReadCalls'])
         self.assertEqual(result['readCallsByEffectiveLimit'], {'missing': 1, '20': 1})
         self.assertEqual(result['unparsedContextPayloads'], 1)

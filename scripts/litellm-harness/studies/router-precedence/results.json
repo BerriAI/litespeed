@@ -1,23 +1,23 @@
 {
-  "status": "interim",
+  "status": "complete",
   "note": "Development selection only. Interim observed-task means can change as slower trials finish. Bootstrap resamples tasks, not attempts; it does not correct adaptive candidate selection or establish future generalization. Token prices exclude requests without usage and do not replace the campaign ledger.",
   "variants": [
     {
       "variant": "control",
-      "evaluated": 1,
+      "evaluated": 2,
       "expected": 2,
       "successes": 0,
-      "meanSeconds": 219.542,
-      "tokenPricedUsd": 0.032232694,
+      "meanSeconds": 192.32850000000002,
+      "tokenPricedUsd": 0.056571262,
       "trialsWithoutTokenPrice": 0
     },
     {
       "variant": "decision-guide",
-      "evaluated": 1,
+      "evaluated": 2,
       "expected": 2,
       "successes": 0,
-      "meanSeconds": 174.287,
-      "tokenPricedUsd": 0.029148392000000002,
+      "meanSeconds": 227.56349999999998,
+      "tokenPricedUsd": 0.073175946,
       "trialsWithoutTokenPrice": 0
     }
   ],
@@ -25,10 +25,21 @@
     {
       "variant": "decision-guide",
       "control": "control",
-      "pairedTasks": 0,
+      "pairedTasks": 1,
       "expectedTasks": 1,
-      "complete": false,
-      "pairs": []
+      "complete": true,
+      "pairs": [
+        {
+          "dataset": "",
+          "case": "router-candidates",
+          "successDelta": 0,
+          "secondsDelta": 35.23499999999996
+        }
+      ],
+      "successDelta": 0,
+      "secondsDelta": 35.23499999999996,
+      "taskBootstrap95": null,
+      "uncertaintyNote": "One task cannot estimate variation between tasks; no bootstrap interval is reported."
     }
   ],
   "trials": [
@@ -61,6 +72,8 @@
         ],
         "unparsedContextPayloads": 0,
         "finalReviewNotices": 1,
+        "guidedFinalReviewNotices": 0,
+        "finalReviewGuideIdsShown": [],
         "testFocusNotices": 1,
         "explorationFocusNotices": 1,
         "readCallsByEffectiveLimit": {
@@ -116,6 +129,8 @@
         ],
         "unparsedContextPayloads": 0,
         "finalReviewNotices": 1,
+        "guidedFinalReviewNotices": 0,
+        "finalReviewGuideIdsShown": [],
         "testFocusNotices": 1,
         "explorationFocusNotices": 1,
         "readCallsByEffectiveLimit": {
@@ -145,7 +160,47 @@
       "label": "replication-v25-decision-control-r2",
       "commit": "a60c5d9556a69f8c795c514f81dfcda279fc3d7b",
       "effort": "medium",
-      "evaluated": false
+      "evaluated": true,
+      "success": false,
+      "completed": true,
+      "completionReason": "completed",
+      "seconds": 165.115,
+      "acceptance": {
+        "exit": 0,
+        "tests": 1,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0,
+        "passed": true
+      },
+      "computedUsd": 0.024338568,
+      "activations": {
+        "initialMapNotices": 1,
+        "contextToolCalls": 0,
+        "guideIdsShown": [
+          "router-resolution-and-request-state"
+        ],
+        "unparsedContextPayloads": 0,
+        "finalReviewNotices": 1,
+        "guidedFinalReviewNotices": 0,
+        "finalReviewGuideIdsShown": [],
+        "testFocusNotices": 1,
+        "explorationFocusNotices": 1,
+        "readCallsByEffectiveLimit": {
+          "30": 1
+        },
+        "defaultWindowReadCalls": null,
+        "readLimitProvenance": "unknown: saved arguments include host-injected defaults"
+      },
+      "originalSuccess": true,
+      "supplemental": {
+        "artifact": "routing-probe.json",
+        "checks": 5,
+        "expectedChecks": 5,
+        "checksPassed": 3,
+        "exit": 0,
+        "passed": false
+      }
     },
     {
       "dataset": "",
@@ -154,7 +209,57 @@
       "label": "replication-v25-decision-decision-guide-r2",
       "commit": "3357bac238da7aca2fffd56c0b0a8708014937e2",
       "effort": "medium",
-      "evaluated": false
+      "evaluated": true,
+      "success": false,
+      "completed": true,
+      "completionReason": "completed",
+      "seconds": 280.84,
+      "acceptance": {
+        "exit": 0,
+        "tests": 1,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0,
+        "passed": true
+      },
+      "computedUsd": 0.044027554,
+      "activations": {
+        "initialMapNotices": 1,
+        "contextToolCalls": 0,
+        "guideIdsShown": [
+          "router-resolution-and-request-state"
+        ],
+        "unparsedContextPayloads": 0,
+        "finalReviewNotices": 1,
+        "guidedFinalReviewNotices": 0,
+        "finalReviewGuideIdsShown": [],
+        "testFocusNotices": 1,
+        "explorationFocusNotices": 1,
+        "readCallsByEffectiveLimit": {
+          "140": 1,
+          "160": 2,
+          "100": 2,
+          "60": 3,
+          "80": 3,
+          "120": 1,
+          "150": 1,
+          "15": 1,
+          "25": 2,
+          "70": 1,
+          "30": 1
+        },
+        "defaultWindowReadCalls": null,
+        "readLimitProvenance": "unknown: saved arguments include host-injected defaults"
+      },
+      "originalSuccess": true,
+      "supplemental": {
+        "artifact": "routing-probe.json",
+        "checks": 5,
+        "expectedChecks": 5,
+        "checksPassed": 3,
+        "exit": 0,
+        "passed": false
+      }
     }
   ]
 }

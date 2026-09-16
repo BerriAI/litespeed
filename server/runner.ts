@@ -2055,7 +2055,12 @@ export class Runner {
         // This is an advisory about activity, not a passing-check receipt.
         // Python/env wrappers and compound shells can execute tests without a
         // safely attributable checkKey. Count finished jobs once, not polls.
-        for(const call of message.toolCalls) {
+        // Yielded jobs update their original bash call when they finish. A
+        // bash_output/wait call has no execution receipt of its own, so inspect
+        // this turn's saved calls instead of only the latest batch.
+        const recorded=this.store.messages(id);
+        const turnCalls=recorded.slice(recorded.findIndex(item=>item.id===run.turnId)+1).flatMap(item=>item.toolCalls??[]);
+        for(const call of turnCalls) {
           const execution=call.execution;
           if(call.status==='completed'&&execution&&execution.status!=='running'&&isCheckCommand(execution.command)) {
             litellmCheckJobs.add(execution.jobId??`${execution.startedAt}:${call.id}`);

@@ -103,4 +103,20 @@ describe('LiteLLM-specific runner integration',()=>{
     expect(notices).toHaveLength(1);expect(notices[0].content).toContain('this notice does not authorize edits');
     expect(requests).toHaveLength(14);
   });
+  it('counts finished yielded test jobs once when polling has no execution receipt',async()=>{
+    await writeFile(join(root,'package.json'),JSON.stringify({scripts:{test:'node -e "setTimeout(() => {}, 100)"'}}));
+    const session=store.createSession({workspace:root,providerId:'test',model:'model',permissionMode:'auto',architecture:{kind:'litellm-specific'}});
+    for(let i=0;i<4;i++)actions.push(
+      {name:'bash',args:{command:`npm test # trial ${i}`,timeout_ms:1}},
+      {name:'wait',args:{job_ids:[`job-${i+1}`],timeout_ms:2000}},
+      {name:'bash_output',args:{job_id:`job-${i+1}`,wait_ms:0}},
+    );
+    runner.start(session.id,'Run the requested tests.');await runner.whenIdle();
+    const messages=store.messages(session.id);
+    const calls=messages.flatMap(message=>message.toolCalls??[]);
+    expect(calls.filter(call=>call.name==='bash_output').every(call=>!call.execution)).toBe(true);
+    expect(calls.filter(call=>call.name==='bash').map(call=>call.execution?.status)).toEqual(['exited','exited','exited','exited']);
+    expect(messages.filter(message=>message.content.startsWith('LiteLLM verification checkpoint:'))).toHaveLength(1);
+    expect(requests).toHaveLength(14);
+  });
 });

@@ -98,12 +98,13 @@ def main():
                            completed=result['completed'], completionReason=result.get('completionReason'),
                            seconds=result['seconds'], acceptance=acceptance,
                            computedUsd=result.get('computedUsd'), activations=result.get('activations'))
-                if plan.get('supplemental'):
+                specification = item.get('supplemental', plan.get('supplemental'))
+                if specification:
                     row['originalSuccess'] = row['success']
                     directory = (dataset / 'runs' / result['run']).resolve()
                     if directory.parent != (dataset / 'runs').resolve():
                         raise ValueError('Result must identify one run directory.')
-                    extra = supplemental_result(directory, plan['supplemental'])
+                    extra = supplemental_result(directory, specification)
                     row['supplemental'] = extra
                     row['evaluated'] = extra is not None
                     row['success'] = bool(row['originalSuccess'] and extra and extra['passed'])

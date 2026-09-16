@@ -25,3 +25,7 @@ For subsequent reproduction, run the interpreter with `-B`, followed by `scripts
 ## Starting-snapshot cache audit
 
 Some trial baselines inherited generated Python bytecode from host probes. [The audit](../../snapshot-hygiene-audit.json) identifies affected trials, verifies all present Python source against its Git base, and retains original results. All 12 affected trials reproduced their original acceptance verdict and counts with adjacent caches disabled. All 19 supplemental reruns verified import origins; previously recorded per-case results were unchanged. Only generated caches were removed from reusable starting snapshots; existing trial workspaces and patches were preserved. The launcher now rejects cached starting snapshots.
+
+## Targeted guide experiment
+
+All four predeclared v25 trials are complete. Both controls and both candidates passed the original acceptance selection, but none passed all five supplemental checks. The extra guide pointed explicitly to actual request selection and warned that listing helpers and docstrings can imply unions. Its presence alone did not correct the patches, so it was not promoted. See [plan](plan.json), [patch](decision-guide.patch) and [results](results.json).

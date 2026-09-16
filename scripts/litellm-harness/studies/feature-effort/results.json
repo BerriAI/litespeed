@@ -4,13 +4,21 @@
   "variants": [
     {
       "variant": "high",
-      "evaluated": 0,
-      "expected": 8
+      "evaluated": 1,
+      "expected": 8,
+      "successes": 1,
+      "meanSeconds": 319.729,
+      "tokenPricedUsd": 0.07599445,
+      "trialsWithoutTokenPrice": 0
     },
     {
       "variant": "medium",
-      "evaluated": 0,
-      "expected": 8
+      "evaluated": 1,
+      "expected": 8,
+      "successes": 1,
+      "meanSeconds": 228.083,
+      "tokenPricedUsd": 0.053904872,
+      "trialsWithoutTokenPrice": 0
     }
   ],
   "comparisons": [
@@ -31,7 +39,47 @@
       "label": "replication-v24-features-high-r1",
       "commit": "c7e6826341989fd6ebf3588b53901087b2fa7a56",
       "effort": "high",
-      "evaluated": false
+      "evaluated": true,
+      "success": true,
+      "completed": true,
+      "completionReason": "completed",
+      "seconds": 319.729,
+      "acceptance": {
+        "exit": 0,
+        "tests": 4,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0,
+        "passed": true
+      },
+      "computedUsd": 0.07599445,
+      "activations": {
+        "initialMapNotices": 1,
+        "contextToolCalls": 0,
+        "guideIdsShown": [],
+        "unparsedContextPayloads": 0,
+        "finalReviewNotices": 1,
+        "guidedFinalReviewNotices": 0,
+        "finalReviewGuideIdsShown": [],
+        "testFocusNotices": 0,
+        "explorationFocusNotices": 1,
+        "readCallsByEffectiveLimit": {
+          "420": 1,
+          "160": 3,
+          "240": 2,
+          "280": 1,
+          "130": 1,
+          "140": 1,
+          "180": 1,
+          "70": 1,
+          "55": 1,
+          "60": 1,
+          "50": 2,
+          "30": 1
+        },
+        "defaultWindowReadCalls": null,
+        "readLimitProvenance": "unknown: saved arguments include host-injected defaults"
+      }
     },
     {
       "dataset": "training5",
@@ -40,7 +88,46 @@
       "label": "replication-v24-features-medium-r1",
       "commit": "c7e6826341989fd6ebf3588b53901087b2fa7a56",
       "effort": "medium",
-      "evaluated": false
+      "evaluated": true,
+      "success": true,
+      "completed": true,
+      "completionReason": "completed",
+      "seconds": 228.083,
+      "acceptance": {
+        "exit": 0,
+        "tests": 4,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0,
+        "passed": true
+      },
+      "computedUsd": 0.053904872,
+      "activations": {
+        "initialMapNotices": 1,
+        "contextToolCalls": 1,
+        "guideIdsShown": [],
+        "unparsedContextPayloads": 0,
+        "finalReviewNotices": 1,
+        "guidedFinalReviewNotices": 0,
+        "finalReviewGuideIdsShown": [],
+        "testFocusNotices": 0,
+        "explorationFocusNotices": 1,
+        "readCallsByEffectiveLimit": {
+          "160": 3,
+          "300": 2,
+          "260": 1,
+          "200": 1,
+          "220": 1,
+          "180": 1,
+          "280": 1,
+          "150": 1,
+          "70": 2,
+          "100": 1,
+          "40": 1
+        },
+        "defaultWindowReadCalls": null,
+        "readLimitProvenance": "unknown: saved arguments include host-injected defaults"
+      }
     },
     {
       "dataset": "training5",

@@ -1,0 +1,100 @@
+{
+  "status": "interim",
+  "note": "Development selection only. Interim observed-task means can change as slower trials finish. Bootstrap resamples tasks, not attempts; it does not correct adaptive candidate selection or establish future generalization. Token prices exclude requests without usage and do not replace the campaign ledger.",
+  "variants": [
+    {
+      "variant": "control",
+      "evaluated": 0,
+      "expected": 4
+    },
+    {
+      "variant": "guided-review",
+      "evaluated": 0,
+      "expected": 4
+    }
+  ],
+  "comparisons": [
+    {
+      "variant": "guided-review",
+      "control": "control",
+      "pairedTasks": 0,
+      "expectedTasks": 2,
+      "complete": false,
+      "pairs": []
+    }
+  ],
+  "trials": [
+    {
+      "dataset": "",
+      "case": "router-candidates",
+      "name": "guided-review",
+      "label": "replication-v27-review-guided-review-r2",
+      "commit": "39085680fcc0cb3807eeae69d888245c3adcab6c",
+      "effort": "medium",
+      "evaluated": false
+    },
+    {
+      "dataset": "",
+      "case": "team-member-budget",
+      "name": "control",
+      "label": "replication-v27-review-control-r2",
+      "commit": "9e79372e3388e45b0dd85186238401f521425c96",
+      "effort": "medium",
+      "evaluated": false
+    },
+    {
+      "dataset": "",
+      "case": "router-candidates",
+      "name": "control",
+      "label": "replication-v27-review-control-r1",
+      "commit": "9e79372e3388e45b0dd85186238401f521425c96",
+      "effort": "medium",
+      "evaluated": false
+    },
+    {
+      "dataset": "",
+      "case": "router-candidates",
+      "name": "guided-review",
+      "label": "replication-v27-review-guided-review-r1",
+      "commit": "39085680fcc0cb3807eeae69d888245c3adcab6c",
+      "effort": "medium",
+      "evaluated": false
+    },
+    {
+      "dataset": "",
+      "case": "team-member-budget",
+      "name": "guided-review",
+      "label": "replication-v27-review-guided-review-r2",
+      "commit": "39085680fcc0cb3807eeae69d888245c3adcab6c",
+      "effort": "medium",
+      "evaluated": false
+    },
+    {
+      "dataset": "",
+      "case": "team-member-budget",
+      "name": "guided-review",
+      "label": "replication-v27-review-guided-review-r1",
+      "commit": "39085680fcc0cb3807eeae69d888245c3adcab6c",
+      "effort": "medium",
+      "evaluated": false
+    },
+    {
+      "dataset": "",
+      "case": "router-candidates",
+      "name": "control",
+      "label": "replication-v27-review-control-r2",
+      "commit": "9e79372e3388e45b0dd85186238401f521425c96",
+      "effort": "medium",
+      "evaluated": false
+    },
+    {
+      "dataset": "",
+      "case": "team-member-budget",
+      "name": "control",
+      "label": "replication-v27-review-control-r1",
+      "commit": "9e79372e3388e45b0dd85186238401f521425c96",
+      "effort": "medium",
+      "evaluated": false
+    }
+  ]
+}
