@@ -120,8 +120,12 @@
         "expectedCost": 0.001575
       }
     ],
-    "importCount": 3,
-    "bytecodePolicy": "fresh cache path; reads from adjacent caches and all writes disabled"
+    "bytecodePolicy": "fresh cache path; reads from adjacent caches and all writes disabled",
+    "imports": {
+      "packageOrigin": "litellm/__init__.py",
+      "allLiteLLMModulesWithinWorkspace": true,
+      "moduleCount": 813
+    }
   },
   "patchSha256": "264d602a4bac369b277c27716b79f761e737afda2ef377566e96fe24fc5fc5ef",
   "toolCounts": {
