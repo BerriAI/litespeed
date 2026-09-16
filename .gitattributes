@@ -1,1 +1,3 @@
 docs/litellm-harness*-results.json linguist-generated=true
+docs/litellm-harness-bottlenecks.json linguist-generated=true
+scripts/litellm-harness/studies/**/results.json linguist-generated=true
