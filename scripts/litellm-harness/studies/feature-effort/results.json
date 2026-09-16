@@ -13,11 +13,11 @@
     },
     {
       "variant": "medium",
-      "evaluated": 4,
+      "evaluated": 5,
       "expected": 8,
-      "successes": 2,
-      "meanSeconds": 621.7,
-      "tokenPricedUsd": 0.545752458,
+      "successes": 3,
+      "meanSeconds": 536.7566,
+      "tokenPricedUsd": 0.582766472,
       "trialsWithoutTokenPrice": 0
     }
   ],
@@ -25,10 +25,21 @@
     {
       "variant": "high",
       "control": "medium",
-      "pairedTasks": 0,
+      "pairedTasks": 1,
       "expectedTasks": 4,
       "complete": false,
-      "pairs": []
+      "pairs": [
+        {
+          "dataset": "training5",
+          "case": "stream-tool-rewrite-membership",
+          "successDelta": 0,
+          "secondsDelta": 125.97149999999999
+        }
+      ],
+      "successDelta": 0,
+      "secondsDelta": 125.97149999999999,
+      "taskBootstrap95": null,
+      "uncertaintyNote": "One task cannot estimate variation between tasks; no bootstrap interval is reported."
     }
   ],
   "trials": [
@@ -562,7 +573,48 @@
       "label": "replication-v24-features-medium-r2",
       "commit": "c7e6826341989fd6ebf3588b53901087b2fa7a56",
       "effort": "medium",
-      "evaluated": false
+      "evaluated": true,
+      "success": true,
+      "completed": true,
+      "completionReason": "completed",
+      "seconds": 196.983,
+      "acceptance": {
+        "exit": 0,
+        "tests": 4,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0,
+        "passed": true
+      },
+      "computedUsd": 0.037014014,
+      "activations": {
+        "initialMapNotices": 1,
+        "contextToolCalls": 0,
+        "guideIdsShown": [],
+        "unparsedContextPayloads": 0,
+        "finalReviewNotices": 1,
+        "guidedFinalReviewNotices": 0,
+        "finalReviewGuideIdsShown": [],
+        "batchedEditCalls": 0,
+        "completedBatchedEditCalls": 0,
+        "batchEditsRequested": 0,
+        "batchSizes": [],
+        "backgroundCommandNotices": 0,
+        "testFocusNotices": 0,
+        "explorationFocusNotices": 1,
+        "readCallsByEffectiveLimit": {
+          "160": 4,
+          "240": 2,
+          "130": 1,
+          "280": 1,
+          "300": 1,
+          "100": 1,
+          "80": 1,
+          "70": 1
+        },
+        "defaultWindowReadCalls": null,
+        "readLimitProvenance": "unknown: saved arguments include host-injected defaults"
+      }
     },
     {
       "dataset": "training5",

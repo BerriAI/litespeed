@@ -1,46 +1,25 @@
 {
-  "status": "interim",
-  "note": "Development selection only. Interim observed-task means can change as slower trials finish. Bootstrap resamples tasks, not attempts; it does not correct adaptive candidate selection or establish future generalization. Token prices exclude requests without usage and do not replace the campaign ledger.",
-  "variants": [
-    {
-      "variant": "control",
-      "evaluated": 0,
-      "expected": 4
-    },
-    {
-      "variant": "native-inspection",
-      "evaluated": 0,
-      "expected": 4
-    }
-  ],
-  "comparisons": [
-    {
-      "variant": "native-inspection",
-      "control": "control",
-      "pairedTasks": 0,
-      "expectedTasks": 2,
-      "complete": false,
-      "pairs": []
-    }
-  ],
-  "trials": [
+  "createdAt": "2026-09-16T05:16:44.137467+00:00",
+  "protocol": 6,
+  "control": "control",
+  "repetitions": 2,
+  "seed": 35160926,
+  "runs": [
     {
       "dataset": "training5",
       "case": "legacy-stream-pipeline",
       "name": "native-inspection",
-      "label": "replication-v35-inspection-native-inspection-r2-envfix",
+      "label": "replication-v35-inspection-native-inspection-r2",
       "commit": "b5f5899ce41cf64f64c495cfa42262eaf1848911",
-      "effort": "medium",
-      "evaluated": false
+      "effort": "medium"
     },
     {
       "dataset": "",
       "case": "databricks-reasoning",
       "name": "control",
-      "label": "replication-v35-inspection-control-r1-envfix",
+      "label": "replication-v35-inspection-control-r1",
       "commit": "58eb44cb6ff1e0142e57cced9eed2e917f28cdb2",
-      "effort": "medium",
-      "evaluated": false
+      "effort": "medium"
     },
     {
       "dataset": "training5",
@@ -48,8 +27,7 @@
       "name": "control",
       "label": "replication-v35-inspection-control-r2",
       "commit": "58eb44cb6ff1e0142e57cced9eed2e917f28cdb2",
-      "effort": "medium",
-      "evaluated": false
+      "effort": "medium"
     },
     {
       "dataset": "",
@@ -57,8 +35,7 @@
       "name": "control",
       "label": "replication-v35-inspection-control-r2",
       "commit": "58eb44cb6ff1e0142e57cced9eed2e917f28cdb2",
-      "effort": "medium",
-      "evaluated": false
+      "effort": "medium"
     },
     {
       "dataset": "training5",
@@ -66,8 +43,7 @@
       "name": "native-inspection",
       "label": "replication-v35-inspection-native-inspection-r1",
       "commit": "b5f5899ce41cf64f64c495cfa42262eaf1848911",
-      "effort": "medium",
-      "evaluated": false
+      "effort": "medium"
     },
     {
       "dataset": "training5",
@@ -75,8 +51,7 @@
       "name": "control",
       "label": "replication-v35-inspection-control-r1",
       "commit": "58eb44cb6ff1e0142e57cced9eed2e917f28cdb2",
-      "effort": "medium",
-      "evaluated": false
+      "effort": "medium"
     },
     {
       "dataset": "",
@@ -84,8 +59,7 @@
       "name": "native-inspection",
       "label": "replication-v35-inspection-native-inspection-r2",
       "commit": "b5f5899ce41cf64f64c495cfa42262eaf1848911",
-      "effort": "medium",
-      "evaluated": false
+      "effort": "medium"
     },
     {
       "dataset": "",
@@ -93,8 +67,16 @@
       "name": "native-inspection",
       "label": "replication-v35-inspection-native-inspection-r1",
       "commit": "b5f5899ce41cf64f64c495cfa42262eaf1848911",
-      "effort": "medium",
-      "evaluated": false
+      "effort": "medium"
     }
-  ]
+  ],
+  "hypothesis": "Preferring built-in bounded source inspection reduces shell snapshot overhead and advances first edits without weakening permission or history behavior.",
+  "selectionDataOnly": true,
+  "scope": "Two previously inspected training tasks. Both arms include v33 command-history and v34 test-partner corrections. Only the native-inspection preference and version label differ.",
+  "successNote": "Compare normal completion and frozen behavior checks first, then shell/inspection counts, first-edit latency, tool time, cost and elapsed time. No promotion from a single run or microbenchmark; shared-host timing is observational.",
+  "execution": {
+    "timeoutSeconds": 900,
+    "sharedSolverConcurrency": 3
+  },
+  "motivationRun": "replication-v24-features-medium-r1-legacy-stream-pipeline-78c8c634"
 }

@@ -1,23 +1,23 @@
 {
-  "status": "interim",
+  "status": "complete",
   "note": "Development selection only. Interim observed-task means can change as slower trials finish. Bootstrap resamples tasks, not attempts; it does not correct adaptive candidate selection or establish future generalization. Token prices exclude requests without usage and do not replace the campaign ledger.",
   "variants": [
     {
       "variant": "control",
-      "evaluated": 1,
+      "evaluated": 2,
       "expected": 2,
-      "successes": 1,
-      "meanSeconds": 463.613,
-      "tokenPricedUsd": 0.083915498,
+      "successes": 2,
+      "meanSeconds": 532.475,
+      "tokenPricedUsd": 0.18798729200000003,
       "trialsWithoutTokenPrice": 0
     },
     {
       "variant": "counter-values",
-      "evaluated": 1,
+      "evaluated": 2,
       "expected": 2,
-      "successes": 0,
-      "meanSeconds": 787.958,
-      "tokenPricedUsd": 0.11037209,
+      "successes": 1,
+      "meanSeconds": 754.42,
+      "tokenPricedUsd": 0.218848752,
       "trialsWithoutTokenPrice": 0
     }
   ],
@@ -25,10 +25,21 @@
     {
       "variant": "counter-values",
       "control": "control",
-      "pairedTasks": 0,
+      "pairedTasks": 1,
       "expectedTasks": 1,
-      "complete": false,
-      "pairs": []
+      "complete": true,
+      "pairs": [
+        {
+          "dataset": "",
+          "case": "team-member-budget",
+          "successDelta": -0.5,
+          "secondsDelta": 221.94499999999994
+        }
+      ],
+      "successDelta": -0.5,
+      "secondsDelta": 221.94499999999994,
+      "taskBootstrap95": null,
+      "uncertaintyNote": "One task cannot estimate variation between tasks; no bootstrap interval is reported."
     }
   ],
   "trials": [
@@ -125,7 +136,60 @@
       "label": "replication-v32-counters-counter-values-r1",
       "commit": "60abb3ac9a289f528dbff82940280e18e4dc5940",
       "effort": "medium",
-      "evaluated": false
+      "evaluated": true,
+      "success": true,
+      "completed": true,
+      "completionReason": "completed",
+      "seconds": 720.882,
+      "acceptance": {
+        "exit": 0,
+        "tests": 5,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0,
+        "passed": true
+      },
+      "computedUsd": 0.108476662,
+      "activations": {
+        "initialMapNotices": 1,
+        "contextToolCalls": 0,
+        "guideIdsShown": [
+          "budget-cache-reconciliation"
+        ],
+        "unparsedContextPayloads": 0,
+        "finalReviewNotices": 1,
+        "guidedFinalReviewNotices": 0,
+        "finalReviewGuideIdsShown": [],
+        "batchedEditCalls": 0,
+        "completedBatchedEditCalls": 0,
+        "batchEditsRequested": 0,
+        "batchSizes": [],
+        "backgroundCommandNotices": 0,
+        "testFocusNotices": 1,
+        "explorationFocusNotices": 1,
+        "readCallsByEffectiveLimit": {
+          "260": 2,
+          "90": 1,
+          "160": 7,
+          "420": 1,
+          "100": 1,
+          "400": 1,
+          "500": 1,
+          "300": 1,
+          "180": 1,
+          "280": 1,
+          "70": 3,
+          "240": 1,
+          "150": 1,
+          "120": 1,
+          "80": 2,
+          "110": 1,
+          "60": 1,
+          "50": 1
+        },
+        "defaultWindowReadCalls": null,
+        "readLimitProvenance": "unknown: saved arguments include host-injected defaults"
+      }
     },
     {
       "dataset": "",
@@ -134,7 +198,52 @@
       "label": "replication-v32-counters-control-r1",
       "commit": "a37b3d38fc7bb39e9b16e460af7db4fca8843ada",
       "effort": "medium",
-      "evaluated": false
+      "evaluated": true,
+      "success": true,
+      "completed": true,
+      "completionReason": "completed",
+      "seconds": 601.337,
+      "acceptance": {
+        "exit": 0,
+        "tests": 5,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0,
+        "passed": true
+      },
+      "computedUsd": 0.10407179400000001,
+      "activations": {
+        "initialMapNotices": 1,
+        "contextToolCalls": 0,
+        "guideIdsShown": [
+          "budget-cache-reconciliation"
+        ],
+        "unparsedContextPayloads": 0,
+        "finalReviewNotices": 1,
+        "guidedFinalReviewNotices": 0,
+        "finalReviewGuideIdsShown": [],
+        "batchedEditCalls": 0,
+        "completedBatchedEditCalls": 0,
+        "batchEditsRequested": 0,
+        "batchSizes": [],
+        "backgroundCommandNotices": 0,
+        "testFocusNotices": 1,
+        "explorationFocusNotices": 1,
+        "readCallsByEffectiveLimit": {
+          "160": 3,
+          "240": 1,
+          "150": 1,
+          "120": 3,
+          "20": 1,
+          "130": 1,
+          "80": 1,
+          "45": 2,
+          "30": 2,
+          "40": 1
+        },
+        "defaultWindowReadCalls": null,
+        "readLimitProvenance": "unknown: saved arguments include host-injected defaults"
+      }
     }
   ]
 }

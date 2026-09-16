@@ -19,3 +19,9 @@ node --import tsx scripts/litellm-harness/studies/native-inspection/benchmark.mt
 ## Paid comparison
 
 [`plan.json`](plan.json) freezes two repetitions each of two training cases (Databricks reasoning and legacy streaming), two arms, Medium reasoning, protocol 6, 900-second deadline and the shared three-solver queue. Both arms include v33 history and v34 test-navigation fixes. The randomized order uses seed 35160926. Inspect normal completion and original acceptance first, then first edit, tool counts/time, model usage and elapsed time. A single fast or passing run cannot establish improvement. These cases have already informed development and cannot measure held-out quality.
+
+## Dependency-isolation amendment
+
+The first two allocations failed during runtime import, before any model request: the frozen worktrees linked `node_modules` outside their allowed filesystem boundary. Those are infrastructure failures, not model attempts. Both [original records](startup-failures.json) and the [original plan](plan-v1.json) are retained. Dependencies were physically cloned inside each frozen runtime, and imports of both the runner and harness succeeded under the exact retained isolation profiles. Source commits and model settings did not change.
+
+Plan revision 2 assigns new `-envfix` labels to replacements for just those two failures; the other six identities are unchanged. The current eight-row results use the amended plan. The campaign-wide export also retains the two startup failures, including the untouched-base acceptance failures. Future isolated runtimes must contain their dependency files within the allowed boundary.

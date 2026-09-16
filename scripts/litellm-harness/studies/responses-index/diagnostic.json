@@ -1,0 +1,17 @@
+{
+  "scope": "Posthoc host-authored training diagnosis on an independent candidate copy. Original normal 13/15 result unchanged. This shared-helper change diagnoses the missed boundary; other callers were not exhaustively tested and it is not a proposed LiteLLM PR.",
+  "sourceRun": "replication-p6-ablation-control-r1-responses-custom-guardrail-9f89cbc8",
+  "change": {
+    "path": "litellm/responses/litellm_completion_transformation/transformation.py",
+    "function": "convert_response_function_tool_call_to_chat_completion_tool_call",
+    "old": "\"index\": 0",
+    "new": "\"index\": index"
+  },
+  "exit": 0,
+  "tests": 15,
+  "failures": 0,
+  "errors": 0,
+  "skipped": 0,
+  "packageOriginsAsserted": true,
+  "criticAssessment": "The supplied test guardrail preserves function name and arguments; missing-name return shapes do not explain the two observed failures. The existing converter accepts index but always emits zero, so the new write-back targets a preceding message instead of the function-call item."
+}

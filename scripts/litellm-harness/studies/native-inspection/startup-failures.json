@@ -1,0 +1,45 @@
+{
+  "failures": [
+    {
+      "run": "replication-v35-inspection-native-inspection-r2-legacy-stream-pipeline-45cc142c",
+      "label": "replication-v35-inspection-native-inspection-r2",
+      "replacementLabel": "replication-v35-inspection-native-inspection-r2-envfix",
+      "dataset": "training5",
+      "case": "legacy-stream-pipeline",
+      "seconds": 0.282,
+      "gatewayAdmittedRequests": 0,
+      "cause": "Sandbox rejected external node_modules symlink before the model runtime imported.",
+      "originalAcceptance": {
+        "exit": 1,
+        "tests": 16,
+        "failures": 15,
+        "errors": 0,
+        "skipped": 0,
+        "passed": false
+      }
+    },
+    {
+      "run": "replication-v35-inspection-control-r1-databricks-reasoning-1f03e83e",
+      "label": "replication-v35-inspection-control-r1",
+      "replacementLabel": "replication-v35-inspection-control-r1-envfix",
+      "dataset": "",
+      "case": "databricks-reasoning",
+      "seconds": 0.195,
+      "gatewayAdmittedRequests": 0,
+      "cause": "Sandbox rejected external node_modules symlink before the model runtime imported.",
+      "originalAcceptance": {
+        "exit": 1,
+        "tests": 6,
+        "failures": 4,
+        "errors": 0,
+        "skipped": 0,
+        "passed": false
+      }
+    }
+  ],
+  "isolatedRuntimeImportChecks": {
+    "control": true,
+    "native-inspection": true
+  },
+  "dependencySourceLockSha256": "b0615d83c0d9f21a68abacb97c16777dc1eb4f42daa2b5496da51f787d394e88"
+}

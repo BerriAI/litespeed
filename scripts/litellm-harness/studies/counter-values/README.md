@@ -10,6 +10,12 @@ The [plan](plan.json) freezes both runtimes, randomizes two repetitions per arm,
 
 ## First candidate observation
 
-Candidate repetition 2 (`e215e803`) finished normally in 787.96 seconds with 4/5 checks passing. Its initial navigation note contained the new lesson in full, including stale values above and below the recovered total and separate Redis/local assertions. The expiry check still found local spend 0.6 instead of 0.35. Control repetition 2 (`13ed67d6`) finished in 463.61 seconds with 5/5. Repetition 1 remains pending; this is not a complete paired estimate.
+Candidate repetition 2 (`e215e803`) finished normally in 787.96 seconds with 4/5 checks passing. Its initial navigation note contained the new lesson in full, including stale values above and below the recovered total and separate Redis/local assertions. The expiry check still found local spend 0.6 instead of 0.35. Control repetition 2 (`13ed67d6`) finished in 463.61 seconds with 5/5. Repetition 1 subsequently finished; the complete comparison is below.
 
 The candidate's own settlement regression used local 0.4 and recovered total 0.55, so the existing maximum-only repair looked correct. A separate release regression explicitly expected local 0.4 to remain above the recovered Redis value 0.25 and justified this as conservative fallback behavior. Showing the desired counterexample in context did not ensure the model used it to challenge the inherited helper. This observation argues against treating guide delivery as evidence that its checks were performed. The original acceptance result remains unchanged, and the guide is unpromoted.
+
+## Complete result and decision
+
+Across both repetitions, control completed successfully **2/2**, while the added guide completed successfully **1/2**. Mean elapsed time was 532.48 seconds for control and 754.42 seconds for the guide (+221.94 seconds). Token-priced totals were $0.1880 and $0.2188 respectively; these totals do not replace the campaign ledger. Every attempt finished normally.
+
+**Reject promotion.** This one previously inspected task gives no evidence of benefit from the extra wording. It does not establish that such value comparisons are unhelpful; it establishes that delivering this particular lesson did not reliably make the solver perform them. No between-task uncertainty interval is available from one task. See [the complete trial results](results.json).

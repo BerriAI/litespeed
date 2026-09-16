@@ -9,7 +9,7 @@
       "dataset": "training5",
       "case": "legacy-stream-pipeline",
       "name": "native-inspection",
-      "label": "replication-v35-inspection-native-inspection-r2",
+      "label": "replication-v35-inspection-native-inspection-r2-envfix",
       "commit": "b5f5899ce41cf64f64c495cfa42262eaf1848911",
       "effort": "medium"
     },
@@ -17,7 +17,7 @@
       "dataset": "",
       "case": "databricks-reasoning",
       "name": "control",
-      "label": "replication-v35-inspection-control-r1",
+      "label": "replication-v35-inspection-control-r1-envfix",
       "commit": "58eb44cb6ff1e0142e57cced9eed2e917f28cdb2",
       "effort": "medium"
     },
@@ -78,5 +78,46 @@
     "timeoutSeconds": 900,
     "sharedSolverConcurrency": 3
   },
-  "motivationRun": "replication-v24-features-medium-r1-legacy-stream-pipeline-78c8c634"
+  "motivationRun": "replication-v24-features-medium-r1-legacy-stream-pipeline-78c8c634",
+  "revision": 2,
+  "amendedAt": "2026-09-16T06:03:39.688840+00:00",
+  "amendment": "Two startup-only failures in plan-v1.json are retained and replaced under explicit -envfix labels. No provider request was admitted in either failed allocation. Dependencies are now local APFS copies inside both frozen runtimes; code commits, task inputs, model settings, eight valid-attempt target and other six trial identities are unchanged. Both runtimes passed module imports under the exact retained Seatbelt profiles before resuming.",
+  "startupFailures": [
+    {
+      "run": "replication-v35-inspection-native-inspection-r2-legacy-stream-pipeline-45cc142c",
+      "label": "replication-v35-inspection-native-inspection-r2",
+      "replacementLabel": "replication-v35-inspection-native-inspection-r2-envfix",
+      "dataset": "training5",
+      "case": "legacy-stream-pipeline",
+      "seconds": 0.282,
+      "gatewayAdmittedRequests": 0,
+      "cause": "Sandbox rejected external node_modules symlink before the model runtime imported.",
+      "originalAcceptance": {
+        "exit": 1,
+        "tests": 16,
+        "failures": 15,
+        "errors": 0,
+        "skipped": 0,
+        "passed": false
+      }
+    },
+    {
+      "run": "replication-v35-inspection-control-r1-databricks-reasoning-1f03e83e",
+      "label": "replication-v35-inspection-control-r1",
+      "replacementLabel": "replication-v35-inspection-control-r1-envfix",
+      "dataset": "",
+      "case": "databricks-reasoning",
+      "seconds": 0.195,
+      "gatewayAdmittedRequests": 0,
+      "cause": "Sandbox rejected external node_modules symlink before the model runtime imported.",
+      "originalAcceptance": {
+        "exit": 1,
+        "tests": 6,
+        "failures": 4,
+        "errors": 0,
+        "skipped": 0,
+        "passed": false
+      }
+    }
+  ]
 }
