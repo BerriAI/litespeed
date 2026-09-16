@@ -1,0 +1,18 @@
+{
+  "control": {
+    "bytes": 562,
+    "sha256": "2a3c696f4e305fd9ef07e59fd9af0d7d53007e87f30ce769abeb22dd862b59ca",
+    "containsFinalRule": false,
+    "containsSuppressionRule": false,
+    "containsMutationRule": false
+  },
+  "candidate": {
+    "bytes": 16707,
+    "sha256": "3309ffb7c86b395131e7866c25eb47575cc1d7cac836e185173e8ba3fa570e19",
+    "containsFinalRule": true,
+    "containsSuppressionRule": true,
+    "containsMutationRule": true
+  },
+  "sameAGENTSPrefix": true,
+  "noProviderCall": true
+}

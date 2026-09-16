@@ -1,0 +1,169 @@
+diff --git a/server/litellm-harness.ts b/server/litellm-harness.ts
+index 1db44d0..91f108a 100644
+--- a/server/litellm-harness.ts
++++ b/server/litellm-harness.ts
+@@ -4,7 +4,7 @@ import path from 'node:path';
+ import fg from 'fast-glob';
+ import type { ToolDefinition } from '../shared/types.js';
+ 
+-export const LITELLM_HARNESS_VERSION='2026-09-16.52';
++export const LITELLM_HARNESS_VERSION='2026-09-16.56';
+ export const litellmContextTool:ToolDefinition={type:'function',function:{name:'litellm_context',description:'Navigate the current LiteLLM checkout. Give a task query to find relevant definitions, inline conditions and existing tests. Give a source path to see its symbol outline and test partners; add a symbol name to read that definition with numbered lines, or callers to find functions invoking a named helper in that file. Reads only this workspace, never Git history or remote answers.',parameters:{type:'object',properties:{query:{type:'string',maxLength:1000},path:{type:'string',maxLength:500},symbol:{type:'string',maxLength:200},callers:{type:'string',maxLength:200,description:'Python helper name whose call sites and enclosing functions to find; requires path.'}},additionalProperties:false}}};
+ 
+ const playbooks = [
+diff --git a/server/runner.ts b/server/runner.ts
+index 765e3fe..b84497d 100644
+--- a/server/runner.ts
++++ b/server/runner.ts
+@@ -563,7 +563,12 @@ export class Runner {
+     // Settings.hooks, trustedWorkspaces, or .litespeed/hooks.json never change a
+     // running turn. captureHooks never throws; invalid config -> advisory.
+     const hooks=this.hooks.captureHooks(session.workspace,this.store.settings());
+-    const policy:RunPolicy={sidecars:structuredClone(this.store.settings().sidecars??[]),session:{...structuredClone(session),providerId:pair.providerId,model:pair.model},provider:structuredClone(provider),guidance:captureProjectGuidance(session.workspace),style:this.captureStyle(session.workspace,session.outputStyle),rules,hooks,memory:Boolean(this.store.settings().memoryEnabled),tools:[...toolDefinitions.filter(tool=>(profile?.active.tools==null||profile.active.tools.some(name=>name===tool.function.name))&&(session.mode!=='plan'||isReadOnlyTool(tool.function.name))&&!rules.hidden.includes(tool.function.name)),historySearchTool,toolOutputPageTool,bashOutputTool,killShellTool,waitTool,viewImageTool,webSearchTool].map(tool=>tool.function.name)};
++    const sidecars=structuredClone(this.store.settings().sidecars??[]);
++    const referencedClaude=session.architecture?.kind==='litellm-specific'
++      &&(profile?.active.tools==null||profile.active.tools.includes('read_file'))
++      &&hooks.hooks.length===0&&sidecars.length===0
++      &&![...rules.project,...rules.app].some(rule=>rule.tool==='read_file'&&rule.decision!=='allow');
++    const policy:RunPolicy={sidecars,session:{...structuredClone(session),providerId:pair.providerId,model:pair.model},provider:structuredClone(provider),guidance:captureProjectGuidance(session.workspace,{referencedClaude}),style:this.captureStyle(session.workspace,session.outputStyle),rules,hooks,memory:Boolean(this.store.settings().memoryEnabled),tools:[...toolDefinitions.filter(tool=>(profile?.active.tools==null||profile.active.tools.some(name=>name===tool.function.name))&&(session.mode!=='plan'||isReadOnlyTool(tool.function.name))&&!rules.hidden.includes(tool.function.name)),historySearchTool,toolOutputPageTool,bashOutputTool,killShellTool,waitTool,viewImageTool,webSearchTool].map(tool=>tool.function.name)};
+     const run: ActiveRun = { clientSurface: parseClientSurface(surface), controller: new AbortController(), approvals: new Map(), profile, policy, budget:{launches:0,steps:0,elapsedMs:0} };
+     policy.workerProvider = workerProvider && structuredClone(workerProvider);
+     if(session.architecture?.kind==='litefusion')policy.litefusion=captureLiteFusion(session.architecture,this.store.settings().providers);
+diff --git a/server/tools.ts b/server/tools.ts
+index 5f02587..3af122e 100644
+--- a/server/tools.ts
++++ b/server/tools.ts
+@@ -171,10 +171,12 @@ export function isReadOnlyTool(name: string): boolean { return READ_ONLY.has(nam
+ 
+ /** Acceptance-time guidance snapshot. Fixed paths only, bounded reads, no links,
+  * devices, pipes, or application-state traversal. Optional invalid files are ignored. */
+-export function captureProjectGuidance(workspace: string): string {
++export function captureProjectGuidance(workspace: string, options:{referencedClaude?:boolean}={}): string {
+   const root = realpathSync(workspace);
+   let result = '';
+-  for (const file of ['AGENTS.md', 'LITESPEED.md', '.litespeed/instructions.md']) {
++  let referencedClaude=false;
++  for (const file of ['AGENTS.md', 'CLAUDE.md', 'LITESPEED.md', '.litespeed/instructions.md']) {
++    if(file==='CLAUDE.md'&&(!options.referencedClaude||!referencedClaude))continue;
+     let descriptor: number | undefined;
+     try {
+       const target = path.join(root, file), parent = path.dirname(target);
+@@ -191,7 +193,9 @@ export function captureProjectGuidance(workspace: string): string {
+       if (count !== before.size || after.size !== before.size || after.mtimeMs !== before.mtimeMs || after.ctimeMs !== before.ctimeMs || after.nlink !== 1 || after.dev !== before.dev || after.ino !== before.ino || finalLink.isSymbolicLink() || finalLink.dev !== before.dev || finalLink.ino !== before.ino || realpathSync(root) !== root || realpathSync(parent) !== parent || realpathSync(target) !== target) continue;
+       const content = new TextDecoder('utf-8', { fatal: true }).decode(bytes);
+       if (content.includes('\0')) continue;
+-      result += `\n\nProject instructions (${file}):\n${content.slice(0, 24000)}`;
++      const captured=content.slice(0,24000);
++      if(file==='AGENTS.md')referencedClaude=/^\s*(?:[-*]\s+)?read\s+@?CLAUDE\.md(?=$|[ \t:])/im.test(captured);
++      result += `\n\nProject instructions (${file}):\n${captured}`;
+     } catch { /* Optional guidance must never open unsafe special files. */ }
+     finally { if (descriptor !== undefined) closeSync(descriptor); }
+   }
+diff --git a/tests/litellm-harness-runner.test.ts b/tests/litellm-harness-runner.test.ts
+index ed364c7..ca5945d 100644
+--- a/tests/litellm-harness-runner.test.ts
++++ b/tests/litellm-harness-runner.test.ts
+@@ -25,6 +25,31 @@ describe('LiteLLM-specific runner integration',()=>{
+     runner=createApp({store}).runner;
+   });
+   afterEach(async()=>{runner.stopAll();await runner.whenIdle();server.closeAllConnections();await new Promise<void>(resolve=>server.close(()=>resolve()));store.close();await rm(root,{recursive:true,force:true});});
++  it.each(['build','plan'] as const)('pins explicitly referenced project guidance before the first %s request',async(mode)=>{
++    await writeFile(join(root,'AGENTS.md'),'Read @CLAUDE.md for coding guidelines');
++    await writeFile(join(root,'CLAUDE.md'),'PINNED_CLAUDE_RULE: use immutable typed values.');
++    const session=store.createSession({workspace:root,providerId:'test',model:'model',permissionMode:'auto',mode,architecture:{kind:'litellm-specific'}});
++    runner.start(session.id,'Explain example code.');
++    await writeFile(join(root,'CLAUDE.md'),'LATER_CLAUDE_RULE');
++    await runner.whenIdle();
++    expect(requests).toHaveLength(1);
++    expect(requests[0].messages[0].content).toContain('Project instructions (CLAUDE.md):\nPINNED_CLAUDE_RULE');
++    expect(requests[0].messages[0].content).not.toContain('LATER_CLAUDE_RULE');
++    requests=[];
++    const plain=store.createSession({workspace:root,providerId:'test',model:'model',permissionMode:'auto',mode});
++    runner.start(plain.id,'Explain example code.');await runner.whenIdle();
++    expect(requests[0].messages[0].content).not.toContain('Project instructions (CLAUDE.md)');
++  });
++  it.each(['scoped-deny','scoped-ask','generic-hook','read-hook','sidecar'] as const)('keeps referenced guidance on ordinary read tools when %s needs interception',async(kind)=>{
++    await writeFile(join(root,'AGENTS.md'),'Read @CLAUDE.md for coding guidelines');
++    await writeFile(join(root,'CLAUDE.md'),'DO_NOT_PRELOAD_CLAUDE');
++    if(kind==='scoped-deny'||kind==='scoped-ask')store.saveSettings({permissionRules:{version:1,rules:[{tool:'read_file',decision:kind==='scoped-deny'?'deny':'ask',patterns:['CLAUDE.md']}]}});
++    else if(kind==='sidecar')store.saveSettings({sidecars:[{name:'reader',events:['tool_call'],command:'exit 0'}]});
++    else store.saveSettings({hooks:[{event:'PreToolUse',...(kind==='read-hook'?{matcher:'read_file'}:{}),command:'exit 2'}]});
++    const session=store.createSession({workspace:root,providerId:'test',model:'model',permissionMode:'auto',architecture:{kind:'litellm-specific'}});
++    runner.start(session.id,'Explain example code.');await runner.whenIdle();
++    expect(JSON.stringify(requests[0].messages)).not.toContain('DO_NOT_PRELOAD_CLAUDE');
++  });
+   it('uses the real single-agent loop, exposes navigation in Plan and bounds unspecified reads',async()=>{
+     const session=store.createSession({workspace:root,providerId:'test',model:'model',permissionMode:'auto',mode:'plan',architecture:{kind:'litellm-specific'}});
+     action={name:'read_file',args:{path:'litellm/example.py'}};runner.start(session.id,'Inspect the code.');await runner.whenIdle();
+diff --git a/tests/profile-runner.test.ts b/tests/profile-runner.test.ts
+index bc9ab5c..8d99b90 100644
+--- a/tests/profile-runner.test.ts
++++ b/tests/profile-runner.test.ts
+@@ -44,6 +44,14 @@ describe('profile Runner and API integration',()=>{
+   });
+   afterEach(async()=>{runner.stopAll();await runner.whenIdle();vi.restoreAllMocks();await close(server);await close(providerServer);store.close();await rm(directory,{recursive:true,force:true});});
+ 
++  it.each([['empty',false],['review',true]] as const)('captures referenced LiteLLM guidance only when profile %s permits reads',async(profileId,expected)=>{
++    await writeFile(join(directory,'AGENTS.md'),'Read @CLAUDE.md for coding guidelines');
++    await writeFile(join(directory,'CLAUDE.md'),'REFERENCED_READ_GUIDANCE');
++    const session=await create(await choice(profileId),{architecture:{kind:'litellm-specific'}});
++    await run(session.id);
++    expect(calls[0].messages[0].content.includes('REFERENCED_READ_GUIDANCE')).toBe(expected);
++  });
++
+   it('catalog and preactivation preview are explicit bounded reads with no session, grants or provider work',async()=>{
+     const source=await catalog();expect(source.workspace).toBe(directory);expect(source.profiles[0].instructions).toBeUndefined();expect(source.skills[0].body).toBeUndefined();
+     const preview=await api('/profiles/preview',{workspace:directory,choice:{profileId:'review',skillIds:['testing'],catalogRevision:source.revision}});
+diff --git a/tests/project-guidance.test.ts b/tests/project-guidance.test.ts
+new file mode 100644
+index 0000000..3014c79
+--- /dev/null
++++ b/tests/project-guidance.test.ts
+@@ -0,0 +1,47 @@
++import { afterEach, beforeEach, expect, it } from 'vitest';
++import { mkdtemp, writeFile, rm, symlink, link } from 'node:fs/promises';
++import { tmpdir } from 'node:os';
++import { join } from 'node:path';
++import { captureProjectGuidance } from '../server/tools.js';
++
++let root:string;
++beforeEach(async()=>{root=await mkdtemp(join(tmpdir(),'referenced-guidance-'));});
++afterEach(async()=>{await rm(root,{recursive:true,force:true});});
++
++it('captures the explicitly referenced root file only when requested',async()=>{
++  await writeFile(join(root,'AGENTS.md'),'Read @CLAUDE.md for coding guidelines\n');
++  await writeFile(join(root,'CLAUDE.md'),'Use Final and do not rebind local variables.');
++  expect(captureProjectGuidance(root)).not.toContain('Use Final');
++  const captured=captureProjectGuidance(root,{referencedClaude:true});
++  expect(captured).toContain('Project instructions (CLAUDE.md):\nUse Final');
++  await writeFile(join(root,'CLAUDE.md'),'Later instructions');
++  expect(captured).not.toContain('Later instructions');
++});
++
++it.each(['CLAUDE.md exists here.','Do not read CLAUDE.md.','Read /tmp/CLAUDE.md','Read nested/CLAUDE.md','Read @OTHER.md','Read CLAUDE.md.bak','Read CLAUDE.md/nested'])('does not follow unrelated or external mentions: %s',async(instruction)=>{
++  await writeFile(join(root,'AGENTS.md'),instruction);
++  await writeFile(join(root,'CLAUDE.md'),'DO_NOT_CAPTURE');
++  expect(captureProjectGuidance(root,{referencedClaude:true})).not.toContain('DO_NOT_CAPTURE');
++});
++
++it('bounds the referenced file and does not follow another reference',async()=>{
++  await writeFile(join(root,'AGENTS.md'),'Read CLAUDE.md');
++  await writeFile(join(root,'CLAUDE.md'),'Read @OTHER.md\n'+'x'.repeat(24000)+'OMITTED_TAIL');
++  await writeFile(join(root,'OTHER.md'),'DO_NOT_CAPTURE');
++  const captured=captureProjectGuidance(root,{referencedClaude:true});
++  expect(captured).toContain('Read @OTHER.md');
++  expect(captured).not.toContain('DO_NOT_CAPTURE');
++  expect(captured).not.toContain('OMITTED_TAIL');
++});
++
++it.each(['symlink','hardlink','oversized','binary','invalid-utf8'] as const)('skips an unsafe referenced file: %s',async(kind)=>{
++  await writeFile(join(root,'AGENTS.md'),'Read @CLAUDE.md');
++  const target=join(root,'CLAUDE.md');
++  if(kind==='symlink'||kind==='hardlink'){
++    const source=join(root,'source');await writeFile(source,'DO_NOT_CAPTURE');
++    if(kind==='symlink')await symlink(source,target);else await link(source,target);
++  }else await writeFile(target,kind==='oversized'?'x'.repeat(300000):kind==='binary'?'DO_NOT_CAPTURE\0':Buffer.from([0xff]));
++  const captured=captureProjectGuidance(root,{referencedClaude:true});
++  expect(captured).toContain('Project instructions (AGENTS.md)');
++  expect(captured).not.toContain('Project instructions (CLAUDE.md)');
++});
