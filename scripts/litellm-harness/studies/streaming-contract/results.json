@@ -1,0 +1,64 @@
+{
+  "status": "interim",
+  "note": "Development selection only. Interim observed-task means can change as slower trials finish. Bootstrap resamples tasks, not attempts; it does not correct adaptive candidate selection or establish future generalization. Token prices exclude requests without usage and do not replace the campaign ledger.",
+  "variants": [
+    {
+      "variant": "control",
+      "evaluated": 0,
+      "expected": 2
+    },
+    {
+      "variant": "stream-guide",
+      "evaluated": 0,
+      "expected": 2
+    }
+  ],
+  "comparisons": [
+    {
+      "variant": "stream-guide",
+      "control": "control",
+      "pairedTasks": 0,
+      "expectedTasks": 1,
+      "complete": false,
+      "pairs": []
+    }
+  ],
+  "trials": [
+    {
+      "dataset": "training5",
+      "case": "legacy-stream-pipeline",
+      "name": "stream-guide",
+      "label": "replication-v39-streams-stream-guide-r1",
+      "commit": "85119eacb8640c6f1000ff48a246e50e4be53675",
+      "effort": "medium",
+      "evaluated": false
+    },
+    {
+      "dataset": "training5",
+      "case": "legacy-stream-pipeline",
+      "name": "control",
+      "label": "replication-v39-streams-control-r1",
+      "commit": "05f3011b4c5000d1fbb384a2d237856d2120c72c",
+      "effort": "medium",
+      "evaluated": false
+    },
+    {
+      "dataset": "training5",
+      "case": "legacy-stream-pipeline",
+      "name": "stream-guide",
+      "label": "replication-v39-streams-stream-guide-r2",
+      "commit": "85119eacb8640c6f1000ff48a246e50e4be53675",
+      "effort": "medium",
+      "evaluated": false
+    },
+    {
+      "dataset": "training5",
+      "case": "legacy-stream-pipeline",
+      "name": "control",
+      "label": "replication-v39-streams-control-r2",
+      "commit": "05f3011b4c5000d1fbb384a2d237856d2120c72c",
+      "effort": "medium",
+      "evaluated": false
+    }
+  ]
+}

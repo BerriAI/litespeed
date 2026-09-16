@@ -13,11 +13,11 @@
     },
     {
       "variant": "native-inspection",
-      "evaluated": 1,
+      "evaluated": 3,
       "expected": 4,
-      "successes": 0,
-      "meanSeconds": 838.445,
-      "tokenPricedUsd": 0.43998473600000004,
+      "successes": 2,
+      "meanSeconds": 453.79533333333336,
+      "tokenPricedUsd": 0.524942156,
       "trialsWithoutTokenPrice": 0
     }
   ],
@@ -201,7 +201,48 @@
       "label": "replication-v35-inspection-native-inspection-r2",
       "commit": "b5f5899ce41cf64f64c495cfa42262eaf1848911",
       "effort": "medium",
-      "evaluated": false
+      "evaluated": true,
+      "success": true,
+      "completed": true,
+      "completionReason": "completed",
+      "seconds": 321.594,
+      "acceptance": {
+        "exit": 0,
+        "tests": 6,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0,
+        "passed": true
+      },
+      "computedUsd": 0.050583708000000005,
+      "activations": {
+        "initialMapNotices": 1,
+        "contextToolCalls": 0,
+        "guideIdsShown": [],
+        "unparsedContextPayloads": 0,
+        "finalReviewNotices": 1,
+        "guidedFinalReviewNotices": 0,
+        "finalReviewGuideIdsShown": [],
+        "batchedEditCalls": 0,
+        "completedBatchedEditCalls": 0,
+        "batchEditsRequested": 0,
+        "batchSizes": [],
+        "backgroundCommandNotices": 0,
+        "testFocusNotices": 1,
+        "explorationFocusNotices": 1,
+        "readCallsByEffectiveLimit": {
+          "200": 3,
+          "300": 1,
+          "160": 2,
+          "230": 1,
+          "40": 3,
+          "50": 1,
+          "100": 1,
+          "30": 1
+        },
+        "defaultWindowReadCalls": null,
+        "readLimitProvenance": "unknown: saved arguments include host-injected defaults"
+      }
     },
     {
       "dataset": "",
@@ -210,7 +251,47 @@
       "label": "replication-v35-inspection-native-inspection-r1",
       "commit": "b5f5899ce41cf64f64c495cfa42262eaf1848911",
       "effort": "medium",
-      "evaluated": false
+      "evaluated": true,
+      "success": true,
+      "completed": true,
+      "completionReason": "completed",
+      "seconds": 201.347,
+      "acceptance": {
+        "exit": 0,
+        "tests": 6,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0,
+        "passed": true
+      },
+      "computedUsd": 0.034373712,
+      "activations": {
+        "initialMapNotices": 1,
+        "contextToolCalls": 1,
+        "guideIdsShown": [],
+        "unparsedContextPayloads": 0,
+        "finalReviewNotices": 1,
+        "guidedFinalReviewNotices": 0,
+        "finalReviewGuideIdsShown": [],
+        "batchedEditCalls": 0,
+        "completedBatchedEditCalls": 0,
+        "batchEditsRequested": 0,
+        "batchSizes": [],
+        "backgroundCommandNotices": 0,
+        "testFocusNotices": 1,
+        "explorationFocusNotices": 1,
+        "readCallsByEffectiveLimit": {
+          "160": 2,
+          "365": 1,
+          "80": 1,
+          "40": 3,
+          "215": 1,
+          "120": 2,
+          "10": 1
+        },
+        "defaultWindowReadCalls": null,
+        "readLimitProvenance": "unknown: saved arguments include host-injected defaults"
+      }
     }
   ]
 }

@@ -63,4 +63,6 @@ do not overwrite the original plan or mix new runs into its results.
 
 ## Metering-gateway outage
 
+The [critic scheduling record](critic-scheduling.json) also distinguishes solver slots from optional model critiques. Earlier sequential windowed critiques could issue a fourth model request alongside three solvers. Remaining critiques now use the same shared queue; the change interrupted no paid request and preserves all completed syntheses. The three-solver limit itself did not change. Timing remains observational on a shared host and provider.
+
 The current plan explicitly replaces allocations affected by the verified gateway heap failure, regardless of their patch scores. [The outage audit](../gateway-memory/outage.json) records every original attempt and its admitted-request count; `plan-before-gateway-oom.json` preserves the previous identities. Source commits, tasks, effort, deadlines and concurrency are unchanged. Replacements use new `-oom1` labels. Original partial work, failed allocations and charges stay in the campaign-wide report; complete-pair summaries use the amended plan. These are infrastructure replacements, not selection of a better model attempt.
