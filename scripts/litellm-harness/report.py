@@ -11,7 +11,7 @@ destination = Path(sys.argv[1])
 destination.mkdir(parents=True, exist_ok=True)
 analysis = json.loads((root / 'analysis.json').read_text())
 fields = ['run', 'id', 'kind', 'label', 'promptRevision', 'snapshotRevision', 'taskPrompt',
-          'harnessVersion', 'harnessSha256', 'harnessCommit', 'completed', 'status', 'exit',
+          'harnessVersion', 'harnessSha256', 'harnessCommit', 'completed', 'completionReason', 'status', 'exit',
           'contextWindow', 'evaluationProtocol', 'isolation', 'effort', 'timeoutSeconds', 'compactions',
           'seconds', 'timedOut', 'requests', 'reportedRequests', 'inputTokens', 'cachedTokens',
           'outputTokens', 'computedUsd', 'acceptance', 'firstEditRound', 'exactRepeatedCalls',
@@ -127,7 +127,7 @@ lines += ['', '## Development record', '',
           '| Run | Prompt / snapshot revision | Reference checks | Seconds | Completed | Integrity issue |',
           '|---|---|---:|---:|---|---|']
 for run in runs:
-    if run not in primary and run not in followup and run not in final_runs:
+    if run['evaluationProtocol'] in (None, 1, 2, 3) and run not in primary and run not in followup and run not in final_runs:
         lines.append(f"| {run['run']} | {run['promptRevision']} / {run['snapshotRevision']} | {verdict(run)} | {run['seconds']:.1f} | {run['completed']} | {'Out-of-snapshot access' if run['integrityIssue'] else '—'} |")
 lines += ['', '## Where the work went', '',
           'Tool and latency counters include all recorded trials, including flagged ones; they describe execution, not uncontaminated quality. DeepSeek repeatedly spent many rounds locating and reconsidering code before its first edit. The navigator is available but is not forced: shell searches remained common. Router tasks still missed alternate async/batch entrypoints and sometimes exhausted the time allowance. The improvements reduce particular navigation and verification failures; they do not establish that prompts repair the underlying reasoning gap.', '',
@@ -138,13 +138,14 @@ for name, group in groups[1:]:
     lines.append(f"| {name} | {statistics.median(r['requests'] for r in group):.0f} | {statistics.median(first_edits) if first_edits else 'Unavailable'} | {sum((r['toolCounts'] or {}).get('bash', 0) for r in group)} | {sum((r['toolCounts'] or {}).get('litellm_context', 0) for r in group)} | {sum(r['exactRepeatedCalls'] or 0 for r in group)} |")
 lines += ['', '## Trace counters', '',
           'The JSON retains every recorded tool count and output-character total. `readCharacters` counts read_file, grep, glob and litellm_context output only; `bashOutputCharacters` covers command output, and `toolOutputCharacters` covers all tools. Exact repeated-call counts detect identical tool names and arguments, not semantically equivalent commands. Missing token usage remains unavailable, not zero.', '',
-          '## Spending', '',
+          '## Campaign spending at export time', '',
+          'This ledger snapshot includes later work in the ongoing campaign. It is not a phase-1 subtotal; route-specific token subtotals appear above.', '',
           f"The local gateway admitted **{money['admittedRequests']} requests**. Usage/header-priced charges total **${money['pricedUsd']:.4f}**. The ledger commits **${money['committedUsd']:.4f}**, including full conservative reservations for **{money['unpricedRequests']} unpriced requests**, against a **${money['ceilingUsd']:.2f} ceiling**. Committed dollars are an upper accounting bound, not actual spend. Account-level billing was unavailable.", '',
           f"Known token charges split into **${money['knownTokenCosts']['uncachedInputUsd']:.4f} uncached input**, **${money['knownTokenCosts']['cachedInputUsd']:.4f} cached input**, and **${money['knownTokenCosts']['outputUsd']:.4f} output**. {100 * known_cached / known_input if known_input else 0:.1f}% of reported input tokens were cached. These components exclude unknown usage.", '',
           'DeepSeek run subtotals use known token usage and the verified gateway rates. Missing usage is not free. The campaign total also covers exploratory reviewer calls. Codex/Astra dollar charges are unavailable and separate from the DeepSeek ceiling; they are not zero.', '',
           '## Scope and limitations', '',
           'This is retrospective repository-specific replay, not a blind or chronological future-PR study. Requirements were curated from public changes; the curator inspected references to qualify tasks. Two tasks failed qualification and were excluded. Historical snapshots share a Python dependency environment rather than reproducing every historical CI setup. Solvers receive fresh source snapshots without the original Git history or reference patches. Separate scoring kept reference patches out of task workspaces, but offline instructions did not prevent live-checkout access. The shell was not isolated, and the integrity failures above invalidate an uncontaminated comparison claim.', '',
-          'The shipping workbench uses protocol 4: a macOS Seatbelt filesystem boundary blocks the live source and other campaign/reference files while permitting the current run and trusted runtime/dependencies. Networking remains available for model APIs; this is not complete adversarial isolation. Real training smoke runs verify the launcher separately. The v9/v11/v13 comparison series used protocol 3 and does not inherit this correction.', '',
+          'Protocol 4 first introduced a macOS Seatbelt filesystem boundary that blocks the live source and other campaign/reference files while permitting the current run and trusted runtime/dependencies. Networking remains available for model APIs; this is not complete adversarial isolation. Real training smoke runs verify the launcher separately. The current workbench protocol is documented in the replay instructions. The v9/v11/v13 comparison series used protocol 3 and does not inherit later corrections.', '',
           'Source hashes and task revisions are recorded. Production sessions do not automatically mutate the harness. The shipped guides were distilled from training/development cases, and the v11 follow-up was frozen before comparison outcomes were inspected. Neither a green model-written test nor a green focused reference selection proves the absence of other bugs.',
 ]
 (destination / 'litellm-harness-phase1-results.md').write_text('\n'.join(lines) + '\n')

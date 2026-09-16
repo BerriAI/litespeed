@@ -152,9 +152,6 @@ These exploratory runs informed changes and task corrections. Earlier runs used 
 | inline-max-v9-empty-choices-23c319a4 | 3 / 2 | 6/13 | 600.1 | False | — |
 | inline-v9-converse-config-4945178e | 3 / 2 | 2/2 | 163.6 | True | — |
 | inline-v9-team-member-budget-c769d326 | 3 / 2 | 2/5 | 600.1 | False | — |
-| isolation-v4-baseline-converse-config-7a56e8de | 3 / 2 | 0/2 | 20.0 | True | — |
-| isolation-v4-baseline-retry-converse-config-d3af6a07 | 3 / 2 | 2/2 | 147.2 | True | — |
-| isolation-v4-converse-config-e9f617b9 | 3 / 2 | 2/2 | 216.7 | True | — |
 | navigator-v1-converse-config-5526ab77 | 1 / 1 | 2/2 | 89.9 | True | — |
 | navigator-v1-vertex-version-path-2458d6a0 | 1 / 1 | 4/6 | 382.1 | True | — |
 | playbook-v10-empty-choices-3d7677bc | 3 / 2 | 8/13 | 403.2 | True | — |
@@ -169,95 +166,12 @@ These exploratory runs informed changes and task corrections. Earlier runs used 
 | qualified-v7-router-candidates-a3ca0fdf | 3 / 2 | 0/1 | 327.6 | False | — |
 | qualified-v7-team-member-budget-1ab3cc38 | 3 / 2 | 2/5 | 600.1 | False | — |
 | replication-development-v11-team-member-budget-a053317b | 3 / 2 | 3/5 | 625.5 | True | — |
-| replication-phase2-astra-v5-smoke-converse-config-f1f2a7e4 | 3 / 2 | 2/2 | 121.1 | True | — |
-| replication-phase2-v13-r1-anthropic-image-guardrail-8a360f98 | 3 / 2 | 5/5 | 286.2 | True | — |
-| replication-phase2-v13-r1-anthropic-tool-document-d7a38288 | 3 / 2 | 2/2 | 556.5 | True | — |
-| replication-phase2-v13-r1-bedrock-thinking-6161cbc2 | 3 / 2 | 22/22 | 911.0 | False | — |
-| replication-phase2-v13-r1-converse-config-9eeb32f9 | 3 / 2 | 2/2 | 265.4 | True | — |
-| replication-phase2-v13-r1-dashscope-rerank-441e2ca9 | 3 / 2 | 5/10 | 900.2 | False | — |
-| replication-phase2-v13-r1-databricks-reasoning-194f0e98 | 3 / 2 | 6/6 | 535.7 | True | — |
-| replication-phase2-v13-r1-databricks-unity-9c1770c0 | 3 / 2 | 5/5 | 571.7 | True | — |
-| replication-phase2-v13-r1-empty-choices-9bac6d1f | 3 / 2 | 8/13 | 701.9 | True | — |
-| replication-phase2-v13-r1-mai-image-params-50bb070d | 3 / 2 | 27/38 | 908.1 | False | — |
-| replication-phase2-v13-r1-openai-schema-patterns-275312ba | 3 / 2 | 11/11 | 907.9 | False | — |
-| replication-phase2-v13-r1-router-candidates-bc4c92e7 | 3 / 2 | 1/1 | 553.8 | True | — |
-| replication-phase2-v13-r1-router-request-tags-4d761152 | 3 / 2 | 1/2 | 855.6 | False | — |
-| replication-phase2-v13-r1-router-retry-deployment-8f39f599 | 3 / 2 | 9/11 | 881.1 | False | — |
-| replication-phase2-v13-r1-router-strategy-isolation-5ebe7114 | 3 / 2 | 8/9 | 908.6 | False | — |
-| replication-phase2-v13-r1-team-member-budget-77d7cceb | 3 / 2 | 2/5 | 903.7 | False | — |
-| replication-phase2-v13-r1-team-router-names-c0515f3e | 3 / 2 | 1/23 | 553.8 | False | — |
-| replication-phase2-v13-r1-vertex-version-path-f38290c6 | 3 / 2 | 4/6 | 185.4 | True | — |
-| replication-phase2-v14-medium-anthropic-image-guardrail-8aa0378f | 3 / 2 | 5/5 | 347.8 | True | — |
-| replication-phase2-v14-medium-anthropic-tool-document-36483eb9 | 3 / 2 | 2/2 | 437.0 | True | — |
-| replication-phase2-v14-medium-converse-config-9cb98681 | 3 / 2 | 2/2 | 326.4 | True | — |
-| replication-phase2-v14-medium-dashscope-rerank-eb4508db | 3 / 2 | 9/10 | 779.6 | True | — |
-| replication-phase2-v14-medium-databricks-reasoning-e1038264 | 3 / 2 | 6/6 | 668.8 | True | — |
-| replication-phase2-v14-medium-empty-choices-6e642c5e | 3 / 2 | 8/13 | 900.2 | False | — |
-| replication-phase2-v14-medium-router-candidates-a0307e54 | 3 / 2 | 1/1 | 515.5 | True | — |
-| replication-phase2-v14-medium-router-strategy-isolation-4c274617 | 3 / 2 | 5/9 | 884.2 | False | — |
-| replication-phase2-v14-medium-team-member-budget-b88e1e45 | 3 / 2 | 3/5 | 910.8 | False | — |
-| replication-phase2-v14-medium-vertex-version-path-d9077929 | 3 / 2 | 4/6 | 629.8 | True | — |
-| replication-phase2-v14-r1-anthropic-image-guardrail-0f30e583 | 3 / 2 | 5/5 | 507.9 | True | — |
-| replication-phase2-v14-r1-anthropic-tool-document-d5495773 | 3 / 2 | 2/2 | 195.8 | True | — |
-| replication-phase2-v14-r1-bedrock-thinking-82a856d3 | 3 / 2 | 22/22 | 802.4 | False | — |
-| replication-phase2-v14-r1-converse-config-3a61a6c7 | 3 / 2 | 2/2 | 337.7 | True | — |
-| replication-phase2-v14-r1-dashscope-rerank-7c578754 | 3 / 2 | 9/10 | 928.6 | False | — |
-| replication-phase2-v14-r1-databricks-reasoning-02c2036f | 3 / 2 | 6/6 | 825.7 | True | — |
-| replication-phase2-v14-r1-databricks-unity-5e59625e | 3 / 2 | 5/5 | 597.7 | True | — |
-| replication-phase2-v14-r1-empty-choices-ff74a934 | 3 / 2 | 8/13 | 907.8 | False | — |
-| replication-phase2-v14-r1-mai-image-params-be4df5df | 3 / 2 | 28/38 | 698.5 | True | — |
-| replication-phase2-v14-r1-openai-schema-patterns-237ec648 | 3 / 2 | 11/11 | 908.6 | False | — |
-| replication-phase2-v14-r1-router-candidates-7a9407ee | 3 / 2 | 1/1 | 552.5 | False | — |
-| replication-phase2-v14-r1-router-request-tags-551f3288 | 3 / 2 | 1/2 | 900.2 | False | — |
-| replication-phase2-v14-r1-router-retry-deployment-a8af18ee | 3 / 2 | 9/11 | 900.3 | False | — |
-| replication-phase2-v14-r1-router-strategy-isolation-3448003b | 3 / 2 | 0/9 | 283.9 | False | — |
-| replication-phase2-v14-r1-team-member-budget-4687d818 | 3 / 2 | 4/5 | 900.2 | False | — |
-| replication-phase2-v14-r1-team-router-names-7009bdf7 | 3 / 2 | 9/23 | 900.3 | False | — |
-| replication-phase2-v14-r1-vertex-version-path-d237e7c1 | 3 / 2 | 4/6 | 374.7 | True | — |
-| replication-phase2-v15-smoke-converse-config-17e6d98e | 3 / 2 | 2/2 | 166.7 | True | — |
-| replication-phase2-v15-smoke-router-strategy-isolation-44e1bdb1 | 3 / 2 | 5/9 | 906.0 | False | — |
-| replication-phase2-v15-smoke-team-member-budget-974f8dc6 | 3 / 2 | 4/5 | 908.9 | False | — |
-| replication-phase2-v15-smoke-vertex-version-path-a75147e7 | 3 / 2 | 6/6 | 273.3 | True | — |
-| replication-protocol5-v14-medium-r1-anthropic-image-guardrail-ee33e90f | 3 / 2 | 5/5 | 173.6 | True | — |
-| replication-protocol5-v14-medium-r1-anthropic-tool-document-24154ce6 | 3 / 2 | 2/2 | 123.0 | True | — |
-| replication-protocol5-v14-medium-r1-converse-config-1086fab3 | 3 / 2 | 2/2 | 279.5 | True | — |
-| replication-protocol5-v14-medium-r1-dashscope-rerank-33d0a6d6 | 3 / 2 | 10/10 | 605.9 | True | — |
-| replication-protocol5-v14-medium-r1-databricks-reasoning-c2847f39 | 3 / 2 | 6/6 | 542.8 | False | — |
-| replication-protocol5-v14-medium-r1-empty-choices-89e17382 | 3 / 2 | 2/13 | 289.5 | False | — |
-| replication-protocol5-v14-medium-r1-router-candidates-bbb35c29 | 3 / 2 | 1/1 | 432.1 | True | — |
-| replication-protocol5-v14-medium-r1-vertex-version-path-1fd10cfc | 3 / 2 | 4/6 | 448.8 | True | — |
-| replication-protocol5-v15-low-r1-anthropic-image-guardrail-9f2ff45a | 3 / 2 | 5/5 | 312.3 | True | — |
-| replication-protocol5-v15-low-r1-anthropic-tool-document-e033374e | 3 / 2 | 2/2 | 208.3 | True | — |
-| replication-protocol5-v15-low-r1-converse-config-a8e8f9cd | 3 / 2 | 2/2 | 169.1 | True | — |
-| replication-protocol5-v15-low-r1-dashscope-rerank-140e428c | 3 / 2 | 9/10 | 481.0 | True | — |
-| replication-protocol5-v15-low-r1-databricks-reasoning-e7c256f9 | 3 / 2 | 2/6 | 209.0 | False | — |
-| replication-protocol5-v15-low-r1-empty-choices-7dec8f0e | 3 / 2 | 2/13 | 256.1 | False | — |
-| replication-protocol5-v15-low-r1-router-candidates-46d58a67 | 3 / 2 | 1/1 | 268.9 | True | — |
-| replication-protocol5-v15-low-r1-vertex-version-path-d4f54f1c | 3 / 2 | 6/6 | 525.5 | True | — |
-| replication-protocol5-v15-medium-r1-anthropic-image-guardrail-20ea2a3e | 3 / 2 | 5/5 | 145.7 | True | — |
-| replication-protocol5-v15-medium-r1-anthropic-tool-document-a0afe015 | 3 / 2 | 2/2 | 302.9 | True | — |
-| replication-protocol5-v15-medium-r1-converse-config-14979fec | 3 / 2 | 2/2 | 109.9 | True | — |
-| replication-protocol5-v15-medium-r1-dashscope-rerank-4e371480 | 3 / 2 | 10/10 | 591.6 | True | — |
-| replication-protocol5-v15-medium-r1-databricks-reasoning-e003da1b | 3 / 2 | 6/6 | 412.9 | False | — |
-| replication-protocol5-v15-medium-r1-empty-choices-9a50d833 | 3 / 2 | 2/13 | 319.7 | False | — |
-| replication-protocol5-v15-medium-r1-router-candidates-03f1404e | 3 / 2 | 1/1 | 340.8 | True | — |
-| replication-protocol5-v15-medium-r1-vertex-version-path-8bbeef3d | 3 / 2 | 6/6 | 617.3 | True | — |
-| replication-protocol5-v16-medium-r1-dashscope-rerank-a4453620 | 3 / 2 | 10/10 | 840.9 | True | — |
-| replication-protocol5-v16-medium-r1-empty-choices-a4e3b9d4 | 3 / 2 | 8/13 | 513.7 | True | — |
-| replication-protocol5-v16-medium-r1-router-strategy-isolation-da3a5010 | 3 / 2 | 5/9 | 455.0 | False | — |
-| replication-protocol5-v16-medium-r1-team-member-budget-9bc44ff1 | 3 / 2 | 2/5 | 455.6 | False | — |
-| replication-stable-v16-medium-r1-router-strategy-isolation-8ada7df9 | 3 / 2 | 5/9 | 605.1 | True | — |
-| replication-stable-v16-medium-r1-team-member-budget-9aaef27f | 3 / 2 | 3/5 | 590.8 | True | — |
-| replication-stable-v17-medium-r1-router-strategy-isolation-a754566b | 3 / 2 | 5/9 | 510.4 | True | — |
-| replication-stable-v17-medium-r1-team-member-budget-2199690f | 3 / 2 | 5/5 | 446.4 | True | — |
-| replication-stable-v17-none-r1-router-strategy-isolation-3ad4234b | 3 / 2 | 4/9 | 640.2 | True | — |
-| replication-stable-v17-none-r1-team-member-budget-066f93ff | 3 / 2 | 4/5 | 421.4 | True | — |
 | review-v3-anthropic-tool-document-76ef2bf6 | 1 / 1 | 2/2 | 131.9 | True | — |
-| review-v3-dashscope-rerank-cf0c8898 | 1 / 1 | 4/10 | 601.3 | True | — |
+| review-v3-dashscope-rerank-cf0c8898 | 1 / 1 | 4/10 | 601.3 | False | — |
 | review-v3-databricks-reasoning-76004611 | 1 / 1 | 3/6 | 210.0 | True | — |
 | review-v3-empty-choices-6e78831d | 1 / 1 | 2/13 | 546.0 | True | — |
 | review-v3-router-candidates-a5abf172 | 1 / 1 | 1/1 | 548.5 | True | — |
-| review-v3-team-member-budget-9be2f1a2 | 1 / 1 | 2/5 | 604.3 | True | — |
+| review-v3-team-member-budget-9be2f1a2 | 1 / 1 | 2/5 | 604.3 | False | — |
 | review-v3-vertex-version-path-3b455509 | 1 / 1 | 6/6 | 402.9 | True | — |
 | symbols-v6-empty-choices-5d62a72e | 2 / 1 | 2/13 | 490.3 | True | — |
 | symbols-v6-full-dashscope-rerank-818e9b29 | 2 / 1 | 4/10 | 570.7 | True | — |
@@ -279,11 +193,13 @@ Tool and latency counters include all recorded trials, including flagged ones; t
 
 The JSON retains every recorded tool count and output-character total. `readCharacters` counts read_file, grep, glob and litellm_context output only; `bashOutputCharacters` covers command output, and `toolOutputCharacters` covers all tools. Exact repeated-call counts detect identical tool names and arguments, not semantically equivalent commands. Missing token usage remains unavailable, not zero.
 
-## Spending
+## Campaign spending at export time
 
-The local gateway admitted **10028 requests**. Usage/header-priced charges total **$16.5620**. The ledger commits **$46.3350**, including full conservative reservations for **118 unpriced requests**, against a **$100.00 ceiling**. Committed dollars are an upper accounting bound, not actual spend. Account-level billing was unavailable.
+This ledger snapshot includes later work in the ongoing campaign. It is not a phase-1 subtotal; route-specific token subtotals appear above.
 
-Known token charges split into **$9.0484 uncached input**, **$3.9099 cached input**, and **$3.6037 output**. 93.1% of reported input tokens were cached. These components exclude unknown usage.
+The local gateway admitted **10915 requests**. Usage/header-priced charges total **$17.9986**. The ledger commits **$47.2670**, including full conservative reservations for **116 unpriced requests**, against a **$100.00 ceiling**. Committed dollars are an upper accounting bound, not actual spend. Account-level billing was unavailable.
+
+Known token charges split into **$9.8296 uncached input**, **$4.1903 cached input**, and **$3.9787 output**. 93.1% of reported input tokens were cached. These components exclude unknown usage.
 
 DeepSeek run subtotals use known token usage and the verified gateway rates. Missing usage is not free. The campaign total also covers exploratory reviewer calls. Codex/Astra dollar charges are unavailable and separate from the DeepSeek ceiling; they are not zero.
 
@@ -291,6 +207,6 @@ DeepSeek run subtotals use known token usage and the verified gateway rates. Mis
 
 This is retrospective repository-specific replay, not a blind or chronological future-PR study. Requirements were curated from public changes; the curator inspected references to qualify tasks. Two tasks failed qualification and were excluded. Historical snapshots share a Python dependency environment rather than reproducing every historical CI setup. Solvers receive fresh source snapshots without the original Git history or reference patches. Separate scoring kept reference patches out of task workspaces, but offline instructions did not prevent live-checkout access. The shell was not isolated, and the integrity failures above invalidate an uncontaminated comparison claim.
 
-The shipping workbench uses protocol 4: a macOS Seatbelt filesystem boundary blocks the live source and other campaign/reference files while permitting the current run and trusted runtime/dependencies. Networking remains available for model APIs; this is not complete adversarial isolation. Real training smoke runs verify the launcher separately. The v9/v11/v13 comparison series used protocol 3 and does not inherit this correction.
+Protocol 4 first introduced a macOS Seatbelt filesystem boundary that blocks the live source and other campaign/reference files while permitting the current run and trusted runtime/dependencies. Networking remains available for model APIs; this is not complete adversarial isolation. Real training smoke runs verify the launcher separately. The current workbench protocol is documented in the replay instructions. The v9/v11/v13 comparison series used protocol 3 and does not inherit later corrections.
 
 Source hashes and task revisions are recorded. Production sessions do not automatically mutate the harness. The shipped guides were distilled from training/development cases, and the v11 follow-up was frozen before comparison outcomes were inspected. Neither a green model-written test nor a green focused reference selection proves the absence of other bugs.

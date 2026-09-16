@@ -1,6 +1,6 @@
 # LiteLLM harness campaign results
 
-Interim snapshot: 2026-09-16T00:13:30.401017+00:00. Current harness: **2026-09-15.17**.
+Interim snapshot: 2026-09-16T00:50:05.670949+00:00. Current harness: **2026-09-15.17**.
 
 **The campaign is still running. It has not established a quality win over Astra/Codex or production replacement readiness.**
 
@@ -8,7 +8,7 @@ The selectable architecture and replay workbench are implemented. The current wo
 
 ## Spending
 
-Confirmed token/header-priced charges: **$16.6865**. Missing receipts retain **$29.2684** across 116 requests; active requests reserve another **$0.2523**. The committed upper bound is **$46.2072** against the authorized **$100.00** ceiling. Reservations are not actual charges. Astra account billing is unavailable.
+Confirmed token/header-priced charges: **$17.9986**. Missing receipts retain **$29.2684** across 116 requests; active requests reserve another **$0.0000**. The committed upper bound is **$47.2670** against the authorized **$100.00** ceiling. Reservations are not actual charges. Astra account billing is unavailable.
 
 ## Controlled development observations
 
@@ -17,14 +17,17 @@ The following are training/development trials under protocol 5, after enforcing 
 | Task | Harness | Reasoning | Checks | Finished | Seconds |
 |---|---|---|---:|---|---:|
 | langfuse-session-traces | 2026-09-15.17 | medium | 60/60 | Yes | 280.6 |
+| mcp-auth-challenge | 2026-09-15.17 | medium | 52/52 | No | 419.0 |
 | mcp-optional-discovery | 2026-09-15.17 | medium | 29/29 | Yes | 325.3 |
 | mock-input-tokens | 2026-09-15.17 | medium | 6/6 | Yes | 223.4 |
+| responses-custom-guardrail | 2026-09-15.17 | medium | 15/15 | Yes | 679.4 |
 | router-strategy-isolation | 2026-09-15.16 | medium | 5/9 | Yes | 605.1 |
 | router-strategy-isolation | 2026-09-15.17 | medium | 5/9 | Yes | 510.4 |
 | router-strategy-isolation | 2026-09-15.17 | none | 4/9 | Yes | 640.2 |
 | team-member-budget | 2026-09-15.16 | medium | 3/5 | Yes | 590.8 |
 | team-member-budget | 2026-09-15.17 | medium | 5/5 | Yes | 446.4 |
 | team-member-budget | 2026-09-15.17 | none | 4/5 | Yes | 421.4 |
+| vertex-version-path | 2026-09-15.17 | none | 6/6 | Yes | 174.6 |
 
 ## What the traces changed
 
@@ -33,6 +36,8 @@ The following are training/development trials under protocol 5, after enforcing 
 - Three broad Medium-reasoning code audits exhausted 24,000 output tokens each without returning a review. A focused router audit with relevant function excerpts returned actionable findings in 4,026 completion tokens. Its focus came from prior training failures; this does not validate a general-purpose blind reviewer. A second-attempt repair is measured separately.
 - Disabling reasoning did not earn a default on the first two hard development cases: it missed more router checks and one budget check. Other effort results remain separate.
 - Per-batch concurrency limits collectively overloaded the host. All datasets now share three solver slots and one grader. Interrupted runs and unknown charges are preserved.
+
+- An MCP-auth patch passed its reference checks, but repeated 600 ms job polling triggered the host loop guard. Earlier reporting treated every idle session as completed. The analyzer now separates explicit host guard stops from normal completion, even when the patch passes.
 
 ## Evaluation status
 
