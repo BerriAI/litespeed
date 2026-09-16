@@ -1,0 +1,7 @@
+# Background-notice placement: transport diagnosis
+
+The [plan](plan.json) isolates a mechanism observed in the [job-event trials](../job-events/README.md): replacing a system message early in the conversation can invalidate the cached source and tool history that follows it. Six paired synthetic scenarios compare an updated early envelope with notices appended at the end. Each contains 12 short replies over 160,000 or 480,000 characters of already inspected training source. Unique leading nonces separate cache warming; arm order is randomized within each round.
+
+The Flash solver task is simply to reply OK, so this experiment measures transport cost rather than patch quality. The chronological arm retains previous notices and consequently grows slightly more. The separate [affinity pilot](../cache-affinity/README.md) already found no useful gain from a stable user hint; neither arm here adds that hint.
+
+Run `prefix_study.py CAMPAIGN_DIRECTORY STUDY_DIRECTORY` using the frozen plan. The runner shares the three campaign slots and authoritative gateway budget. It refuses existing request markers rather than silently retrying; missing receipts retain their reservation. It stops admitting new work at a $90 committed campaign balance to preserve evaluation funds. Export complete paired measurements with `cache_study.py STUDY_DIRECTORY OUTPUT_JSON`. The source hashes and runner hash are recorded before launch.

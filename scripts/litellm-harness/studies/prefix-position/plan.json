@@ -1,0 +1,29 @@
+{
+  "createdAt": "2026-09-16T08:02:54.394676+00:00",
+  "model": "fireworks_ai/deepseek-v4p1-flash",
+  "seed": 42160926,
+  "targetSourceCharacters": [
+    160000,
+    480000
+  ],
+  "repetitions": 3,
+  "roundsPerArm": 12,
+  "arms": [
+    "early-envelope",
+    "chronological-event"
+  ],
+  "control": "early-envelope",
+  "candidate": "chronological-event",
+  "maxTokens": 64,
+  "reasoningEffort": "none",
+  "temperature": 0,
+  "sharedSlots": 3,
+  "stopAdmittingAtCommittedUsd": 90,
+  "sourceHashes": {
+    "litellm/router.py": "8290a1eb02597a0b746f9dd6119e9df07a203887b0f8d4ac4795a8f421a57ce1",
+    "litellm/utils.py": "3d1190c6f791c95293dc88e046cd7f1bcc6a403f25f0cf134a69939edb3124eb"
+  },
+  "runnerSha256": "72e3e0d93f02c5ecc4a7388c4b7af3b06f2f5dbe822f82655a2bc4053f5e8320",
+  "scope": "Synthetic transport experiment isolating the placement of background completion notices. Both arms start with the same message structure and bounded pre-merge training source. Each arm/repetition has a distinct leading nonce to prevent cross-arm prefix warming. After each reply, control replaces its early second system message; candidate appends the same notice chronologically. The candidate retains prior notices as real conversations do; byte lengths therefore differ. Within-round order is randomized. This does not test coding quality or reproduce every runtime message. No reserved dataset is read.",
+  "primary": "Post-initial cached/input fraction and token-priced input cost within six paired scenarios. Warmup reported separately, all failures retained; latency observational on a shared service. No production cache guarantee."
+}

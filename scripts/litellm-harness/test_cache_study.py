@@ -3,9 +3,23 @@ import tempfile
 import json
 from pathlib import Path
 from cache_study import aggregate, summarize
+from prefix_study import advance
 
 
 class CacheMeasurementTests(unittest.TestCase):
+    def test_chronological_notice_preserves_the_sent_prefix(self):
+        original = [{'role': 'system', 'content': 'instructions'},
+                    {'role': 'system', 'content': 'initial'},
+                    {'role': 'user', 'content': 'source'}]
+        history = original.copy()
+        advance(history, 'chronological-event', 0, 'OK')
+        self.assertEqual(history[:len(original)], original)
+        self.assertEqual(history[-2]['content'], 'Background command completion: job-1 exited with code 0.')
+        changed = original.copy()
+        advance(changed, 'early-envelope', 0, 'OK')
+        self.assertNotEqual(changed[1], original[1])
+        self.assertEqual(changed[2], original[2])
+
     def row(self, tokens, cached, seconds=1):
         return {'usage': {'prompt_tokens': tokens, 'prompt_tokens_details': {'cached_tokens': cached}},
                 'seconds': seconds, 'responseIsOK': True, 'finishReason': 'stop'}
@@ -30,6 +44,27 @@ class CacheMeasurementTests(unittest.TestCase):
         self.assertTrue(result['completeMeasurements'])
         self.assertFalse(result['allResponsesOK'])
         self.assertEqual(result['cacheRatio'],.5)
+
+    def test_declared_arm_direction_is_used_for_deltas(self):
+        with tempfile.TemporaryDirectory() as temporary:
+            root = Path(temporary)
+            plan = {'targetSourceCharacters': [100], 'repetitions': 1, 'roundsPerArm': 2,
+                    'arms': ['early-envelope', 'chronological-event'],
+                    'control': 'early-envelope', 'candidate': 'chronological-event'}
+            (root / 'plan.json').write_text(json.dumps(plan))
+            for arm, cached in [('early-envelope', 0), ('chronological-event', 90)]:
+                for step in range(2):
+                    row = {**self.row(100, cached), 'sourceCharacters': 100,
+                           'rep': 1, 'arm': arm, 'round': step}
+                    (root / f'100-r1-{arm}-step{step:02d}.result.json').write_text(json.dumps(row))
+            result = summarize(root)
+            self.assertEqual(result['status'], 'complete')
+            self.assertAlmostEqual(result['comparisons'][0]['cacheRatioDelta'], .9)
+            self.assertLess(result['comparisons'][0]['inputEstimatedUsdDelta'], 0)
+            plan['candidate'] = plan['control']
+            (root / 'plan.json').write_text(json.dumps(plan))
+            with self.assertRaises(ValueError):
+                summarize(root)
 
     def test_declared_replacement_excludes_original_attempt_receipts(self):
         with tempfile.TemporaryDirectory() as temporary:

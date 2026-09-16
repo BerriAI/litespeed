@@ -29,6 +29,10 @@ def aggregate(rows):
 def summarize(directory):
     directory = Path(directory)
     plan = json.loads((directory / 'plan.json').read_text())
+    control_name = plan.get('control', 'omitted-user')
+    candidate_name = plan.get('candidate', 'stable-user')
+    if control_name == candidate_name or set(plan['arms']) != {control_name, candidate_name}:
+        raise ValueError('Declare exactly one control and one different candidate arm.')
     trials, pairs = [], []
     for size in plan['targetSourceCharacters']:
         for rep in range(1, plan['repetitions'] + 1):
@@ -56,13 +60,13 @@ def summarize(directory):
                 trials.append(entry)
                 arms[arm] = entry
             if all(a['complete'] for a in arms.values()):
-                control, candidate = arms['omitted-user']['postInitial'], arms['stable-user']['postInitial']
+                control, candidate = arms[control_name]['postInitial'], arms[candidate_name]['postInitial']
                 pairs.append({'sourceCharacters': size, 'rep': rep,
                               'cacheRatioDelta': candidate['cacheRatio'] - control['cacheRatio'] if candidate['cacheRatio'] is not None and control['cacheRatio'] is not None else None,
                               'inputEstimatedUsdDelta': candidate['inputEstimatedUsd'] - control['inputEstimatedUsd'],
                               'meanSecondsDelta': candidate['meanSeconds'] - control['meanSeconds']})
     return {'status': 'complete' if all(r['complete'] for r in trials) else 'interim',
-            'scope': 'Synthetic transport pilot. Deltas are stable-user minus omitted-user within each source-size/repetition. Warm-up is separate. Only complete paired scenarios enter comparisons. No coding-quality or production cache guarantee; request latencies share a live service and are not independent samples.',
+            'scope': f'Synthetic transport pilot. Deltas are {candidate_name} minus {control_name} within each source-size/repetition. Warm-up is separate. Only complete paired scenarios enter comparisons. No coding-quality or production cache guarantee; request latencies share a live service and are not independent samples.',
             'trials': trials, 'comparisons': pairs}
 
 
