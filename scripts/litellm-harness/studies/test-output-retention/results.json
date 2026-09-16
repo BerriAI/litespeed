@@ -1,0 +1,108 @@
+{
+  "status": "interim",
+  "note": "Development selection only. Interim observed-task means can change as slower trials finish. Bootstrap resamples tasks, not attempts; it does not correct adaptive candidate selection or establish future generalization. Token prices exclude requests without usage and do not replace the campaign ledger.",
+  "variants": [
+    {
+      "variant": "control",
+      "evaluated": 0,
+      "expected": 4
+    },
+    {
+      "variant": "retain-output",
+      "evaluated": 0,
+      "expected": 4
+    }
+  ],
+  "comparisons": [
+    {
+      "variant": "retain-output",
+      "control": "control",
+      "pairedTasks": 0,
+      "expectedTasks": 2,
+      "complete": false,
+      "pairs": []
+    }
+  ],
+  "trials": [
+    {
+      "dataset": "",
+      "case": "router-strategy-isolation",
+      "name": "retain-output",
+      "label": "replication-v47-output-retain-output-r2",
+      "commit": "4b8173f85aeb0e31416545f403da3853b5ce560a",
+      "effort": "medium",
+      "kind": "litellm-specific",
+      "evaluated": false
+    },
+    {
+      "dataset": "training5",
+      "case": "legacy-stream-pipeline",
+      "name": "control",
+      "label": "replication-v47-output-control-r2",
+      "commit": "3d9836557fc5c796ee0bddce30009ad322cbcc33",
+      "effort": "medium",
+      "kind": "litellm-specific",
+      "evaluated": false
+    },
+    {
+      "dataset": "training5",
+      "case": "legacy-stream-pipeline",
+      "name": "control",
+      "label": "replication-v47-output-control-r1",
+      "commit": "3d9836557fc5c796ee0bddce30009ad322cbcc33",
+      "effort": "medium",
+      "kind": "litellm-specific",
+      "evaluated": false
+    },
+    {
+      "dataset": "training5",
+      "case": "legacy-stream-pipeline",
+      "name": "retain-output",
+      "label": "replication-v47-output-retain-output-r2",
+      "commit": "4b8173f85aeb0e31416545f403da3853b5ce560a",
+      "effort": "medium",
+      "kind": "litellm-specific",
+      "evaluated": false
+    },
+    {
+      "dataset": "",
+      "case": "router-strategy-isolation",
+      "name": "control",
+      "label": "replication-v47-output-control-r1",
+      "commit": "3d9836557fc5c796ee0bddce30009ad322cbcc33",
+      "effort": "medium",
+      "kind": "litellm-specific",
+      "evaluated": false
+    },
+    {
+      "dataset": "",
+      "case": "router-strategy-isolation",
+      "name": "control",
+      "label": "replication-v47-output-control-r2",
+      "commit": "3d9836557fc5c796ee0bddce30009ad322cbcc33",
+      "effort": "medium",
+      "kind": "litellm-specific",
+      "evaluated": false
+    },
+    {
+      "dataset": "training5",
+      "case": "legacy-stream-pipeline",
+      "name": "retain-output",
+      "label": "replication-v47-output-retain-output-r1",
+      "commit": "4b8173f85aeb0e31416545f403da3853b5ce560a",
+      "effort": "medium",
+      "kind": "litellm-specific",
+      "evaluated": false
+    },
+    {
+      "dataset": "",
+      "case": "router-strategy-isolation",
+      "name": "retain-output",
+      "label": "replication-v47-output-retain-output-r1",
+      "commit": "4b8173f85aeb0e31416545f403da3853b5ce560a",
+      "effort": "medium",
+      "kind": "litellm-specific",
+      "evaluated": false
+    }
+  ]
+}

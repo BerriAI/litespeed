@@ -1,0 +1,604 @@
+{
+  "probeSha256": "6738d78db3887a03544db4ebc3f0adf497388c780ed0f60a1a1350294879f643",
+  "base": "8b2983bd909ef408e59072fb77ff87cb0f9865e5",
+  "reference": "b7dad8b44e30e87e6ae174ea6f58054e17cfc8a5",
+  "rows": [
+    {
+      "snapshot": "base",
+      "rows": [
+        {
+          "name": "normal:empty",
+          "pass": false,
+          "errorType": "APIError",
+          "diagnosticNamesChoicesAndType": false
+        },
+        {
+          "name": "normal:missing",
+          "pass": true,
+          "errorType": "APIError",
+          "diagnosticNamesChoicesAndType": true
+        },
+        {
+          "name": "normal:NoneType",
+          "pass": false,
+          "errorType": "APIError",
+          "diagnosticNamesChoicesAndType": false
+        },
+        {
+          "name": "normal:dict",
+          "pass": false,
+          "errorType": "APIError",
+          "diagnosticNamesChoicesAndType": false
+        },
+        {
+          "name": "normal:str",
+          "pass": false,
+          "errorType": "APIError",
+          "diagnosticNamesChoicesAndType": false
+        },
+        {
+          "name": "normal:int",
+          "pass": false,
+          "errorType": "APIError",
+          "diagnosticNamesChoicesAndType": false
+        },
+        {
+          "name": "sync:empty",
+          "pass": false,
+          "errorType": "APIError",
+          "diagnosticNamesChoicesAndType": false
+        },
+        {
+          "name": "sync:missing",
+          "pass": true,
+          "errorType": "APIError",
+          "diagnosticNamesChoicesAndType": true
+        },
+        {
+          "name": "sync:NoneType",
+          "pass": false,
+          "errorType": "APIError",
+          "diagnosticNamesChoicesAndType": false
+        },
+        {
+          "name": "sync:dict",
+          "pass": false,
+          "errorType": "APIError",
+          "diagnosticNamesChoicesAndType": false
+        },
+        {
+          "name": "sync:str",
+          "pass": false,
+          "errorType": "APIError",
+          "diagnosticNamesChoicesAndType": false
+        },
+        {
+          "name": "sync:int",
+          "pass": false,
+          "errorType": "APIError",
+          "diagnosticNamesChoicesAndType": false
+        },
+        {
+          "name": "async:empty",
+          "pass": false,
+          "errorType": "APIError",
+          "diagnosticNamesChoicesAndType": false
+        },
+        {
+          "name": "async:missing",
+          "pass": true,
+          "errorType": "APIError",
+          "diagnosticNamesChoicesAndType": true
+        },
+        {
+          "name": "async:NoneType",
+          "pass": false,
+          "errorType": "APIError",
+          "diagnosticNamesChoicesAndType": false
+        },
+        {
+          "name": "async:dict",
+          "pass": false,
+          "errorType": "APIError",
+          "diagnosticNamesChoicesAndType": false
+        },
+        {
+          "name": "async:str",
+          "pass": false,
+          "errorType": "APIError",
+          "diagnosticNamesChoicesAndType": false
+        },
+        {
+          "name": "async:int",
+          "pass": false,
+          "errorType": "APIError",
+          "diagnosticNamesChoicesAndType": false
+        },
+        {
+          "name": "wrapper:sync:include_usage=False",
+          "pass": false,
+          "errorType": "MidStreamFallbackError"
+        },
+        {
+          "name": "wrapper:sync:include_usage=True",
+          "pass": false,
+          "errorType": "MidStreamFallbackError"
+        },
+        {
+          "name": "wrapper:async:include_usage=False",
+          "pass": false,
+          "errorType": "MidStreamFallbackError"
+        },
+        {
+          "name": "wrapper:async:include_usage=True",
+          "pass": false,
+          "errorType": "MidStreamFallbackError"
+        }
+      ],
+      "passed": false,
+      "imports": {
+        "packageOrigin": "litellm/__init__.py",
+        "allLiteLLMModulesWithinWorkspace": true,
+        "moduleCount": 810
+      },
+      "bytecodePolicy": "fresh cache path; reads from adjacent caches and all writes disabled",
+      "exit": 0
+    },
+    {
+      "snapshot": "reference",
+      "rows": [
+        {
+          "name": "normal:empty",
+          "pass": true,
+          "choices": [
+            0
+          ]
+        },
+        {
+          "name": "normal:missing",
+          "pass": true,
+          "errorType": "APIError",
+          "diagnosticNamesChoicesAndType": true
+        },
+        {
+          "name": "normal:NoneType",
+          "pass": true,
+          "errorType": "APIError",
+          "diagnosticNamesChoicesAndType": true
+        },
+        {
+          "name": "normal:dict",
+          "pass": true,
+          "errorType": "APIError",
+          "diagnosticNamesChoicesAndType": true
+        },
+        {
+          "name": "normal:str",
+          "pass": true,
+          "errorType": "APIError",
+          "diagnosticNamesChoicesAndType": true
+        },
+        {
+          "name": "normal:int",
+          "pass": true,
+          "errorType": "APIError",
+          "diagnosticNamesChoicesAndType": true
+        },
+        {
+          "name": "sync:empty",
+          "pass": true,
+          "choices": [
+            0
+          ]
+        },
+        {
+          "name": "sync:missing",
+          "pass": true,
+          "errorType": "APIError",
+          "diagnosticNamesChoicesAndType": true
+        },
+        {
+          "name": "sync:NoneType",
+          "pass": true,
+          "errorType": "APIError",
+          "diagnosticNamesChoicesAndType": true
+        },
+        {
+          "name": "sync:dict",
+          "pass": true,
+          "errorType": "APIError",
+          "diagnosticNamesChoicesAndType": true
+        },
+        {
+          "name": "sync:str",
+          "pass": true,
+          "errorType": "APIError",
+          "diagnosticNamesChoicesAndType": true
+        },
+        {
+          "name": "sync:int",
+          "pass": true,
+          "errorType": "APIError",
+          "diagnosticNamesChoicesAndType": true
+        },
+        {
+          "name": "async:empty",
+          "pass": true,
+          "choices": [
+            0
+          ]
+        },
+        {
+          "name": "async:missing",
+          "pass": true,
+          "errorType": "APIError",
+          "diagnosticNamesChoicesAndType": true
+        },
+        {
+          "name": "async:NoneType",
+          "pass": true,
+          "errorType": "APIError",
+          "diagnosticNamesChoicesAndType": true
+        },
+        {
+          "name": "async:dict",
+          "pass": true,
+          "errorType": "APIError",
+          "diagnosticNamesChoicesAndType": true
+        },
+        {
+          "name": "async:str",
+          "pass": true,
+          "errorType": "APIError",
+          "diagnosticNamesChoicesAndType": true
+        },
+        {
+          "name": "async:int",
+          "pass": true,
+          "errorType": "APIError",
+          "diagnosticNamesChoicesAndType": true
+        },
+        {
+          "name": "wrapper:sync:include_usage=False",
+          "pass": true,
+          "returned": [
+            {
+              "choiceCount": 1,
+              "finishReasons": [
+                "stop"
+              ],
+              "deltaContents": [
+                null
+              ],
+              "usagePromptTokens": null
+            }
+          ]
+        },
+        {
+          "name": "wrapper:sync:include_usage=True",
+          "pass": false,
+          "returned": [
+            {
+              "choiceCount": 0,
+              "finishReasons": [],
+              "deltaContents": [],
+              "usagePromptTokens": null
+            },
+            {
+              "choiceCount": 1,
+              "finishReasons": [
+                "stop"
+              ],
+              "deltaContents": [
+                null
+              ],
+              "usagePromptTokens": null
+            },
+            {
+              "choiceCount": 1,
+              "finishReasons": [
+                null
+              ],
+              "deltaContents": [
+                null
+              ],
+              "usagePromptTokens": 3
+            }
+          ]
+        },
+        {
+          "name": "wrapper:async:include_usage=False",
+          "pass": true,
+          "returned": [
+            {
+              "choiceCount": 1,
+              "finishReasons": [
+                "stop"
+              ],
+              "deltaContents": [
+                null
+              ],
+              "usagePromptTokens": null
+            }
+          ]
+        },
+        {
+          "name": "wrapper:async:include_usage=True",
+          "pass": false,
+          "returned": [
+            {
+              "choiceCount": 0,
+              "finishReasons": [],
+              "deltaContents": [],
+              "usagePromptTokens": null
+            },
+            {
+              "choiceCount": 1,
+              "finishReasons": [
+                "stop"
+              ],
+              "deltaContents": [
+                null
+              ],
+              "usagePromptTokens": null
+            },
+            {
+              "choiceCount": 1,
+              "finishReasons": [
+                null
+              ],
+              "deltaContents": [
+                null
+              ],
+              "usagePromptTokens": 3
+            }
+          ]
+        }
+      ],
+      "passed": false,
+      "imports": {
+        "packageOrigin": "litellm/__init__.py",
+        "allLiteLLMModulesWithinWorkspace": true,
+        "moduleCount": 811
+      },
+      "bytecodePolicy": "fresh cache path; reads from adjacent caches and all writes disabled",
+      "exit": 0
+    },
+    {
+      "snapshot": "candidate",
+      "rows": [
+        {
+          "name": "normal:empty",
+          "pass": true,
+          "choices": [
+            0
+          ]
+        },
+        {
+          "name": "normal:missing",
+          "pass": true,
+          "errorType": "APIError",
+          "diagnosticNamesChoicesAndType": true
+        },
+        {
+          "name": "normal:NoneType",
+          "pass": true,
+          "errorType": "APIError",
+          "diagnosticNamesChoicesAndType": true
+        },
+        {
+          "name": "normal:dict",
+          "pass": true,
+          "errorType": "APIError",
+          "diagnosticNamesChoicesAndType": true
+        },
+        {
+          "name": "normal:str",
+          "pass": true,
+          "errorType": "APIError",
+          "diagnosticNamesChoicesAndType": true
+        },
+        {
+          "name": "normal:int",
+          "pass": true,
+          "errorType": "APIError",
+          "diagnosticNamesChoicesAndType": true
+        },
+        {
+          "name": "sync:empty",
+          "pass": true,
+          "choices": [
+            0
+          ]
+        },
+        {
+          "name": "sync:missing",
+          "pass": true,
+          "errorType": "APIError",
+          "diagnosticNamesChoicesAndType": true
+        },
+        {
+          "name": "sync:NoneType",
+          "pass": true,
+          "errorType": "APIError",
+          "diagnosticNamesChoicesAndType": true
+        },
+        {
+          "name": "sync:dict",
+          "pass": true,
+          "errorType": "APIError",
+          "diagnosticNamesChoicesAndType": true
+        },
+        {
+          "name": "sync:str",
+          "pass": true,
+          "errorType": "APIError",
+          "diagnosticNamesChoicesAndType": true
+        },
+        {
+          "name": "sync:int",
+          "pass": true,
+          "errorType": "APIError",
+          "diagnosticNamesChoicesAndType": true
+        },
+        {
+          "name": "async:empty",
+          "pass": true,
+          "choices": [
+            0
+          ]
+        },
+        {
+          "name": "async:missing",
+          "pass": true,
+          "errorType": "APIError",
+          "diagnosticNamesChoicesAndType": true
+        },
+        {
+          "name": "async:NoneType",
+          "pass": true,
+          "errorType": "APIError",
+          "diagnosticNamesChoicesAndType": true
+        },
+        {
+          "name": "async:dict",
+          "pass": true,
+          "errorType": "APIError",
+          "diagnosticNamesChoicesAndType": true
+        },
+        {
+          "name": "async:str",
+          "pass": true,
+          "errorType": "APIError",
+          "diagnosticNamesChoicesAndType": true
+        },
+        {
+          "name": "async:int",
+          "pass": true,
+          "errorType": "APIError",
+          "diagnosticNamesChoicesAndType": true
+        },
+        {
+          "name": "wrapper:sync:include_usage=False",
+          "pass": true,
+          "returned": [
+            {
+              "choiceCount": 1,
+              "finishReasons": [
+                "stop"
+              ],
+              "deltaContents": [
+                null
+              ],
+              "usagePromptTokens": null
+            }
+          ]
+        },
+        {
+          "name": "wrapper:sync:include_usage=True",
+          "pass": true,
+          "returned": [
+            {
+              "choiceCount": 1,
+              "finishReasons": [
+                "stop"
+              ],
+              "deltaContents": [
+                null
+              ],
+              "usagePromptTokens": null
+            },
+            {
+              "choiceCount": 1,
+              "finishReasons": [
+                null
+              ],
+              "deltaContents": [
+                null
+              ],
+              "usagePromptTokens": 4
+            }
+          ]
+        },
+        {
+          "name": "wrapper:async:include_usage=False",
+          "pass": true,
+          "returned": [
+            {
+              "choiceCount": 1,
+              "finishReasons": [
+                "stop"
+              ],
+              "deltaContents": [
+                null
+              ],
+              "usagePromptTokens": null
+            }
+          ]
+        },
+        {
+          "name": "wrapper:async:include_usage=True",
+          "pass": true,
+          "returned": [
+            {
+              "choiceCount": 1,
+              "finishReasons": [
+                "stop"
+              ],
+              "deltaContents": [
+                null
+              ],
+              "usagePromptTokens": null
+            },
+            {
+              "choiceCount": 1,
+              "finishReasons": [
+                null
+              ],
+              "deltaContents": [
+                null
+              ],
+              "usagePromptTokens": 4
+            }
+          ]
+        }
+      ],
+      "passed": true,
+      "imports": {
+        "packageOrigin": "litellm/__init__.py",
+        "allLiteLLMModulesWithinWorkspace": true,
+        "moduleCount": 811
+      },
+      "bytecodePolicy": "fresh cache path; reads from adjacent caches and all writes disabled",
+      "exit": 0
+    }
+  ],
+  "createdAt": "2026-09-16T09:54:01.981543+00:00",
+  "scope": "Posthoc training diagnosis. The first 18 conversion checks qualify on base/reference; the four wrapper observations include two reference failures and are not a replacement qualified oracle. Original frozen scores and completion remain unchanged.",
+  "candidateRun": "replication-p6-ablation-control-r1-empty-choices-ce6b2b87",
+  "candidatePatchSha256": "46c37b12282b763589c4c01c25c68dea018c2625803055a6142a80d03aefdf1b",
+  "sourcePathsVerifiedAgainstRecordedCommits": [
+    "litellm/litellm_core_utils/llm_response_utils/convert_dict_to_response.py",
+    "litellm/litellm_core_utils/streaming_handler.py",
+    "litellm/llms/anthropic/experimental_pass_through/adapters/transformation.py"
+  ],
+  "qualifiedConversionCounts": {
+    "base": {
+      "checks": 18,
+      "passed": 3
+    },
+    "reference": {
+      "checks": 18,
+      "passed": 18
+    },
+    "candidate": {
+      "checks": 18,
+      "passed": 18
+    }
+  },
+  "originalCandidate": {
+    "tests": 13,
+    "passed": 8,
+    "normalCompletion": true
+  }
+}

@@ -22,6 +22,6 @@ A separate v46 checkout combines the same feature mechanisms with the independen
 
 This is integration preparation only. The paid 16-trial comparison keeps the earlier declared commits; no version is substituted mid-study.
 
-## First two observations
+## First four observations
 
-The combined arm completes MCP authentication normally in 456.05 seconds, passing 52/52 checks for $0.08410 token-priced. Its first legacy-streaming attempt times out at 901.29 seconds with 12/16 original and 11/24 real-adapter checks for $0.16253. These are two candidate observations without their matching controls; they establish neither a comparative gain nor future-task quality. [Interim results](results.json).
+The combined arm completes MCP authentication normally in 456.05 seconds, passing 52/52 checks for $0.08410 token-priced. Its first legacy-streaming attempt times out at 901.29 seconds with 12/16 original and 11/24 real-adapter checks for $0.16253. The control's first completed legacy attempt also times out, at 900.09 seconds with 7/16 original and 4/24 real checks; its Databricks attempt completes in 392.32 seconds with 6/6. Neither task yet has both declared repetitions in both arms. These observations establish neither a comparative gain nor future-task quality. [Interim results](results.json).

@@ -7,62 +7,62 @@
       "rep": 1,
       "arm": "early-envelope",
       "attempt": "original",
-      "completedRequests": 0,
+      "completedRequests": 12,
       "expectedRequests": 12,
       "warmup": {
-        "requests": 0,
-        "validMeasurements": 0,
-        "completeMeasurements": false,
-        "inputTokens": null,
-        "cachedTokens": null,
-        "cacheRatio": null,
-        "inputEstimatedUsd": null,
-        "meanSeconds": null,
-        "allResponsesOK": null
+        "requests": 1,
+        "validMeasurements": 1,
+        "completeMeasurements": true,
+        "inputTokens": 35723,
+        "cachedTokens": 0,
+        "cacheRatio": 0.0,
+        "inputEstimatedUsd": 0.007859060000000001,
+        "meanSeconds": 1.78915495891124,
+        "allResponsesOK": true
       },
       "postInitial": {
-        "requests": 0,
-        "validMeasurements": 0,
-        "completeMeasurements": false,
-        "inputTokens": null,
-        "cachedTokens": null,
-        "cacheRatio": null,
-        "inputEstimatedUsd": null,
-        "meanSeconds": null,
-        "allResponsesOK": null
+        "requests": 11,
+        "validMeasurements": 11,
+        "completeMeasurements": true,
+        "inputTokens": 393833,
+        "cachedTokens": 0,
+        "cacheRatio": 0.0,
+        "inputEstimatedUsd": 0.08664326,
+        "meanSeconds": 1.7828947120684793,
+        "allResponsesOK": true
       },
-      "complete": false
+      "complete": true
     },
     {
       "sourceCharacters": 160000,
       "rep": 1,
       "arm": "chronological-event",
       "attempt": "original",
-      "completedRequests": 0,
+      "completedRequests": 12,
       "expectedRequests": 12,
       "warmup": {
-        "requests": 0,
-        "validMeasurements": 0,
-        "completeMeasurements": false,
-        "inputTokens": null,
-        "cachedTokens": null,
-        "cacheRatio": null,
-        "inputEstimatedUsd": null,
-        "meanSeconds": null,
-        "allResponsesOK": null
+        "requests": 1,
+        "validMeasurements": 1,
+        "completeMeasurements": true,
+        "inputTokens": 35727,
+        "cachedTokens": 0,
+        "cacheRatio": 0.0,
+        "inputEstimatedUsd": 0.00785994,
+        "meanSeconds": 1.8288594998884946,
+        "allResponsesOK": true
       },
       "postInitial": {
-        "requests": 0,
-        "validMeasurements": 0,
-        "completeMeasurements": false,
-        "inputTokens": null,
-        "cachedTokens": null,
-        "cacheRatio": null,
-        "inputEstimatedUsd": null,
-        "meanSeconds": null,
-        "allResponsesOK": null
+        "requests": 11,
+        "validMeasurements": 11,
+        "completeMeasurements": true,
+        "inputTokens": 394713,
+        "cachedTokens": 357202,
+        "cacheRatio": 0.9049663933034888,
+        "inputEstimatedUsd": 0.010752834000000001,
+        "meanSeconds": 0.9865649922708557,
+        "allResponsesOK": true
       },
-      "complete": false
+      "complete": true
     },
     {
       "sourceCharacters": 160000,
@@ -131,62 +131,62 @@
       "rep": 3,
       "arm": "early-envelope",
       "attempt": "original",
-      "completedRequests": 0,
+      "completedRequests": 12,
       "expectedRequests": 12,
       "warmup": {
-        "requests": 0,
-        "validMeasurements": 0,
-        "completeMeasurements": false,
-        "inputTokens": null,
-        "cachedTokens": null,
-        "cacheRatio": null,
-        "inputEstimatedUsd": null,
-        "meanSeconds": null,
-        "allResponsesOK": null
+        "requests": 1,
+        "validMeasurements": 1,
+        "completeMeasurements": true,
+        "inputTokens": 35724,
+        "cachedTokens": 0,
+        "cacheRatio": 0.0,
+        "inputEstimatedUsd": 0.00785928,
+        "meanSeconds": 3.7709572919411585,
+        "allResponsesOK": true
       },
       "postInitial": {
-        "requests": 0,
-        "validMeasurements": 0,
-        "completeMeasurements": false,
-        "inputTokens": null,
-        "cachedTokens": null,
-        "cacheRatio": null,
-        "inputEstimatedUsd": null,
-        "meanSeconds": null,
-        "allResponsesOK": null
+        "requests": 11,
+        "validMeasurements": 11,
+        "completeMeasurements": true,
+        "inputTokens": 393844,
+        "cachedTokens": 0,
+        "cacheRatio": 0.0,
+        "inputEstimatedUsd": 0.08664568,
+        "meanSeconds": 1.519990538162264,
+        "allResponsesOK": true
       },
-      "complete": false
+      "complete": true
     },
     {
       "sourceCharacters": 160000,
       "rep": 3,
       "arm": "chronological-event",
       "attempt": "original",
-      "completedRequests": 0,
+      "completedRequests": 12,
       "expectedRequests": 12,
       "warmup": {
-        "requests": 0,
-        "validMeasurements": 0,
-        "completeMeasurements": false,
-        "inputTokens": null,
-        "cachedTokens": null,
-        "cacheRatio": null,
-        "inputEstimatedUsd": null,
-        "meanSeconds": null,
-        "allResponsesOK": null
+        "requests": 1,
+        "validMeasurements": 1,
+        "completeMeasurements": true,
+        "inputTokens": 35723,
+        "cachedTokens": 0,
+        "cacheRatio": 0.0,
+        "inputEstimatedUsd": 0.007859060000000001,
+        "meanSeconds": 2.4154537500580773,
+        "allResponsesOK": true
       },
       "postInitial": {
-        "requests": 0,
-        "validMeasurements": 0,
-        "completeMeasurements": false,
-        "inputTokens": null,
-        "cachedTokens": null,
-        "cacheRatio": null,
-        "inputEstimatedUsd": null,
-        "meanSeconds": null,
-        "allResponsesOK": null
+        "requests": 11,
+        "validMeasurements": 11,
+        "completeMeasurements": true,
+        "inputTokens": 394669,
+        "cachedTokens": 392964,
+        "cacheRatio": 0.9956799241896374,
+        "inputEstimatedUsd": 0.003125848,
+        "meanSeconds": 1.068836424192837,
+        "allResponsesOK": true
       },
-      "complete": false
+      "complete": true
     },
     {
       "sourceCharacters": 480000,
@@ -376,6 +376,20 @@
     }
   ],
   "comparisons": [
+    {
+      "sourceCharacters": 160000,
+      "rep": 1,
+      "cacheRatioDelta": 0.9049663933034888,
+      "inputEstimatedUsdDelta": -0.075890426,
+      "meanSecondsDelta": -0.7963297197976236
+    },
+    {
+      "sourceCharacters": 160000,
+      "rep": 3,
+      "cacheRatioDelta": 0.9956799241896374,
+      "inputEstimatedUsdDelta": -0.083519832,
+      "meanSecondsDelta": -0.45115411396942706
+    },
     {
       "sourceCharacters": 480000,
       "rep": 1,

@@ -1,7 +1,7 @@
 import { closeSync, existsSync, openSync, readFileSync, renameSync, unlinkSync, writeFileSync } from 'node:fs';
 import { randomUUID } from 'node:crypto';
 
-export interface Charge { id:string; label:string; reservedUsd:number; chargedUsd?:number; costKnown?:boolean; pricingSource?:'tokens'|'header'|'tokens-and-header'; responseCostUsd?:number; httpStatus?:number; status:'pending'|'settled'; usage?:unknown; seconds?:number; }
+export interface Charge { id:string; label:string; reservedUsd:number; chargedUsd?:number; costKnown?:boolean; pricingSource?:'tokens'|'header'|'tokens-and-header'|'runner-usage'; responseCostUsd?:number; httpStatus?:number; status:'pending'|'settled'; usage?:unknown; seconds?:number; }
 export class CampaignBudget {
   readonly records:Charge[];
   constructor(readonly file:string, readonly limitUsd:number) {

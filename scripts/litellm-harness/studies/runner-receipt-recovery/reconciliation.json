@@ -1,0 +1,1242 @@
+{
+  "at": "2026-09-16T09:47:34.430002+00:00",
+  "scope": "Offline reconciliation from persisted provider usage, not an upstream invoice. The original ledger is backed up and every original reservation remains in its record. No unmatched request is released.",
+  "matchedUnknownRequests": 58,
+  "knownValidationCount": 3359,
+  "knownMismatches": 0,
+  "restoredTokenPricedUsd": 0.076783878,
+  "releasedExcessReservationUsd": 14.557404922000002,
+  "beforeCommittedUsd": 74.47269697799946,
+  "afterCommittedUsd": 59.915292056000006,
+  "remainingUnknownRequests": 60,
+  "remainingUnknownReservedUsd": 15.138816000000002,
+  "limitUsd": 100,
+  "auditSha256": "25301a70f6d54b90e3647eef092dce7a6437667976ec5eba9f942131bf034523",
+  "matcherSourceSha256": "836cd17d6d7a65cc4848580940e2b0f4d6e85fc27f5f147e4e1ead2e9eda18d9",
+  "matchedRequests": [
+    {
+      "requestId": "0e64e891-49d4-49ca-a1b8-d3127fde82e2",
+      "receiptId": "8426b644-4d86-4961-8ab6-cd61d9c8a237",
+      "assistantMessageId": "4bcfd88d-60f1-48bf-8a75-449be5a66a5f",
+      "priorToolCallId": "call_56bd0707340942a4ac812c92",
+      "requestSha256": "5bb8d74ee96b1f73f22b2cf4bbcaa966778a8c4ab1045267096cbaeb83c4a061",
+      "startDeltaMs": 6.015869140625,
+      "durationDeltaMs": 4.0,
+      "usage": {
+        "prompt_tokens": 12641,
+        "completion_tokens": 147,
+        "prompt_tokens_details": {
+          "cached_tokens": 9014
+        }
+      },
+      "tokenPricedUsd": 0.000958058,
+      "reconciledUsd": 0.000958058,
+      "priorReservedUsd": 0.2523136,
+      "dataset": ".",
+      "run": "comparison-r1-bedrock-thinking-618baba0"
+    },
+    {
+      "requestId": "bb0ebb1d-452d-45f4-8df7-4f13b77f46cb",
+      "receiptId": "2b200b28-f8ab-43e8-95f9-2baa8053f835",
+      "assistantMessageId": "a6200d8c-161a-4a14-a4b3-152058505f37",
+      "priorToolCallId": "call_77c6b24edacb45558e3f5bfd",
+      "requestSha256": "5a58971bf099d1962457cfe54bc07b9b1ef6f41444bf4a51abbd42999d7aa031",
+      "startDeltaMs": 9.318603515625,
+      "durationDeltaMs": 63.0,
+      "usage": {
+        "prompt_tokens": 56408,
+        "completion_tokens": 1317,
+        "prompt_tokens_details": {
+          "cached_tokens": 55138
+        }
+      },
+      "tokenPricedUsd": 0.0015345860000000001,
+      "reconciledUsd": 0.0015345860000000001,
+      "priorReservedUsd": 0.2523136,
+      "dataset": ".",
+      "run": "comparison-r1-databricks-unity-207c95bc"
+    },
+    {
+      "requestId": "27249130-afd9-44fb-b7c2-4f5570c87633",
+      "receiptId": "d17278b2-ae9b-4487-a379-6878bbd0afc0",
+      "assistantMessageId": "136a83ad-2a8d-4af1-84eb-5cfc2062ea58",
+      "priorToolCallId": "call_e5e407277d3541e3984edb8f",
+      "requestSha256": "474b0f9c471de5c9a1c1b8d24789cfc42cf8343496e9653fd2eb0f459ce66181",
+      "startDeltaMs": 7.8896484375,
+      "durationDeltaMs": 13.0,
+      "usage": {
+        "prompt_tokens": 47036,
+        "completion_tokens": 321,
+        "prompt_tokens_details": {
+          "cached_tokens": 43114
+        }
+      },
+      "tokenPricedUsd": 0.001376498,
+      "reconciledUsd": 0.001376498,
+      "priorReservedUsd": 0.2523136,
+      "dataset": ".",
+      "run": "comparison-r1-openai-schema-patterns-6b681359"
+    },
+    {
+      "requestId": "4acd6c70-4ce5-4043-9191-2c02532c5db2",
+      "receiptId": "00e752cd-d231-4003-862f-8b2a33568a63",
+      "assistantMessageId": "bc482b43-3666-4c68-a023-455c42684845",
+      "priorToolCallId": "call_08beffce1e5f45e8972f3ac3",
+      "requestSha256": "551592d680e0ff087285bf744e83e612501f4120bb6c1f86de75bd9bafb53bb2",
+      "startDeltaMs": 9.58544921875,
+      "durationDeltaMs": 28.0,
+      "usage": {
+        "prompt_tokens": 100916,
+        "completion_tokens": 575,
+        "prompt_tokens_details": {
+          "cached_tokens": 100490
+        }
+      },
+      "tokenPricedUsd": 0.00117665,
+      "reconciledUsd": 0.00117665,
+      "priorReservedUsd": 0.2523136,
+      "dataset": ".",
+      "run": "comparison-r1-openai-schema-patterns-6b681359"
+    },
+    {
+      "requestId": "3fe7c9c3-dce6-49f4-a96f-6437cfd8c043",
+      "receiptId": "e369759c-2f48-4fe7-969c-d6f3f6fb042b",
+      "assistantMessageId": "4cbaaf81-e9a0-492c-9be6-dbf249876cf7",
+      "priorToolCallId": "call_e793e26c81ae4b868807f7b0",
+      "requestSha256": "18b104c2db10883636adce61bc87770411dde7d36126804499336700518e5e6b",
+      "startDeltaMs": 11.466796875,
+      "durationDeltaMs": 20.0,
+      "usage": {
+        "prompt_tokens": 101914,
+        "completion_tokens": 312,
+        "prompt_tokens_details": {
+          "cached_tokens": 101502
+        }
+      },
+      "tokenPricedUsd": 0.0010070740000000002,
+      "reconciledUsd": 0.0010070740000000002,
+      "priorReservedUsd": 0.2523136,
+      "dataset": ".",
+      "run": "comparison-r1-openai-schema-patterns-6b681359"
+    },
+    {
+      "requestId": "17b38c45-0eb7-46d7-9479-7dfb6905f827",
+      "receiptId": "2d2893f3-d6e6-43b3-85a8-4163670d0a4a",
+      "assistantMessageId": "b1079349-b9de-4c86-9b17-02c16007f443",
+      "priorToolCallId": "call_5c3e94cc2b5045bf86fc9ecf",
+      "requestSha256": "5e1e0e68580ef2d79f7a1bab4ccbcbe0e48bdacfd519a44207323ffda36d62e4",
+      "startDeltaMs": 12.50830078125,
+      "durationDeltaMs": 3.0,
+      "usage": {
+        "prompt_tokens": 48726,
+        "completion_tokens": 207,
+        "prompt_tokens_details": {
+          "cached_tokens": 46176
+        }
+      },
+      "tokenPricedUsd": 0.001020852,
+      "reconciledUsd": 0.001020852,
+      "priorReservedUsd": 0.2523136,
+      "dataset": ".",
+      "run": "comparison-r1-router-request-tags-39cc8797"
+    },
+    {
+      "requestId": "3f993aa1-0b4a-4375-a0cc-5449803b576f",
+      "receiptId": "721beaf8-e620-4f9b-9c6c-72d399e0a5f9",
+      "assistantMessageId": "91d2f5bf-dfa7-489b-8ade-34d1465354fa",
+      "priorToolCallId": "call_6b32cf705403407cb9121ffc",
+      "requestSha256": "d4773d737bf881ea665a0a43a5bfbf0ef8f365811583b3c2ba83d2a3fa03e501",
+      "startDeltaMs": 11.275634765625,
+      "durationDeltaMs": 10.0,
+      "usage": {
+        "prompt_tokens": 16880,
+        "completion_tokens": 168,
+        "prompt_tokens_details": {
+          "cached_tokens": 14968
+        }
+      },
+      "tokenPricedUsd": 0.000636296,
+      "reconciledUsd": 0.000636296,
+      "priorReservedUsd": 0.2523136,
+      "dataset": ".",
+      "run": "comparison-r1-router-retry-deployment-65c49131"
+    },
+    {
+      "requestId": "452cba6a-617c-4cc5-b22c-8b75735aa309",
+      "receiptId": "880193e8-a2d6-4104-a3cd-e17edd05c0a2",
+      "assistantMessageId": "68373313-811e-42e1-bf15-f1c6d432cbf2",
+      "priorToolCallId": "call_226cb9fc82b449f394384ab7",
+      "requestSha256": "c9e678a062943100794173811b4aaaeac58c1543e945e0714fd878efeba39262",
+      "startDeltaMs": 10.482177734375,
+      "durationDeltaMs": 41.0,
+      "usage": {
+        "prompt_tokens": 93748,
+        "completion_tokens": 802,
+        "prompt_tokens_details": {
+          "cached_tokens": 92982
+        }
+      },
+      "tokenPricedUsd": 0.001348714,
+      "reconciledUsd": 0.001348714,
+      "priorReservedUsd": 0.2523136,
+      "dataset": ".",
+      "run": "comparison-r1-router-retry-deployment-65c49131"
+    },
+    {
+      "requestId": "d70d0101-bccd-49a6-957d-71c494a9709e",
+      "receiptId": "c86cd5ec-72d6-46c8-a2da-c4d7a386ed5d",
+      "assistantMessageId": "af0f0f43-d2aa-4030-beae-b28c008bab0a",
+      "priorToolCallId": "call_efcb6fb9fd7b4937a5ca2d58",
+      "requestSha256": "76fcc0a7db737238e034ad6ece6750c15cbd3eaef397a0c21db28611a7936879",
+      "startDeltaMs": 12.939453125,
+      "durationDeltaMs": -2.0,
+      "usage": {
+        "prompt_tokens": 104701,
+        "completion_tokens": 241,
+        "prompt_tokens_details": {
+          "cached_tokens": 104048
+        }
+      },
+      "tokenPricedUsd": 0.001031056,
+      "reconciledUsd": 0.001031056,
+      "priorReservedUsd": 0.2523136,
+      "dataset": ".",
+      "run": "comparison-r1-router-retry-deployment-65c49131"
+    },
+    {
+      "requestId": "f22f9769-4655-455f-a3ee-5551ee8b18c1",
+      "receiptId": "6a5302cd-4fe4-41ef-9b83-b24a329e686e",
+      "assistantMessageId": "5c93aa25-ee3e-4375-8945-9f5187c34d70",
+      "priorToolCallId": "call_8fb779c4163e4b79920779ff",
+      "requestSha256": "1b4e755403d7d78d467c0f359dd98e3bb60a6bad86498afba82893c6de955e24",
+      "startDeltaMs": 21.524169921875,
+      "durationDeltaMs": 8.0,
+      "usage": {
+        "prompt_tokens": 117029,
+        "completion_tokens": 289,
+        "prompt_tokens_details": {
+          "cached_tokens": 114476
+        }
+      },
+      "tokenPricedUsd": 0.001553732,
+      "reconciledUsd": 0.001553732,
+      "priorReservedUsd": 0.2523136,
+      "dataset": ".",
+      "run": "comparison-r1-router-retry-deployment-65c49131"
+    },
+    {
+      "requestId": "e567d173-35a0-40c2-97f9-86fa9d6ba8c0",
+      "receiptId": "4e0ca234-f3b8-4c9e-8084-0de2b3bdf43e",
+      "assistantMessageId": "9b86a210-d874-42f3-9731-d4945e0f18ef",
+      "priorToolCallId": "call_9a09bc66398c4925a5a5d2cd",
+      "requestSha256": "ca26317aa4970a4c61abc94dd0699b41b8ff6ab5adb6e13a00cc88db48327bba",
+      "startDeltaMs": 26.0673828125,
+      "durationDeltaMs": -4.0,
+      "usage": {
+        "prompt_tokens": 169000,
+        "completion_tokens": 209,
+        "prompt_tokens_details": {
+          "cached_tokens": 162858
+        }
+      },
+      "tokenPricedUsd": 0.002629186,
+      "reconciledUsd": 0.002629186,
+      "priorReservedUsd": 0.2523136,
+      "dataset": ".",
+      "run": "comparison-r1-team-router-names-13651103"
+    },
+    {
+      "requestId": "62e4bb33-e9c8-4899-86c4-d42c6a14e3bc",
+      "receiptId": "15b2108a-6a17-463f-8656-cdf435ecaf95",
+      "assistantMessageId": "2a7989f0-a4a2-4c4b-970c-f5b6804b2dc2",
+      "priorToolCallId": "call_c6a62a5eab2044d0af3c7a63",
+      "requestSha256": "70965c7dce7de08dd2b0f745c70889e7c10976f187c519caad97452cd4fac419",
+      "startDeltaMs": 25.402587890625,
+      "durationDeltaMs": 1.0,
+      "usage": {
+        "prompt_tokens": 173820,
+        "completion_tokens": 276,
+        "prompt_tokens_details": {
+          "cached_tokens": 172800
+        }
+      },
+      "tokenPricedUsd": 0.0016161600000000004,
+      "reconciledUsd": 0.0016161600000000004,
+      "priorReservedUsd": 0.2523136,
+      "dataset": ".",
+      "run": "comparison-r1-team-router-names-13651103"
+    },
+    {
+      "requestId": "00c29ed3-804b-4531-801d-add58f087684",
+      "receiptId": "e55fda8e-6ef9-4502-9baf-7e613f5774be",
+      "assistantMessageId": "4dde2eb4-70da-462c-82e1-3ec52dbe0a77",
+      "priorToolCallId": "call_60f8a7e7e9794c0c80c7ec76",
+      "requestSha256": "400708ad2e01088943fe28559cfce68cac146abaea96a7a3f74213f779a2838c",
+      "startDeltaMs": 12.573486328125,
+      "durationDeltaMs": 2.0,
+      "usage": {
+        "prompt_tokens": 33216,
+        "completion_tokens": 56,
+        "prompt_tokens_details": {
+          "cached_tokens": 32676
+        }
+      },
+      "tokenPricedUsd": 0.00038449199999999995,
+      "reconciledUsd": 0.00038449199999999995,
+      "priorReservedUsd": 0.2523136,
+      "dataset": ".",
+      "run": "comparison-r2-bedrock-thinking-d2b2b120"
+    },
+    {
+      "requestId": "c5ce4d3b-6b3f-4851-bdb3-a15a075ade48",
+      "receiptId": "cc295a77-86a7-4356-9c50-4109ec6046ac",
+      "assistantMessageId": "60835a22-96f8-489b-aea2-0fc9a766a949",
+      "priorToolCallId": "call_e9c8968bdfad407ba30926bb",
+      "requestSha256": "b2d4ea52a8eecdf45aba3286825535b9af2fd8efdf48b46cb38232f3170d2cf0",
+      "startDeltaMs": 6.153076171875,
+      "durationDeltaMs": -1.0,
+      "usage": {
+        "prompt_tokens": 14786,
+        "completion_tokens": 145,
+        "prompt_tokens_details": {
+          "cached_tokens": 13534
+        }
+      },
+      "tokenPricedUsd": 0.000465878,
+      "reconciledUsd": 0.000465878,
+      "priorReservedUsd": 0.2523136,
+      "dataset": ".",
+      "run": "comparison-r2-mai-image-params-843265b0"
+    },
+    {
+      "requestId": "6bbd5ee9-beb7-4e56-a945-af06d769fb93",
+      "receiptId": "709e1a72-7aec-442a-bf2a-c7976481a04b",
+      "assistantMessageId": "32fc637b-2f70-44e2-a0b3-7419bb56e1c8",
+      "priorToolCallId": "call_e3c860b170a44afab14ee36c",
+      "requestSha256": "05911ba444f845c95e8e38d8541fb540fe67c08db9e7c1e01e0fbb69c0db9dd4",
+      "startDeltaMs": 29.066650390625,
+      "durationDeltaMs": 41.0,
+      "usage": {
+        "prompt_tokens": 28665,
+        "completion_tokens": 872,
+        "prompt_tokens_details": {
+          "cached_tokens": 27274
+        }
+      },
+      "tokenPricedUsd": 0.001072458,
+      "reconciledUsd": 0.001072458,
+      "priorReservedUsd": 0.2523136,
+      "dataset": ".",
+      "run": "comparison-r2-openai-schema-patterns-c591f18d"
+    },
+    {
+      "requestId": "51b77dcd-b6c1-498b-9c2b-58dca59ba2e0",
+      "receiptId": "df50a814-5636-44a5-b363-b2dfc84df41a",
+      "assistantMessageId": "517a3472-89ea-4640-8742-080062eaab93",
+      "priorToolCallId": "call_7e59c0038fce4f39b6300748",
+      "requestSha256": "7104195056ee671a217cf96588a7f889c9695ad4a3fc687bdef81ee05dc25c2e",
+      "startDeltaMs": 14.42724609375,
+      "durationDeltaMs": 155.0,
+      "usage": {
+        "prompt_tokens": 56550,
+        "completion_tokens": 2895,
+        "prompt_tokens_details": {
+          "cached_tokens": 55662
+        }
+      },
+      "tokenPricedUsd": 0.002495694,
+      "reconciledUsd": 0.002495694,
+      "priorReservedUsd": 0.2523136,
+      "dataset": ".",
+      "run": "comparison-r2-router-request-tags-58fbfa2a"
+    },
+    {
+      "requestId": "06d788b8-9f25-4a56-95a5-a86d49a1eb5c",
+      "receiptId": "8a66b622-60b2-4142-98d9-f423e055b427",
+      "assistantMessageId": "4e2c3798-4a83-4f0e-8009-c08f78c8a36f",
+      "priorToolCallId": "call_027ed831c8c84e5a96452105",
+      "requestSha256": "84d50625a8d81ef60cc2176e84997069ec60834e5f84c940251ea0038cf5f48b",
+      "startDeltaMs": 17.8203125,
+      "durationDeltaMs": 11.0,
+      "usage": {
+        "prompt_tokens": 7220,
+        "completion_tokens": 113,
+        "prompt_tokens_details": {
+          "cached_tokens": 4510
+        }
+      },
+      "tokenPricedUsd": 0.0007023500000000001,
+      "reconciledUsd": 0.0007023500000000001,
+      "priorReservedUsd": 0.2523136,
+      "dataset": ".",
+      "run": "comparison-r2-team-router-names-34199f31"
+    },
+    {
+      "requestId": "5de5a250-a0c2-43c0-9b68-33d24db7a8a1",
+      "receiptId": "b47c1758-5621-4b42-af27-191a29797a6e",
+      "assistantMessageId": "972d6814-5311-4044-8b7b-f13edc738903",
+      "priorToolCallId": "call_6145dd156dfd4ffe9f179ffa",
+      "requestSha256": "1c51092b73d8ee0d2c5073b5b1fe5c749616c4916a8d3c1057a0ec0f200691d8",
+      "startDeltaMs": 28.41162109375,
+      "durationDeltaMs": 6.0,
+      "usage": {
+        "prompt_tokens": 113448,
+        "completion_tokens": 229,
+        "prompt_tokens_details": {
+          "cached_tokens": 111676
+        }
+      },
+      "tokenPricedUsd": 0.001322712,
+      "reconciledUsd": 0.001322712,
+      "priorReservedUsd": 0.2523136,
+      "dataset": ".",
+      "run": "comparison-r2-team-router-names-34199f31"
+    },
+    {
+      "requestId": "4f1cec44-eb27-43b7-9cd8-50e8713108ac",
+      "receiptId": "498f0d66-4a1d-429d-83d8-e6384108f782",
+      "assistantMessageId": "07182fb6-8f11-4467-89f3-027736c7de68",
+      "priorToolCallId": "call_8d3e8c9a546f4e0e8e8552c4",
+      "requestSha256": "8515b01b4eac2ebdbbe55dc8346f679af7aebc0119fdc4bc28aaaff962a6c565",
+      "startDeltaMs": 8.927734375,
+      "durationDeltaMs": 51.0,
+      "usage": {
+        "prompt_tokens": 40151,
+        "completion_tokens": 1306,
+        "prompt_tokens_details": {
+          "cached_tokens": 36732
+        }
+      },
+      "tokenPricedUsd": 0.001871264,
+      "reconciledUsd": 0.001871264,
+      "priorReservedUsd": 0.2523136,
+      "dataset": ".",
+      "run": "comparison-r3-databricks-unity-2cb72de5"
+    },
+    {
+      "requestId": "191a64a2-baf6-4e65-b155-5e7d27dcfe96",
+      "receiptId": "23695c92-d3ef-4aee-8553-0f2d95101c6a",
+      "assistantMessageId": "d9d0631e-eff5-4bf2-a88d-bfb2f0a7da0e",
+      "priorToolCallId": "call_041724e007904661bed9de6e",
+      "requestSha256": "de6b317c168c7188757324638b07532dec95537e2e80db2c44ac56c12d9a4468",
+      "startDeltaMs": 7.198974609375,
+      "durationDeltaMs": 26.0,
+      "usage": {
+        "prompt_tokens": 57144,
+        "completion_tokens": 521,
+        "prompt_tokens_details": {
+          "cached_tokens": 54656
+        }
+      },
+      "tokenPricedUsd": 0.0012738119999999998,
+      "reconciledUsd": 0.0012738119999999998,
+      "priorReservedUsd": 0.2523136,
+      "dataset": ".",
+      "run": "comparison-r3-databricks-unity-2cb72de5"
+    },
+    {
+      "requestId": "5f2c6a1f-2a53-4e64-9544-becdce595415",
+      "receiptId": "ffcc4411-76ff-4c0b-920e-b0c65a1643a6",
+      "assistantMessageId": "e2272cc8-e89b-45fc-b635-bf247178ab48",
+      "priorToolCallId": "call_602fb1711c2d4e1a9f28d04c",
+      "requestSha256": "7ffdf85d1a7d5e9dc6f2d4896b890e77e29b7503c28abfa2d0036276b3f7159b",
+      "startDeltaMs": 38.6142578125,
+      "durationDeltaMs": -26.0,
+      "usage": {
+        "prompt_tokens": 22429,
+        "completion_tokens": 316,
+        "prompt_tokens_details": {
+          "cached_tokens": 18908
+        }
+      },
+      "tokenPricedUsd": 0.001115536,
+      "reconciledUsd": 0.001115536,
+      "priorReservedUsd": 0.2523136,
+      "dataset": ".",
+      "run": "comparison-r3-openai-schema-patterns-8ef8728d"
+    },
+    {
+      "requestId": "feb38bc1-f944-410a-bb57-29d53c994b9b",
+      "receiptId": "881c7b93-2012-4c79-988e-fcf7934fce1f",
+      "assistantMessageId": "83ab9e30-89a2-41f5-a2aa-7e3be166ac04",
+      "priorToolCallId": "call_b65a6fa042014cc18f3f2fff",
+      "requestSha256": "9951b87c86234767bc032bc7e881470f44635e219f7ae74375eb92b9cb1fe989",
+      "startDeltaMs": 17.3798828125,
+      "durationDeltaMs": 5.0,
+      "usage": {
+        "prompt_tokens": 9308,
+        "completion_tokens": 139,
+        "prompt_tokens_details": {
+          "cached_tokens": 4398
+        }
+      },
+      "tokenPricedUsd": 0.001202726,
+      "reconciledUsd": 0.001202726,
+      "priorReservedUsd": 0.2523136,
+      "dataset": ".",
+      "run": "comparison-r3-router-request-tags-95b0265b"
+    },
+    {
+      "requestId": "2a9fda08-a538-4523-98a7-3b94bb229676",
+      "receiptId": "8bf042b3-d993-4a46-8a60-b8fb61f8ff47",
+      "assistantMessageId": "66eb7023-3460-4bb6-a7fa-f70420f72f64",
+      "priorToolCallId": "call_10fac10894de4db7961ad73e",
+      "requestSha256": "8b7592cb940e803405f7b4f3207e19c88a222b4a20f3611a6be22ba355173bdb",
+      "startDeltaMs": 18.72119140625,
+      "durationDeltaMs": 25.0,
+      "usage": {
+        "prompt_tokens": 93383,
+        "completion_tokens": 395,
+        "prompt_tokens_details": {
+          "cached_tokens": 92646
+        }
+      },
+      "tokenPricedUsd": 0.0010713620000000002,
+      "reconciledUsd": 0.0010713620000000002,
+      "priorReservedUsd": 0.2523136,
+      "dataset": ".",
+      "run": "comparison-r3-router-request-tags-95b0265b"
+    },
+    {
+      "requestId": "8b98ad38-0373-49a2-bd19-517f84f99d1d",
+      "receiptId": "7e2c12ae-cbf6-4128-8d3c-47a704c81f7b",
+      "assistantMessageId": "cbdb3d37-0602-49bd-959a-cd614c938743",
+      "priorToolCallId": "call_028f550276a24fcda43fbc95",
+      "requestSha256": "d1882b71be4091c647b84389a064a68b1fc545c424978f6729a30c12e273501b",
+      "startDeltaMs": 14.599853515625,
+      "durationDeltaMs": 35.0,
+      "usage": {
+        "prompt_tokens": 31764,
+        "completion_tokens": 639,
+        "prompt_tokens_details": {
+          "cached_tokens": 30496
+        }
+      },
+      "tokenPricedUsd": 0.000914172,
+      "reconciledUsd": 0.000914172,
+      "priorReservedUsd": 0.2523136,
+      "dataset": ".",
+      "run": "comparison-r3-router-retry-deployment-431735d0"
+    },
+    {
+      "requestId": "21d6263f-367a-4660-90ca-28f2cdbb0dff",
+      "receiptId": "eba77baa-b973-4344-a853-71c3c2faad39",
+      "assistantMessageId": "a8bee924-ae6e-4cb7-b9c6-0e461d29ed33",
+      "priorToolCallId": "call_f1c28664b09f475f89e549b1",
+      "requestSha256": "5dceb6d4116f9099c5e89c0f3f22869905cb89d202cdce6ba7298b250807f0b5",
+      "startDeltaMs": 10.1787109375,
+      "durationDeltaMs": 9.0,
+      "usage": {
+        "prompt_tokens": 71384,
+        "completion_tokens": 436,
+        "prompt_tokens_details": {
+          "cached_tokens": 70780
+        }
+      },
+      "tokenPricedUsd": 0.0009161,
+      "reconciledUsd": 0.0009161,
+      "priorReservedUsd": 0.2523136,
+      "dataset": ".",
+      "run": "effort-low-v7-dashscope-rerank-52ae54aa"
+    },
+    {
+      "requestId": "d35da531-8e2e-4efb-9881-e3e0d7bb7e4a",
+      "receiptId": "31a70822-fe55-4842-8193-60feb85fac9e",
+      "assistantMessageId": "e82a96ed-c66a-4be2-9064-f77ccc3c750f",
+      "priorToolCallId": "call_4f07ebba5c5d4eefa5382c3f",
+      "requestSha256": "73279dc494a87c46b17a5eb04b240c62a4da46ade1b3c88492377c821013a0c7",
+      "startDeltaMs": 12.719482421875,
+      "durationDeltaMs": -4.0,
+      "usage": {
+        "prompt_tokens": 20520,
+        "completion_tokens": 155,
+        "prompt_tokens_details": {
+          "cached_tokens": 18598
+        }
+      },
+      "tokenPricedUsd": 0.000655326,
+      "reconciledUsd": 0.000655326,
+      "priorReservedUsd": 0.2523136,
+      "dataset": ".",
+      "run": "effort-low-v7-empty-choices-ea753560"
+    },
+    {
+      "requestId": "e99088d4-c7e7-4c54-8181-e47b583bf6c7",
+      "receiptId": "6dd8a569-8ebf-4f72-9e14-81381dad2a10",
+      "assistantMessageId": "b5d09997-0a58-41a7-a925-5c6f4a5c8e97",
+      "priorToolCallId": "call_53a8185ab07142329fa5abba",
+      "requestSha256": "6a355ad9a1059731a9c8ade6847abe57d823c10d6164eea5057b2ae249370174",
+      "startDeltaMs": 11.755615234375,
+      "durationDeltaMs": 14.0,
+      "usage": {
+        "prompt_tokens": 89956,
+        "completion_tokens": 263,
+        "prompt_tokens_details": {
+          "cached_tokens": 89014
+        }
+      },
+      "tokenPricedUsd": 0.001003918,
+      "reconciledUsd": 0.001003918,
+      "priorReservedUsd": 0.2523136,
+      "dataset": ".",
+      "run": "effort-low-v7-empty-choices-ea753560"
+    },
+    {
+      "requestId": "95309f11-e228-4e40-b262-106aad16504b",
+      "receiptId": "9a312520-706a-47be-9ac6-476e876f6a14",
+      "assistantMessageId": "f49bde01-83e5-4738-94b9-5898c19116e5",
+      "priorToolCallId": "call_c05f2c6ad258441fb52e95bf",
+      "requestSha256": "137dfb891a4b7f8178c85f791c2c5492443144cfcbde989f3ce59d9784cf8acf",
+      "startDeltaMs": 10.486083984375,
+      "durationDeltaMs": 57.0,
+      "usage": {
+        "prompt_tokens": 34732,
+        "completion_tokens": 1220,
+        "prompt_tokens_details": {
+          "cached_tokens": 32976
+        }
+      },
+      "tokenPricedUsd": 0.001422352,
+      "reconciledUsd": 0.001422352,
+      "priorReservedUsd": 0.2523136,
+      "dataset": ".",
+      "run": "effort-max-v7-router-strategy-isolation-d60f7aa5"
+    },
+    {
+      "requestId": "09da2980-afd2-4aa3-8fb1-a4089cb2a5c5",
+      "receiptId": "faa927c3-7267-4999-b660-7ff5559ed93c",
+      "assistantMessageId": "2167bb98-39e5-4ece-bb05-dadd4e480ac9",
+      "priorToolCallId": "call_68fd639e3d6f46d785a5d119",
+      "requestSha256": "9734300aa822069f0613029ebe40e531614559a1cf56af7f0bdfd667079e5f44",
+      "startDeltaMs": 15.506103515625,
+      "durationDeltaMs": 2.0,
+      "usage": {
+        "prompt_tokens": 120752,
+        "completion_tokens": 171,
+        "prompt_tokens_details": {
+          "cached_tokens": 120184
+        }
+      },
+      "tokenPricedUsd": 0.0010791079999999998,
+      "reconciledUsd": 0.0010791079999999998,
+      "priorReservedUsd": 0.2523136,
+      "dataset": ".",
+      "run": "effort-max-v7-vertex-version-path-7d9a8bff"
+    },
+    {
+      "requestId": "5ca610ab-cc58-4b32-bc46-6f05f625323c",
+      "receiptId": "6e2649bf-ac72-4b2e-bf87-eca32f23ecba",
+      "assistantMessageId": "479d91be-ff19-4274-a770-53a3abcb084c",
+      "priorToolCallId": "call_5eaa99f6ff4244958ef753f0",
+      "requestSha256": "f146de5b2f192e0a1ad65cd70e477f296c440f997e911a02331200a1188f85da",
+      "startDeltaMs": 7.382568359375,
+      "durationDeltaMs": 3.0,
+      "usage": {
+        "prompt_tokens": 12765,
+        "completion_tokens": 87,
+        "prompt_tokens_details": {
+          "cached_tokens": 10760
+        }
+      },
+      "tokenPricedUsd": 0.00057384,
+      "reconciledUsd": 0.00057384,
+      "priorReservedUsd": 0.2523136,
+      "dataset": ".",
+      "run": "inline-v9-converse-config-4945178e"
+    },
+    {
+      "requestId": "19534e4e-58b3-4a35-a811-cc99bbd576a1",
+      "receiptId": "3f9bf062-1b2a-401c-9be8-cfd24e9c6268",
+      "assistantMessageId": "8a905d5d-4460-4d29-ba30-0e2aa80b1625",
+      "priorToolCallId": "call_445c506fac6740ddb4bac91b",
+      "requestSha256": "1b667045af096a714849705eae5f7a4051bcd4c49bd1996581f0db7312803761",
+      "startDeltaMs": 14.455810546875,
+      "durationDeltaMs": 17.0,
+      "usage": {
+        "prompt_tokens": 36067,
+        "completion_tokens": 309,
+        "prompt_tokens_details": {
+          "cached_tokens": 35102
+        }
+      },
+      "tokenPricedUsd": 0.000661954,
+      "reconciledUsd": 0.000661954,
+      "priorReservedUsd": 0.2523136,
+      "dataset": ".",
+      "run": "isolation-v4-converse-config-e9f617b9"
+    },
+    {
+      "requestId": "4d452b97-f26b-4d0c-8252-b731b73686b8",
+      "receiptId": "2df0dc56-5286-44e4-a405-76a5417d3160",
+      "assistantMessageId": "ddca5f31-374f-466b-8cf3-c6ce47a0dfcb",
+      "priorToolCallId": "call_3a12ab5455694574a4df5af2",
+      "requestSha256": "92849e1e6c2ba4873425990adb5275a3106c05823827a6fe2ace31f76c8f12d9",
+      "startDeltaMs": 9.28369140625,
+      "durationDeltaMs": -2.0,
+      "usage": {
+        "prompt_tokens": 38816,
+        "completion_tokens": 133,
+        "prompt_tokens_details": {
+          "cached_tokens": 38126
+        }
+      },
+      "tokenPricedUsd": 0.000506462,
+      "reconciledUsd": 0.000506462,
+      "priorReservedUsd": 0.2523136,
+      "dataset": ".",
+      "run": "playbook-v10-empty-choices-3d7677bc"
+    },
+    {
+      "requestId": "93e1e409-d7cb-4607-936a-94bd0ecb38d9",
+      "receiptId": "69f3ceb8-3f52-4843-a246-b8e64abf6268",
+      "assistantMessageId": "7d4965ed-c6c7-4083-ae7d-1f49632c4ec4",
+      "priorToolCallId": "call_25f118ab34a24c979b4fcb31",
+      "requestSha256": "20755f00f26d382d9d3300d58504b3219f3e92ada0579c420d93489f200159e8",
+      "startDeltaMs": 21.396728515625,
+      "durationDeltaMs": 21.0,
+      "usage": {
+        "prompt_tokens": 74726,
+        "completion_tokens": 62,
+        "prompt_tokens_details": {
+          "cached_tokens": 74176
+        }
+      },
+      "tokenPricedUsd": 0.000681152,
+      "reconciledUsd": 0.000681152,
+      "priorReservedUsd": 0.2523136,
+      "dataset": ".",
+      "run": "playbook-v10-empty-choices-3d7677bc"
+    },
+    {
+      "requestId": "e896d8e7-eeac-40ed-9da6-c9707171a2de",
+      "receiptId": "a2088ac9-55db-41b1-aa13-dfa23f537bd9",
+      "assistantMessageId": "ffd561d2-de81-42e8-b3c2-7a9a865150cb",
+      "priorToolCallId": "call_d180e7dac0a64a77a3c66483",
+      "requestSha256": "6d03673435427dc55c5f8460afe5b0fb53b96788046e95ab9ff857e0759b5d94",
+      "startDeltaMs": 9.200439453125,
+      "durationDeltaMs": 29.0,
+      "usage": {
+        "prompt_tokens": 94571,
+        "completion_tokens": 661,
+        "prompt_tokens_details": {
+          "cached_tokens": 94188
+        }
+      },
+      "tokenPricedUsd": 0.001179836,
+      "reconciledUsd": 0.001179836,
+      "priorReservedUsd": 0.2523136,
+      "dataset": ".",
+      "run": "playbook-v10-empty-choices-3d7677bc"
+    },
+    {
+      "requestId": "e47c5c48-0b66-4488-a840-a832d3255d70",
+      "receiptId": "8ca3ef7e-15a3-4ca8-8b9a-b92212a24059",
+      "assistantMessageId": "e63f7cd4-1d0f-46fc-93e6-d8a8bcab5898",
+      "priorToolCallId": "call_0e434104b1e14a4ebdde373c",
+      "requestSha256": "14e769d0f524b6eb3bbdb7e0e93de60636fb3fe9414a79ed04055bd0496bdda2",
+      "startDeltaMs": 6.2509765625,
+      "durationDeltaMs": 10.0,
+      "usage": {
+        "prompt_tokens": 18368,
+        "completion_tokens": 309,
+        "prompt_tokens_details": {
+          "cached_tokens": 16052
+        }
+      },
+      "tokenPricedUsd": 0.0008258240000000001,
+      "reconciledUsd": 0.0008258240000000001,
+      "priorReservedUsd": 0.2523136,
+      "dataset": ".",
+      "run": "playbook-v10-team-member-budget-73bad876"
+    },
+    {
+      "requestId": "8ae57b63-f902-4a2e-9539-1800328df350",
+      "receiptId": "5f219c50-f676-4326-9142-1b43614361ab",
+      "assistantMessageId": "341e5073-7150-4d63-85d9-30f855322792",
+      "priorToolCallId": "call_71bc93c18b7d4cf5948665e1",
+      "requestSha256": "afafd08334ad3a5d96e789e0235c24fefc3161f8c3784c15f36bcab0087fcf6c",
+      "startDeltaMs": 8.89599609375,
+      "durationDeltaMs": 5.0,
+      "usage": {
+        "prompt_tokens": 33419,
+        "completion_tokens": 169,
+        "prompt_tokens_details": {
+          "cached_tokens": 32686
+        }
+      },
+      "tokenPricedUsd": 0.0005016020000000001,
+      "reconciledUsd": 0.0005016020000000001,
+      "priorReservedUsd": 0.2523136,
+      "dataset": ".",
+      "run": "playbook-v10-team-member-budget-73bad876"
+    },
+    {
+      "requestId": "ac97f3af-4208-45e6-9b7b-28e0c6ed6986",
+      "receiptId": "3c661caa-fb9d-4c65-b954-90ac2dc6f81c",
+      "assistantMessageId": "05c1f6f6-3c29-4897-a814-02b8e298aa75",
+      "priorToolCallId": "call_7aa789c70f1e40c997985961",
+      "requestSha256": "32df5fd54b545a191fa6c9fb3b9142c2b87965ddf399ebbe1dd3c80fa4662d63",
+      "startDeltaMs": 11.65576171875,
+      "durationDeltaMs": 15.0,
+      "usage": {
+        "prompt_tokens": 47555,
+        "completion_tokens": 405,
+        "prompt_tokens_details": {
+          "cached_tokens": 45398
+        }
+      },
+      "tokenPricedUsd": 0.001059626,
+      "reconciledUsd": 0.001059626,
+      "priorReservedUsd": 0.2523136,
+      "dataset": ".",
+      "run": "playbook-v10-team-member-budget-73bad876"
+    },
+    {
+      "requestId": "64d9c774-07f2-4146-9bc8-b8dd170cd6dd",
+      "receiptId": "ac81f7f4-14f5-40e7-95f1-c752f34e23f9",
+      "assistantMessageId": "729ed56f-d806-40d1-bab7-04f444155658",
+      "priorToolCallId": "call_d9336a14b4084965b8966f97",
+      "requestSha256": "e5712e363266249a56275cea19e250fde7699478b36639205c2a2b60989f4196",
+      "startDeltaMs": 11.59521484375,
+      "durationDeltaMs": -1.0,
+      "usage": {
+        "prompt_tokens": 46068,
+        "completion_tokens": 116,
+        "prompt_tokens_details": {
+          "cached_tokens": 44394
+        }
+      },
+      "tokenPricedUsd": 0.0007555979999999999,
+      "reconciledUsd": 0.0007555979999999999,
+      "priorReservedUsd": 0.2523136,
+      "dataset": ".",
+      "run": "qualified-single-dev-team-member-budget-82c9fa47"
+    },
+    {
+      "requestId": "d5a9a4e0-fcd2-4777-b5b4-4351f5712f75",
+      "receiptId": "a48ffb98-ee37-47f2-9744-b50ea1b0ea19",
+      "assistantMessageId": "de51b8d7-52e8-4e1e-b8fa-6d1dc0422ecd",
+      "priorToolCallId": "call_8969cbfe853646a1a9847a2f",
+      "requestSha256": "1217a99b5b5edbab4ea1de34551e3f5bfbf7e38cb9e0417e6cd207b9fcb83da8",
+      "startDeltaMs": 9.48046875,
+      "durationDeltaMs": 23.0,
+      "usage": {
+        "prompt_tokens": 62096,
+        "completion_tokens": 578,
+        "prompt_tokens_details": {
+          "cached_tokens": 59818
+        }
+      },
+      "tokenPricedUsd": 0.001301366,
+      "reconciledUsd": 0.001301366,
+      "priorReservedUsd": 0.2523136,
+      "dataset": ".",
+      "run": "qualified-single-dev-team-member-budget-82c9fa47"
+    },
+    {
+      "requestId": "726b009f-3c97-4a78-a89a-39a80f87469f",
+      "receiptId": "0afdb485-8597-490e-9c12-b17ba131a7ac",
+      "assistantMessageId": "a7e3bdaa-6349-4194-a66d-5410e567a537",
+      "priorToolCallId": "call_2f32d36a3c544cfe93984344",
+      "requestSha256": "077a955d88d3d55612b22b2a8dadb6783941bec2ccd2fc563b74d606334edbba",
+      "startDeltaMs": 15.114501953125,
+      "durationDeltaMs": -2.0,
+      "usage": {
+        "prompt_tokens": 86420,
+        "completion_tokens": 132,
+        "prompt_tokens_details": {
+          "cached_tokens": 85194
+        }
+      },
+      "tokenPricedUsd": 0.000953198,
+      "reconciledUsd": 0.000953198,
+      "priorReservedUsd": 0.2523136,
+      "dataset": ".",
+      "run": "qualified-single-dev-team-member-budget-82c9fa47"
+    },
+    {
+      "requestId": "7e91bc56-147c-40c5-8f01-203afefe170e",
+      "receiptId": "3c3ca678-2c0e-4109-a648-ddfe3718d066",
+      "assistantMessageId": "2a59e6e4-90ab-463f-8978-f4c8f20633bd",
+      "priorToolCallId": "call_6cd16daf5fcc49869280a1c8",
+      "requestSha256": "9e3eb570b74268e33e5c87165cc9fb1c5d44fdce5d3904b87f5a4457572fb323",
+      "startDeltaMs": 5.942138671875,
+      "durationDeltaMs": 1.0,
+      "usage": {
+        "prompt_tokens": 63768,
+        "completion_tokens": 565,
+        "prompt_tokens_details": {
+          "cached_tokens": 62174
+        }
+      },
+      "tokenPricedUsd": 0.001158798,
+      "reconciledUsd": 0.001158798,
+      "priorReservedUsd": 0.2523136,
+      "dataset": ".",
+      "run": "qualified-v7-empty-choices-73754528"
+    },
+    {
+      "requestId": "b4d2e4a3-2952-44cb-a6de-391b3394300c",
+      "receiptId": "80343972-49bd-4233-863c-9968a93efa0a",
+      "assistantMessageId": "f5c7f030-9d92-4828-b431-6682c0505105",
+      "priorToolCallId": "call_92a7e853051b40f887a03ff3",
+      "requestSha256": "12c4c5d3efb8f26b70e4b91c07011bd3c11b7e2851d8cc7bb6dd08bb0d45f561",
+      "startDeltaMs": 6.778076171875,
+      "durationDeltaMs": 2.0,
+      "usage": {
+        "prompt_tokens": 63477,
+        "completion_tokens": 116,
+        "prompt_tokens_details": {
+          "cached_tokens": 62794
+        }
+      },
+      "tokenPricedUsd": 0.0006663779999999999,
+      "reconciledUsd": 0.0006663779999999999,
+      "priorReservedUsd": 0.2523136,
+      "dataset": ".",
+      "run": "qualified-v7-team-member-budget-1ab3cc38"
+    },
+    {
+      "requestId": "22d46bd3-d7bb-4a9b-9829-ec53162b4563",
+      "receiptId": "40793708-cabc-42d8-b207-8af91820c5e4",
+      "assistantMessageId": "f5abba18-8889-4618-b8fd-481153c22790",
+      "priorToolCallId": "call_db9d672f283d44b89df17f2a",
+      "requestSha256": "d9031f9ed44f09ab37b905055b596cb46b4df7e2004aee7ba408806ecd0831b0",
+      "startDeltaMs": 9.0849609375,
+      "durationDeltaMs": 69.0,
+      "usage": {
+        "prompt_tokens": 29826,
+        "completion_tokens": 743,
+        "prompt_tokens_details": {
+          "cached_tokens": 27412
+        }
+      },
+      "tokenPricedUsd": 0.001213344,
+      "reconciledUsd": 0.001213344,
+      "priorReservedUsd": 0.2523136,
+      "dataset": ".",
+      "run": "replication-development-v11-team-member-budget-a053317b"
+    },
+    {
+      "requestId": "41f11d92-4e69-44f3-93f9-5d596b740777",
+      "receiptId": "2d669cd2-c36d-49b6-bcf5-9061540dd4be",
+      "assistantMessageId": "3952ea07-1b12-456d-a506-6f5246f252b2",
+      "priorToolCallId": "call_317670168d434aafadda34ac",
+      "requestSha256": "73eec5b91eb3f621ad28825830b722e079efdb8b4cb258a471be84834eaebf6f",
+      "startDeltaMs": 10.953857421875,
+      "durationDeltaMs": 0.0,
+      "usage": {
+        "prompt_tokens": 63241,
+        "completion_tokens": 128,
+        "prompt_tokens_details": {
+          "cached_tokens": 61140
+        }
+      },
+      "tokenPricedUsd": 0.00097468,
+      "reconciledUsd": 0.00097468,
+      "priorReservedUsd": 0.2523136,
+      "dataset": ".",
+      "run": "replication-development-v11-team-member-budget-a053317b"
+    },
+    {
+      "requestId": "ee59492a-ec19-4733-bbaf-b5125c6b9588",
+      "receiptId": "6834297c-a4f9-46be-940b-2d8c8223ffc1",
+      "assistantMessageId": "bf6038ab-688c-4a5d-a343-05471bb60283",
+      "priorToolCallId": "call_4a6633d54a4e4617a5ff3abe",
+      "requestSha256": "e19d73e1cb5289c91b69f66559983fdd8c3a47992454778e354ff29c242fe1e9",
+      "startDeltaMs": 17.827880859375,
+      "durationDeltaMs": -7.0,
+      "usage": {
+        "prompt_tokens": 84438,
+        "completion_tokens": 111,
+        "prompt_tokens_details": {
+          "cached_tokens": 4196
+        }
+      },
+      "tokenPricedUsd": 0.017755872,
+      "reconciledUsd": 0.017755872,
+      "priorReservedUsd": 0.2523136,
+      "dataset": ".",
+      "run": "replication-development-v11-team-member-budget-a053317b"
+    },
+    {
+      "requestId": "171e0db2-3470-4f10-a56a-1b1bd06360db",
+      "receiptId": "632023ff-311a-4740-b82d-dca29a68d6c0",
+      "assistantMessageId": "13412929-40da-43c3-9488-d89aa3683a93",
+      "priorToolCallId": "call_00f555376f4c4cf3abc21e6b",
+      "requestSha256": "d0b04c20744c5977b7ba6042ac042a2979ca9055356e7c85e4bd5e6474cb7d0d",
+      "startDeltaMs": 23.322021484375,
+      "durationDeltaMs": -6.0,
+      "usage": {
+        "prompt_tokens": 91783,
+        "completion_tokens": 249,
+        "prompt_tokens_details": {
+          "cached_tokens": 91344
+        }
+      },
+      "tokenPricedUsd": 0.000900328,
+      "reconciledUsd": 0.000900328,
+      "priorReservedUsd": 0.2523136,
+      "dataset": ".",
+      "run": "replication-development-v11-team-member-budget-a053317b"
+    },
+    {
+      "requestId": "6ec8e799-71d5-4657-a6cb-63d6189e9b93",
+      "receiptId": "d3cc0156-a810-43ec-870f-d999a5f4f572",
+      "assistantMessageId": "0b2e47e2-b895-4fe5-8654-fc107bc15269",
+      "priorToolCallId": "call_955acfc05da94cc6b1f5e20e",
+      "requestSha256": "27a48dcc2c44fd2eff70a635abe73ae0a98e723eae594715c3fc709cf4642cea",
+      "startDeltaMs": 10.353515625,
+      "durationDeltaMs": 10.0,
+      "usage": {
+        "prompt_tokens": 25396,
+        "completion_tokens": 125,
+        "prompt_tokens_details": {
+          "cached_tokens": 24208
+        }
+      },
+      "tokenPricedUsd": 0.000513316,
+      "reconciledUsd": 0.000513316,
+      "priorReservedUsd": 0.2523136,
+      "dataset": ".",
+      "run": "replication-v11-r1-databricks-unity-133f07d2"
+    },
+    {
+      "requestId": "8337d890-8836-4ceb-92a3-5922e835f701",
+      "receiptId": "908547e6-364a-417e-b656-d4ea4a83143e",
+      "assistantMessageId": "54a6be3e-f5aa-41b5-b9b4-02fc3e8dc4f0",
+      "priorToolCallId": "call_7200cc1c93ad4e27aa246366",
+      "requestSha256": "33bbfe70af197a2e884efdc6222479b1cff953f28f15dc362365923c75dd10b3",
+      "startDeltaMs": 26.369873046875,
+      "durationDeltaMs": 8.0,
+      "usage": {
+        "prompt_tokens": 71117,
+        "completion_tokens": 379,
+        "prompt_tokens_details": {
+          "cached_tokens": 68342
+        }
+      },
+      "tokenPricedUsd": 0.001339034,
+      "reconciledUsd": 0.001339034,
+      "priorReservedUsd": 0.2523136,
+      "dataset": ".",
+      "run": "replication-v11-r1-mai-image-params-454d3b5a"
+    },
+    {
+      "requestId": "889fdd64-cc5a-4c63-b4cc-04afc3fde827",
+      "receiptId": "1d3ed504-da99-44b2-b2fa-5c3b2d2bc093",
+      "assistantMessageId": "9b7c65c0-e7f5-4b51-bcfc-cfd0c7cba5b1",
+      "priorToolCallId": "call_92143230aad64686871d7417",
+      "requestSha256": "f35e5f0ed52190442c56187d0e771fc603d5282f026ad90076efda35efe59ffb",
+      "startDeltaMs": 10.40771484375,
+      "durationDeltaMs": 21.0,
+      "usage": {
+        "prompt_tokens": 91361,
+        "completion_tokens": 317,
+        "prompt_tokens_details": {
+          "cached_tokens": 90334
+        }
+      },
+      "tokenPricedUsd": 0.001067498,
+      "reconciledUsd": 0.001067498,
+      "priorReservedUsd": 0.2523136,
+      "dataset": ".",
+      "run": "replication-v11-r1-openai-schema-patterns-06dff2a9"
+    },
+    {
+      "requestId": "19f5081e-50ac-4c86-9776-1066db37b4f9",
+      "receiptId": "93126c59-4be7-4169-bbd4-a17e3712adef",
+      "assistantMessageId": "23a80e0d-541a-40b1-8cc1-38bfd63b9bdf",
+      "priorToolCallId": "call_b9c02c87e8bf4e5098b18c2c",
+      "requestSha256": "ca95a1aa537f9ccfda9e53de5ace5fc4334bbc9c3fc162814453feb926f94103",
+      "startDeltaMs": 18.661376953125,
+      "durationDeltaMs": 0.0,
+      "usage": {
+        "prompt_tokens": 52167,
+        "completion_tokens": 76,
+        "prompt_tokens_details": {
+          "cached_tokens": 51510
+        }
+      },
+      "tokenPricedUsd": 0.00055527,
+      "reconciledUsd": 0.00055527,
+      "priorReservedUsd": 0.2523136,
+      "dataset": ".",
+      "run": "replication-v11-r1-team-router-names-f7022c08"
+    },
+    {
+      "requestId": "0e28c3bd-917b-492e-b7b0-1060f1cf0b47",
+      "receiptId": "5cb33046-5bc5-44c2-b21a-0c4cf0cba951",
+      "assistantMessageId": "45c27774-d9db-4ba3-b25f-44232c31baca",
+      "priorToolCallId": "call_5e3355c9fa5f4aa5a89cbbe0",
+      "requestSha256": "2b83880cae68be6fe71277b93687c2c81f93d44f61617fc6fa439d1074e450d4",
+      "startDeltaMs": 16.46533203125,
+      "durationDeltaMs": 3.9999999999997726,
+      "usage": {
+        "prompt_tokens": 118593,
+        "completion_tokens": 109,
+        "prompt_tokens_details": {
+          "cached_tokens": 117956
+        }
+      },
+      "tokenPricedUsd": 0.001037772,
+      "reconciledUsd": 0.001037772,
+      "priorReservedUsd": 0.2523136,
+      "dataset": ".",
+      "run": "replication-v11-r1-team-router-names-f7022c08"
+    },
+    {
+      "requestId": "2f42cadc-7274-4f7e-8c37-cb84b304265c",
+      "receiptId": "89ae00dc-98fc-4ef1-997d-1005dde373c7",
+      "assistantMessageId": "e4293172-edc9-492e-b2b5-c143f2c8f8b3",
+      "priorToolCallId": "call_6631e073df8f4232b56cf27b",
+      "requestSha256": "e987e55c0b614fc51cf6bf8269232900765c0b5de0be0688eab15d16f3c3c713",
+      "startDeltaMs": 65.447998046875,
+      "durationDeltaMs": -3.0,
+      "usage": {
+        "prompt_tokens": 128288,
+        "completion_tokens": 62,
+        "prompt_tokens_details": {
+          "cached_tokens": 127688
+        }
+      },
+      "tokenPricedUsd": 0.0010667360000000002,
+      "reconciledUsd": 0.0010667360000000002,
+      "priorReservedUsd": 0.2523136,
+      "dataset": ".",
+      "run": "replication-v11-r1-team-router-names-f7022c08"
+    },
+    {
+      "requestId": "5ff71376-903a-4a84-82bf-752a6ec7de9b",
+      "receiptId": "6be87953-0e7c-4223-b8c1-3194bc193ec7",
+      "assistantMessageId": "081047fe-7036-49fb-9b5c-530e3ea69d8b",
+      "priorToolCallId": "call_a1dcf15e695f4986a5387ee7",
+      "requestSha256": "8fb7723626de5533a70ef2c6e1aa1eae189cee32d75decb2483d8d7142371121",
+      "startDeltaMs": 13.907470703125,
+      "durationDeltaMs": 7.0,
+      "usage": {
+        "prompt_tokens": 7687,
+        "completion_tokens": 109,
+        "prompt_tokens_details": {
+          "cached_tokens": 4494
+        }
+      },
+      "tokenPricedUsd": 0.0008058579999999999,
+      "reconciledUsd": 0.0008058579999999999,
+      "priorReservedUsd": 0.2523136,
+      "dataset": ".",
+      "run": "replication-v13-r1-bedrock-thinking-43aa0f2d"
+    },
+    {
+      "requestId": "aa528dfa-f394-43ad-89e6-7f90fc7d38bb",
+      "receiptId": "89a2e599-7c42-4503-bec2-eadc0ff8e085",
+      "assistantMessageId": "90c90737-3f83-4276-83bd-a82f5cfd8f6e",
+      "priorToolCallId": "call_179c017f177849bc8491fe9d",
+      "requestSha256": "1d4809fff03d1290944807b3558ad9ac05ab2f5cae3dabb877dda3fe1833be10",
+      "startDeltaMs": 23.579345703125,
+      "durationDeltaMs": 1.0,
+      "usage": {
+        "prompt_tokens": 24838,
+        "completion_tokens": 139,
+        "prompt_tokens_details": {
+          "cached_tokens": 23980
+        }
+      },
+      "tokenPricedUsd": 0.00044836,
+      "reconciledUsd": 0.00044836,
+      "priorReservedUsd": 0.2523136,
+      "dataset": ".",
+      "run": "replication-v13-r1-bedrock-thinking-43aa0f2d"
+    },
+    {
+      "requestId": "0ae2289f-7f7b-40ad-81be-11e038fbc125",
+      "receiptId": "0792ae95-8004-4f34-9e7f-620048aca6c0",
+      "assistantMessageId": "78eacca4-06ce-4740-89f7-056fd171c077",
+      "priorToolCallId": "call_27b6c9b0b30949999da3edb0",
+      "requestSha256": "82ae789928573e75713dbf52db7edd79766185268355c311d858383c0a84b904",
+      "startDeltaMs": 15.5673828125,
+      "durationDeltaMs": 1.0,
+      "usage": {
+        "prompt_tokens": 14814,
+        "completion_tokens": 76,
+        "prompt_tokens_details": {
+          "cached_tokens": 13306
+        }
+      },
+      "tokenPricedUsd": 0.000475062,
+      "reconciledUsd": 0.000475062,
+      "priorReservedUsd": 0.2523136,
+      "dataset": ".",
+      "run": "replication-v13-r1-router-retry-deployment-725e04e3"
+    },
+    {
+      "requestId": "45fe0bb1-e526-4acb-9200-8674b817c5fa",
+      "receiptId": "409f3288-929b-487f-91c5-80693aecd4f1",
+      "assistantMessageId": "c4406138-3632-48e7-a0ff-3709ff79beed",
+      "priorToolCallId": "call_fc571ec1efc946418252a51e",
+      "requestSha256": "ef8ca668d1bcf42c7efcddd1f1581d4be74f19dd99277a3d389b667a42379c58",
+      "startDeltaMs": 24.642578125,
+      "durationDeltaMs": 3.0,
+      "usage": {
+        "prompt_tokens": 58738,
+        "completion_tokens": 324,
+        "prompt_tokens_details": {
+          "cached_tokens": 57976
+        }
+      },
+      "tokenPricedUsd": 0.000787312,
+      "reconciledUsd": 0.000787312,
+      "priorReservedUsd": 0.2523136,
+      "dataset": ".",
+      "run": "replication-v13-r1-router-retry-deployment-725e04e3"
+    },
+    {
+      "requestId": "41622e38-a980-4cc5-8f60-7eb22e439b74",
+      "receiptId": "c6ac3063-a1d7-4d9e-9706-c53b110932d6",
+      "assistantMessageId": "b55af275-417b-4af5-befa-0909b73d401b",
+      "priorToolCallId": "call_02dd8de10493436e9785cf9c",
+      "requestSha256": "7d009d0fd8c803b248811516252f3896c39a7cc2e68131152af2f640ea58bf04",
+      "startDeltaMs": 15.80419921875,
+      "durationDeltaMs": 2.0,
+      "usage": {
+        "prompt_tokens": 84799,
+        "completion_tokens": 405,
+        "prompt_tokens_details": {
+          "cached_tokens": 84252
+        }
+      },
+      "tokenPricedUsd": 0.000977404,
+      "reconciledUsd": 0.000977404,
+      "priorReservedUsd": 0.2523136,
+      "dataset": ".",
+      "run": "replication-v13-r1-router-retry-deployment-725e04e3"
+    },
+    {
+      "requestId": "0ef25bc0-58fe-449e-a0ef-c1bf5120d333",
+      "receiptId": "f308a6c6-36b6-4e6a-b35f-8023759bee45",
+      "assistantMessageId": "ae213577-af34-4537-b644-71a54907d9ac",
+      "priorToolCallId": "call_f034cd42882f41e19347e66c",
+      "requestSha256": "1cf2b173117474292beddc997152b70c5d9c106e6e1915035be1c15554860c47",
+      "startDeltaMs": 16.738037109375,
+      "durationDeltaMs": 2.0,
+      "usage": {
+        "prompt_tokens": 114135,
+        "completion_tokens": 372,
+        "prompt_tokens_details": {
+          "cached_tokens": 113488
+        }
+      },
+      "tokenPricedUsd": 0.0011822760000000001,
+      "reconciledUsd": 0.0011822760000000001,
+      "priorReservedUsd": 0.2523136,
+      "dataset": ".",
+      "run": "replication-v13-r1-team-router-names-54bcebb2"
+    }
+  ],
+  "validation": {
+    "focusedPythonTests": 7,
+    "existingBudgetTests": 5,
+    "typecheck": "passed"
+  },
+  "application": "New admissions held; all three slots drained; no pending requests; gateway stopped cleanly; exclusive lock acquired; every source hash and match recomputed before atomic ledger replacement; gateway restarted and balance checked before admissions resumed."
+}

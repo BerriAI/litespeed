@@ -1,0 +1,479 @@
+diff --git a/litellm/litellm_core_utils/llm_response_utils/convert_dict_to_response.py b/litellm/litellm_core_utils/llm_response_utils/convert_dict_to_response.py
+index a6f10e1..77c5fb8 100644
+--- a/litellm/litellm_core_utils/llm_response_utils/convert_dict_to_response.py
++++ b/litellm/litellm_core_utils/llm_response_utils/convert_dict_to_response.py
+@@ -3,7 +3,7 @@ import json
+ import re
+ import time
+ import traceback
+-from collections.abc import Iterable, Sequence
++from collections.abc import Sequence
+ from typing import Final, Literal, cast
+ 
+ import litellm
+@@ -151,6 +151,45 @@ def _clear_later_replay_slice_metadata(choice: StreamingChoices) -> None:
+         del choice.enhancements
+ 
+ 
++def _validated_choices_field(response_object: dict) -> list:
++    """
++    Return the response's ``choices`` list after validating its shape.
++
++    An explicit empty list is a valid upstream response: OpenAI-compatible
++    providers (vLLM, OpenAI with ``stream_options.include_usage``) emit
++    usage-only responses and metadata-only chunks with ``choices: []``. A
++    missing ``choices`` key or a value that is not a list (including ``None``)
++    is malformed and raises ``APIError`` with a diagnostic naming ``choices``
++    and the supplied type.
++    """
++    from litellm.exceptions import APIError
++
++    if "choices" not in response_object:
++        raise APIError(
++            status_code=500,
++            message=(
++                "LiteLLM: provider returned a response with no 'choices'. "
++                f"Raw keys: {list(response_object.keys())}"
++            ),
++            llm_provider="",
++            model="",
++        )
++
++    choices = response_object["choices"]
++    if not isinstance(choices, list):
++        raise APIError(
++            status_code=500,
++            message=(
++                "LiteLLM: provider returned a response with an invalid 'choices' field - expected a list. "
++                f"choices={choices!r}, type={type(choices).__name__}. "
++                f"Raw keys: {list(response_object.keys())}"
++            ),
++            llm_provider="",
++            model="",
++        )
++    return choices
++
++
+ async def convert_to_streaming_response_async(
+     response_object: dict | None = None,
+ ):
+@@ -179,19 +218,7 @@ async def convert_to_streaming_response_async(
+ 
+     choice_list: Final[list[StreamingChoices]] = []
+ 
+-    if not response_object.get("choices"):
+-        from litellm.exceptions import APIError
+-
+-        raise APIError(
+-            status_code=500,
+-            message=(
+-                f"LiteLLM: provider returned a response with no 'choices'. Raw keys: {list(response_object.keys())}"
+-            ),
+-            llm_provider="",
+-            model="",
+-        )
+-
+-    for idx, choice in enumerate(response_object["choices"]):
++    for idx, choice in enumerate(_validated_choices_field(response_object)):
+         if (
+             choice["message"].get("tool_calls", None) is not None
+             and isinstance(choice["message"]["tool_calls"], list)
+@@ -287,19 +314,7 @@ def convert_to_streaming_response(
+     model_response_object: Final = ModelResponseStream()
+     choice_list: Final[list[StreamingChoices]] = []
+ 
+-    if not response_object.get("choices"):
+-        from litellm.exceptions import APIError
+-
+-        raise APIError(
+-            status_code=500,
+-            message=(
+-                f"LiteLLM: provider returned a response with no 'choices'. Raw keys: {list(response_object.keys())}"
+-            ),
+-            llm_provider="",
+-            model="",
+-        )
+-
+-    for idx, choice in enumerate(response_object["choices"]):
++    for idx, choice in enumerate(_validated_choices_field(response_object)):
+         delta = Delta(**choice["message"])
+         finish_reason = choice.get("finish_reason", None)
+         if finish_reason is None:
+@@ -623,20 +638,7 @@ def convert_to_model_response_object(
+                 return convert_to_streaming_response(response_object=response_object)
+             choice_list: Final[list[Choices]] = []
+ 
+-            if not response_object.get("choices") or not isinstance(response_object["choices"], Iterable):
+-                from litellm.exceptions import APIError
+-
+-                raise APIError(
+-                    status_code=500,
+-                    message=(
+-                        "LiteLLM: provider returned a response with no 'choices'. "
+-                        f"Raw keys: {list(response_object.keys())}"
+-                    ),
+-                    llm_provider="",
+-                    model="",
+-                )
+-
+-            for idx, choice in enumerate(response_object["choices"]):
++            for idx, choice in enumerate(_validated_choices_field(response_object)):
+                 ## HANDLE JSON MODE - anthropic returns single function call]
+                 tool_calls = choice["message"].get("tool_calls", None)
+                 if tool_calls is not None:
+diff --git a/litellm/litellm_core_utils/streaming_handler.py b/litellm/litellm_core_utils/streaming_handler.py
+index 6ae17ba..d1f0e2c 100644
+--- a/litellm/litellm_core_utils/streaming_handler.py
++++ b/litellm/litellm_core_utils/streaming_handler.py
+@@ -1473,18 +1473,32 @@ class CustomStreamWrapper:
+                 self.received_finish_reason = response_obj["finish_reason"]
+         elif self.custom_llm_provider == "cached_response":
+             cached_chunk: Final = cast(ModelResponseStream, chunk)
+-            chunk_finish_reason: Final = cached_chunk.choices[0].finish_reason
+-            response_obj = {
+-                "text": cached_chunk.choices[0].delta.content,
+-                "is_finished": chunk_finish_reason is not None,
+-                "finish_reason": chunk_finish_reason,
+-                "original_chunk": cached_chunk,
+-                "tool_calls": (
+-                    cached_chunk.choices[0].delta.tool_calls
+-                    if hasattr(cached_chunk.choices[0].delta, "tool_calls")
+-                    else None
+-                ),
+-            }
++            # A usage-only cached chunk (OpenAI's `stream_options.include_usage`
++            # final chunk) legitimately ships `choices: []`. Guard the
++            # first-choice access so cache replay does not raise IndexError.
++            cached_choices: Final = cached_chunk.choices or []
++            if cached_choices:
++                chunk_finish_reason: Final = cached_choices[0].finish_reason
++                response_obj = {
++                    "text": cached_choices[0].delta.content,
++                    "is_finished": chunk_finish_reason is not None,
++                    "finish_reason": chunk_finish_reason,
++                    "original_chunk": cached_chunk,
++                    "tool_calls": (
++                        cached_choices[0].delta.tool_calls
++                        if hasattr(cached_choices[0].delta, "tool_calls")
++                        else None
++                    ),
++                }
++            else:
++                chunk_finish_reason = None
++                response_obj = {
++                    "text": None,
++                    "is_finished": False,
++                    "finish_reason": None,
++                    "original_chunk": cached_chunk,
++                    "tool_calls": None,
++                }
+ 
+             completion_obj["content"] = response_obj["text"]
+             if response_obj["tool_calls"] is not None:
+@@ -1495,6 +1509,10 @@ class CustomStreamWrapper:
+                 self.response_id = cached_chunk.id
+             if hasattr(cached_chunk, "system_fingerprint"):
+                 self.system_fingerprint = cached_chunk.system_fingerprint
++            # Usage-only chunks return before the generic usage copy below, so
++            # carry the provider usage onto the replayed chunk here.
++            if getattr(cached_chunk, "usage", None) is not None:
++                model_response.usage = cached_chunk.usage
+             if response_obj["is_finished"]:
+                 self.received_finish_reason = response_obj["finish_reason"]
+         else:  # openai / azure chat model
+@@ -2214,11 +2232,12 @@ class CustomStreamWrapper:
+                         if processed_chunk is None:
+                             continue
+ 
+-                        choice = processed_chunk.choices[0]
+-                        if isinstance(choice, StreamingChoices):
+-                            self.response_uptil_now += choice.delta.get("content", "") or ""
+-                        else:
+-                            self.response_uptil_now += ""
++                        if processed_chunk.choices:
++                            choice = processed_chunk.choices[0]
++                            if isinstance(choice, StreamingChoices):
++                                self.response_uptil_now += choice.delta.get("content", "") or ""
++                            else:
++                                self.response_uptil_now += ""
+                         self.rules.post_call_rules(input=self.response_uptil_now, model=self.model)
+                         # RETURN RESULT
+                         self.chunks.append(processed_chunk)
+diff --git a/litellm/llms/anthropic/experimental_pass_through/adapters/transformation.py b/litellm/llms/anthropic/experimental_pass_through/adapters/transformation.py
+index db89066..455f87d 100644
+--- a/litellm/llms/anthropic/experimental_pass_through/adapters/transformation.py
++++ b/litellm/llms/anthropic/experimental_pass_through/adapters/transformation.py
+@@ -1487,8 +1487,11 @@ class LiteLLMAnthropicMessagesAdapter:
+             anthropic_content.insert(0, polyfill_result.compaction_block)
+ 
+         ## extract finish reason
++        # A valid upstream response may carry `choices: []` (e.g. a usage-only
++        # response); there is no first choice to read a finish reason from.
++        openai_finish_reason: Final = response.choices[0].finish_reason if response.choices else None
+         translated_finish_reason: Final = self._translate_openai_finish_reason_to_anthropic(
+-            openai_finish_reason=response.choices[0].finish_reason
++            openai_finish_reason=openai_finish_reason
+         )
+         anthropic_finish_reason: Final = (
+             "refusal"
+@@ -1643,9 +1646,10 @@ class LiteLLMAnthropicMessagesAdapter:
+         applied_edits: list[AppliedEdit] | None = None,
+     ) -> ContentBlockDelta | MessageBlockDelta:
+         ## base case - final chunk w/ finish reason
+-        if response.choices[0].finish_reason is not None:
++        first_choice_finish_reason: Final = response.choices[0].finish_reason if response.choices else None
++        if first_choice_finish_reason is not None:
+             delta: Final = MessageDelta(
+-                stop_reason=self._translate_openai_finish_reason_to_anthropic(response.choices[0].finish_reason),
++                stop_reason=self._translate_openai_finish_reason_to_anthropic(first_choice_finish_reason),
+             )
+             if getattr(response, "usage", None) is not None:
+                 litellm_usage_chunk: Usage | None = response.usage
+diff --git a/tests/llm_translation/test_llm_response_utils/test_convert_dict_to_chat_completion.py b/tests/llm_translation/test_llm_response_utils/test_convert_dict_to_chat_completion.py
+index b6e30dd..5c06bc4 100644
+--- a/tests/llm_translation/test_llm_response_utils/test_convert_dict_to_chat_completion.py
++++ b/tests/llm_translation/test_llm_response_utils/test_convert_dict_to_chat_completion.py
+@@ -1623,19 +1623,40 @@ class TestMissingChoicesGuard:
+ 
+         assert "no 'choices'" in exc_info.value.message
+ 
+-    def test_convert_to_model_response_object_empty_choices_raises_api_error(self):
+-        """Empty choices list raises APIError, same as missing/null choices.
++    def test_convert_to_model_response_object_empty_choices_is_valid(self):
++        """An explicit empty choices list is a valid upstream response.
+ 
+-        Provider-specific repair (e.g. github_copilot synthesizing choices for
+-        Anthropic-native responses) happens before this guard, in the provider
+-        config; the core utility keeps treating empty choices as an error.
++        Usage-only responses (e.g. OpenAI with `stream_options.include_usage`)
++        must round-trip with no fabricated assistant choice and their usage
++        preserved.
+         """
++        response_object = {
++            "id": "msg_123",
++            "model": "some-model",
++            "choices": [],
++            "usage": {"prompt_tokens": 10, "completion_tokens": 1, "total_tokens": 11},
++        }
++
++        result = convert_to_model_response_object(
++            response_object=response_object,
++            model_response_object=ModelResponse(),
++        )
++
++        assert isinstance(result, ModelResponse)
++        assert result.choices == []
++        assert result.usage is not None
++        assert result.usage.prompt_tokens == 10
++        assert result.usage.completion_tokens == 1
++        assert result.usage.total_tokens == 11
++
++    def test_convert_to_model_response_object_null_choices_raises_api_error(self):
++        """choices=None is malformed and raises APIError naming the type."""
+         from litellm.exceptions import APIError
+ 
+         response_object = {
+             "id": "msg_123",
+             "model": "some-model",
+-            "choices": [],
++            "choices": None,
+             "usage": {"prompt_tokens": 10, "completion_tokens": 1, "total_tokens": 11},
+         }
+ 
+@@ -1645,16 +1666,18 @@ class TestMissingChoicesGuard:
+                 model_response_object=ModelResponse(),
+             )
+ 
+-        assert "no 'choices'" in exc_info.value.message
++        message = exc_info.value.message
++        assert "choices" in message
++        assert "NoneType" in message
+ 
+-    def test_convert_to_model_response_object_null_choices_raises_api_error(self):
+-        """choices=None raises APIError."""
++    def test_convert_to_model_response_object_non_list_choices_raises_api_error(self):
++        """choices of the wrong type is malformed and raises APIError."""
+         from litellm.exceptions import APIError
+ 
+         response_object = {
+             "id": "msg_123",
+             "model": "some-model",
+-            "choices": None,
++            "choices": {"index": 0},
+             "usage": {"prompt_tokens": 10, "completion_tokens": 1, "total_tokens": 11},
+         }
+ 
+@@ -1664,7 +1687,9 @@ class TestMissingChoicesGuard:
+                 model_response_object=ModelResponse(),
+             )
+ 
+-        assert "no 'choices'" in exc_info.value.message
++        message = exc_info.value.message
++        assert "choices" in message
++        assert "dict" in message
+ 
+     def test_convert_to_streaming_response_no_choices_raises_api_error(self):
+         """Missing choices in streaming cache-hit path raises APIError."""
+@@ -1736,6 +1761,97 @@ class TestMissingChoicesGuard:
+ 
+         assert "no 'choices'" in exc_info.value.message
+ 
++    def test_convert_to_streaming_response_empty_choices_is_valid(self):
++        """Sync cache-hit streaming keeps a usage-only chunk's empty choices."""
++        from litellm.litellm_core_utils.llm_response_utils.convert_dict_to_response import (
++            convert_to_streaming_response,
++        )
++
++        response_object = {
++            "id": "msg_123",
++            "model": "some-model",
++            "choices": [],
++            "usage": {"prompt_tokens": 10, "completion_tokens": 1, "total_tokens": 11},
++        }
++
++        chunks = list(convert_to_streaming_response(response_object=response_object))
++
++        assert len(chunks) == 1
++        assert chunks[0].choices == []
++        assert chunks[0].usage is not None
++        assert chunks[0].usage.total_tokens == 11
++
++    def test_convert_to_streaming_response_async_empty_choices_is_valid(self):
++        """Async cache-hit streaming keeps a usage-only chunk's empty choices."""
++        import asyncio
++
++        from litellm.litellm_core_utils.llm_response_utils.convert_dict_to_response import (
++            convert_to_streaming_response_async,
++        )
++
++        response_object = {
++            "id": "msg_123",
++            "model": "some-model",
++            "choices": [],
++            "usage": {"prompt_tokens": 10, "completion_tokens": 1, "total_tokens": 11},
++        }
++
++        async def consume():
++            return [
++                chunk
++                async for chunk in convert_to_streaming_response_async(
++                    response_object=response_object
++                )
++            ]
++
++        chunks = asyncio.run(consume())
++
++        assert len(chunks) == 1
++        assert chunks[0].choices == []
++        assert chunks[0].usage is not None
++        assert chunks[0].usage.total_tokens == 11
++
++    def test_convert_to_model_response_object_stream_true_empty_choices_is_valid(self):
++        """stream=True cache replay of a usage-only response keeps empty choices."""
++        response_object = {
++            "id": "msg_123",
++            "model": "some-model",
++            "choices": [],
++            "usage": {"prompt_tokens": 10, "completion_tokens": 1, "total_tokens": 11},
++        }
++
++        chunks = list(
++            convert_to_model_response_object(
++                response_object=response_object,
++                model_response_object=ModelResponse(),
++                stream=True,
++            )
++        )
++
++        assert len(chunks) == 1
++        assert chunks[0].choices == []
++        assert chunks[0].usage.total_tokens == 11
++
++    def test_convert_to_streaming_response_non_list_choices_raises_api_error(self):
++        """A wrong-typed choices field in the streaming path raises APIError."""
++        from litellm.exceptions import APIError
++        from litellm.litellm_core_utils.llm_response_utils.convert_dict_to_response import (
++            convert_to_streaming_response,
++        )
++
++        response_object = {
++            "id": "msg_123",
++            "model": "some-model",
++            "choices": None,
++            "usage": {"prompt_tokens": 10, "completion_tokens": 1, "total_tokens": 11},
++        }
++
++        with pytest.raises(APIError) as exc_info:
++            list(convert_to_streaming_response(response_object=response_object))
++
++        assert "choices" in exc_info.value.message
++        assert "NoneType" in exc_info.value.message
++
+     def test_error_message_includes_response_keys(self):
+         """The error message should include the keys present in the response for debugging."""
+         from litellm.exceptions import APIError
+diff --git a/tests/test_litellm/litellm_core_utils/test_streaming_handler.py b/tests/test_litellm/litellm_core_utils/test_streaming_handler.py
+index 0aa7383..d3b6ede 100644
+--- a/tests/test_litellm/litellm_core_utils/test_streaming_handler.py
++++ b/tests/test_litellm/litellm_core_utils/test_streaming_handler.py
+@@ -2633,6 +2633,29 @@ def test_dispatch_cached_response_extracts_delta(
+     assert initialized_custom_stream_wrapper.response_id == "chatcmpl-cache-1"
+ 
+ 
++def test_dispatch_cached_response_empty_choices_usage_only_chunk(
++    initialized_custom_stream_wrapper: CustomStreamWrapper,
++):
++    """A usage-only cached chunk (`choices: []`) must not raise IndexError and
++    its usage must survive onto the replayed response."""
++    initialized_custom_stream_wrapper.custom_llm_provider = "cached_response"
++    chunk = ModelResponseStream(
++        id="chatcmpl-cache-usage",
++        choices=[],
++        usage=Usage(prompt_tokens=5, completion_tokens=2, total_tokens=7),
++    )
++
++    result, model_response, completion_obj = _run_dispatch(
++        initialized_custom_stream_wrapper, chunk
++    )
++
++    assert isinstance(result, _ProviderChunkParsed)
++    assert completion_obj["content"] is None
++    assert model_response.usage is not None
++    assert model_response.usage.total_tokens == 7
++    assert initialized_custom_stream_wrapper.received_finish_reason is None
++
++
+ def test_dispatch_vertex_ai_legacy_text_and_finish_reason(
+     initialized_custom_stream_wrapper: CustomStreamWrapper,
+ ):
+diff --git a/tests/test_litellm/llms/anthropic/experimental_pass_through/adapters/test_anthropic_experimental_pass_through_adapters_transformation.py b/tests/test_litellm/llms/anthropic/experimental_pass_through/adapters/test_anthropic_experimental_pass_through_adapters_transformation.py
+index c59ec70..24fca2f 100644
+--- a/tests/test_litellm/llms/anthropic/experimental_pass_through/adapters/test_anthropic_experimental_pass_through_adapters_transformation.py
++++ b/tests/test_litellm/llms/anthropic/experimental_pass_through/adapters/test_anthropic_experimental_pass_through_adapters_transformation.py
+@@ -86,6 +86,26 @@ def test_translate_chat_length_takes_precedence_over_refusal():
+     assert result.get("stop_details") is None
+ 
+ 
++def test_translate_empty_choices_response_to_anthropic():
++    """A usage-only upstream response (`choices: []`) must not IndexError.
++
++    It translates to an Anthropic message with empty content and default
++    stop reason, preserving usage, instead of fabricating an assistant turn.
++    """
++    response = ModelResponse(
++        id="chatcmpl-empty-choices",
++        model="openai-model",
++        choices=[],
++        usage=Usage(prompt_tokens=3, completion_tokens=0, total_tokens=3),
++    )
++
++    result = LiteLLMAnthropicMessagesAdapter().translate_openai_response_to_anthropic(response)
++
++    assert result["content"] == []
++    assert result["stop_reason"] == "end_turn"
++    assert result["usage"]["input_tokens"] == 3
++
++
+ def test_translate_streaming_openai_chunk_to_anthropic_content_block():
+     choices = [
+         StreamingChoices(

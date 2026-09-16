@@ -1,6 +1,6 @@
 # LiteLLM harness campaign results
 
-Interim snapshot: 2026-09-16T09:28:15.969679+00:00. Current harness: **2026-09-16.45**.
+Interim snapshot: 2026-09-16T09:55:59.344703+00:00. Current harness: **2026-09-16.45**.
 
 **The campaign is still running. It has not established a quality win over Astra/Codex or production replacement readiness.**
 
@@ -8,7 +8,9 @@ The selectable architecture and replay workbench are implemented. The current wo
 
 ## Spending
 
-Confirmed token/header-priced charges: **$43.6855**. Missing receipts retain **$29.7730** across 118 requests; active requests reserve another **$0.2523**. The committed upper bound is **$73.7108** against the authorized **$100.00** ceiling. Reservations are not actual charges. Astra account billing is unavailable.
+Confirmed token/header-priced charges: **$45.2055**. Missing receipts retain **$15.1388** across 60 requests; active requests reserve another **$0.5046**. The committed upper bound is **$60.8490** against the authorized **$100.00** ceiling. Reservations are not actual charges. Astra account billing is unavailable.
+
+An [offline receipt reconciliation](../scripts/litellm-harness/studies/runner-receipt-recovery/README.md) subsequently matched 58 missing gateway records to independently persisted runner usage. Exact round binding agreed with 3,359 known receipts. It restored $0.07678 in token-priced charges and released $14.55740 in excess reservations; unmatched requests remain reserved. The original ledger and per-request reservation history are preserved.
 
 ## Controlled development observations
 
@@ -62,6 +64,8 @@ Request-level cost analysis found that completed background jobs repeatedly chan
 A [real streaming-adapter audit](../scripts/litellm-harness/studies/feature-effort/legacy-inheritance/README.md#real-endpoint-check) qualifies 24 hook/stream checks across Chat Completions, Anthropic Messages and Responses. It narrows a critic's diagnosis: two patches handle direct hooks through chat and Messages but fail real Responses behavior differently. The completed [endpoint-aware guide comparison](../scripts/litellm-harness/studies/streaming-contract/README.md) delivers zero strict successes in either arm and costs more with the guide; it is not promoted. No held-out result was used to design that guide.
 
 The completed [inspection-preference comparison](../scripts/litellm-harness/studies/native-inspection/README.md) delivers 2/4 strict successes in each arm, with slightly higher mean time and cost for the preference; it is not promoted. The completed [grouped-edit comparison](../scripts/litellm-harness/studies/batched-edits/README.md) shows lower time and cost on three known tasks, but its raw pass-rate difference is coupled to the background-test design. The [combined comparison](../scripts/litellm-harness/studies/combined-candidate/README.md) remains in progress.
+
+An [empty-choices oracle audit](../scripts/litellm-harness/studies/empty-choices-oracle/README.md) identifies five exact diagnostic-phrase assertions absent from the task contract. Eighteen independent conversion checks give base 3/18, human reference 18/18 and candidate 18/18. Separate cached-stream observations expose a usage difference in the reference itself and are not treated as a qualified replacement suite; the candidate retains its original 8/13 score.
 
 ## Evaluation status
 

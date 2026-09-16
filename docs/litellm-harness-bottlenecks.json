@@ -1,10 +1,10 @@
 {
-  "sourceGeneratedAt": "2026-09-16T09:28:15.969679+00:00",
+  "sourceGeneratedAt": "2026-09-16T09:55:59.344703+00:00",
   "classificationVersion": 2,
   "scope": "Descriptive protocol-6/7 development attempts with recorded Flash usage. Different tasks, candidate versions, isolation protocols and efforts are pooled only to locate spending. Includes paid interruptions and timeouts; excludes zero-usage startup failures. Not a quality comparison or causal estimate. Protocol 6 has the disclosed runtime-artifact access limitation. Missing usage is outside these token-priced totals; the campaign ledger remains authoritative.",
   "protocolCounts": {
-    "6": 182,
-    "7": 3
+    "6": 186,
+    "7": 5
   },
   "runProtocols": {
     "replication-p6-ablation-control-r1-anthropic-image-guardrail-2510a6a3": 6,
@@ -102,6 +102,7 @@
     "replication-v35-inspection-control-r2-oom1-databricks-reasoning-edabe604": 6,
     "replication-v35-inspection-native-inspection-r1-databricks-reasoning-1d23305a": 6,
     "replication-v35-inspection-native-inspection-r2-databricks-reasoning-ff61f727": 6,
+    "replication-v44-combined-control-r1-databricks-reasoning-d3f77814": 7,
     "replication-p6-ablation-control-r1-bedrock-session-tags-3e02204f": 6,
     "replication-p6-ablation-control-r1-langfuse-session-traces-434c82c9": 6,
     "replication-p6-ablation-control-r1-mcp-auth-challenge-aad2d3c9": 6,
@@ -114,6 +115,7 @@
     "replication-p6-ablation-no-guides-r1-responses-custom-guardrail-f773453c": 6,
     "replication-p6-ablation-no-preload-r1-bedrock-session-tags-d03b1174": 6,
     "replication-p6-ablation-no-preload-r1-langfuse-session-traces-7e700bc5": 6,
+    "replication-p6-ablation-no-preload-r1-mcp-auth-challenge-7e5f6d23": 6,
     "replication-p6-ablation-no-preload-r1-mcp-optional-discovery-41361f27": 6,
     "replication-p6-ablation-no-preload-r1-oom1-responses-custom-guardrail-a0675746": 6,
     "replication-p6-ablation-no-review-r1-bedrock-session-tags-0093eabc": 6,
@@ -125,6 +127,7 @@
     "replication-p6-ablation-read-480-r1-langfuse-session-traces-d07240fb": 6,
     "replication-p6-ablation-read-480-r1-mcp-auth-challenge-90d71d3c": 6,
     "replication-p6-ablation-read-480-r1-mcp-optional-discovery-6445e713": 6,
+    "replication-p6-ablation-read-480-r1-mock-input-tokens-dcd0b092": 6,
     "replication-p6-ablation-read-480-r1-responses-custom-guardrail-c81ac9a3": 6,
     "replication-v19-wait-r1-mcp-auth-challenge-ba720ed4": 6,
     "replication-v19-wait-r1-mcp-optional-discovery-31dae056": 6,
@@ -150,6 +153,8 @@
     "replication-v31-jobs-appended-jobs-r2-bedrock-session-tags-780037f9": 6,
     "replication-v31-jobs-appended-jobs-r2-mcp-auth-challenge-0b5cee2d": 6,
     "replication-v31-jobs-control-r1-mcp-auth-challenge-dae42955": 6,
+    "replication-v31-jobs-control-r1-oom1-bedrock-session-tags-d86c29fd": 6,
+    "replication-v31-jobs-control-r1-oom1-mcp-auth-challenge-2192ff3d": 6,
     "replication-v31-jobs-control-r2-bedrock-session-tags-d8c2c980": 6,
     "replication-v31-jobs-control-r2-mcp-auth-challenge-267b89d3": 6,
     "replication-v31-jobs-control-r2-oom1-bedrock-session-tags-f317de1e": 6,
@@ -191,12 +196,13 @@
     "replication-v39-streams-control-r2-legacy-stream-pipeline-db20a2dc": 6,
     "replication-v39-streams-stream-guide-r1-legacy-stream-pipeline-5933dea8": 6,
     "replication-v39-streams-stream-guide-r2-legacy-stream-pipeline-929c8cfe": 6,
-    "replication-v44-combined-combined-r1-legacy-stream-pipeline-fc4cc74b": 7
+    "replication-v44-combined-combined-r1-legacy-stream-pipeline-fc4cc74b": 7,
+    "replication-v44-combined-control-r2-legacy-stream-pipeline-78ee2f68": 7
   },
-  "runs": 185,
+  "runs": 191,
   "completionReasons": {
-    "completed": 160,
-    "timeout": 22,
+    "completed": 165,
+    "timeout": 23,
     "runner-error": 3
   },
   "runIds": [
@@ -295,6 +301,7 @@
     "replication-v35-inspection-control-r2-oom1-databricks-reasoning-edabe604",
     "replication-v35-inspection-native-inspection-r1-databricks-reasoning-1d23305a",
     "replication-v35-inspection-native-inspection-r2-databricks-reasoning-ff61f727",
+    "replication-v44-combined-control-r1-databricks-reasoning-d3f77814",
     "replication-p6-ablation-control-r1-bedrock-session-tags-3e02204f",
     "replication-p6-ablation-control-r1-langfuse-session-traces-434c82c9",
     "replication-p6-ablation-control-r1-mcp-auth-challenge-aad2d3c9",
@@ -307,6 +314,7 @@
     "replication-p6-ablation-no-guides-r1-responses-custom-guardrail-f773453c",
     "replication-p6-ablation-no-preload-r1-bedrock-session-tags-d03b1174",
     "replication-p6-ablation-no-preload-r1-langfuse-session-traces-7e700bc5",
+    "replication-p6-ablation-no-preload-r1-mcp-auth-challenge-7e5f6d23",
     "replication-p6-ablation-no-preload-r1-mcp-optional-discovery-41361f27",
     "replication-p6-ablation-no-preload-r1-oom1-responses-custom-guardrail-a0675746",
     "replication-p6-ablation-no-review-r1-bedrock-session-tags-0093eabc",
@@ -318,6 +326,7 @@
     "replication-p6-ablation-read-480-r1-langfuse-session-traces-d07240fb",
     "replication-p6-ablation-read-480-r1-mcp-auth-challenge-90d71d3c",
     "replication-p6-ablation-read-480-r1-mcp-optional-discovery-6445e713",
+    "replication-p6-ablation-read-480-r1-mock-input-tokens-dcd0b092",
     "replication-p6-ablation-read-480-r1-responses-custom-guardrail-c81ac9a3",
     "replication-v19-wait-r1-mcp-auth-challenge-ba720ed4",
     "replication-v19-wait-r1-mcp-optional-discovery-31dae056",
@@ -343,6 +352,8 @@
     "replication-v31-jobs-appended-jobs-r2-bedrock-session-tags-780037f9",
     "replication-v31-jobs-appended-jobs-r2-mcp-auth-challenge-0b5cee2d",
     "replication-v31-jobs-control-r1-mcp-auth-challenge-dae42955",
+    "replication-v31-jobs-control-r1-oom1-bedrock-session-tags-d86c29fd",
+    "replication-v31-jobs-control-r1-oom1-mcp-auth-challenge-2192ff3d",
     "replication-v31-jobs-control-r2-bedrock-session-tags-d8c2c980",
     "replication-v31-jobs-control-r2-mcp-auth-challenge-267b89d3",
     "replication-v31-jobs-control-r2-oom1-bedrock-session-tags-f317de1e",
@@ -384,79 +395,80 @@
     "replication-v39-streams-control-r2-legacy-stream-pipeline-db20a2dc",
     "replication-v39-streams-stream-guide-r1-legacy-stream-pipeline-5933dea8",
     "replication-v39-streams-stream-guide-r2-legacy-stream-pipeline-929c8cfe",
-    "replication-v44-combined-combined-r1-legacy-stream-pipeline-fc4cc74b"
+    "replication-v44-combined-combined-r1-legacy-stream-pipeline-fc4cc74b",
+    "replication-v44-combined-control-r2-legacy-stream-pipeline-78ee2f68"
   ],
-  "recordedTokenPricedUsd": 24.481237142,
-  "attributedTokenPricedUsd": 24.481237142,
-  "unattributedTokenPricedUsd": 0.0,
+  "recordedTokenPricedUsd": 25.746671082000002,
+  "attributedTokenPricedUsd": 25.746671082,
+  "unattributedTokenPricedUsd": 3.552713678800501e-15,
   "groups": {
     "shell-command": {
-      "requests": 3729,
-      "estimatedUsd": 6.701872146000002,
-      "inputTokens": 302878281,
-      "cachedTokens": 288469318,
-      "outputTokens": 2291841,
-      "reportedModelSeconds": 20536.825999999994,
+      "requests": 3905,
+      "estimatedUsd": 7.011631176000002,
+      "inputTokens": 317799207,
+      "cachedTokens": 302740768,
+      "outputTokens": 2393317,
+      "reportedModelSeconds": 21488.852999999992,
       "durationUnreportedRequests": 0,
       "cacheUnreportedRequests": 0
     },
     "navigation": {
-      "requests": 4134,
-      "estimatedUsd": 5.452676556,
-      "inputTokens": 240849447,
-      "cachedTokens": 228802748,
-      "outputTokens": 1819369,
-      "reportedModelSeconds": 17054.444000000003,
+      "requests": 4269,
+      "estimatedUsd": 5.611765318,
+      "inputTokens": 250068514,
+      "cachedTokens": 237702054,
+      "outputTokens": 1859439,
+      "reportedModelSeconds": 17468.693,
       "durationUnreportedRequests": 0,
       "cacheUnreportedRequests": 0
     },
     "shell-mentions-checks": {
-      "requests": 1486,
-      "estimatedUsd": 3.92661118,
-      "inputTokens": 153409285,
-      "cachedTokens": 142191960,
-      "outputTokens": 702206,
-      "reportedModelSeconds": 6423.894000000002,
+      "requests": 1548,
+      "estimatedUsd": 4.1580025,
+      "inputTokens": 160197892,
+      "cachedTokens": 148193740,
+      "outputTokens": 726868,
+      "reportedModelSeconds": 6675.327,
       "durationUnreportedRequests": 0,
       "cacheUnreportedRequests": 0
     },
     "structured-edit": {
-      "requests": 2057,
-      "estimatedUsd": 3.632344427999999,
-      "inputTokens": 186649650,
-      "cachedTokens": 180648584,
-      "outputTokens": 1587227,
-      "reportedModelSeconds": 11403.733999999999,
+      "requests": 2174,
+      "estimatedUsd": 3.8236872759999985,
+      "inputTokens": 198030124,
+      "cachedTokens": 191751048,
+      "outputTokens": 1666717,
+      "reportedModelSeconds": 12019.709,
       "durationUnreportedRequests": 0,
       "cacheUnreportedRequests": 0
     },
     "job-poll-or-wait": {
-      "requests": 580,
-      "estimatedUsd": 3.224573896,
-      "inputTokens": 64698589,
-      "cachedTokens": 51815848,
-      "outputTokens": 41909,
-      "reportedModelSeconds": 1327.9909999999995,
+      "requests": 614,
+      "estimatedUsd": 3.533248184,
+      "inputTokens": 68575382,
+      "cachedTokens": 54377212,
+      "outputTokens": 43955,
+      "reportedModelSeconds": 1412.5049999999997,
       "durationUnreportedRequests": 0,
       "cacheUnreportedRequests": 0
     },
     "text-only": {
-      "requests": 320,
-      "estimatedUsd": 0.8697639779999996,
-      "inputTokens": 31069602,
-      "cachedTokens": 28963334,
-      "outputTokens": 308548,
-      "reportedModelSeconds": 2619.3390000000004,
+      "requests": 330,
+      "estimatedUsd": 0.9135879079999996,
+      "inputTokens": 32221280,
+      "cachedTokens": 29977304,
+      "outputTokens": 318291,
+      "reportedModelSeconds": 2707.813,
       "durationUnreportedRequests": 0,
       "cacheUnreportedRequests": 0
     },
     "mixed-tools": {
-      "requests": 381,
-      "estimatedUsd": 0.5788026120000002,
-      "inputTokens": 16166712,
-      "cachedTokens": 14739716,
-      "outputTokens": 244978,
-      "reportedModelSeconds": 1989.359,
+      "requests": 395,
+      "estimatedUsd": 0.6001563740000002,
+      "inputTokens": 16520135,
+      "cachedTokens": 15017342,
+      "outputTokens": 249122,
+      "reportedModelSeconds": 2023.926,
       "durationUnreportedRequests": 0,
       "cacheUnreportedRequests": 0
     },
@@ -473,15 +485,15 @@
   },
   "timing": {
     "modelSeconds": {
-      "measuredRuns": 185,
-      "medianSeconds": 330.805
+      "measuredRuns": 191,
+      "medianSeconds": 331.802
     },
     "toolActiveSeconds": {
-      "measuredRuns": 185,
-      "medianSeconds": 83.568
+      "measuredRuns": 191,
+      "medianSeconds": 87.461
     },
     "timeToFirstEditSeconds": {
-      "measuredRuns": 185,
+      "measuredRuns": 191,
       "medianSeconds": 144.119
     }
   }

@@ -1,0 +1,1709 @@
+{
+  "scope": "Heuristic only: identical pytest argument tokens, different shell output filter, no recorded structured edit or intervening non-pytest shell command. Test execution can mutate state and independent verification may justify repetitions. Not a causal wasted-time estimate.",
+  "rows": [
+    {
+      "dataset": "original",
+      "run": "replication-p6-ablation-control-r1-router-strategy-isolation-ad5bb49e",
+      "completed": false,
+      "pytestCalls": 12,
+      "matches": [
+        {
+          "firstId": "call_452a7e9a79ce426087c17a57",
+          "nextId": "call_9844d4e3efb24f86b2fb1813",
+          "firstFilter": [
+            "|",
+            "grep",
+            "-A40",
+            "FAILED\\|assert\\|Error",
+            "|",
+            "head",
+            "-80"
+          ],
+          "nextFilter": [
+            "|",
+            "tail",
+            "-20"
+          ],
+          "elapsedMs": 7009,
+          "durationMs": 2454
+        },
+        {
+          "firstId": "call_6bfdc0354f0542cabde1330e",
+          "nextId": "call_7aeb94a6cae44083bb772083",
+          "firstFilter": [
+            "|",
+            "tail",
+            "-15"
+          ],
+          "nextFilter": [
+            "|",
+            "grep",
+            "-B5",
+            "-A30",
+            "test_group_call_429_registers_cooldown_end_to_end _",
+            "|",
+            "head",
+            "-80"
+          ],
+          "elapsedMs": 115954,
+          "durationMs": 18005
+        },
+        {
+          "firstId": "call_7aeb94a6cae44083bb772083",
+          "nextId": "call_225b43fce5144ef3bb6d348c",
+          "firstFilter": [
+            "|",
+            "grep",
+            "-B5",
+            "-A30",
+            "test_group_call_429_registers_cooldown_end_to_end _",
+            "|",
+            "head",
+            "-80"
+          ],
+          "nextFilter": [
+            "|",
+            "tail",
+            "-6;",
+            "echo",
+            "DONE"
+          ],
+          "elapsedMs": 120271,
+          "durationMs": 83909
+        }
+      ]
+    },
+    {
+      "dataset": "original",
+      "run": "replication-p6-ablation-no-guides-r1-router-candidates-360f3ddd",
+      "completed": true,
+      "pytestCalls": 10,
+      "matches": [
+        {
+          "firstId": "call_9f8e12fb5c0641b68c2b75b8",
+          "nextId": "call_7123093f092a48d59dd9dac3",
+          "firstFilter": [
+            "|",
+            "grep",
+            "-n",
+            "assert\\|Error\\|line ",
+            "|",
+            "head",
+            "-40"
+          ],
+          "nextFilter": [
+            "|",
+            "tail",
+            "-4;",
+            "done"
+          ],
+          "elapsedMs": 15717,
+          "durationMs": 4135
+        }
+      ]
+    },
+    {
+      "dataset": "original",
+      "run": "replication-p6-ablation-no-preload-r1-team-member-budget-e6f46fba",
+      "completed": true,
+      "pytestCalls": 21,
+      "matches": [
+        {
+          "firstId": "call_d3fbd122745541cc94715d57",
+          "nextId": "call_7dbffaa2845e40489ead7944",
+          "firstFilter": [
+            "|",
+            "tail",
+            "-12"
+          ],
+          "nextFilter": [
+            "|",
+            "grep",
+            "-E",
+            "REDIS|INMEM|assert|Error",
+            "|",
+            "head",
+            "-20"
+          ],
+          "elapsedMs": 14269,
+          "durationMs": 9049
+        }
+      ]
+    },
+    {
+      "dataset": "original",
+      "run": "replication-p6-ablation-no-review-r1-converse-config-956edcd4",
+      "completed": true,
+      "pytestCalls": 8,
+      "matches": [
+        {
+          "firstId": "call_faa32d4611e5409199572308",
+          "nextId": "call_b5c0931f93534ffe88dda8d3",
+          "firstFilter": [
+            "|",
+            "head",
+            "-40"
+          ],
+          "nextFilter": [
+            "|",
+            "sed",
+            "-n",
+            "40,80p"
+          ],
+          "elapsedMs": 5725,
+          "durationMs": 2247
+        }
+      ]
+    },
+    {
+      "dataset": "original",
+      "run": "replication-p6-ablation-read-480-r1-empty-choices-546a1e66",
+      "completed": true,
+      "pytestCalls": 15,
+      "matches": [
+        {
+          "firstId": "call_88684b0065554dac967d83ac",
+          "nextId": "call_16c8c0f2164f4862a8fc24af",
+          "firstFilter": [
+            "|",
+            "tail",
+            "-8"
+          ],
+          "nextFilter": [
+            "|",
+            "grep",
+            "-E",
+            "^(FAILED|ERROR)",
+            "|",
+            "head"
+          ],
+          "elapsedMs": 8382,
+          "durationMs": 4194
+        },
+        {
+          "firstId": "call_96c44ee26d8d4b02b6624ddf",
+          "nextId": "call_7af8397ae0d7487f9b8ed29c",
+          "firstFilter": [
+            "|",
+            "tail",
+            "-8"
+          ],
+          "nextFilter": [
+            "|",
+            "grep",
+            "-E",
+            "^FAILED|^ERROR",
+            "|",
+            "sed",
+            "-E",
+            "s/::.*//",
+            "|",
+            "sort",
+            "|",
+            "uniq",
+            "-c"
+          ],
+          "elapsedMs": 20921,
+          "durationMs": 183
+        }
+      ]
+    },
+    {
+      "dataset": "original",
+      "run": "replication-p6-ablation-read-480-r1-router-candidates-64d116b8",
+      "completed": true,
+      "pytestCalls": 6,
+      "matches": [
+        {
+          "firstId": "call_d9630090ad6d44a6b52c3e39",
+          "nextId": "call_2896311497374bb3ad94b4c1",
+          "firstFilter": [
+            "|",
+            "tail",
+            "-15"
+          ],
+          "nextFilter": [
+            "|",
+            "tail",
+            "-4"
+          ],
+          "elapsedMs": 19096,
+          "durationMs": 3151
+        }
+      ]
+    },
+    {
+      "dataset": "original",
+      "run": "replication-p6-ablation-read-480-r1-team-member-budget-766700a8",
+      "completed": true,
+      "pytestCalls": 19,
+      "matches": [
+        {
+          "firstId": "call_aa92fc31806f48f59efd6381",
+          "nextId": "call_291d5672ede84ed08047b58a",
+          "firstFilter": [
+            "|",
+            "tail",
+            "-30"
+          ],
+          "nextFilter": [
+            "|",
+            "grep",
+            "-A15",
+            "DID NOT RAISE\\|Failed:"
+          ],
+          "elapsedMs": 13592,
+          "durationMs": 8705
+        },
+        {
+          "firstId": "call_cef2cc3b21934fc49ecd73fc",
+          "nextId": "call_8d197d2749e140deb3a7bc87",
+          "firstFilter": [
+            "|",
+            "grep",
+            "-B5",
+            "-A20",
+            "def test_temp_budget_increase_applied_for_cached_key\\|assert",
+            "|",
+            "head",
+            "-60"
+          ],
+          "nextFilter": [
+            "|",
+            "tail",
+            "-4",
+            "cp",
+            "$TMPDIR/uaka.fixed.py",
+            "litellm/proxy/auth/user_api_key_auth.py",
+            "grep",
+            "-n",
+            "team_member_spend >= team_member_budget",
+            "litellm/proxy/auth/user_api_key_auth.py"
+          ],
+          "elapsedMs": 19453,
+          "durationMs": 9231
+        }
+      ]
+    },
+    {
+      "dataset": "original",
+      "run": "replication-v18-owner-r3-router-strategy-isolation-25642167",
+      "completed": true,
+      "pytestCalls": 14,
+      "matches": [
+        {
+          "firstId": "call_1f7837464d024e10abedf18d",
+          "nextId": "call_7261fc4c28d14660b10a4aaf",
+          "firstFilter": [
+            "|",
+            "tail",
+            "-12"
+          ],
+          "nextFilter": [
+            "|",
+            "grep",
+            "-E",
+            "^(FAILED|ERROR)",
+            "|",
+            "head",
+            "-30"
+          ],
+          "elapsedMs": 10279,
+          "durationMs": 6518
+        }
+      ]
+    },
+    {
+      "dataset": "original",
+      "run": "replication-v20-boundary-review-r2-router-strategy-isolation-2b23a214",
+      "completed": true,
+      "pytestCalls": 10,
+      "matches": [
+        {
+          "firstId": "call_7f7fb2bcd691448d8637f44e",
+          "nextId": "call_77b601f12a274166b12e8f78",
+          "firstFilter": [
+            "|",
+            "tail",
+            "-25"
+          ],
+          "nextFilter": [
+            "|",
+            "tail",
+            "-6",
+            "&&",
+            "/Users/mfkhalil/Code/litellm/.venv/bin/python",
+            "-c",
+            "import ast;ast.parse(open('litellm/router.py').read());print('router.py parses')"
+          ],
+          "elapsedMs": 26147,
+          "durationMs": 4229
+        },
+        {
+          "firstId": "call_65d469d9bb3e4e6ebb05ab1e",
+          "nextId": "call_3dd9c536233b46db8cf7defb",
+          "firstFilter": [
+            "|",
+            "tail",
+            "-5"
+          ],
+          "nextFilter": [
+            "|",
+            "grep",
+            "-E",
+            "^(FAILED|ERROR)"
+          ],
+          "elapsedMs": 9081,
+          "durationMs": 4958
+        }
+      ]
+    },
+    {
+      "dataset": "original",
+      "run": "replication-v20-boundary-review-r3-router-candidates-68175e2a",
+      "completed": true,
+      "pytestCalls": 11,
+      "matches": [
+        {
+          "firstId": "call_68d50b04d87447ceb9eb62c8",
+          "nextId": "call_797ce31613ae4e75902b0afc",
+          "firstFilter": [
+            "|",
+            "tail",
+            "-8"
+          ],
+          "nextFilter": [
+            "|",
+            "grep",
+            "-A",
+            "40",
+            "test_affinity_falls_back_to_same_boundary_on_alias_switch",
+            "|",
+            "head",
+            "-70"
+          ],
+          "elapsedMs": 15857,
+          "durationMs": 3172
+        },
+        {
+          "firstId": "call_797ce31613ae4e75902b0afc",
+          "nextId": "call_445f708f95134cfcbcefa78c",
+          "firstFilter": [
+            "|",
+            "grep",
+            "-A",
+            "40",
+            "test_affinity_falls_back_to_same_boundary_on_alias_switch",
+            "|",
+            "head",
+            "-70"
+          ],
+          "nextFilter": [
+            "|",
+            "grep",
+            "-B2",
+            "-A",
+            "30",
+            "AssertionError\\|FAILED\\|Error",
+            "|",
+            "head",
+            "-80"
+          ],
+          "elapsedMs": 5862,
+          "durationMs": 3158
+        },
+        {
+          "firstId": "call_6adac3b2e0454ec8aa82f1e1",
+          "nextId": "call_a75497d9cd5d4f89a3a5f8e9",
+          "firstFilter": [
+            "|",
+            "tail",
+            "-2;",
+            "done"
+          ],
+          "nextFilter": [
+            "|",
+            "tail",
+            "-1;",
+            "done",
+            "cp",
+            "$TMPDIR/router_fixed2.py",
+            "litellm/router.py",
+            "&&",
+            "echo",
+            "restored",
+            "&&",
+            "grep",
+            "-c",
+            "get_deployments_by_pattern(model=resolved)",
+            "litellm/router.py"
+          ],
+          "elapsedMs": 15107,
+          "durationMs": 9912
+        }
+      ]
+    },
+    {
+      "dataset": "original",
+      "run": "replication-v20-boundary-review-r3-router-strategy-isolation-8be1b53f",
+      "completed": false,
+      "pytestCalls": 19,
+      "matches": [
+        {
+          "firstId": "call_59cd2409244542fb81bfa894",
+          "nextId": "call_1e56dba8ab7546ea98e69c81",
+          "firstFilter": [
+            "|",
+            "tail",
+            "-4"
+          ],
+          "nextFilter": [
+            "|",
+            "grep",
+            "-E",
+            "^(FAILED|ERROR)",
+            "|",
+            "head",
+            "-25"
+          ],
+          "elapsedMs": 10787,
+          "durationMs": 6941
+        }
+      ]
+    },
+    {
+      "dataset": "original",
+      "run": "replication-v21-route-identities-r2-router-candidates-4ebd2ac9",
+      "completed": true,
+      "pytestCalls": 12,
+      "matches": [
+        {
+          "firstId": "call_d30b7d2b9a314fb3b408e22d",
+          "nextId": "call_fd4e9f55df2d43f6acf19cbe",
+          "firstFilter": [
+            "|",
+            "tail",
+            "-6"
+          ],
+          "nextFilter": [
+            "|",
+            "sed",
+            "-n",
+            "1,140p"
+          ],
+          "elapsedMs": 8951,
+          "durationMs": 3108
+        },
+        {
+          "firstId": "call_fd4e9f55df2d43f6acf19cbe",
+          "nextId": "call_314bc1dc04244330add43c26",
+          "firstFilter": [
+            "|",
+            "sed",
+            "-n",
+            "1,140p"
+          ],
+          "nextFilter": [
+            "|",
+            "tail",
+            "-2;",
+            "done"
+          ],
+          "elapsedMs": 8242,
+          "durationMs": 7666
+        }
+      ]
+    },
+    {
+      "dataset": "original",
+      "run": "replication-v21-route-identities-r2-router-strategy-isolation-cb078f50",
+      "completed": false,
+      "pytestCalls": 25,
+      "matches": [
+        {
+          "firstId": "call_0ec436a86a7f4d7195e7ac08",
+          "nextId": "call_83d66bf6a5734cc893c184ff",
+          "firstFilter": [
+            "|",
+            "grep",
+            "-E",
+            "assert|Error|E  ",
+            "|",
+            "head",
+            "-20"
+          ],
+          "nextFilter": [
+            "|",
+            "sed",
+            "-n",
+            "1,60p"
+          ],
+          "elapsedMs": 5857,
+          "durationMs": 3003
+        },
+        {
+          "firstId": "call_df09e3671a7147be8d18b80c",
+          "nextId": "call_232501c7ee89469da75b7e87",
+          "firstFilter": [
+            "|",
+            "tail",
+            "-15"
+          ],
+          "nextFilter": [
+            "|",
+            "sed",
+            "-n",
+            "/FAILED\\|_____ test_full_acompletion/,/short test summary/p",
+            "|",
+            "head",
+            "-60"
+          ],
+          "elapsedMs": 21920,
+          "durationMs": 4042
+        },
+        {
+          "firstId": "call_f09ae71eb1e747aa82005698",
+          "nextId": "call_02cf334cf4784a92b7b586c4",
+          "firstFilter": [
+            "|",
+            "tail",
+            "-4"
+          ],
+          "nextFilter": [
+            "|",
+            "grep",
+            "-E",
+            "RateLimitError|rpm limit|current usage",
+            "|",
+            "head",
+            "-10"
+          ],
+          "elapsedMs": 10905,
+          "durationMs": 3260
+        },
+        {
+          "firstId": "call_f8001335700e4681887a89d7",
+          "nextId": "call_d6ed047861fd4bc5bd649a19",
+          "firstFilter": [
+            "|",
+            "tail",
+            "-6"
+          ],
+          "nextFilter": [
+            "|",
+            "grep",
+            "-E",
+            "rpm limit|current usage|^E |assert",
+            "|",
+            "head",
+            "-12"
+          ],
+          "elapsedMs": 7843,
+          "durationMs": 3785
+        },
+        {
+          "firstId": "call_a96619d0266c467589bf1764",
+          "nextId": "call_c80eb32f676d48d5ad4886b5",
+          "firstFilter": [
+            "|",
+            "grep",
+            "-E",
+            "DEBUG|passed|failed",
+            "|",
+            "head",
+            "-20"
+          ],
+          "nextFilter": [
+            "|",
+            "grep",
+            "-E",
+            "DEBUG|passed|failed",
+            "|",
+            "head",
+            "-30"
+          ],
+          "elapsedMs": 20722,
+          "durationMs": 3971
+        }
+      ]
+    },
+    {
+      "dataset": "original",
+      "run": "replication-v21-route-identities-r3-router-candidates-10682b2e",
+      "completed": true,
+      "pytestCalls": 7,
+      "matches": [
+        {
+          "firstId": "call_ed97507c2d524925b82cd1bf",
+          "nextId": "call_6b5a62c8bf33468e9f5f45e1",
+          "firstFilter": [
+            "|",
+            "grep",
+            "-E",
+            "FAILED|passed|failed"
+          ],
+          "nextFilter": [
+            "|",
+            "grep",
+            "-E",
+            "passed|failed",
+            "|",
+            "tail",
+            "-1;",
+            "done"
+          ],
+          "elapsedMs": 6700,
+          "durationMs": 7430
+        },
+        {
+          "firstId": "call_6b5a62c8bf33468e9f5f45e1",
+          "nextId": "call_b3555187679e4b9aa0f64466",
+          "firstFilter": [
+            "|",
+            "grep",
+            "-E",
+            "passed|failed",
+            "|",
+            "tail",
+            "-1;",
+            "done"
+          ],
+          "nextFilter": [
+            "|",
+            "grep",
+            "-E",
+            "passed|failed",
+            "|",
+            "tail",
+            "-1;",
+            "done;",
+            "cp",
+            "$TMPDIR/router.py.patched",
+            "litellm/router.py",
+            "&&",
+            "echo",
+            "RESTORED",
+            "&&",
+            "grep",
+            "-n",
+            "get_deployments_by_pattern(model=resolved)",
+            "litellm/router.py"
+          ],
+          "elapsedMs": 15028,
+          "durationMs": 6955
+        }
+      ]
+    },
+    {
+      "dataset": "original",
+      "run": "replication-v22-effort-high-r1-team-member-budget-603cc805",
+      "completed": true,
+      "pytestCalls": 12,
+      "matches": [
+        {
+          "firstId": "call_cd4d2a4a57c44858a2546668",
+          "nextId": "call_c1def48d8bed4cfebaf86e71",
+          "firstFilter": [
+            "|",
+            "head",
+            "-60"
+          ],
+          "nextFilter": [
+            "|",
+            "grep",
+            "-n",
+            "Error\\|assert\\|raise\\|line ",
+            "|",
+            "head",
+            "-40"
+          ],
+          "elapsedMs": 13505,
+          "durationMs": 10403
+        },
+        {
+          "firstId": "call_c1def48d8bed4cfebaf86e71",
+          "nextId": "call_9d5829a2be7044dead70a8b8",
+          "firstFilter": [
+            "|",
+            "grep",
+            "-n",
+            "Error\\|assert\\|raise\\|line ",
+            "|",
+            "head",
+            "-40"
+          ],
+          "nextFilter": [
+            "|",
+            "sed",
+            "-n",
+            "1090,1125p"
+          ],
+          "elapsedMs": 14484,
+          "durationMs": 10014
+        }
+      ]
+    },
+    {
+      "dataset": "original",
+      "run": "replication-v22-effort-medium-r1-team-member-budget-65debef6",
+      "completed": true,
+      "pytestCalls": 12,
+      "matches": [
+        {
+          "firstId": "call_504aeaa5d68e4515813bbb1b",
+          "nextId": "call_bf462c379dbe4463b3c6e7f9",
+          "firstFilter": [
+            "|",
+            "tail",
+            "-40"
+          ],
+          "nextFilter": [
+            "|",
+            "tail",
+            "-15;",
+            "echo",
+            "--- restoring ---;",
+            "python",
+            "-c",
+            "\nimport pathlib\np = pathlib.Path('litellm/proxy/auth/user_api_key_auth.py'); s = p.read_text()\np.write_text(s.replace('if team_member_spend > team_member_budget:', 'if team_member_spend >= team_member_budget:', 1))\n;",
+            "grep",
+            "-n",
+            "if team_member_spend",
+            "litellm/proxy/auth/user_api_key_auth.py"
+          ],
+          "elapsedMs": 19701,
+          "durationMs": 626
+        },
+        {
+          "firstId": "call_bf462c379dbe4463b3c6e7f9",
+          "nextId": "call_fed07aa4c1bf446a9f2ba698",
+          "firstFilter": [
+            "|",
+            "tail",
+            "-15;",
+            "echo",
+            "--- restoring ---;",
+            "python",
+            "-c",
+            "\nimport pathlib\np = pathlib.Path('litellm/proxy/auth/user_api_key_auth.py'); s = p.read_text()\np.write_text(s.replace('if team_member_spend > team_member_budget:', 'if team_member_spend >= team_member_budget:', 1))\n;",
+            "grep",
+            "-n",
+            "if team_member_spend",
+            "litellm/proxy/auth/user_api_key_auth.py"
+          ],
+          "nextFilter": [
+            "|",
+            "tail",
+            "-15;",
+            "echo",
+            "--- restoring ---;",
+            "$PY",
+            "-c",
+            "\nimport pathlib\np = pathlib.Path('litellm/proxy/auth/user_api_key_auth.py'); s = p.read_text()\nassert 'if team_member_spend > team_member_budget:' in s\np.write_text(s.replace('if team_member_spend > team_member_budget:', 'if team_member_spend >= team_member_budget:', 1))\n;",
+            "grep",
+            "-n",
+            "if team_member_spend",
+            "litellm/proxy/auth/user_api_key_auth.py"
+          ],
+          "elapsedMs": 7498,
+          "durationMs": 10157
+        }
+      ]
+    },
+    {
+      "dataset": "original",
+      "run": "replication-v24-test-activity-r1-router-strategy-isolation-9f455209",
+      "completed": false,
+      "pytestCalls": 17,
+      "matches": [
+        {
+          "firstId": "call_fbfc13ea0633491d8cc17b8c",
+          "nextId": "call_9869230dc1f74a52b67c4b5e",
+          "firstFilter": [
+            "|",
+            "grep",
+            "-E",
+            "FAILED|passed|failed|deselected",
+            "|",
+            "head;",
+            "cp",
+            "$TMPDIR/router_fixed.py",
+            "litellm/router.py;",
+            "echo",
+            "restored: $(grep -c 'register_callbacks=False' litellm/router.py)"
+          ],
+          "nextFilter": [
+            "|",
+            "grep",
+            "-E",
+            "FAILED|passed|failed|deselected",
+            "|",
+            "head"
+          ],
+          "elapsedMs": 7546,
+          "durationMs": 3155
+        }
+      ]
+    },
+    {
+      "dataset": "original",
+      "run": "replication-v24-test-activity-r2-router-strategy-isolation-63017a65",
+      "completed": true,
+      "pytestCalls": 14,
+      "matches": [
+        {
+          "firstId": "call_2e616f54366c4323a95e89e3",
+          "nextId": "call_3061b95c85f74bedb43b24b6",
+          "firstFilter": [
+            "|",
+            "tail",
+            "-8"
+          ],
+          "nextFilter": [
+            "|",
+            "grep",
+            "-A40",
+            "test_model_group_affinity_config_only_applies",
+            "|",
+            "head",
+            "-80"
+          ],
+          "elapsedMs": 17887,
+          "durationMs": 183
+        }
+      ]
+    },
+    {
+      "dataset": "original",
+      "run": "replication-v25-decision-control-r1-router-candidates-fb8cc6ba",
+      "completed": true,
+      "pytestCalls": 12,
+      "matches": [
+        {
+          "firstId": "call_77445c1492754e978649d1f0",
+          "nextId": "call_955207cee27e457d8cb60618",
+          "firstFilter": [
+            "|",
+            "grep",
+            "-E",
+            "assert|Error|E  ",
+            "|",
+            "head",
+            "-40"
+          ],
+          "nextFilter": [
+            "|",
+            "sed",
+            "-n",
+            "1,120p"
+          ],
+          "elapsedMs": 5501,
+          "durationMs": 2581
+        },
+        {
+          "firstId": "call_d69eccca2bd747ad8b4bb331",
+          "nextId": "call_ce441d14116f43e29eac3e62",
+          "firstFilter": [
+            "|",
+            "tail",
+            "-5"
+          ],
+          "nextFilter": [
+            "|",
+            "sed",
+            "-n",
+            "/def test_affinity_falls_back_to_same_boundary_on_alias_switch/,/short test summary/p",
+            "|",
+            "head",
+            "-80"
+          ],
+          "elapsedMs": 5488,
+          "durationMs": 2921
+        },
+        {
+          "firstId": "call_ce441d14116f43e29eac3e62",
+          "nextId": "call_f81518cb4306466cb645dd5d",
+          "firstFilter": [
+            "|",
+            "sed",
+            "-n",
+            "/def test_affinity_falls_back_to_same_boundary_on_alias_switch/,/short test summary/p",
+            "|",
+            "head",
+            "-80"
+          ],
+          "nextFilter": [
+            "|",
+            "grep",
+            "-nE",
+            "^E |assert",
+            "|",
+            "head",
+            "-40"
+          ],
+          "elapsedMs": 5500,
+          "durationMs": 2977
+        }
+      ]
+    },
+    {
+      "dataset": "original",
+      "run": "replication-v25-decision-decision-guide-r1-router-candidates-5f4ecd6b",
+      "completed": true,
+      "pytestCalls": 5,
+      "matches": [
+        {
+          "firstId": "call_e9e37928ed7746e487334ad3",
+          "nextId": "call_ee8b3c81ccef4d038921f62f",
+          "firstFilter": [
+            "|",
+            "tail",
+            "-20"
+          ],
+          "nextFilter": [
+            "|",
+            "tail",
+            "-4;",
+            "done"
+          ],
+          "elapsedMs": 31543,
+          "durationMs": 5207
+        }
+      ]
+    },
+    {
+      "dataset": "original",
+      "run": "replication-v25-decision-decision-guide-r2-router-candidates-9ce7e94a",
+      "completed": true,
+      "pytestCalls": 16,
+      "matches": [
+        {
+          "firstId": "call_a5e07725fbb24d12a65edfd1",
+          "nextId": "call_1ef1c173e80041afa0010eb4",
+          "firstFilter": [
+            "|",
+            "tail",
+            "-5",
+            ")",
+            ";",
+            "cp",
+            "$T/fixed.py",
+            "litellm/router.py",
+            ";",
+            "echo",
+            "restored",
+            ";",
+            "grep",
+            "-n",
+            "get_deployments_by_pattern(model=resolved)",
+            "litellm/router.py"
+          ],
+          "nextFilter": [
+            "|",
+            "tail",
+            "-5"
+          ],
+          "elapsedMs": 10588,
+          "durationMs": 3031
+        },
+        {
+          "firstId": "call_ba67006a295f421ba575d691",
+          "nextId": "call_3a7d722e4ccd4d13ad49fa4d",
+          "firstFilter": [
+            "|",
+            "tail",
+            "-5"
+          ],
+          "nextFilter": [
+            "|",
+            "tail",
+            "-5",
+            ")",
+            ";",
+            "cp",
+            "$T/fixed.py",
+            "litellm/router.py",
+            ";",
+            "echo",
+            "restored",
+            ";",
+            "grep",
+            "-c",
+            "get_deployments_by_pattern(model=resolved)",
+            "litellm/router.py"
+          ],
+          "elapsedMs": 6370,
+          "durationMs": 3165
+        }
+      ]
+    },
+    {
+      "dataset": "original",
+      "run": "replication-v27-review-control-r1-router-candidates-d12e30d5",
+      "completed": true,
+      "pytestCalls": 5,
+      "matches": [
+        {
+          "firstId": "call_22bf96dafbdc4a1f9ea44c73",
+          "nextId": "call_c39139aad8aa40a6a1d6eb6c",
+          "firstFilter": [
+            "|",
+            "tail",
+            "-8;",
+            "cp",
+            "$TMPDIR/router_fixed.py",
+            "litellm/router.py",
+            "&&",
+            "echo",
+            "RESTORED"
+          ],
+          "nextFilter": [
+            "|",
+            "tail",
+            "-8"
+          ],
+          "elapsedMs": 9182,
+          "durationMs": 4436
+        }
+      ]
+    },
+    {
+      "dataset": "original",
+      "run": "replication-v27-review-guided-review-r1-router-candidates-f9913f75",
+      "completed": true,
+      "pytestCalls": 6,
+      "matches": [
+        {
+          "firstId": "call_f7755d3106d14bcf8581ae38",
+          "nextId": "call_ad2512b66b564960974c37e5",
+          "firstFilter": [
+            "|",
+            "tail",
+            "-8",
+            "cp",
+            "$T",
+            "litellm/router.py",
+            "&&",
+            "echo",
+            "RESTORED",
+            "&&",
+            "grep",
+            "-n",
+            "get_deployments_by_pattern(model=resolved)",
+            "litellm/router.py"
+          ],
+          "nextFilter": [
+            "|",
+            "tail",
+            "-3;",
+            "done"
+          ],
+          "elapsedMs": 16327,
+          "durationMs": 10003
+        },
+        {
+          "firstId": "call_079c047107f44f928e8c6c86",
+          "nextId": "call_819d38cc5ea844069d8f6f3d",
+          "firstFilter": [
+            "|",
+            "tail",
+            "-15"
+          ],
+          "nextFilter": [
+            "|",
+            "tail",
+            "-5",
+            "cp",
+            "$T",
+            "litellm/router.py",
+            "&&",
+            "echo",
+            "RESTORED"
+          ],
+          "elapsedMs": 52365,
+          "durationMs": 4750
+        }
+      ]
+    },
+    {
+      "dataset": "original",
+      "run": "replication-v27-review-guided-review-r2-router-candidates-40d8257d",
+      "completed": true,
+      "pytestCalls": 8,
+      "matches": [
+        {
+          "firstId": "call_3f6ce10d47e74ddea6d23308",
+          "nextId": "call_b97546babba74391920be0d1",
+          "firstFilter": [
+            "|",
+            "tail",
+            "-8"
+          ],
+          "nextFilter": [
+            "|",
+            "grep",
+            "-A",
+            "30",
+            "test_model_group_affinity_config_only_applies|",
+            "head",
+            "-50"
+          ],
+          "elapsedMs": 18884,
+          "durationMs": 5827
+        },
+        {
+          "firstId": "call_b97546babba74391920be0d1",
+          "nextId": "call_30e21a299fdd436ea7820060",
+          "firstFilter": [
+            "|",
+            "grep",
+            "-A",
+            "30",
+            "test_model_group_affinity_config_only_applies|",
+            "head",
+            "-50"
+          ],
+          "nextFilter": [
+            "|",
+            "grep",
+            "-B5",
+            "-A8",
+            "Error\\|assert\\|E  ",
+            "|",
+            "tail",
+            "-60"
+          ],
+          "elapsedMs": 9395,
+          "durationMs": 6214
+        }
+      ]
+    },
+    {
+      "dataset": "original",
+      "run": "replication-v32-counters-control-r1-team-member-budget-8becbd13",
+      "completed": true,
+      "pytestCalls": 10,
+      "matches": [
+        {
+          "firstId": "call_294bdafc9e5f4334918cc414",
+          "nextId": "call_7cd61feae268463680fbf199",
+          "firstFilter": [
+            "|",
+            "tail",
+            "-8"
+          ],
+          "nextFilter": [
+            "|",
+            "grep",
+            "-E",
+            "Error|assert|Exception|code|raise|E  ",
+            "|",
+            "head",
+            "-30"
+          ],
+          "elapsedMs": 15518,
+          "durationMs": 12855
+        }
+      ]
+    },
+    {
+      "dataset": "original",
+      "run": "replication-v32-counters-counter-values-r2-team-member-budget-e215e803",
+      "completed": true,
+      "pytestCalls": 16,
+      "matches": [
+        {
+          "firstId": "call_211269708e59463f9c8951b6",
+          "nextId": "call_fb254853f41c40eea7832334",
+          "firstFilter": [
+            "|",
+            "tail",
+            "-30"
+          ],
+          "nextFilter": [
+            "|",
+            "tail",
+            "-8;",
+            "python3",
+            "-",
+            "<<EOF",
+            "import",
+            "pathlib",
+            "p",
+            "=",
+            "pathlib.Path(litellm/proxy/auth/user_api_key_auth.py)",
+            "s",
+            "=",
+            "p.read_text()",
+            "p.write_text(s.replace(if team_member_spend > team_member_budget:,",
+            "if team_member_spend >= team_member_budget:))",
+            "EOF",
+            "grep",
+            "-n",
+            "team_member_spend >= team_member_budget",
+            "litellm/proxy/auth/user_api_key_auth.py"
+          ],
+          "elapsedMs": 16544,
+          "durationMs": 12546
+        }
+      ]
+    },
+    {
+      "dataset": "training2",
+      "run": "replication-p6-ablation-no-guides-r1-bedrock-session-tags-6586c24e",
+      "completed": true,
+      "pytestCalls": 14,
+      "matches": [
+        {
+          "firstId": "call_4884a9a4add4454fad374b43",
+          "nextId": "call_3e50bd0b1dde4af3af4f1b89",
+          "firstFilter": [
+            "|",
+            "grep",
+            "-A40",
+            "def test_bedrock_completion_with_region_name\\|Error\\|assert",
+            "|",
+            "head",
+            "-70"
+          ],
+          "nextFilter": [
+            "|",
+            "grep",
+            "-E",
+            "^E |Error|assert |raise ",
+            "|",
+            "tail",
+            "-30"
+          ],
+          "elapsedMs": 15144,
+          "durationMs": 181
+        },
+        {
+          "firstId": "call_bfac67335cba4eef83753a47",
+          "nextId": "call_e29a412fcf004e26b89393fd",
+          "firstFilter": [
+            "|",
+            "tail",
+            "-8"
+          ],
+          "nextFilter": [
+            "|",
+            "grep",
+            "-B2",
+            "-A6",
+            "ERROR at setup\\|fixture",
+            "|",
+            "head",
+            "-40"
+          ],
+          "elapsedMs": 11545,
+          "durationMs": 243
+        }
+      ]
+    },
+    {
+      "dataset": "training2",
+      "run": "replication-p6-ablation-no-preload-r1-bedrock-session-tags-d03b1174",
+      "completed": true,
+      "pytestCalls": 14,
+      "matches": [
+        {
+          "firstId": "call_ab9df0d92c92412d8313b65d",
+          "nextId": "call_a5d645e02d184340910c27f3",
+          "firstFilter": [
+            "|",
+            "tail",
+            "-8"
+          ],
+          "nextFilter": [
+            "|",
+            "grep",
+            "-E",
+            "passed|failed|error",
+            "|",
+            "tail",
+            "-5"
+          ],
+          "elapsedMs": 8868,
+          "durationMs": 6117
+        },
+        {
+          "firstId": "call_a5d645e02d184340910c27f3",
+          "nextId": "call_cc3d1e47ec1c42498d20118f",
+          "firstFilter": [
+            "|",
+            "grep",
+            "-E",
+            "passed|failed|error",
+            "|",
+            "tail",
+            "-5"
+          ],
+          "nextFilter": [
+            "|",
+            "grep",
+            "-E",
+            "^FAILED"
+          ],
+          "elapsedMs": 9932,
+          "durationMs": 5882
+        }
+      ]
+    },
+    {
+      "dataset": "training2",
+      "run": "replication-p6-ablation-no-preload-r1-langfuse-session-traces-7e700bc5",
+      "completed": true,
+      "pytestCalls": 7,
+      "matches": [
+        {
+          "firstId": "call_b7949118d43244b1b1fb6c83",
+          "nextId": "call_c2f109245e084e43ac085b30",
+          "firstFilter": [
+            "|",
+            "grep",
+            "-A25",
+            "def test_log_event_on_langfuse"
+          ],
+          "nextFilter": [
+            "|",
+            "grep",
+            "-E",
+            "assert|Error|result",
+            "|",
+            "head",
+            "-20"
+          ],
+          "elapsedMs": 7470,
+          "durationMs": 2398
+        }
+      ]
+    },
+    {
+      "dataset": "training2",
+      "run": "replication-p6-ablation-read-480-r1-langfuse-session-traces-d07240fb",
+      "completed": true,
+      "pytestCalls": 6,
+      "matches": [
+        {
+          "firstId": "call_eef4b9e5fbea4542b286d318",
+          "nextId": "call_a5cef3863a4e4301946e24a4",
+          "firstFilter": [
+            "|",
+            "grep",
+            "-A",
+            "40",
+            "def test_langfuse_e2e_sync\\|Error\\|assert",
+            "|",
+            "head",
+            "-60"
+          ],
+          "nextFilter": [
+            "|",
+            "tail",
+            "-2;",
+            "done"
+          ],
+          "elapsedMs": 20310,
+          "durationMs": 24342
+        }
+      ]
+    },
+    {
+      "dataset": "training2",
+      "run": "replication-v23-identity-identity-guide-r1-langfuse-session-traces-3c790ef0",
+      "completed": true,
+      "pytestCalls": 9,
+      "matches": [
+        {
+          "firstId": "call_ecb34151a0b14798a958bc11",
+          "nextId": "call_1054778bada549b489844af8",
+          "firstFilter": [
+            "|",
+            "grep",
+            "-A40",
+            "def test_langfuse_e2e_sync\\|Error\\|assert",
+            "|",
+            "head",
+            "-60"
+          ],
+          "nextFilter": [
+            "|",
+            "tail",
+            "-2;",
+            "done"
+          ],
+          "elapsedMs": 18693,
+          "durationMs": 24115
+        }
+      ]
+    },
+    {
+      "dataset": "training2",
+      "run": "replication-v31-jobs-control-r2-bedrock-session-tags-d8c2c980",
+      "completed": false,
+      "pytestCalls": 9,
+      "matches": [
+        {
+          "firstId": "call_2f48a38089bb4f2999693c9e",
+          "nextId": "call_82f0fd263e0a45fba69eddb1",
+          "firstFilter": [
+            "|",
+            "grep",
+            "-A",
+            "25",
+            "def test_auth_with"
+          ],
+          "nextFilter": [
+            "|",
+            "grep",
+            "-E",
+            "^E |Error|assert",
+            "|",
+            "head",
+            "-20"
+          ],
+          "elapsedMs": 8411,
+          "durationMs": 5261
+        }
+      ]
+    },
+    {
+      "dataset": "training5",
+      "run": "replication-v24-features-high-r1-aws-signing-off-loop-a3ffaff1",
+      "completed": true,
+      "pytestCalls": 12,
+      "matches": [
+        {
+          "firstId": "call_94a3c2b21175498c8f735c43",
+          "nextId": "call_3b5384dfea454068a6e0a0e2",
+          "firstFilter": [
+            "|",
+            "tail",
+            "-25"
+          ],
+          "nextFilter": [
+            "|",
+            "grep",
+            "-E",
+            "llm_http_handler|transformation|test_bedrock_mantle|litellm/",
+            "|",
+            "head",
+            "-40"
+          ],
+          "elapsedMs": 11615,
+          "durationMs": 2597
+        }
+      ]
+    },
+    {
+      "dataset": "training5",
+      "run": "replication-v24-features-high-r1-background-responses-pipeline-4c64c9b6",
+      "completed": true,
+      "pytestCalls": 14,
+      "matches": [
+        {
+          "firstId": "call_3e247d3fee334056ac8061cf",
+          "nextId": "call_869ec5258f5d44e08e46f191",
+          "firstFilter": [
+            "|",
+            "tail",
+            "-5"
+          ],
+          "nextFilter": [
+            "|",
+            "grep",
+            "-E",
+            "^FAILED|^ERROR|passed|failed",
+            "|",
+            "tail",
+            "-5"
+          ],
+          "elapsedMs": 109158,
+          "durationMs": 17485
+        }
+      ]
+    },
+    {
+      "dataset": "training5",
+      "run": "replication-v24-features-medium-r1-background-responses-pipeline-17f57e85",
+      "completed": false,
+      "pytestCalls": 18,
+      "matches": [
+        {
+          "firstId": "call_3ebd3a485e8747cc82b75032",
+          "nextId": "call_c97bee25ed5e4192a6babc9d",
+          "firstFilter": [
+            "|",
+            "tail",
+            "-5"
+          ],
+          "nextFilter": [
+            "|",
+            "grep",
+            "^FAILED"
+          ],
+          "elapsedMs": 70429,
+          "durationMs": 64887
+        }
+      ]
+    },
+    {
+      "dataset": "training5",
+      "run": "replication-v29-edits-batched-edits-r2-oom1-background-responses-pipeline-d25104ed",
+      "completed": true,
+      "pytestCalls": 16,
+      "matches": [
+        {
+          "firstId": "call_d00ced94fe94405fad74131e",
+          "nextId": "call_fe06e4980b8f43bab952cbb0",
+          "firstFilter": [
+            "|",
+            "tail",
+            "-20"
+          ],
+          "nextFilter": [
+            "|",
+            "grep",
+            "-A",
+            "25",
+            "FAILURES|",
+            "head",
+            "-60"
+          ],
+          "elapsedMs": 8564,
+          "durationMs": 4752
+        }
+      ]
+    },
+    {
+      "dataset": "training5",
+      "run": "replication-v29-edits-control-r2-legacy-stream-pipeline-cdfd0aa2",
+      "completed": false,
+      "pytestCalls": 13,
+      "matches": [
+        {
+          "firstId": "call_088adb68fee240808682d3cd",
+          "nextId": "call_ca2deb26d1e24ddf90096909",
+          "firstFilter": [
+            "|",
+            "tail",
+            "-8"
+          ],
+          "nextFilter": [
+            "|",
+            "grep",
+            "-B2",
+            "-A",
+            "12",
+            "test_completed_stream_does_not_double_bill_on_late_disconnect\\b",
+            "|",
+            "head",
+            "-40"
+          ],
+          "elapsedMs": 74670,
+          "durationMs": 10005
+        }
+      ]
+    },
+    {
+      "dataset": "training5",
+      "run": "replication-v39-streams-control-r2-legacy-stream-pipeline-db20a2dc",
+      "completed": false,
+      "pytestCalls": 10,
+      "matches": [
+        {
+          "firstId": "call_a3b5539a61674473ad9f7679",
+          "nextId": "call_9face4a1cda040b69fd6b60b",
+          "firstFilter": [
+            "|",
+            "tail",
+            "-5"
+          ],
+          "nextFilter": [
+            "|",
+            "grep",
+            "^FAILED"
+          ],
+          "elapsedMs": 73934,
+          "durationMs": 68846
+        }
+      ]
+    },
+    {
+      "dataset": "training5",
+      "run": "replication-v39-streams-stream-guide-r2-legacy-stream-pipeline-929c8cfe",
+      "completed": false,
+      "pytestCalls": 9,
+      "matches": [
+        {
+          "firstId": "call_148a8107aecd48f284c9df37",
+          "nextId": "call_b4a10395262e4a6c95648e83",
+          "firstFilter": [
+            "|",
+            "grep",
+            "-A",
+            "25",
+            "def test_completed_stream_does_not_double_bill",
+            "|",
+            "head",
+            "-45"
+          ],
+          "nextFilter": [
+            "|",
+            "grep",
+            "-E",
+            "^E |Error|assert",
+            "|",
+            "head",
+            "-30"
+          ],
+          "elapsedMs": 14727,
+          "durationMs": 11302
+        }
+      ]
+    },
+    {
+      "dataset": "training5",
+      "run": "replication-v44-combined-combined-r1-legacy-stream-pipeline-fc4cc74b",
+      "completed": false,
+      "pytestCalls": 15,
+      "matches": [
+        {
+          "firstId": "call_090f853930864e2baf33cde7",
+          "nextId": "call_92f572502a4a4fc7a9049594",
+          "firstFilter": [
+            "|",
+            "grep",
+            "-A",
+            "20",
+            "test_disconnect_billing_backfills_missing_cache_fields",
+            "|",
+            "head",
+            "-50"
+          ],
+          "nextFilter": [
+            "|",
+            "grep",
+            "-E",
+            "^E |Error|assert",
+            "|",
+            "head",
+            "-40"
+          ],
+          "elapsedMs": 57466,
+          "durationMs": 18773
+        }
+      ]
+    }
+  ],
+  "createdAt": "2026-09-16T09:33:42.195148+00:00",
+  "matchedRuns": 40,
+  "matchedPairs": 62,
+  "limitations": [
+    "Model-authored tests may alter runtime state; no mutation log was reconstructed.",
+    "Non-pytest shell commands and structured edits reset the heuristic. Identical pytest token selections with changed output filters are leads for inspection, not proof of unnecessary testing.",
+    "Recorded call duration can exclude later background execution and cannot estimate time saved.",
+    "Only explicitly named development datasets and protocol-6/7 attempts with acceptance records were opened. Protocol-6 artifact limitations remain."
+  ]
+}
