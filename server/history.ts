@@ -191,7 +191,7 @@ export class History {
   async beginCommand(id: string, workspace: string, actor?: Pick<FileChange,'actorSessionId'|'invocationId'>): Promise<string> {
     const row=this.rows(id).findLast(row=>row.status==='open');
     if(!row)throw conflict('No accepted turn is available for command effects.');
-    const before=await snapshotWorkspace(workspace,[this.store.directory]);
+    const before=await snapshotWorkspace(workspace,[this.store.directory],this.read(row).changes.map(change=>change.path));
     const key=randomUUID();
     this.store.db.prepare('INSERT INTO command_snapshots(id,session_id,checkpoint_id,workspace,data) VALUES(?,?,?,?,?)').run(key,id,row.id,workspace,JSON.stringify({before,actor}));
     this.noteEffects(id,'Undo covers recorded source-file changes. Generated/dependency directories, processes, network and external tool effects are outside file history.');
@@ -201,7 +201,7 @@ export class History {
     const record=this.store.db.prepare('SELECT * FROM command_snapshots WHERE id=?').get(key) as {session_id:string;checkpoint_id:string;workspace:string;data:string}|undefined;
     if(!record)return [];
     const {before,actor}=JSON.parse(record.data) as {before:WorkspaceSnapshot;actor?:Pick<FileChange,'actorSessionId'|'invocationId'>};
-    const result=snapshotChanges(before,await snapshotWorkspace(record.workspace,[this.store.directory]));
+    const result=snapshotChanges(before,await snapshotWorkspace(record.workspace,[this.store.directory],[...Object.keys(before.files),...(before.absent??[])]));
     const changes=result.changes.map(change=>({...change,...actor}));
     this.transaction(()=>{
       const row=this.rows(record.session_id).find(row=>row.id===record.checkpoint_id);

@@ -5,6 +5,7 @@ import { join } from 'node:path';
 import { randomUUID } from 'node:crypto';
 import { Store } from '../server/store.js';
 import { History, HISTORY_LIMITS } from '../server/history.js';
+import { SNAPSHOT_LIMITS } from '../server/workspace-snapshot.js';
 import { executeTool } from '../server/tools.js';
 import type { FileChange, Message } from '../shared/types.js';
 
@@ -433,6 +434,24 @@ describe('turn checkpoint history', () => {
 
 
 describe('generated test recordings and command history',()=>{
+  it('tracks shell edits to an already edited file beyond the scan budget and preserves undo/redo',async()=>{
+    const originalLimit=SNAPSHOT_LIMITS.bytes;
+    try {
+      SNAPSHOT_LIMITS.bytes=100;
+      await writeFile(join(workspace,'a-docs.txt'),'a'.repeat(100));
+      await writeFile(join(workspace,'z-source.ts'),'original');
+      history.accept(id,user());await edit('z-source.ts','structured');
+      const command=await history.beginCommand(id,workspace);
+      await writeFile(join(workspace,'z-source.ts'),'shell');
+      await expect(history.finishCommand(command)).resolves.toEqual([{path:'z-source.ts',before:'structured',after:'shell'}]);
+      await edit('z-source.ts','final');store.saveMessage(answer());history.seal(id);
+      await history.undo(id,current().undoId!);
+      expect(await readFile(join(workspace,'z-source.ts'),'utf8')).toBe('original');
+      await history.redo(id,current().redoId!);
+      expect(await readFile(join(workspace,'z-source.ts'),'utf8')).toBe('final');
+      expect(await readFile(join(workspace,'a-docs.txt'),'utf8')).toBe('a'.repeat(100));
+    } finally {SNAPSHOT_LIMITS.bytes=originalLimit;}
+  });
   it('allows test recordings to change between commands while tracking source edits',async()=>{
     await mkdir(join(workspace,'test-results-tui'));history.accept(id,user());
     const first=await history.beginCommand(id,workspace);
@@ -442,6 +461,19 @@ describe('generated test recordings and command history',()=>{
     await writeFile(join(workspace,'source.ts'),'two');await writeFile(join(workspace,'test-results-tui/frames.jsonl'),'new test output');
     await expect(history.finishCommand(second)).resolves.toMatchObject([{path:'source.ts',before:'one',after:'two'}]);
     expect(store.changes(id).every(change=>change.path==='source.ts')).toBe(true);
+  });
+  it('tracks deletion beyond entry truncation and still rejects external source changes',async()=>{
+    const originalLimit=SNAPSHOT_LIMITS.files;
+    try{
+      SNAPSHOT_LIMITS.files=2;
+      for(const path of ['a','b','z'])await writeFile(join(workspace,path),path);
+      history.accept(id,user());await edit('z','structured');
+      const remove=await history.beginCommand(id,workspace);await rm(join(workspace,'z'));
+      await expect(history.finishCommand(remove)).resolves.toEqual([{path:'z',before:'structured',after:null}]);
+      await edit('z','recreated');await writeFile(join(workspace,'z'),'external');
+      const conflict=await history.beginCommand(id,workspace);await writeFile(join(workspace,'z'),'shell');
+      await expect(history.finishCommand(conflict)).rejects.toThrow('Unrecorded changes conflict with command history for z');
+    }finally{SNAPSHOT_LIMITS.files=originalLimit;}
   });
   it('still refuses unrecorded source conflicts',async()=>{
     history.accept(id,user());const first=await history.beginCommand(id,workspace);await writeFile(join(workspace,'source.ts'),'one');await history.finishCommand(first);
