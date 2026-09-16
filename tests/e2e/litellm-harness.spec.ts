@@ -40,6 +40,12 @@ test('LiteLLM architecture persists one model and displays repository navigation
     expect(calls[0].output).toContain('def transform_request');
     await page.locator('.work-log > summary').first().click();
     await expect(page.getByText('Navigate LiteLLM',{exact:true})).toBeVisible();
+    const note=page.locator('.harness-note');
+    await expect(note.locator('summary')).toHaveText('LiteLLM code and test map');
+    await expect(note.locator('pre')).not.toBeVisible();
+    await note.locator('summary').click();
+    await expect(note.locator('pre')).toContainText('<workspace_reference>');
+    await note.locator('summary').click();
     await page.screenshot({path:testInfo.outputPath('navigation.png')});
   }finally {
     if(session){await request.post(`/api/sessions/${session.id}/cancel`);await request.delete(`/api/sessions/${session.id}`);}

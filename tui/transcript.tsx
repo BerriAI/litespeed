@@ -16,6 +16,7 @@ import {
 } from './transcriptModel.js';
 import { activityActors, activitySections, conversationGroups, usageLabel, type ActivityEntry } from './conversation.js';
 import { steeringContent } from '../shared/steering-presentation.js';
+import { litellmHarnessNoteTitle } from '../shared/litellm-presentation.js';
 import { Button } from './ui.js';
 import { terminalText } from './protocol.js';
 import { toolRow, reasoningSummary, stableStreamingMarkdown } from './transcriptModel.js';
@@ -38,6 +39,15 @@ export const RAIL_BORDER = {
  * a row built from one needs no wrapper padding. */
 const ACTIVITY_TEXT = 3;
 const ACTIVITY_CHEVRON = 1;
+
+function HarnessNoteRow({title,content}:{title:string;content:string}) {
+  const theme=useTheme(),settings=useTranscriptSettings(),[expanded,setExpanded]=useState(false);
+  const open=expanded||settings.toolDetails;
+  return <box marginTop={1} paddingLeft={ACTIVITY_CHEVRON} flexDirection="column" flexShrink={0}>
+    <Button tone="muted" onPress={()=>setExpanded(!expanded)}>{`${open?'▾':'▸'} ${title}`}</Button>
+    {open&&<text paddingLeft={ACTIVITY_TEXT-ACTIVITY_CHEVRON} fg={toHex(theme.textMuted)} wrapMode="word">{terminalText(content,true)}</text>}
+  </box>;
+}
 
 export interface TranscriptSettings {
   showThinking: boolean;
@@ -396,6 +406,8 @@ export const Transcript = memo(function Transcript({ detail, width, height, acti
       if (message.role === 'user') { previousActor = undefined; return embedded ? null : <UserRow key={message.id} message={message} first={index === 0} />; }
       if (message.role === 'system') {
         previousActor = undefined;
+        const title=litellmHarnessNoteTitle(message.content);
+        if(title)return <HarnessNoteRow key={message.id} title={title} content={message.content}/>;
         return <box key={message.id} marginTop={1} paddingLeft={ACTIVITY_TEXT} flexShrink={0}><text fg={toHex(theme.textMuted)} wrapMode="word">{terminalText(message.content, true)}</text></box>;
       }
       const usageMessage = steps.findLast(step => step.turnUsage) ?? steps.at(-1) ?? message;

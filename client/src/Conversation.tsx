@@ -1,6 +1,7 @@
 import { cacheHitLabel, usagePhase } from '../../shared/usage';
 import { shuntLabel } from '../../shared/shunt';
 import { steeringContent } from '../../shared/steering-presentation';
+import { litellmHarnessNoteTitle } from '../../shared/litellm-presentation';
 import { conversationBlocks } from './conversation-blocks';
 import { createContext, useContext, memo, useLayoutEffect, useRef, useState, type ReactNode } from 'react';
 import type { QuestionRequest } from '../../shared/questions';
@@ -41,7 +42,9 @@ function ToolCard({ tool }: { tool: ToolCall }) {
     {tool.output&&<div className="shunt-answer"><Markdown content={tool.output}/></div>}
     {tool.shunt&&<details className="shunt-sources"><summary>{tool.shunt.sources.length} source{tool.shunt.sources.length===1?'':'s'}{tool.shunt.target?` → ${tool.shunt.target}`:''}</summary>{tool.shunt.sources.map((source,index)=><div key={index}><code>{source.path}</code> · {source.lines} lines · {source.bytes} bytes<small>sha256 {source.sha256}</small></div>)}</details>}
   </section>;
-  const title = (tool.name === 'capability' ? `${String(tool.args.operation)} ${String(tool.args.query ?? tool.args.name ?? '')}` : '') || tool.waitingForWorkspace || tool.args?.path || tool.args?.command || tool.args?.pattern || tool.args?.url;
+  const navigationTitle=tool.name==='litellm_context'
+    ? `${String(tool.args.path??tool.args.query??'repository map')}${typeof tool.args.symbol==='string'?` · ${tool.args.symbol}`:typeof tool.args.callers==='string'?` · callers of ${tool.args.callers}`:''}` : '';
+  const title = (tool.name === 'capability' ? `${String(tool.args.operation)} ${String(tool.args.query ?? tool.args.name ?? '')}` : '') || tool.waitingForWorkspace || navigationTitle || tool.args?.path || tool.args?.command || tool.args?.pattern || tool.args?.url;
   // Sidecar interception is VISIBLE by design (design note 4.5): the summary
   // row is tagged with the interceptor's name, and the expanded body shows the
   // unmodified original arguments above the (modified) executed ones.
@@ -124,7 +127,10 @@ function toolGroups(tools: ToolCall[]): ToolCall[][] {
 function MessageView({ lead, driver, workerNoun, message, running, grouped, tail, live, runUsage, steps, workActivity, onFork, disabled, readOnly, renderTask, inline, expanded, onExpand }: { expanded: boolean; onExpand: (open: boolean) => void; lead?:boolean; driver: boolean; workerNoun: string; message: Message; running: boolean; grouped: boolean; tail: boolean; live: boolean; runUsage?: Usage; steps: Message[]; workActivity?: string|false; onFork: () => void; disabled: boolean; readOnly?: boolean; inline?: boolean; renderTask?: (tool: ToolCall, message: Message, expanded: boolean) => ReactNode }) {
   const steering = steeringContent(message);
   if (steering !== undefined) message = { ...message, content: steering };
-  if (message.role === 'system' && steering === undefined) return <div className="system-message"><Terminal size={12} />{message.content}</div>;
+  if (message.role === 'system' && steering === undefined) {
+    const title=litellmHarnessNoteTitle(message.content);
+    return title?<details className="harness-note"><summary><Terminal size={12}/>{title}<ChevronRight size={12} className="disclosure-chevron"/></summary><pre>{message.content}</pre></details>:<div className="system-message"><Terminal size={12} />{message.content}</div>;
+  }
   const assistant = message.role === 'assistant';
   const content = assistant ? withoutVerificationNotice(message.content, message.receipts) : message.content;
   return <article className={`message ${assistant ? 'assistant-message' : 'user-message'}${grouped ? ' grouped' : ''}`} aria-label={assistant ? 'Assistant message' : inline ? 'Assignment' : 'Your message'}>

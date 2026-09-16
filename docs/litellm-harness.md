@@ -45,6 +45,8 @@ The equivalent session API selection is:
 
 **Review the actual change.** Before a Build turn with recorded edits finishes, the host requests one focused review. The model first audits the patch and existing checks against the requested behavior. It should finish when that evidence is sufficient, and investigate further only for a named gap or defect. Baseline experiments must keep the working patch intact; a separate copy avoids losing the fix on cancellation. The review highlights protocol representation, URL composition, caller-owned state and absent/null/false distinctions. It uses the same selected model and normal tools. It is a quality prompt, not an independent correctness oracle.
 
+Automatic code maps and harness checkpoints appear as compact, expandable notes in the browser and terminal. Expand a note to inspect the exact context supplied to the model. Navigation summaries show the query, definition or caller search so you can follow the work without opening each tool result.
+
 The review can add work and latency. It runs once per changed turn; it does not run for read-only explanations or Plan mode. Normal cancellation, permissions, receipts, history and Undo continue to apply. Successful symbol reads count as file-read evidence; an outline or missing symbol does not.
 
 On large checkouts, command history prioritizes files already edited in the current turn. This keeps subsequent shell edits to those files connected to Undo and later structured edits. Snapshots remain bounded; the history notice identifies incomplete coverage of other command effects.

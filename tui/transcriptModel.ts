@@ -244,7 +244,7 @@ export function toolRow(call: ToolCall): ToolRowModel {
       };
     }
     case 'litellm_context': {
-      return {...base,icon:'→',text:`LiteLLM ${str(args.path)||str(args.query)||'repository map'}${args.symbol?` · ${str(args.symbol)}`:''}`,pending:'Finding LiteLLM code and tests…'};
+      return {...base,icon:'→',text:`LiteLLM ${str(args.path)||str(args.query)||'repository map'}${args.symbol?` · ${str(args.symbol)}`:args.callers?` · callers of ${str(args.callers)}`:''}`,pending:'Finding LiteLLM code and tests…'};
     }
     case 'read_file': {
       const label = `Read ${baseName(str(args.path))} ${inlineArgs(args, ['path'])}`.trimEnd();
