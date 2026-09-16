@@ -1,0 +1,21 @@
+{
+  "at": "2026-09-16T02:40:32.216589+00:00",
+  "reviewed": [
+    "aws-signing-off-loop",
+    "stream-tool-rewrite-membership",
+    "background-responses-pipeline",
+    "legacy-stream-pipeline"
+  ],
+  "corrections": [
+    "AWS draft overstated an exact marker-class dependency; marker design is not in the tests and is not prescribed.",
+    "Background pending-response requirement narrowed to policy pipeline callbacks, preserving other hooks.",
+    "Legacy draft omitted the new directly tested post_call_hook_response method name; prompt now states this interface.",
+    "Anthropic conversion preserves mapped finish reasons rather than forcing end_turn for every response.",
+    "Warning fragments asserted by tests are explicitly disclosed, avoiding an undisclosed wording oracle."
+  ],
+  "remainingInvalid": [
+    "router-tier-output-ceiling",
+    "cost-map-background-retry"
+  ],
+  "notes": "No solver outcomes existed when prompts were curated. Original failed environment qualification and raw model drafts retained."
+}
