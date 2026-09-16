@@ -13,8 +13,12 @@
     },
     {
       "variant": "control",
-      "evaluated": 0,
-      "expected": 2
+      "evaluated": 1,
+      "expected": 2,
+      "successes": 0,
+      "meanSeconds": 1158.028,
+      "tokenPricedUsd": 0.288668562,
+      "trialsWithoutTokenPrice": 0
     }
   ],
   "qualityEligibleVariants": [
@@ -26,7 +30,7 @@
     },
     {
       "variant": "control",
-      "eligibleEvaluated": 0,
+      "eligibleEvaluated": 1,
       "successes": 0,
       "incidentAllocations": 0
     }
@@ -127,7 +131,70 @@
       "effort": "medium",
       "kind": "litellm-specific",
       "timeoutSeconds": 1800,
-      "evaluated": false
+      "evaluated": true,
+      "run": "replication-v55-billing-control-r2-realtime-cached-audio-cost-8a992532",
+      "infrastructureIncident": null,
+      "success": false,
+      "completed": true,
+      "completionReason": "completed",
+      "seconds": 1158.028,
+      "acceptance": {
+        "exit": 1,
+        "tests": 17,
+        "failures": 1,
+        "errors": 0,
+        "skipped": 0,
+        "passed": false
+      },
+      "computedUsd": 0.288668562,
+      "activations": {
+        "initialMapNotices": 1,
+        "contextToolCalls": 0,
+        "guideIdsShown": [],
+        "unparsedContextPayloads": 0,
+        "finalReviewNotices": 1,
+        "guidedFinalReviewNotices": 0,
+        "finalReviewGuideIdsShown": [],
+        "batchedEditCalls": 0,
+        "completedBatchedEditCalls": 0,
+        "batchEditsRequested": 0,
+        "batchSizes": [],
+        "backgroundCommandNotices": 0,
+        "testFocusNotices": 1,
+        "explorationFocusNotices": 1,
+        "readCallsByEffectiveLimit": {
+          "160": 3,
+          "140": 3,
+          "80": 4,
+          "120": 5,
+          "200": 1,
+          "60": 2,
+          "130": 1,
+          "260": 1,
+          "70": 6,
+          "20": 3,
+          "40": 8,
+          "190": 1,
+          "30": 6,
+          "45": 3,
+          "18": 3,
+          "50": 1,
+          "90": 1,
+          "14": 1,
+          "35": 1
+        },
+        "defaultWindowReadCalls": null,
+        "readLimitProvenance": "unknown: saved arguments include host-injected defaults"
+      },
+      "originalSuccess": false,
+      "supplemental": {
+        "artifact": "billing-contract-probe.json",
+        "checks": 12,
+        "expectedChecks": 12,
+        "checksPassed": 9,
+        "exit": 0,
+        "passed": false
+      }
     },
     {
       "dataset": "training7",
