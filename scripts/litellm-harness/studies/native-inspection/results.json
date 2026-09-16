@@ -4,11 +4,11 @@
   "variants": [
     {
       "variant": "control",
-      "evaluated": 1,
+      "evaluated": 2,
       "expected": 4,
-      "successes": 0,
-      "meanSeconds": 900.714,
-      "tokenPricedUsd": 0.403493412,
+      "successes": 1,
+      "meanSeconds": 551.2385,
+      "tokenPricedUsd": 0.434862668,
       "trialsWithoutTokenPrice": 0
     },
     {
@@ -122,7 +122,44 @@
       "label": "replication-v35-inspection-control-r2-oom1",
       "commit": "58eb44cb6ff1e0142e57cced9eed2e917f28cdb2",
       "effort": "medium",
-      "evaluated": false
+      "evaluated": true,
+      "success": true,
+      "completed": true,
+      "completionReason": "completed",
+      "seconds": 201.763,
+      "acceptance": {
+        "exit": 0,
+        "tests": 6,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0,
+        "passed": true
+      },
+      "computedUsd": 0.031369256,
+      "activations": {
+        "initialMapNotices": 1,
+        "contextToolCalls": 0,
+        "guideIdsShown": [],
+        "unparsedContextPayloads": 0,
+        "finalReviewNotices": 1,
+        "guidedFinalReviewNotices": 0,
+        "finalReviewGuideIdsShown": [],
+        "batchedEditCalls": 0,
+        "completedBatchedEditCalls": 0,
+        "batchEditsRequested": 0,
+        "batchSizes": [],
+        "backgroundCommandNotices": 0,
+        "testFocusNotices": 0,
+        "explorationFocusNotices": 1,
+        "readCallsByEffectiveLimit": {
+          "280": 1,
+          "110": 1,
+          "90": 1,
+          "52": 1
+        },
+        "defaultWindowReadCalls": null,
+        "readLimitProvenance": "unknown: saved arguments include host-injected defaults"
+      }
     },
     {
       "dataset": "training5",

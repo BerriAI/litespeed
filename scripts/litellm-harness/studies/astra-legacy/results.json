@@ -1,11 +1,15 @@
 {
-  "status": "interim",
+  "status": "complete",
   "note": "Development selection only. Interim observed-task means can change as slower trials finish. Bootstrap resamples tasks, not attempts; it does not correct adaptive candidate selection or establish future generalization. Token prices exclude requests without usage and do not replace the campaign ledger.",
   "variants": [
     {
       "variant": "astra",
-      "evaluated": 0,
-      "expected": 2
+      "evaluated": 2,
+      "expected": 2,
+      "successes": 2,
+      "meanSeconds": 479.2685,
+      "tokenPricedUsd": null,
+      "trialsWithoutTokenPrice": 2
     }
   ],
   "comparisons": [],
@@ -18,7 +22,30 @@
       "commit": "05f3011b4c5000d1fbb384a2d237856d2120c72c",
       "effort": "high",
       "kind": "codex",
-      "evaluated": false
+      "evaluated": true,
+      "success": true,
+      "completed": true,
+      "completionReason": "completed",
+      "seconds": 393.528,
+      "acceptance": {
+        "exit": 0,
+        "tests": 16,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0,
+        "passed": true
+      },
+      "computedUsd": null,
+      "activations": null,
+      "originalSuccess": true,
+      "supplemental": {
+        "artifact": "real-stream-probe.json",
+        "checks": 24,
+        "expectedChecks": 24,
+        "checksPassed": 24,
+        "exit": 0,
+        "passed": true
+      }
     },
     {
       "dataset": "training5",
@@ -28,7 +55,30 @@
       "commit": "05f3011b4c5000d1fbb384a2d237856d2120c72c",
       "effort": "high",
       "kind": "codex",
-      "evaluated": false
+      "evaluated": true,
+      "success": true,
+      "completed": true,
+      "completionReason": "completed",
+      "seconds": 565.009,
+      "acceptance": {
+        "exit": 0,
+        "tests": 16,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0,
+        "passed": true
+      },
+      "computedUsd": null,
+      "activations": null,
+      "originalSuccess": true,
+      "supplemental": {
+        "artifact": "real-stream-probe.json",
+        "checks": 24,
+        "expectedChecks": 24,
+        "checksPassed": 24,
+        "exit": 0,
+        "passed": true
+      }
     }
   ]
 }

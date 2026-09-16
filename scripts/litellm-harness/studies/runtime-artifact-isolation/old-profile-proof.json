@@ -1,0 +1,7 @@
+{
+  "sourceRun": "replication-v39-streams-stream-guide-r2-legacy-stream-pipeline-929c8cfe",
+  "relativeArtifact": "docs/litellm-harness-results.json",
+  "exit": 0,
+  "contentsPrinted": false,
+  "purpose": "Host reproduction of reachability, not evidence the solver read it."
+}

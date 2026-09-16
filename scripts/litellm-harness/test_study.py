@@ -27,7 +27,10 @@ class StudyTests(unittest.TestCase):
             (root/'analysis.json').write_text(json.dumps([record]))
             with patch('sys.argv', ['study.py', str(root), str(root/'plan.json'), str(root/'output.json')]), patch('builtins.print'):
                 main()
-            self.assertEqual(json.loads((root/'output.json').read_text())['trials'][0]['kind'], 'codex')
+            result = json.loads((root/'output.json').read_text())
+            self.assertEqual(result['trials'][0]['kind'], 'codex')
+            self.assertIsNone(result['variants'][0]['tokenPricedUsd'])
+            self.assertEqual(result['variants'][0]['trialsWithoutTokenPrice'], 1)
 
     def test_missing_control_cannot_silently_produce_empty_comparisons(self):
         with TemporaryDirectory() as temporary:

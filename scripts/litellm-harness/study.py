@@ -121,8 +121,9 @@ def main():
         selected = [r for r in rows if r['name'] == name and r['evaluated']]
         summary = {'variant': name, 'evaluated': len(selected), 'expected': sum(r['name'] == name for r in rows)}
         if selected:
+            prices = [r['computedUsd'] for r in selected if r.get('computedUsd') is not None]
             summary.update(successes=sum(r['success'] for r in selected), meanSeconds=mean(r['seconds'] for r in selected),
-                           tokenPricedUsd=sum(r.get('computedUsd') or 0 for r in selected),
+                           tokenPricedUsd=sum(prices) if prices else None,
                            trialsWithoutTokenPrice=sum(r.get('computedUsd') is None for r in selected))
         summaries.append(summary)
     result = {'status': 'complete' if all(r['evaluated'] for r in rows) else 'interim',

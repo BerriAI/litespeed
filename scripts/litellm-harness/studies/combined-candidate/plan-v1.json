@@ -1,6 +1,6 @@
 {
   "createdAt": "2026-09-16T08:25:12.228217+00:00",
-  "protocol": 7,
+  "protocol": 6,
   "model": "fireworks_ai/deepseek-v4p1-flash",
   "control": "control",
   "repetitions": 2,
@@ -20,7 +20,7 @@
       "name": "combined",
       "kind": "litellm-specific",
       "label": "replication-v44-combined-combined-r2",
-      "commit": "3737757ecf1d2652cbf60a0abc49f4568e668adb",
+      "commit": "fe1c0207022db0ae878337962dfc28cd47033a42",
       "effort": "medium"
     },
     {
@@ -29,7 +29,7 @@
       "name": "combined",
       "kind": "litellm-specific",
       "label": "replication-v44-combined-combined-r1",
-      "commit": "3737757ecf1d2652cbf60a0abc49f4568e668adb",
+      "commit": "fe1c0207022db0ae878337962dfc28cd47033a42",
       "effort": "medium",
       "supplemental": {
         "artifact": "real-stream-probe.json",
@@ -42,7 +42,7 @@
       "name": "control",
       "kind": "litellm-specific",
       "label": "replication-v44-combined-control-r2",
-      "commit": "b06f9fd2c25f03382f26b6d8a5dbbe38a53ae8ea",
+      "commit": "05f3011b4c5000d1fbb384a2d237856d2120c72c",
       "effort": "medium",
       "supplemental": {
         "artifact": "real-stream-probe.json",
@@ -55,7 +55,7 @@
       "name": "control",
       "kind": "litellm-specific",
       "label": "replication-v44-combined-control-r1",
-      "commit": "b06f9fd2c25f03382f26b6d8a5dbbe38a53ae8ea",
+      "commit": "05f3011b4c5000d1fbb384a2d237856d2120c72c",
       "effort": "medium"
     },
     {
@@ -64,7 +64,7 @@
       "name": "combined",
       "kind": "litellm-specific",
       "label": "replication-v44-combined-combined-r2",
-      "commit": "3737757ecf1d2652cbf60a0abc49f4568e668adb",
+      "commit": "fe1c0207022db0ae878337962dfc28cd47033a42",
       "effort": "medium"
     },
     {
@@ -73,7 +73,7 @@
       "name": "combined",
       "kind": "litellm-specific",
       "label": "replication-v44-combined-combined-r1",
-      "commit": "3737757ecf1d2652cbf60a0abc49f4568e668adb",
+      "commit": "fe1c0207022db0ae878337962dfc28cd47033a42",
       "effort": "medium"
     },
     {
@@ -82,7 +82,7 @@
       "name": "control",
       "kind": "litellm-specific",
       "label": "replication-v44-combined-control-r1",
-      "commit": "b06f9fd2c25f03382f26b6d8a5dbbe38a53ae8ea",
+      "commit": "05f3011b4c5000d1fbb384a2d237856d2120c72c",
       "effort": "medium",
       "supplemental": {
         "artifact": "real-stream-probe.json",
@@ -95,7 +95,7 @@
       "name": "combined",
       "kind": "litellm-specific",
       "label": "replication-v44-combined-combined-r2",
-      "commit": "3737757ecf1d2652cbf60a0abc49f4568e668adb",
+      "commit": "fe1c0207022db0ae878337962dfc28cd47033a42",
       "effort": "medium"
     },
     {
@@ -104,7 +104,7 @@
       "name": "control",
       "kind": "litellm-specific",
       "label": "replication-v44-combined-control-r1",
-      "commit": "b06f9fd2c25f03382f26b6d8a5dbbe38a53ae8ea",
+      "commit": "05f3011b4c5000d1fbb384a2d237856d2120c72c",
       "effort": "medium"
     },
     {
@@ -113,7 +113,7 @@
       "name": "control",
       "kind": "litellm-specific",
       "label": "replication-v44-combined-control-r1",
-      "commit": "b06f9fd2c25f03382f26b6d8a5dbbe38a53ae8ea",
+      "commit": "05f3011b4c5000d1fbb384a2d237856d2120c72c",
       "effort": "medium"
     },
     {
@@ -122,7 +122,7 @@
       "name": "control",
       "kind": "litellm-specific",
       "label": "replication-v44-combined-control-r2",
-      "commit": "b06f9fd2c25f03382f26b6d8a5dbbe38a53ae8ea",
+      "commit": "05f3011b4c5000d1fbb384a2d237856d2120c72c",
       "effort": "medium"
     },
     {
@@ -131,7 +131,7 @@
       "name": "combined",
       "kind": "litellm-specific",
       "label": "replication-v44-combined-combined-r1",
-      "commit": "3737757ecf1d2652cbf60a0abc49f4568e668adb",
+      "commit": "fe1c0207022db0ae878337962dfc28cd47033a42",
       "effort": "medium"
     },
     {
@@ -140,7 +140,7 @@
       "name": "control",
       "kind": "litellm-specific",
       "label": "replication-v44-combined-control-r2",
-      "commit": "b06f9fd2c25f03382f26b6d8a5dbbe38a53ae8ea",
+      "commit": "05f3011b4c5000d1fbb384a2d237856d2120c72c",
       "effort": "medium"
     },
     {
@@ -149,7 +149,7 @@
       "name": "combined",
       "kind": "litellm-specific",
       "label": "replication-v44-combined-combined-r1",
-      "commit": "3737757ecf1d2652cbf60a0abc49f4568e668adb",
+      "commit": "fe1c0207022db0ae878337962dfc28cd47033a42",
       "effort": "medium"
     },
     {
@@ -158,7 +158,7 @@
       "name": "control",
       "kind": "litellm-specific",
       "label": "replication-v44-combined-control-r2",
-      "commit": "b06f9fd2c25f03382f26b6d8a5dbbe38a53ae8ea",
+      "commit": "05f3011b4c5000d1fbb384a2d237856d2120c72c",
       "effort": "medium"
     },
     {
@@ -167,24 +167,12 @@
       "name": "combined",
       "kind": "litellm-specific",
       "label": "replication-v44-combined-combined-r2",
-      "commit": "3737757ecf1d2652cbf60a0abc49f4568e668adb",
+      "commit": "fe1c0207022db0ae878337962dfc28cd47033a42",
       "effort": "medium",
       "supplemental": {
         "artifact": "real-stream-probe.json",
         "expectedChecks": 24
       }
     }
-  ],
-  "amendment": {
-    "createdAt": "2026-09-16T08:38:50.298981+00:00",
-    "priorProtocol": 6,
-    "protocol": 7,
-    "oldAllocatedTrials": 0,
-    "reason": "Runtime benchmark artifacts were readable under protocol 6. Preserve the original plan, freeze the same stronger isolation in both arms before any allocation, and require actual Flash and Astra smoke passes. Tasks, order, labels, effort, timeout and supplemental requirements unchanged.",
-    "commits": {
-      "control": "b06f9fd2c25f03382f26b6d8a5dbbe38a53ae8ea",
-      "combined": "3737757ecf1d2652cbf60a0abc49f4568e668adb"
-    }
-  },
-  "smokeGate": "Both actual model routes must complete converse-config and pass acceptance under protocol 7."
+  ]
 }

@@ -13,11 +13,11 @@
     },
     {
       "variant": "medium",
-      "evaluated": 7,
+      "evaluated": 8,
       "expected": 8,
-      "successes": 4,
-      "meanSeconds": 601.9484285714286,
-      "tokenPricedUsd": 0.899988702,
+      "successes": 5,
+      "meanSeconds": 596.8765,
+      "tokenPricedUsd": 1.047206992,
       "trialsWithoutTokenPrice": 0
     }
   ],
@@ -758,7 +758,64 @@
       "label": "replication-v24-features-medium-r2-oom1",
       "commit": "c7e6826341989fd6ebf3588b53901087b2fa7a56",
       "effort": "medium",
-      "evaluated": false
+      "evaluated": true,
+      "success": true,
+      "completed": true,
+      "completionReason": "completed",
+      "seconds": 561.373,
+      "acceptance": {
+        "exit": 0,
+        "tests": 7,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0,
+        "passed": true
+      },
+      "computedUsd": 0.14721829,
+      "activations": {
+        "initialMapNotices": 1,
+        "contextToolCalls": 1,
+        "guideIdsShown": [
+          "router-resolution-and-request-state"
+        ],
+        "unparsedContextPayloads": 1,
+        "finalReviewNotices": 1,
+        "guidedFinalReviewNotices": 0,
+        "finalReviewGuideIdsShown": [],
+        "batchedEditCalls": 0,
+        "completedBatchedEditCalls": 0,
+        "batchEditsRequested": 0,
+        "batchSizes": [],
+        "backgroundCommandNotices": 0,
+        "testFocusNotices": 1,
+        "explorationFocusNotices": 1,
+        "readCallsByEffectiveLimit": {
+          "130": 2,
+          "80": 4,
+          "120": 5,
+          "300": 1,
+          "460": 1,
+          "220": 1,
+          "140": 2,
+          "200": 1,
+          "110": 1,
+          "30": 2,
+          "180": 2,
+          "170": 1,
+          "160": 3,
+          "70": 3,
+          "40": 3,
+          "290": 1,
+          "90": 1,
+          "100": 1,
+          "20": 1,
+          "60": 3,
+          "45": 1,
+          "125": 1
+        },
+        "defaultWindowReadCalls": null,
+        "readLimitProvenance": "unknown: saved arguments include host-injected defaults"
+      }
     },
     {
       "dataset": "training5",

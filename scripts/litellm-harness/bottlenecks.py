@@ -12,7 +12,7 @@ import sys
 
 
 def summarize(source):
-    rows = [r for r in source['runs'] if r.get('evaluationProtocol') == 6
+    rows = [r for r in source['runs'] if r.get('evaluationProtocol') in (6, 7)
             and r.get('kind') == 'litellm-specific' and (r.get('requests') or 0) > 0
             and r.get('computedUsd') is not None]
     if not rows or any((r.get('actionUsage') or {}).get('classificationVersion') != 2 for r in rows):
@@ -26,7 +26,9 @@ def summarize(source):
     attributed = sum(g['estimatedUsd'] for g in groups.values())
     recorded = sum(r['computedUsd'] for r in rows)
     return {'sourceGeneratedAt': source['generatedAt'], 'classificationVersion': 2,
-            'scope': 'Descriptive protocol-6 development attempts with recorded Flash usage. Different tasks, candidate versions and efforts are pooled only to locate spending. Includes paid interruptions and timeouts; excludes zero-usage startup failures. Not a quality comparison or causal estimate. Missing usage is outside these token-priced totals; the campaign ledger remains authoritative.',
+            'scope': 'Descriptive protocol-6/7 development attempts with recorded Flash usage. Different tasks, candidate versions, isolation protocols and efforts are pooled only to locate spending. Includes paid interruptions and timeouts; excludes zero-usage startup failures. Not a quality comparison or causal estimate. Protocol 6 has the disclosed runtime-artifact access limitation. Missing usage is outside these token-priced totals; the campaign ledger remains authoritative.',
+            'protocolCounts': dict(Counter(str(r['evaluationProtocol']) for r in rows)),
+            'runProtocols': {r['run']: r['evaluationProtocol'] for r in rows},
             'runs': len(rows), 'completionReasons': dict(Counter(r['completionReason'] for r in rows)),
             'runIds': [r['run'] for r in rows], 'recordedTokenPricedUsd': recorded,
             'attributedTokenPricedUsd': attributed, 'unattributedTokenPricedUsd': recorded - attributed,
@@ -43,7 +45,7 @@ def render(data):
              'check-command': 'Shell requests with a recognized check key', 'navigation': 'Source navigation',
              'structured-edit': 'Structured edits', 'job-poll-or-wait': 'Job polling or waiting',
              'text-only': 'Text-only replies', 'mixed-tools': 'Mixed tool families', 'other-tool': 'Other tools'}
-    lines = ['# Where development requests spend tokens', '', f'Snapshot: {data["sourceGeneratedAt"]}. **{data["runs"]} protocol-6 attempts**, with ${data["recordedTokenPricedUsd"]:.4f} recorded token-priced usage.', '',
+    lines = ['# Where development requests spend tokens', '', f'Snapshot: {data["sourceGeneratedAt"]}. **{data["runs"]} development attempts**, with ${data["recordedTokenPricedUsd"]:.4f} recorded token-priced usage. Protocol counts: {data["protocolCounts"]}.', '',
              data['scope'], '',
              'Each row attributes the complete input/output cost of a model request to its chosen next action. A request asking for a read can spend tokens reasoning about a fix; its cost is not the marginal price of reading a file. Shell commands without a conservative check receipt are separately labeled when they mention known checker invocations. Mentions establish neither a passing check nor adequate coverage.', '',
              '| Next action | Requests | Share of requests | Token-priced cost | Share of attributed cost | Cached input |',

@@ -1,6 +1,6 @@
 # LiteLLM harness campaign results
 
-Interim snapshot: 2026-09-16T08:25:54.701737+00:00. Current harness: **2026-09-15.34**.
+Interim snapshot: 2026-09-16T08:40:16.201280+00:00. Current harness: **2026-09-15.34**.
 
 **The campaign is still running. It has not established a quality win over Astra/Codex or production replacement readiness.**
 
@@ -8,7 +8,7 @@ The selectable architecture and replay workbench are implemented. The current wo
 
 ## Spending
 
-Confirmed token/header-priced charges: **$40.1468**. Missing receipts retain **$29.7730** across 118 requests; active requests reserve another **$0.0000**. The committed upper bound is **$69.9198** against the authorized **$100.00** ceiling. Reservations are not actual charges. Astra account billing is unavailable.
+Confirmed token/header-priced charges: **$40.7215**. Missing receipts retain **$29.7730** across 118 requests; active requests reserve another **$0.7569**. The committed upper bound is **$71.2514** against the authorized **$100.00** ceiling. Reservations are not actual charges. Astra account billing is unavailable.
 
 ## Controlled development observations
 
@@ -72,6 +72,8 @@ A later [Bedrock tag-order audit](../scripts/litellm-harness/studies/bedrock-tag
 A separate corpus selects 20 recent September 15 Python changes by explicit file-count and diff-size criteria. Fourteen pass base/reference qualification; six have environment, new-private-API, or reference failures and are excluded before solver outcomes. Its outcomes remain reserved. Earlier September 9 reserved tasks predate some training snapshots, so they cannot establish chronological generalization.
 
 Protocol 6 isolates Git configuration, permits ordinary Git inspection through the installed executable, withholds reference revisions/test selections from solvers, and protects frozen host metadata. Earlier protocol-5 trials contained blocked global-Git-config errors. Do not pool protocols for the final comparison.
+
+A [runtime-artifact isolation audit](../scripts/litellm-harness/studies/runtime-artifact-isolation/README.md) subsequently reproduced access to published reports inside the frozen application checkout under protocol 6. Inspection of 13,290 recorded command arguments across 189 completed runs found no matching access, but cannot prove nonaccess. Protocol 7 blocks runtime reports, probes, tests and Git metadata while preserving exact launcher imports. Previous protocol-6 results retain this limitation; the combined comparison was amended in both arms before allocating any trial, and future chronological evaluation requires protocol 7 or stronger.
 
 ## Earlier results and limits
 
