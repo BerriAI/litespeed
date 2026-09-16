@@ -1,0 +1,19 @@
+{
+  "generatedAt": "2026-09-16T22:17:48.756527+00:00",
+  "commit": "ea9e0d4",
+  "regressionBefore": "One HTTP test fails: expected200 for8192 output tokens, old fixed reservation returns403.",
+  "after": {
+    "focusedTestsPassed": 12,
+    "typecheck": "passed"
+  },
+  "oldUnknownReservations": "Unchanged; test compares the complete old record and live restart compares ledger bytes.",
+  "ledgerSha256BeforeAndAfter": "554d74824f9eb71e7f7afdd26e573fe370251555c51e7467501ab0eb616cbad0",
+  "ledgerUnchanged": true,
+  "knownPricedUsd": 52.819461724,
+  "unknownReservedUsd": 46.9303296,
+  "pending": 0,
+  "committedUsd": 99.74979132399973,
+  "defaultReservationUsd": 0.2523136,
+  "pilotReservationUsd": 0.23609344000000002,
+  "ceilingUsd": 100
+}
