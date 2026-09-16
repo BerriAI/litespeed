@@ -1,0 +1,79 @@
+{
+  "scope": "Posthoc diagnosis on all four completed feature-effort background trials. Reuses the qualified full processing entrypoint probe. Original scores, completion and comparison unchanged. Does not cover downstream policy execution or all semantic conditions.",
+  "probe": "../background-router-oracle/test_outer_retrieval.py",
+  "qualification": "../background-router-oracle/outer-retrieval-diagnostic.json",
+  "results": [
+    {
+      "run": "replication-v24-features-high-r1-background-responses-pipeline-4c64c9b6",
+      "name": "high",
+      "normalCompletion": true,
+      "originalAcceptance": {
+        "exit": 1,
+        "tests": 7,
+        "failures": 1,
+        "errors": 0,
+        "skipped": 0,
+        "passed": false
+      },
+      "exit": 0,
+      "tests": 2,
+      "failures": 0,
+      "errors": 0,
+      "packageOriginsAsserted": true
+    },
+    {
+      "run": "replication-v24-features-medium-r1-background-responses-pipeline-17f57e85",
+      "name": "medium",
+      "normalCompletion": false,
+      "originalAcceptance": {
+        "exit": 1,
+        "tests": 7,
+        "failures": 1,
+        "errors": 0,
+        "skipped": 0,
+        "passed": false
+      },
+      "exit": 0,
+      "tests": 2,
+      "failures": 0,
+      "errors": 0,
+      "packageOriginsAsserted": true
+    },
+    {
+      "run": "replication-v24-features-high-r2-oom1-background-responses-pipeline-3ce55982",
+      "name": "high",
+      "normalCompletion": true,
+      "originalAcceptance": {
+        "exit": 1,
+        "tests": 7,
+        "failures": 1,
+        "errors": 0,
+        "skipped": 0,
+        "passed": false
+      },
+      "exit": 0,
+      "tests": 2,
+      "failures": 0,
+      "errors": 0,
+      "packageOriginsAsserted": true
+    },
+    {
+      "run": "replication-v24-features-medium-r2-oom1-background-responses-pipeline-ae180e08",
+      "name": "medium",
+      "normalCompletion": true,
+      "originalAcceptance": {
+        "exit": 0,
+        "tests": 7,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0,
+        "passed": true
+      },
+      "exit": 0,
+      "tests": 2,
+      "failures": 0,
+      "errors": 0,
+      "packageOriginsAsserted": true
+    }
+  ]
+}
