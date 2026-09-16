@@ -4,13 +4,21 @@
   "variants": [
     {
       "variant": "control",
-      "evaluated": 0,
-      "expected": 2
+      "evaluated": 1,
+      "expected": 2,
+      "successes": 1,
+      "meanSeconds": 463.613,
+      "tokenPricedUsd": 0.083915498,
+      "trialsWithoutTokenPrice": 0
     },
     {
       "variant": "counter-values",
-      "evaluated": 0,
-      "expected": 2
+      "evaluated": 1,
+      "expected": 2,
+      "successes": 0,
+      "meanSeconds": 787.958,
+      "tokenPricedUsd": 0.11037209,
+      "trialsWithoutTokenPrice": 0
     }
   ],
   "comparisons": [
@@ -31,7 +39,41 @@
       "label": "replication-v32-counters-control-r2",
       "commit": "a37b3d38fc7bb39e9b16e460af7db4fca8843ada",
       "effort": "medium",
-      "evaluated": false
+      "evaluated": true,
+      "success": true,
+      "completed": true,
+      "completionReason": "completed",
+      "seconds": 463.613,
+      "acceptance": {
+        "exit": 0,
+        "tests": 5,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0,
+        "passed": true
+      },
+      "computedUsd": 0.083915498,
+      "activations": {
+        "initialMapNotices": 1,
+        "contextToolCalls": 0,
+        "guideIdsShown": [
+          "budget-cache-reconciliation"
+        ],
+        "unparsedContextPayloads": 0,
+        "finalReviewNotices": 1,
+        "guidedFinalReviewNotices": 0,
+        "finalReviewGuideIdsShown": [],
+        "batchedEditCalls": 0,
+        "completedBatchedEditCalls": 0,
+        "batchEditsRequested": 0,
+        "batchSizes": [],
+        "backgroundCommandNotices": 0,
+        "testFocusNotices": 1,
+        "explorationFocusNotices": 1,
+        "readCallsByEffectiveLimit": {},
+        "defaultWindowReadCalls": null,
+        "readLimitProvenance": "unknown: saved arguments include host-injected defaults"
+      }
     },
     {
       "dataset": "",
@@ -40,7 +82,41 @@
       "label": "replication-v32-counters-counter-values-r2",
       "commit": "60abb3ac9a289f528dbff82940280e18e4dc5940",
       "effort": "medium",
-      "evaluated": false
+      "evaluated": true,
+      "success": false,
+      "completed": true,
+      "completionReason": "completed",
+      "seconds": 787.958,
+      "acceptance": {
+        "exit": 1,
+        "tests": 5,
+        "failures": 1,
+        "errors": 0,
+        "skipped": 0,
+        "passed": false
+      },
+      "computedUsd": 0.11037209,
+      "activations": {
+        "initialMapNotices": 1,
+        "contextToolCalls": 0,
+        "guideIdsShown": [
+          "budget-cache-reconciliation"
+        ],
+        "unparsedContextPayloads": 0,
+        "finalReviewNotices": 1,
+        "guidedFinalReviewNotices": 0,
+        "finalReviewGuideIdsShown": [],
+        "batchedEditCalls": 0,
+        "completedBatchedEditCalls": 0,
+        "batchEditsRequested": 0,
+        "batchSizes": [],
+        "backgroundCommandNotices": 0,
+        "testFocusNotices": 1,
+        "explorationFocusNotices": 1,
+        "readCallsByEffectiveLimit": {},
+        "defaultWindowReadCalls": null,
+        "readLimitProvenance": "unknown: saved arguments include host-injected defaults"
+      }
     },
     {
       "dataset": "",

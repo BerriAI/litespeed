@@ -4,11 +4,11 @@
   "variants": [
     {
       "variant": "high",
-      "evaluated": 3,
+      "evaluated": 4,
       "expected": 8,
       "successes": 2,
-      "meanSeconds": 624.4876666666667,
-      "tokenPricedUsd": 0.410561696,
+      "meanSeconds": 693.38875,
+      "tokenPricedUsd": 0.6546737619999999,
       "trialsWithoutTokenPrice": 0
     },
     {
@@ -445,7 +445,57 @@
       "label": "replication-v24-features-high-r1",
       "commit": "c7e6826341989fd6ebf3588b53901087b2fa7a56",
       "effort": "high",
-      "evaluated": false
+      "evaluated": true,
+      "success": false,
+      "completed": false,
+      "completionReason": "timeout",
+      "seconds": 900.092,
+      "acceptance": {
+        "exit": 1,
+        "tests": 16,
+        "failures": 2,
+        "errors": 0,
+        "skipped": 0,
+        "passed": false
+      },
+      "computedUsd": 0.244112066,
+      "activations": {
+        "initialMapNotices": 1,
+        "contextToolCalls": 0,
+        "guideIdsShown": [],
+        "unparsedContextPayloads": 0,
+        "finalReviewNotices": 0,
+        "guidedFinalReviewNotices": 0,
+        "finalReviewGuideIdsShown": [],
+        "batchedEditCalls": 0,
+        "completedBatchedEditCalls": 0,
+        "batchEditsRequested": 0,
+        "batchSizes": [],
+        "backgroundCommandNotices": 0,
+        "testFocusNotices": 1,
+        "explorationFocusNotices": 1,
+        "readCallsByEffectiveLimit": {
+          "160": 2,
+          "360": 1,
+          "130": 5,
+          "120": 2,
+          "230": 1,
+          "60": 4,
+          "180": 2,
+          "150": 1,
+          "80": 6,
+          "70": 3,
+          "90": 4,
+          "40": 2,
+          "30": 3,
+          "50": 3,
+          "140": 1,
+          "55": 1,
+          "45": 1
+        },
+        "defaultWindowReadCalls": null,
+        "readLimitProvenance": "unknown: saved arguments include host-injected defaults"
+      }
     },
     {
       "dataset": "training5",
