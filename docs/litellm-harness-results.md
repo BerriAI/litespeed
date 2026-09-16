@@ -1,6 +1,6 @@
 # LiteLLM harness campaign results
 
-Interim snapshot: 2026-09-16T00:50:05.670949+00:00. Current harness: **2026-09-15.17**.
+Interim snapshot: 2026-09-16T01:32:04.716211+00:00. Current harness: **2026-09-15.17**.
 
 **The campaign is still running. It has not established a quality win over Astra/Codex or production replacement readiness.**
 
@@ -8,7 +8,7 @@ The selectable architecture and replay workbench are implemented. The current wo
 
 ## Spending
 
-Confirmed token/header-priced charges: **$17.9986**. Missing receipts retain **$29.2684** across 116 requests; active requests reserve another **$0.0000**. The committed upper bound is **$47.2670** against the authorized **$100.00** ceiling. Reservations are not actual charges. Astra account billing is unavailable.
+Confirmed token/header-priced charges: **$20.2229**. Missing receipts retain **$29.2684** across 116 requests; active requests reserve another **$0.5046**. The committed upper bound is **$49.9959** against the authorized **$100.00** ceiling. Reservations are not actual charges. Astra account billing is unavailable.
 
 ## Controlled development observations
 
@@ -32,7 +32,7 @@ The following are training/development trials under protocol 5, after enforcing 
 ## What the traces changed
 
 - A passing budget fix was temporarily removed for a baseline experiment, then cancellation prevented restoration. Restoring the model-authored block on a separate diagnostic copy passed all five checks. The original 4/5 timeout stays in the record. The review now keeps the working patch intact.
-- Router fixes repeatedly added accounting in downstream wrappers while direct selection entrypoints bypassed it. A return-site map made these paths visible, but did not eliminate the misses in the first controlled trials.
+- Router override fixes missed early returns: two checks exercise full completion/acompletion by deployment ID and two exercise direct selection. The specific_deployment flag resolves a different identifier. A return-site map made paths visible but did not eliminate the early misses. In a later training repetition, all eight behavior checks passed and only the new-private-helper assertion failed; the preceding repetition still failed behavior checks.
 - Three broad Medium-reasoning code audits exhausted 24,000 output tokens each without returning a review. A focused router audit with relevant function excerpts returned actionable findings in 4,026 completion tokens. Its focus came from prior training failures; this does not validate a general-purpose blind reviewer. A second-attempt repair is measured separately.
 - Disabling reasoning did not earn a default on the first two hard development cases: it missed more router checks and one budget check. Other effort results remain separate.
 - Per-batch concurrency limits collectively overloaded the host. All datasets now share three solver slots and one grader. Interrupted runs and unknown charges are preserved.
@@ -41,7 +41,9 @@ The following are training/development trials under protocol 5, after enforcing 
 
 ## Evaluation status
 
-A feature-removal study compares the current harness with no learned guides, no automatic initial map, no forced final review, and a 480-line default read window. The plan uses 16 qualified training/development tasks, five variants, and two repetitions, with randomized order. Frozen worktrees preserve each candidate. Outcomes select the next candidate; they are not final test results.
+A [feature-removal study](../scripts/litellm-harness/studies/feature-removal/README.md) compares the current harness with no learned guides, no automatic initial map, no forced final review, and a 480-line default read window. The plan uses 16 qualified training/development tasks, five variants, and two repetitions, with randomized order. Frozen worktrees preserve each candidate. Outcomes select the next candidate; they are not final test results. The linked catalogs and patches reconstruct the inputs.
+
+The Bedrock session-tags oracle requires exact error wording absent from the solver prompt. In one 27/34 run, six failures were this wording mismatch; the remaining failure was tuple versus list, which the prompt did specify. Its host oracle note had incorrectly claimed both contracts were supplied. The active study retains its original inputs and raw scores, with this interpretation correction. The router-strategy oracle also includes a new private-helper assertion.
 
 A separate corpus selects 20 recent September 15 Python changes by explicit file-count and diff-size criteria. Fourteen pass base/reference qualification; six have environment, new-private-API, or reference failures and are excluded before solver outcomes. Its outcomes remain reserved. Earlier September 9 reserved tasks predate some training snapshots, so they cannot establish chronological generalization.
 
