@@ -1,10 +1,10 @@
 {
-  "sourceGeneratedAt": "2026-09-16T10:18:16.665896+00:00",
+  "sourceGeneratedAt": "2026-09-16T10:41:23.018400+00:00",
   "classificationVersion": 2,
   "scope": "Descriptive protocol-6/7 development attempts with recorded Flash usage. Different tasks, candidate versions, isolation protocols and efforts are pooled only to locate spending. Includes paid interruptions and timeouts; excludes zero-usage startup failures. Not a quality comparison or causal estimate. Protocol 6 has the disclosed runtime-artifact access limitation. Missing usage is outside these token-priced totals; the campaign ledger remains authoritative.",
   "protocolCounts": {
-    "6": 193,
-    "7": 9
+    "6": 197,
+    "7": 13
   },
   "runProtocols": {
     "replication-p6-ablation-control-r1-anthropic-image-guardrail-2510a6a3": 6,
@@ -18,6 +18,7 @@
     "replication-p6-ablation-control-r1-team-member-budget-9e2820a4": 6,
     "replication-p6-ablation-control-r1-vertex-version-path-6a62ca02": 6,
     "replication-p6-ablation-no-guides-r1-anthropic-image-guardrail-54b64a02": 6,
+    "replication-p6-ablation-no-guides-r1-anthropic-tool-document-f733cceb": 6,
     "replication-p6-ablation-no-guides-r1-converse-config-fff0541b": 6,
     "replication-p6-ablation-no-guides-r1-dashscope-rerank-cf1ec114": 6,
     "replication-p6-ablation-no-guides-r1-databricks-reasoning-e8848e80": 6,
@@ -27,6 +28,7 @@
     "replication-p6-ablation-no-guides-r1-team-member-budget-5f4f5960": 6,
     "replication-p6-ablation-no-guides-r1-vertex-version-path-3ce63c27": 6,
     "replication-p6-ablation-no-preload-r1-anthropic-image-guardrail-3825af81": 6,
+    "replication-p6-ablation-no-preload-r1-anthropic-tool-document-bbfa237f": 6,
     "replication-p6-ablation-no-preload-r1-converse-config-a0fd52a5": 6,
     "replication-p6-ablation-no-preload-r1-dashscope-rerank-5933bfdb": 6,
     "replication-p6-ablation-no-preload-r1-databricks-reasoning-ac4bb219": 6,
@@ -36,6 +38,7 @@
     "replication-p6-ablation-no-preload-r1-team-member-budget-e6f46fba": 6,
     "replication-p6-ablation-no-preload-r1-vertex-version-path-2a97a8a2": 6,
     "replication-p6-ablation-no-review-r1-anthropic-image-guardrail-8e989b04": 6,
+    "replication-p6-ablation-no-review-r1-anthropic-tool-document-f6cb552e": 6,
     "replication-p6-ablation-no-review-r1-converse-config-956edcd4": 6,
     "replication-p6-ablation-no-review-r1-dashscope-rerank-a9ba21ae": 6,
     "replication-p6-ablation-no-review-r1-databricks-reasoning-42016795": 6,
@@ -104,6 +107,7 @@
     "replication-v35-inspection-control-r2-oom1-databricks-reasoning-edabe604": 6,
     "replication-v35-inspection-native-inspection-r1-databricks-reasoning-1d23305a": 6,
     "replication-v35-inspection-native-inspection-r2-databricks-reasoning-ff61f727": 6,
+    "replication-v44-combined-combined-r2-databricks-reasoning-d41ba293": 7,
     "replication-v44-combined-control-r1-databricks-reasoning-d3f77814": 7,
     "replication-v47-output-retain-output-r2-router-strategy-isolation-b21e08d3": 7,
     "replication-p6-ablation-control-r1-bedrock-session-tags-3e02204f": 6,
@@ -136,6 +140,7 @@
     "replication-p6-ablation-read-480-r1-mcp-optional-discovery-6445e713": 6,
     "replication-p6-ablation-read-480-r1-mock-input-tokens-dcd0b092": 6,
     "replication-p6-ablation-read-480-r1-responses-custom-guardrail-c81ac9a3": 6,
+    "replication-p6-ablation-read-480-r2-mcp-optional-discovery-98b316bf": 6,
     "replication-v19-wait-r1-mcp-auth-challenge-ba720ed4": 6,
     "replication-v19-wait-r1-mcp-optional-discovery-31dae056": 6,
     "replication-v19-wait-r2-mcp-auth-challenge-93ccf1b6": 6,
@@ -207,13 +212,16 @@
     "replication-v39-streams-stream-guide-r2-legacy-stream-pipeline-929c8cfe": 6,
     "replication-v44-combined-combined-r1-legacy-stream-pipeline-fc4cc74b": 7,
     "replication-v44-combined-combined-r2-aws-signing-off-loop-efc4f6f1": 7,
+    "replication-v44-combined-control-r1-legacy-stream-pipeline-f1015218": 7,
     "replication-v44-combined-control-r2-legacy-stream-pipeline-78ee2f68": 7,
-    "replication-v47-output-control-r2-legacy-stream-pipeline-ffbf9624": 7
+    "replication-v47-output-control-r1-legacy-stream-pipeline-8377c382": 7,
+    "replication-v47-output-control-r2-legacy-stream-pipeline-ffbf9624": 7,
+    "replication-v47-output-retain-output-r2-legacy-stream-pipeline-c15168ea": 7
   },
-  "runs": 202,
+  "runs": 210,
   "completionReasons": {
-    "completed": 176,
-    "timeout": 23,
+    "completed": 181,
+    "timeout": 26,
     "runner-error": 3
   },
   "runIds": [
@@ -228,6 +236,7 @@
     "replication-p6-ablation-control-r1-team-member-budget-9e2820a4",
     "replication-p6-ablation-control-r1-vertex-version-path-6a62ca02",
     "replication-p6-ablation-no-guides-r1-anthropic-image-guardrail-54b64a02",
+    "replication-p6-ablation-no-guides-r1-anthropic-tool-document-f733cceb",
     "replication-p6-ablation-no-guides-r1-converse-config-fff0541b",
     "replication-p6-ablation-no-guides-r1-dashscope-rerank-cf1ec114",
     "replication-p6-ablation-no-guides-r1-databricks-reasoning-e8848e80",
@@ -237,6 +246,7 @@
     "replication-p6-ablation-no-guides-r1-team-member-budget-5f4f5960",
     "replication-p6-ablation-no-guides-r1-vertex-version-path-3ce63c27",
     "replication-p6-ablation-no-preload-r1-anthropic-image-guardrail-3825af81",
+    "replication-p6-ablation-no-preload-r1-anthropic-tool-document-bbfa237f",
     "replication-p6-ablation-no-preload-r1-converse-config-a0fd52a5",
     "replication-p6-ablation-no-preload-r1-dashscope-rerank-5933bfdb",
     "replication-p6-ablation-no-preload-r1-databricks-reasoning-ac4bb219",
@@ -246,6 +256,7 @@
     "replication-p6-ablation-no-preload-r1-team-member-budget-e6f46fba",
     "replication-p6-ablation-no-preload-r1-vertex-version-path-2a97a8a2",
     "replication-p6-ablation-no-review-r1-anthropic-image-guardrail-8e989b04",
+    "replication-p6-ablation-no-review-r1-anthropic-tool-document-f6cb552e",
     "replication-p6-ablation-no-review-r1-converse-config-956edcd4",
     "replication-p6-ablation-no-review-r1-dashscope-rerank-a9ba21ae",
     "replication-p6-ablation-no-review-r1-databricks-reasoning-42016795",
@@ -314,6 +325,7 @@
     "replication-v35-inspection-control-r2-oom1-databricks-reasoning-edabe604",
     "replication-v35-inspection-native-inspection-r1-databricks-reasoning-1d23305a",
     "replication-v35-inspection-native-inspection-r2-databricks-reasoning-ff61f727",
+    "replication-v44-combined-combined-r2-databricks-reasoning-d41ba293",
     "replication-v44-combined-control-r1-databricks-reasoning-d3f77814",
     "replication-v47-output-retain-output-r2-router-strategy-isolation-b21e08d3",
     "replication-p6-ablation-control-r1-bedrock-session-tags-3e02204f",
@@ -346,6 +358,7 @@
     "replication-p6-ablation-read-480-r1-mcp-optional-discovery-6445e713",
     "replication-p6-ablation-read-480-r1-mock-input-tokens-dcd0b092",
     "replication-p6-ablation-read-480-r1-responses-custom-guardrail-c81ac9a3",
+    "replication-p6-ablation-read-480-r2-mcp-optional-discovery-98b316bf",
     "replication-v19-wait-r1-mcp-auth-challenge-ba720ed4",
     "replication-v19-wait-r1-mcp-optional-discovery-31dae056",
     "replication-v19-wait-r2-mcp-auth-challenge-93ccf1b6",
@@ -417,106 +430,109 @@
     "replication-v39-streams-stream-guide-r2-legacy-stream-pipeline-929c8cfe",
     "replication-v44-combined-combined-r1-legacy-stream-pipeline-fc4cc74b",
     "replication-v44-combined-combined-r2-aws-signing-off-loop-efc4f6f1",
+    "replication-v44-combined-control-r1-legacy-stream-pipeline-f1015218",
     "replication-v44-combined-control-r2-legacy-stream-pipeline-78ee2f68",
-    "replication-v47-output-control-r2-legacy-stream-pipeline-ffbf9624"
+    "replication-v47-output-control-r1-legacy-stream-pipeline-8377c382",
+    "replication-v47-output-control-r2-legacy-stream-pipeline-ffbf9624",
+    "replication-v47-output-retain-output-r2-legacy-stream-pipeline-c15168ea"
   ],
-  "recordedTokenPricedUsd": 26.93780062,
-  "attributedTokenPricedUsd": 26.937800619999997,
+  "recordedTokenPricedUsd": 27.784674812000002,
+  "attributedTokenPricedUsd": 27.784674812,
   "unattributedTokenPricedUsd": 3.552713678800501e-15,
   "groups": {
     "shell-command": {
-      "requests": 4075,
-      "estimatedUsd": 7.351020730000002,
-      "inputTokens": 331898872,
-      "cachedTokens": 316030930,
-      "outputTokens": 2496753,
-      "reportedModelSeconds": 22492.507999999994,
+      "requests": 4206,
+      "estimatedUsd": 7.626599718000001,
+      "inputTokens": 342856695,
+      "cachedTokens": 326374474,
+      "outputTokens": 2599833,
+      "reportedModelSeconds": 23532.434999999994,
       "durationUnreportedRequests": 0,
       "cacheUnreportedRequests": 0
     },
     "navigation": {
-      "requests": 4532,
-      "estimatedUsd": 5.9379396779999984,
-      "inputTokens": 265873113,
-      "cachedTokens": 252786974,
-      "outputTokens": 1953758,
-      "reportedModelSeconds": 18491.270000000004,
+      "requests": 4674,
+      "estimatedUsd": 6.144536025999998,
+      "inputTokens": 275232814,
+      "cachedTokens": 261673758,
+      "outputTokens": 2014890,
+      "reportedModelSeconds": 19166.978000000003,
       "durationUnreportedRequests": 0,
       "cacheUnreportedRequests": 0
     },
     "shell-mentions-checks": {
-      "requests": 1609,
-      "estimatedUsd": 4.242353186000001,
-      "inputTokens": 166500896,
-      "cachedTokens": 154391838,
-      "outputTokens": 753966,
-      "reportedModelSeconds": 6950.160000000001,
+      "requests": 1654,
+      "estimatedUsd": 4.3619833980000005,
+      "inputTokens": 171260526,
+      "cachedTokens": 158800314,
+      "outputTokens": 771416,
+      "reportedModelSeconds": 7130.344,
       "durationUnreportedRequests": 0,
       "cacheUnreportedRequests": 0
     },
     "structured-edit": {
-      "requests": 2290,
-      "estimatedUsd": 4.060953563999998,
-      "inputTokens": 209527455,
-      "cachedTokens": 202789332,
-      "outputTokens": 1756123,
-      "reportedModelSeconds": 12698.481000000002,
+      "requests": 2366,
+      "estimatedUsd": 4.2099272339999985,
+      "inputTokens": 217381182,
+      "cachedTokens": 210395802,
+      "outputTokens": 1818747,
+      "reportedModelSeconds": 13211.222000000002,
       "durationUnreportedRequests": 0,
       "cacheUnreportedRequests": 0
     },
     "job-poll-or-wait": {
-      "requests": 649,
-      "estimatedUsd": 3.661178658,
-      "inputTokens": 72529569,
-      "cachedTokens": 57869874,
-      "outputTokens": 46904,
-      "reportedModelSeconds": 1498.8909999999996,
+      "requests": 658,
+      "estimatedUsd": 3.7074640559999996,
+      "inputTokens": 73671255,
+      "cachedTokens": 58833448,
+      "outputTokens": 47443,
+      "reportedModelSeconds": 1519.4969999999996,
       "durationUnreportedRequests": 0,
       "cacheUnreportedRequests": 0
     },
     "text-only": {
-      "requests": 354,
-      "estimatedUsd": 0.9490235859999996,
-      "inputTokens": 34699684,
-      "cachedTokens": 32428898,
-      "outputTokens": 337043,
-      "reportedModelSeconds": 2883.838,
+      "requests": 363,
+      "estimatedUsd": 0.9582925199999994,
+      "inputTokens": 35166987,
+      "cachedTokens": 32888400,
+      "outputTokens": 343613,
+      "reportedModelSeconds": 2941.081,
       "durationUnreportedRequests": 0,
       "cacheUnreportedRequests": 0
     },
     "mixed-tools": {
-      "requests": 418,
-      "estimatedUsd": 0.6306451020000001,
-      "inputTokens": 17811189,
-      "cachedTokens": 16236806,
-      "outputTokens": 258520,
-      "reportedModelSeconds": 2130.2899999999995,
+      "requests": 441,
+      "estimatedUsd": 0.6674975980000002,
+      "inputTokens": 18916276,
+      "cachedTokens": 17254254,
+      "outputTokens": 274353,
+      "reportedModelSeconds": 2284.2179999999994,
       "durationUnreportedRequests": 0,
       "cacheUnreportedRequests": 0
     },
     "other-tool": {
-      "requests": 45,
-      "estimatedUsd": 0.10468611599999998,
-      "inputTokens": 5026350,
-      "cachedTokens": 4809168,
-      "outputTokens": 35215,
-      "reportedModelSeconds": 309.275,
+      "requests": 47,
+      "estimatedUsd": 0.10837426199999999,
+      "inputTokens": 5165274,
+      "cachedTokens": 4945546,
+      "outputTokens": 38508,
+      "reportedModelSeconds": 341.24199999999996,
       "durationUnreportedRequests": 0,
       "cacheUnreportedRequests": 0
     }
   },
   "timing": {
     "modelSeconds": {
-      "measuredRuns": 202,
-      "medianSeconds": 331.3035
+      "measuredRuns": 210,
+      "medianSeconds": 330.111
     },
     "toolActiveSeconds": {
-      "measuredRuns": 202,
-      "medianSeconds": 82.3775
+      "measuredRuns": 210,
+      "medianSeconds": 81.6905
     },
     "timeToFirstEditSeconds": {
-      "measuredRuns": 202,
-      "medianSeconds": 143.503
+      "measuredRuns": 210,
+      "medianSeconds": 142.49450000000002
     }
   }
 }

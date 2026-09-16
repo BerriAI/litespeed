@@ -1,0 +1,16 @@
+{
+  "completedAt": "2026-09-16T10:39:03.909429+00:00",
+  "complete": true,
+  "finishReason": "stop",
+  "requestSha256": "995e196bac86f36885fa012b83c17246e7695e97853644bdce9520aaa59fbb67",
+  "requestCount": 1,
+  "pricedUsd": 0.008706582000000001,
+  "pricingSource": "tokens-and-header",
+  "inputTokens": 32091,
+  "cachedTokens": 106,
+  "outputTokens": 2529,
+  "windowReviewsReused": 8,
+  "observedResult": "The new synthesis acknowledges green results at steps 125\u2013127 and drops the earlier claim that the 981-test result lacks evidence.",
+  "remainingLimit": "It still cites missing solver execution of private acceptance as a coverage limitation. Solvers are intentionally denied that command; absence is not a solver defect and should not motivate additional production instructions. Proposed coverage-ledger/test prompts remain untested and unpromoted.",
+  "unchanged": "Original candidate, acceptance 52/52, runtime, scores and v2 review remain unchanged."
+}

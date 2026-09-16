@@ -4,20 +4,20 @@
   "variants": [
     {
       "variant": "combined",
-      "evaluated": 4,
+      "evaluated": 5,
       "expected": 8,
-      "successes": 3,
-      "meanSeconds": 621.23575,
-      "tokenPricedUsd": 0.47123938600000004,
+      "successes": 4,
+      "meanSeconds": 554.9114,
+      "tokenPricedUsd": 0.522451826,
       "trialsWithoutTokenPrice": 0
     },
     {
       "variant": "control",
-      "evaluated": 2,
+      "evaluated": 3,
       "expected": 8,
       "successes": 1,
-      "meanSeconds": 646.202,
-      "tokenPricedUsd": 0.543596666,
+      "meanSeconds": 731.0616666666666,
+      "tokenPricedUsd": 0.686586742,
       "trialsWithoutTokenPrice": 0
     }
   ],
@@ -459,7 +459,73 @@
       "commit": "b06f9fd2c25f03382f26b6d8a5dbbe38a53ae8ea",
       "effort": "medium",
       "kind": "litellm-specific",
-      "evaluated": false
+      "evaluated": true,
+      "success": false,
+      "completed": false,
+      "completionReason": "timeout",
+      "seconds": 900.781,
+      "acceptance": {
+        "exit": 1,
+        "tests": 16,
+        "failures": 2,
+        "errors": 0,
+        "skipped": 0,
+        "passed": false
+      },
+      "computedUsd": 0.142990076,
+      "activations": {
+        "initialMapNotices": 1,
+        "contextToolCalls": 0,
+        "guideIdsShown": [],
+        "unparsedContextPayloads": 0,
+        "finalReviewNotices": 0,
+        "guidedFinalReviewNotices": 0,
+        "finalReviewGuideIdsShown": [],
+        "batchedEditCalls": 0,
+        "completedBatchedEditCalls": 0,
+        "batchEditsRequested": 0,
+        "batchSizes": [],
+        "backgroundCommandNotices": 0,
+        "testFocusNotices": 1,
+        "explorationFocusNotices": 1,
+        "readCallsByEffectiveLimit": {
+          "120": 2,
+          "400": 1,
+          "200": 1,
+          "160": 5,
+          "210": 2,
+          "280": 1,
+          "220": 1,
+          "320": 1,
+          "330": 1,
+          "300": 2,
+          "70": 3,
+          "60": 4,
+          "140": 1,
+          "190": 1,
+          "100": 1,
+          "80": 2,
+          "110": 1,
+          "480": 1,
+          "40": 2,
+          "75": 1,
+          "30": 1,
+          "90": 1,
+          "130": 1,
+          "45": 1
+        },
+        "defaultWindowReadCalls": null,
+        "readLimitProvenance": "unknown: saved arguments include host-injected defaults"
+      },
+      "originalSuccess": false,
+      "supplemental": {
+        "artifact": "real-stream-probe.json",
+        "checks": 24,
+        "expectedChecks": 24,
+        "checksPassed": 12,
+        "exit": 0,
+        "passed": false
+      }
     },
     {
       "dataset": "",
@@ -469,7 +535,51 @@
       "commit": "3737757ecf1d2652cbf60a0abc49f4568e668adb",
       "effort": "medium",
       "kind": "litellm-specific",
-      "evaluated": false
+      "evaluated": true,
+      "success": true,
+      "completed": true,
+      "completionReason": "completed",
+      "seconds": 289.614,
+      "acceptance": {
+        "exit": 0,
+        "tests": 6,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0,
+        "passed": true
+      },
+      "computedUsd": 0.05121244,
+      "activations": {
+        "initialMapNotices": 1,
+        "contextToolCalls": 0,
+        "guideIdsShown": [],
+        "unparsedContextPayloads": 0,
+        "finalReviewNotices": 1,
+        "guidedFinalReviewNotices": 0,
+        "finalReviewGuideIdsShown": [],
+        "batchedEditCalls": 3,
+        "completedBatchedEditCalls": 1,
+        "batchEditsRequested": 12,
+        "batchSizes": [
+          4,
+          4,
+          4
+        ],
+        "backgroundCommandNotices": 0,
+        "testFocusNotices": 1,
+        "explorationFocusNotices": 1,
+        "readCallsByEffectiveLimit": {
+          "260": 1,
+          "160": 2,
+          "120": 2,
+          "100": 1,
+          "70": 2,
+          "45": 1,
+          "20": 1
+        },
+        "defaultWindowReadCalls": null,
+        "readLimitProvenance": "unknown: saved arguments include host-injected defaults"
+      }
     },
     {
       "dataset": "training2",
