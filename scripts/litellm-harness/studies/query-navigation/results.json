@@ -1,0 +1,116 @@
+{
+  "status": "interim",
+  "note": "Development selection only. Interim observed-task means can change as slower trials finish. Bootstrap resamples tasks, not attempts; it does not correct adaptive candidate selection or establish future generalization. Token prices exclude requests without usage and do not replace the campaign ledger.",
+  "variants": [
+    {
+      "variant": "control",
+      "evaluated": 0,
+      "expected": 4
+    },
+    {
+      "variant": "query-navigation",
+      "evaluated": 0,
+      "expected": 4
+    }
+  ],
+  "comparisons": [
+    {
+      "variant": "query-navigation",
+      "control": "control",
+      "pairedTasks": 0,
+      "expectedTasks": 2,
+      "complete": false,
+      "pairs": []
+    }
+  ],
+  "trials": [
+    {
+      "dataset": "training7",
+      "case": "realtime-cached-audio-cost",
+      "name": "control",
+      "label": "replication-v53-query-control-r2",
+      "commit": "0fdc384563c46f5baede5818808c292a988004d6",
+      "effort": "medium",
+      "kind": "litellm-specific",
+      "timeoutSeconds": 1800,
+      "evaluated": false
+    },
+    {
+      "dataset": "training7",
+      "case": "realtime-cached-audio-cost",
+      "name": "query-navigation",
+      "label": "replication-v53-query-query-navigation-r1",
+      "commit": "3bae1851ae107d9689054bb75869b07eff5a6ef0",
+      "effort": "medium",
+      "kind": "litellm-specific",
+      "timeoutSeconds": 1800,
+      "evaluated": false
+    },
+    {
+      "dataset": "training7",
+      "case": "realtime-cached-audio-cost",
+      "name": "control",
+      "label": "replication-v53-query-control-r1",
+      "commit": "0fdc384563c46f5baede5818808c292a988004d6",
+      "effort": "medium",
+      "kind": "litellm-specific",
+      "timeoutSeconds": 1800,
+      "evaluated": false
+    },
+    {
+      "dataset": "",
+      "case": "mock-input-tokens",
+      "name": "query-navigation",
+      "label": "replication-v53-query-query-navigation-r1",
+      "commit": "3bae1851ae107d9689054bb75869b07eff5a6ef0",
+      "effort": "medium",
+      "kind": "litellm-specific",
+      "timeoutSeconds": 900,
+      "evaluated": false
+    },
+    {
+      "dataset": "",
+      "case": "mock-input-tokens",
+      "name": "control",
+      "label": "replication-v53-query-control-r2",
+      "commit": "0fdc384563c46f5baede5818808c292a988004d6",
+      "effort": "medium",
+      "kind": "litellm-specific",
+      "timeoutSeconds": 900,
+      "evaluated": false
+    },
+    {
+      "dataset": "",
+      "case": "mock-input-tokens",
+      "name": "control",
+      "label": "replication-v53-query-control-r1",
+      "commit": "0fdc384563c46f5baede5818808c292a988004d6",
+      "effort": "medium",
+      "kind": "litellm-specific",
+      "timeoutSeconds": 900,
+      "evaluated": false
+    },
+    {
+      "dataset": "training7",
+      "case": "realtime-cached-audio-cost",
+      "name": "query-navigation",
+      "label": "replication-v53-query-query-navigation-r2",
+      "commit": "3bae1851ae107d9689054bb75869b07eff5a6ef0",
+      "effort": "medium",
+      "kind": "litellm-specific",
+      "timeoutSeconds": 1800,
+      "evaluated": false
+    },
+    {
+      "dataset": "",
+      "case": "mock-input-tokens",
+      "name": "query-navigation",
+      "label": "replication-v53-query-query-navigation-r2",
+      "commit": "3bae1851ae107d9689054bb75869b07eff5a6ef0",
+      "effort": "medium",
+      "kind": "litellm-specific",
+      "timeoutSeconds": 900,
+      "evaluated": false
+    }
+  ]
+}

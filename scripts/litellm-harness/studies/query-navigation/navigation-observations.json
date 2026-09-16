@@ -1,0 +1,878 @@
+{
+  "scope": "Same observed queries against the answer-free historical base; navigation capability only, no solver quality estimate.",
+  "query": "Realtime cached audio input is overbilled because the nested cached_tokens_details split is lost. Preserve optional text/audio/image cached-token details through realtime and Responses usage normalization and conversion back to Responses usage. Combine the nested split across response.done events, including when only some events supply it, without mutating input usage. Omit the optional nested key from serialized usage when no split was supplied; preserve existing cache-write fields and their absence.\n\nUse cache_read_input_audio_token_cost for cached audio, falling back to cache_read_input_token_cost when the audio rate is absent. Expose that audio rate through model-info lookups and the token-cost breakdown, and make the breakdown agree with input billing. Remove cached tokens from the corresponding full-rate text/audio/image buckets without going negative; cap the nested allocation at the aggregate cached count. Preserve existing billing when nested details are absent, along with exi",
+  "lookup": {
+    "path": "litellm/litellm_core_utils/llm_cost_calc/utils.py",
+    "query": "_calculate_input_cost cached audio rate cache_read_input_audio_token_cost"
+  },
+  "arms": {
+    "control": {
+      "initial": {
+        "query": "Realtime cached audio input is overbilled because the nested cached_tokens_details split is lost. Preserve optional text/audio/image cached-token details through realtime and Responses usage normalization and conversion back to Responses usage. Combine the nested split across response.done events, including when only some events supply it, without mutating input usage. Omit the optional nested key from serialized usage when no split was supplied; preserve existing cache-write fields and their absence.\n\nUse cache_read_input_audio_token_cost for cached audio, falling back to cache_read_input_token_cost when the audio rate is absent. Expose that audio rate through model-info lookups and the token-cost breakdown, and make the breakdown agree with input billing. Remove cached tokens from the corresponding full-rate text/audio/image buckets without going negative; cap the nested allocation at the aggregate cached count. Preserve existing billing when nested details are absent, along with exi",
+        "playbooks": [],
+        "references": [
+          {
+            "path": "litellm/litellm_core_utils/llm_cost_calc/utils.py",
+            "line": 1193,
+            "preview": "prompt_tokens_details[\"text_tokens\"] = uncached_budget - billable_audio - billable_image - billable_video",
+            "score": 6
+          },
+          {
+            "path": "litellm/litellm_core_utils/llm_cost_calc/usage_object_transformation.py",
+            "line": 35,
+            "preview": "text_tokens=usage_object.input_token_details.text_tokens,",
+            "score": 5
+          },
+          {
+            "path": "litellm/litellm_core_utils/llm_cost_calc/usage_object_transformation.py",
+            "line": 36,
+            "preview": "audio_tokens=usage_object.input_token_details.audio_tokens,",
+            "score": 5
+          },
+          {
+            "path": "litellm/litellm_core_utils/llm_cost_calc/utils.py",
+            "line": 1180,
+            "preview": "total_details: Final = text_tokens + cache_hit + audio_tokens + cache_creation + image_tokens + video_tokens",
+            "score": 5
+          },
+          {
+            "path": "litellm/litellm_core_utils/streaming_handler.py",
+            "line": 2534,
+            "preview": "usage.prompt_tokens_details = PromptTokensDetailsWrapper(cached_tokens=0)  # rebind-ok: backfill in place",
+            "score": 5
+          },
+          {
+            "path": "litellm/responses/utils.py",
+            "line": 1137,
+            "preview": "input_tokens_details (text_tokens, image_tokens).",
+            "score": 5
+          },
+          {
+            "path": "litellm/responses/utils.py",
+            "line": 1178,
+            "preview": "cached_tokens=getattr(response_api_usage.input_tokens_details, \"cached_tokens\", None),",
+            "score": 5
+          },
+          {
+            "path": "litellm/responses/utils.py",
+            "line": 1179,
+            "preview": "audio_tokens=getattr(response_api_usage.input_tokens_details, \"audio_tokens\", None),",
+            "score": 5
+          },
+          {
+            "path": "litellm/responses/utils.py",
+            "line": 1180,
+            "preview": "text_tokens=getattr(response_api_usage.input_tokens_details, \"text_tokens\", None),",
+            "score": 5
+          },
+          {
+            "path": "litellm/responses/utils.py",
+            "line": 1181,
+            "preview": "image_tokens=getattr(response_api_usage.input_tokens_details, \"image_tokens\", None),",
+            "score": 5
+          },
+          {
+            "path": "litellm/litellm_core_utils/llm_cost_calc/usage_object_transformation.py",
+            "line": 91,
+            "preview": "if total_cached_tokens and \"text_tokens\" in input_sums:",
+            "score": 4.5
+          },
+          {
+            "path": "litellm/litellm_core_utils/llm_cost_calc/utils.py",
+            "line": 1194,
+            "preview": "elif text_tokens == 0 and prompt_tokens_details[\"image_count\"] == 0:",
+            "score": 4.5
+          }
+        ],
+        "symbols": [
+          {
+            "path": "litellm/caching/redis_semantic_cache.py",
+            "name": "_collect_responses_input_text",
+            "line": 276,
+            "score": 3,
+            "tests": [
+              "tests/test_litellm/caching/test_redis_semantic_cache.py"
+            ]
+          },
+          {
+            "path": "litellm/caching/caching_handler.py",
+            "name": "combine_usage",
+            "line": 561,
+            "score": 2,
+            "tests": [
+              "tests/test_litellm/caching/test_caching_handler.py",
+              "tests/test_litellm/caching/test_llm_caching_handler.py"
+            ]
+          },
+          {
+            "path": "litellm/litellm_core_utils/prompt_templates/factory.py",
+            "name": "get_image_details",
+            "line": 3401,
+            "score": 2,
+            "tests": [
+              "tests/test_litellm/litellm_core_utils/prompt_templates/test_litellm_core_utils_prompt_templates_factory.py"
+            ]
+          },
+          {
+            "path": "litellm/litellm_core_utils/token_counter.py",
+            "name": "_count_image_tokens",
+            "line": 676,
+            "score": 2,
+            "tests": [
+              "tests/test_litellm/litellm_core_utils/test_token_counter.py",
+              "tests/test_litellm/litellm_core_utils/test_token_counter_tool_data.py"
+            ]
+          },
+          {
+            "path": "litellm/responses/utils.py",
+            "name": "_as_input_text_part",
+            "line": 62,
+            "score": 2,
+            "tests": [
+              "tests/test_litellm/responses/test_responses_utils.py"
+            ]
+          },
+          {
+            "path": "litellm/litellm_core_utils/prompt_templates/factory.py",
+            "name": "gemini_text_image_pt",
+            "line": 3247,
+            "score": 2,
+            "tests": [
+              "tests/test_litellm/litellm_core_utils/prompt_templates/test_litellm_core_utils_prompt_templates_factory.py"
+            ]
+          },
+          {
+            "path": "litellm/utils.py",
+            "name": "supports_audio_input",
+            "line": 2755,
+            "score": 2,
+            "tests": [
+              "tests/test_litellm/test_utils.py",
+              "tests/test_litellm/a2a_protocol/test_utils.py"
+            ]
+          },
+          {
+            "path": "litellm/litellm_core_utils/streaming_handler.py",
+            "name": "_coerce_token_details",
+            "line": 2540,
+            "score": 2,
+            "tests": [
+              "tests/test_litellm/litellm_core_utils/test_streaming_handler.py"
+            ]
+          },
+          {
+            "path": "litellm/main.py",
+            "name": "admission_input_tokens",
+            "line": 838,
+            "score": 2,
+            "tests": [
+              "tests/test_litellm/test_main.py",
+              "tests/test_litellm/a2a_protocol/test_main.py"
+            ]
+          },
+          {
+            "path": "litellm/litellm_core_utils/prompt_templates/factory.py",
+            "name": "convert_to_ollama_image",
+            "line": 170,
+            "score": 2,
+            "tests": [
+              "tests/test_litellm/litellm_core_utils/prompt_templates/test_litellm_core_utils_prompt_templates_factory.py"
+            ]
+          },
+          {
+            "path": "litellm/litellm_core_utils/prompt_templates/factory.py",
+            "name": "get_image_details_async",
+            "line": 3385,
+            "score": 2,
+            "tests": [
+              "tests/test_litellm/litellm_core_utils/prompt_templates/test_litellm_core_utils_prompt_templates_factory.py"
+            ]
+          },
+          {
+            "path": "litellm/utils.py",
+            "name": "_get_cached_audio_utils",
+            "line": 194,
+            "score": 2,
+            "tests": [
+              "tests/test_litellm/test_utils.py",
+              "tests/test_litellm/a2a_protocol/test_utils.py"
+            ]
+          }
+        ],
+        "symbolScan": {
+          "roots": [
+            "litellm/caching/",
+            "litellm/responses/",
+            "litellm/main.py",
+            "litellm/litellm_core_utils/",
+            "litellm/utils.py"
+          ],
+          "files": 119,
+          "partial": false
+        },
+        "matches": [
+          {
+            "path": "litellm/responses/mcp/request_context.py",
+            "tests": [
+              "tests/test_litellm/responses/mcp/test_chat_completions_handler.py",
+              "tests/test_litellm/responses/mcp/test_litellm_proxy_mcp_handler.py",
+              "tests/test_litellm/responses/mcp/test_mcp_streaming_iterator.py"
+            ]
+          },
+          {
+            "path": "litellm/llms/bedrock/realtime/trigger_audio.py",
+            "tests": [
+              "tests/test_litellm/llms/bedrock/realtime/test_bedrock_realtime_handler.py",
+              "tests/test_litellm/llms/bedrock/realtime/test_bedrock_realtime_transformation.py"
+            ]
+          },
+          {
+            "path": "litellm/llms/openai/responses/count_tokens/handler.py",
+            "tests": []
+          },
+          {
+            "path": "litellm/llms/openai/responses/count_tokens/__init__.py",
+            "tests": []
+          },
+          {
+            "path": "litellm/llms/openai/responses/count_tokens/token_counter.py",
+            "tests": []
+          },
+          {
+            "path": "litellm/llms/openai/responses/count_tokens/transformation.py",
+            "tests": []
+          },
+          {
+            "path": "litellm/responses/main.py",
+            "tests": [
+              "tests/test_litellm/responses/test_custom_tool_call.py",
+              "tests/test_litellm/responses/test_metadata_codex_callback.py",
+              "tests/test_litellm/responses/test_no_duplicate_spend_logs.py"
+            ]
+          },
+          {
+            "path": "litellm/responses/utils.py",
+            "tests": [
+              "tests/test_litellm/responses/test_responses_utils.py"
+            ]
+          }
+        ],
+        "hint": "Use path + symbol for a definition, path + query to filter a large outline, or grep within the relevant directory for an exact term. Ranked paths and symbols are navigation hints, not proof of the cause."
+      },
+      "lookup": {
+        "path": "litellm/litellm_core_utils/llm_cost_calc/utils.py",
+        "lines": 1858,
+        "symbols": [
+          {
+            "name": "_get_tiered_reasoning_rate",
+            "line": 258,
+            "indent": 0,
+            "signature": "def _get_tiered_reasoning_rate(model_info: ModelInfo, usage: Usage) -> float | None:"
+          },
+          {
+            "name": "TokenRates",
+            "line": 422,
+            "indent": 0,
+            "signature": "class TokenRates:"
+          },
+          {
+            "name": "billed_reasoning_rate",
+            "line": 430,
+            "indent": 4,
+            "signature": "def billed_reasoning_rate(self) -> float:"
+          },
+          {
+            "name": "_parse_off_peak_rate",
+            "line": 434,
+            "indent": 0,
+            "signature": "def _parse_off_peak_rate(value: object) -> float | None:"
+          },
+          {
+            "name": "_off_peak_rate",
+            "line": 447,
+            "indent": 0,
+            "signature": "def _off_peak_rate(off_peak: Mapping[str, object], key: str, standard_rate: float) -> float:"
+          },
+          {
+            "name": "_calculate_input_cost",
+            "line": 906,
+            "indent": 0,
+            "signature": "def _calculate_input_cost("
+          },
+          {
+            "name": "_resolve_billed_reasoning_rate",
+            "line": 1086,
+            "indent": 0,
+            "signature": "def _resolve_billed_reasoning_rate("
+          },
+          {
+            "name": "BilledTokenRates",
+            "line": 1315,
+            "indent": 0,
+            "signature": "class BilledTokenRates:"
+          },
+          {
+            "name": "_custom_pricing_rates",
+            "line": 1370,
+            "indent": 0,
+            "signature": "def _custom_pricing_rates(custom_cost_per_token: CostPerToken) -> BilledTokenRates:"
+          },
+          {
+            "name": "_cost_map_billed_rates",
+            "line": 1386,
+            "indent": 0,
+            "signature": "def _cost_map_billed_rates("
+          },
+          {
+            "name": "get_billed_token_rates",
+            "line": 1431,
+            "indent": 0,
+            "signature": "def get_billed_token_rates("
+          }
+        ],
+        "moreSymbols": false,
+        "references": [
+          {
+            "line": 1187,
+            "preview": "billable_audio: Final = min(audio_tokens, uncached_budget)",
+            "score": 2
+          },
+          {
+            "line": 1188,
+            "preview": "billable_image: Final = min(image_tokens, uncached_budget - billable_audio)",
+            "score": 2
+          },
+          {
+            "line": 1189,
+            "preview": "billable_video: Final = min(video_tokens, uncached_budget - billable_audio - billable_image)",
+            "score": 2
+          },
+          {
+            "line": 1193,
+            "preview": "prompt_tokens_details[\"text_tokens\"] = uncached_budget - billable_audio - billable_image - billable_video",
+            "score": 2
+          },
+          {
+            "line": 17,
+            "preview": "tier_rate,",
+            "score": 1
+          },
+          {
+            "line": 133,
+            "preview": "Subtracts cached tokens from prompt tokens if applicable.",
+            "score": 1
+          },
+          {
+            "line": 264,
+            "preview": "return tier_rate(tier, \"output_cost_per_reasoning_token\", \"output_cost_per_token\")",
+            "score": 1
+          },
+          {
+            "line": 269,
+            "preview": "Resolve the base rates from a model's ``tiered_pricing`` table, if it has one.",
+            "score": 1
+          },
+          {
+            "line": 272,
+            "preview": "and every token of the request is billed at that tier's rate. Rates the tier does not",
+            "score": 1
+          },
+          {
+            "line": 273,
+            "preview": "declare fall back to the tier's input rate, so a request never mixes tiers.",
+            "score": 1
+          },
+          {
+            "line": 275,
+            "preview": "An output rate is the exception: a tier table that spells out only input rates would",
+            "score": 1
+          },
+          {
+            "line": 276,
+            "preview": "otherwise serve every completion for free, so the model's own output rate stands in.",
+            "score": 1
+          },
+          {
+            "line": 282,
+            "preview": "cache_creation_cost: Final = tier_rate(tier, \"cache_creation_input_token_cost\", \"input_cost_per_token\")",
+            "score": 1
+          },
+          {
+            "line": 284,
+            "preview": "tier_rate(tier, \"output_cost_per_token\")",
+            "score": 1
+          },
+          {
+            "line": 289,
+            "preview": "tier_rate(tier, \"input_cost_per_token\"),",
+            "score": 1
+          },
+          {
+            "line": 292,
+            "preview": "tier_rate(tier, \"cache_creation_input_token_cost_above_1hr\", \"cache_creation_input_token_cost\")",
+            "score": 1
+          },
+          {
+            "line": 294,
+            "preview": "tier_rate(tier, \"cache_read_input_token_cost\", \"input_cost_per_token\"),",
+            "score": 1
+          },
+          {
+            "line": 423,
+            "preview": "input_rate: float",
+            "score": 1
+          },
+          {
+            "line": 424,
+            "preview": "output_rate: float",
+            "score": 1
+          },
+          {
+            "line": 425,
+            "preview": "cache_read_rate: float",
+            "score": 1
+          }
+        ],
+        "tests": [
+          "tests/test_litellm/litellm_core_utils/llm_cost_calc/test_llm_cost_calc_utils.py"
+        ]
+      }
+    },
+    "candidate": {
+      "initial": {
+        "query": "Realtime cached audio input is overbilled because the nested cached_tokens_details split is lost. Preserve optional text/audio/image cached-token details through realtime and Responses usage normalization and conversion back to Responses usage. Combine the nested split across response.done events, including when only some events supply it, without mutating input usage. Omit the optional nested key from serialized usage when no split was supplied; preserve existing cache-write fields and their absence.\n\nUse cache_read_input_audio_token_cost for cached audio, falling back to cache_read_input_token_cost when the audio rate is absent. Expose that audio rate through model-info lookups and the token-cost breakdown, and make the breakdown agree with input billing. Remove cached tokens from the corresponding full-rate text/audio/image buckets without going negative; cap the nested allocation at the aggregate cached count. Preserve existing billing when nested details are absent, along with exi",
+        "playbooks": [],
+        "references": [
+          {
+            "path": "litellm/litellm_core_utils/llm_cost_calc/utils.py",
+            "line": 1193,
+            "preview": "prompt_tokens_details[\"text_tokens\"] = uncached_budget - billable_audio - billable_image - billable_video",
+            "score": 6
+          },
+          {
+            "path": "litellm/cost_calculator.py",
+            "line": 237,
+            "preview": "+ cached_tokens * cache_read_input_token_cost",
+            "score": 5
+          },
+          {
+            "path": "litellm/litellm_core_utils/llm_cost_calc/usage_object_transformation.py",
+            "line": 35,
+            "preview": "text_tokens=usage_object.input_token_details.text_tokens,",
+            "score": 5
+          },
+          {
+            "path": "litellm/litellm_core_utils/llm_cost_calc/usage_object_transformation.py",
+            "line": 36,
+            "preview": "audio_tokens=usage_object.input_token_details.audio_tokens,",
+            "score": 5
+          },
+          {
+            "path": "litellm/litellm_core_utils/llm_cost_calc/utils.py",
+            "line": 967,
+            "preview": "model_info, \"input_cost_per_image\", prompt_tokens_details[\"image_count\"]",
+            "score": 5
+          },
+          {
+            "path": "litellm/litellm_core_utils/llm_cost_calc/utils.py",
+            "line": 1180,
+            "preview": "total_details: Final = text_tokens + cache_hit + audio_tokens + cache_creation + image_tokens + video_tokens",
+            "score": 5
+          },
+          {
+            "path": "litellm/responses/utils.py",
+            "line": 1137,
+            "preview": "input_tokens_details (text_tokens, image_tokens).",
+            "score": 5
+          },
+          {
+            "path": "litellm/responses/utils.py",
+            "line": 1178,
+            "preview": "cached_tokens=getattr(response_api_usage.input_tokens_details, \"cached_tokens\", None),",
+            "score": 5
+          },
+          {
+            "path": "litellm/responses/utils.py",
+            "line": 1179,
+            "preview": "audio_tokens=getattr(response_api_usage.input_tokens_details, \"audio_tokens\", None),",
+            "score": 5
+          },
+          {
+            "path": "litellm/responses/utils.py",
+            "line": 1180,
+            "preview": "text_tokens=getattr(response_api_usage.input_tokens_details, \"text_tokens\", None),",
+            "score": 5
+          },
+          {
+            "path": "litellm/responses/utils.py",
+            "line": 1181,
+            "preview": "image_tokens=getattr(response_api_usage.input_tokens_details, \"image_tokens\", None),",
+            "score": 5
+          },
+          {
+            "path": "litellm/utils.py",
+            "line": 6114,
+            "preview": "input_cost_per_audio_token: Optional[float]",
+            "score": 5
+          }
+        ],
+        "symbols": [
+          {
+            "path": "litellm/responses/streaming_iterator.py",
+            "name": "_stamp_responses_usage_cost",
+            "line": 1317,
+            "score": 3,
+            "tests": [
+              "tests/test_litellm/responses/test_streaming_iterator.py",
+              "tests/test_litellm/responses/test_responses_streaming_iterator.py"
+            ]
+          },
+          {
+            "path": "litellm/caching/redis_semantic_cache.py",
+            "name": "_collect_responses_input_text",
+            "line": 276,
+            "score": 3,
+            "tests": [
+              "tests/test_litellm/caching/test_redis_semantic_cache.py"
+            ]
+          },
+          {
+            "path": "litellm/cost_calculator.py",
+            "name": "RealtimeAPITokenUsageProcessor",
+            "line": 2456,
+            "score": 3,
+            "tests": [
+              "tests/test_litellm/test_cost_calculator.py",
+              "tests/test_litellm/a2a_protocol/test_cost_calculator.py"
+            ]
+          },
+          {
+            "path": "litellm/cost_calculator.py",
+            "name": "_candidate_realtime_token_costs",
+            "line": 2540,
+            "score": 3,
+            "tests": [
+              "tests/test_litellm/test_cost_calculator.py",
+              "tests/test_litellm/a2a_protocol/test_cost_calculator.py"
+            ]
+          },
+          {
+            "path": "litellm/cost_calculator.py",
+            "name": "_first_priced_realtime_token_costs",
+            "line": 2568,
+            "score": 3,
+            "tests": [
+              "tests/test_litellm/test_cost_calculator.py",
+              "tests/test_litellm/a2a_protocol/test_cost_calculator.py"
+            ]
+          },
+          {
+            "path": "litellm/cost_calculator.py",
+            "name": "ResponsesWebSocketTokenUsageProcessor",
+            "line": 2509,
+            "score": 3,
+            "tests": [
+              "tests/test_litellm/test_cost_calculator.py",
+              "tests/test_litellm/a2a_protocol/test_cost_calculator.py"
+            ]
+          },
+          {
+            "path": "litellm/cost_calculator.py",
+            "name": "_transcription_usage_has_token_details",
+            "line": 295,
+            "score": 3,
+            "tests": [
+              "tests/test_litellm/test_cost_calculator.py",
+              "tests/test_litellm/a2a_protocol/test_cost_calculator.py"
+            ]
+          },
+          {
+            "path": "litellm/litellm_core_utils/llm_cost_calc/utils.py",
+            "name": "calculate_image_response_cost_from_usage",
+            "line": 1567,
+            "score": 3,
+            "tests": [
+              "tests/test_litellm/litellm_core_utils/llm_cost_calc/test_llm_cost_calc_utils.py"
+            ]
+          },
+          {
+            "path": "litellm/cost_calculator.py",
+            "name": "cost_per_token",
+            "line": 323,
+            "score": 2,
+            "tests": [
+              "tests/test_litellm/test_cost_calculator.py",
+              "tests/test_litellm/a2a_protocol/test_cost_calculator.py"
+            ]
+          },
+          {
+            "path": "litellm/litellm_core_utils/prompt_templates/factory.py",
+            "name": "get_image_details",
+            "line": 3401,
+            "score": 2,
+            "tests": [
+              "tests/test_litellm/litellm_core_utils/prompt_templates/test_litellm_core_utils_prompt_templates_factory.py"
+            ]
+          },
+          {
+            "path": "litellm/litellm_core_utils/token_counter.py",
+            "name": "_count_image_tokens",
+            "line": 676,
+            "score": 2,
+            "tests": [
+              "tests/test_litellm/litellm_core_utils/test_token_counter.py",
+              "tests/test_litellm/litellm_core_utils/test_token_counter_tool_data.py"
+            ]
+          },
+          {
+            "path": "litellm/responses/utils.py",
+            "name": "_as_input_text_part",
+            "line": 62,
+            "score": 2,
+            "tests": [
+              "tests/test_litellm/responses/test_responses_utils.py"
+            ]
+          }
+        ],
+        "symbolScan": {
+          "roots": [
+            "litellm/cost_calculator.py",
+            "litellm/caching/",
+            "litellm/responses/",
+            "litellm/main.py",
+            "litellm/litellm_core_utils/",
+            "litellm/utils.py"
+          ],
+          "files": 120,
+          "partial": false
+        },
+        "matches": [
+          {
+            "path": "litellm/responses/mcp/request_context.py",
+            "tests": [
+              "tests/test_litellm/responses/mcp/test_chat_completions_handler.py",
+              "tests/test_litellm/responses/mcp/test_litellm_proxy_mcp_handler.py",
+              "tests/test_litellm/responses/mcp/test_mcp_streaming_iterator.py"
+            ]
+          },
+          {
+            "path": "litellm/llms/bedrock/realtime/trigger_audio.py",
+            "tests": [
+              "tests/test_litellm/llms/bedrock/realtime/test_bedrock_realtime_handler.py",
+              "tests/test_litellm/llms/bedrock/realtime/test_bedrock_realtime_transformation.py"
+            ]
+          },
+          {
+            "path": "litellm/llms/openai/responses/count_tokens/handler.py",
+            "tests": []
+          },
+          {
+            "path": "litellm/llms/openai/responses/count_tokens/__init__.py",
+            "tests": []
+          },
+          {
+            "path": "litellm/llms/openai/responses/count_tokens/token_counter.py",
+            "tests": []
+          },
+          {
+            "path": "litellm/llms/openai/responses/count_tokens/transformation.py",
+            "tests": []
+          },
+          {
+            "path": "litellm/responses/main.py",
+            "tests": [
+              "tests/test_litellm/responses/test_custom_tool_call.py",
+              "tests/test_litellm/responses/test_metadata_codex_callback.py",
+              "tests/test_litellm/responses/test_no_duplicate_spend_logs.py"
+            ]
+          },
+          {
+            "path": "litellm/responses/utils.py",
+            "tests": [
+              "tests/test_litellm/responses/test_responses_utils.py"
+            ]
+          }
+        ],
+        "hint": "Use path + symbol for a definition, path + query to filter a large outline, or grep within the relevant directory for an exact term. Ranked paths and symbols are navigation hints, not proof of the cause."
+      },
+      "lookup": {
+        "path": "litellm/litellm_core_utils/llm_cost_calc/utils.py",
+        "lines": 1858,
+        "symbols": [
+          {
+            "name": "_calculate_input_cost",
+            "line": 906,
+            "indent": 0,
+            "signature": "def _calculate_input_cost("
+          },
+          {
+            "name": "_get_tiered_reasoning_rate",
+            "line": 258,
+            "indent": 0,
+            "signature": "def _get_tiered_reasoning_rate(model_info: ModelInfo, usage: Usage) -> float | None:"
+          },
+          {
+            "name": "TokenRates",
+            "line": 422,
+            "indent": 0,
+            "signature": "class TokenRates:"
+          },
+          {
+            "name": "billed_reasoning_rate",
+            "line": 430,
+            "indent": 4,
+            "signature": "def billed_reasoning_rate(self) -> float:"
+          },
+          {
+            "name": "_parse_off_peak_rate",
+            "line": 434,
+            "indent": 0,
+            "signature": "def _parse_off_peak_rate(value: object) -> float | None:"
+          },
+          {
+            "name": "_off_peak_rate",
+            "line": 447,
+            "indent": 0,
+            "signature": "def _off_peak_rate(off_peak: Mapping[str, object], key: str, standard_rate: float) -> float:"
+          },
+          {
+            "name": "_resolve_billed_reasoning_rate",
+            "line": 1086,
+            "indent": 0,
+            "signature": "def _resolve_billed_reasoning_rate("
+          },
+          {
+            "name": "BilledTokenRates",
+            "line": 1315,
+            "indent": 0,
+            "signature": "class BilledTokenRates:"
+          },
+          {
+            "name": "_custom_pricing_rates",
+            "line": 1370,
+            "indent": 0,
+            "signature": "def _custom_pricing_rates(custom_cost_per_token: CostPerToken) -> BilledTokenRates:"
+          },
+          {
+            "name": "_cost_map_billed_rates",
+            "line": 1386,
+            "indent": 0,
+            "signature": "def _cost_map_billed_rates("
+          },
+          {
+            "name": "get_billed_token_rates",
+            "line": 1431,
+            "indent": 0,
+            "signature": "def get_billed_token_rates("
+          }
+        ],
+        "moreSymbols": false,
+        "references": [
+          {
+            "line": 1187,
+            "preview": "billable_audio: Final = min(audio_tokens, uncached_budget)",
+            "score": 2
+          },
+          {
+            "line": 1188,
+            "preview": "billable_image: Final = min(image_tokens, uncached_budget - billable_audio)",
+            "score": 2
+          },
+          {
+            "line": 1189,
+            "preview": "billable_video: Final = min(video_tokens, uncached_budget - billable_audio - billable_image)",
+            "score": 2
+          },
+          {
+            "line": 1193,
+            "preview": "prompt_tokens_details[\"text_tokens\"] = uncached_budget - billable_audio - billable_image - billable_video",
+            "score": 2
+          },
+          {
+            "line": 17,
+            "preview": "tier_rate,",
+            "score": 1
+          },
+          {
+            "line": 133,
+            "preview": "Subtracts cached tokens from prompt tokens if applicable.",
+            "score": 1
+          },
+          {
+            "line": 264,
+            "preview": "return tier_rate(tier, \"output_cost_per_reasoning_token\", \"output_cost_per_token\")",
+            "score": 1
+          },
+          {
+            "line": 269,
+            "preview": "Resolve the base rates from a model's ``tiered_pricing`` table, if it has one.",
+            "score": 1
+          },
+          {
+            "line": 272,
+            "preview": "and every token of the request is billed at that tier's rate. Rates the tier does not",
+            "score": 1
+          },
+          {
+            "line": 273,
+            "preview": "declare fall back to the tier's input rate, so a request never mixes tiers.",
+            "score": 1
+          },
+          {
+            "line": 275,
+            "preview": "An output rate is the exception: a tier table that spells out only input rates would",
+            "score": 1
+          },
+          {
+            "line": 276,
+            "preview": "otherwise serve every completion for free, so the model's own output rate stands in.",
+            "score": 1
+          },
+          {
+            "line": 282,
+            "preview": "cache_creation_cost: Final = tier_rate(tier, \"cache_creation_input_token_cost\", \"input_cost_per_token\")",
+            "score": 1
+          },
+          {
+            "line": 284,
+            "preview": "tier_rate(tier, \"output_cost_per_token\")",
+            "score": 1
+          },
+          {
+            "line": 289,
+            "preview": "tier_rate(tier, \"input_cost_per_token\"),",
+            "score": 1
+          },
+          {
+            "line": 292,
+            "preview": "tier_rate(tier, \"cache_creation_input_token_cost_above_1hr\", \"cache_creation_input_token_cost\")",
+            "score": 1
+          },
+          {
+            "line": 294,
+            "preview": "tier_rate(tier, \"cache_read_input_token_cost\", \"input_cost_per_token\"),",
+            "score": 1
+          },
+          {
+            "line": 423,
+            "preview": "input_rate: float",
+            "score": 1
+          },
+          {
+            "line": 424,
+            "preview": "output_rate: float",
+            "score": 1
+          },
+          {
+            "line": 425,
+            "preview": "cache_read_rate: float",
+            "score": 1
+          }
+        ],
+        "tests": [
+          "tests/test_litellm/litellm_core_utils/llm_cost_calc/test_llm_cost_calc_utils.py"
+        ]
+      }
+    }
+  }
+}
