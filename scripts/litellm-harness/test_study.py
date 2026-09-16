@@ -5,10 +5,45 @@ from pathlib import Path
 from tempfile import TemporaryDirectory
 from study import main, paired_summary, supplemental_result
 from trace_metrics import activations
-from completion import completion_reason
+from completion import budget_ceiling_stop, completion_reason
 
 
 class StudyTests(unittest.TestCase):
+    def test_budget_censor_uses_only_a_failed_host_receipt(self):
+        receipt = 'Provider request failed (HTTP 403, budget_exceeded). The provider refused the request.'
+        result = {'status': 'error', 'errors': [receipt], 'final': 'An unfinished patch.'}
+        self.assertTrue(budget_ceiling_stop(result))
+        self.assertEqual(completion_reason(result), 'budget-ceiling')
+        for changed in [dict(status='idle'), dict(kind='codex'), dict(errors=[]),
+                        dict(errors=['Provider request failed (HTTP 403). Permission denied.'])]:
+            self.assertFalse(budget_ceiling_stop({**result, **changed}))
+        self.assertFalse(budget_ceiling_stop({'status':'error', 'errors':[], 'final':receipt}))
+
+    def test_budget_censor_preserves_raw_scores_without_completing_the_comparison(self):
+        for patch_passed in [True, False]:
+            with self.subTest(patch_passed=patch_passed), TemporaryDirectory() as temporary:
+                root = Path(temporary)
+                plan = {'protocol': 7, 'repetitions': 1, 'runs': []}
+                analysis = []
+                for name in ['control', 'candidate']:
+                    censored = name == 'candidate'
+                    plan['runs'].append(dict(dataset='', case='billing', name=name, label=name, commit='abc', effort='medium'))
+                    analysis.append(dict(id='billing', run=name, label=name, harnessCommit='abc', evaluationProtocol=7,
+                                         effort='medium', acceptance={'passed':patch_passed if censored else True},
+                                         completed=not censored, completionReason='budget-ceiling' if censored else 'completed',
+                                         budgetCensored=censored, seconds=1, computedUsd=.02))
+                (root/'plan.json').write_text(json.dumps(plan)); (root/'analysis.json').write_text(json.dumps(analysis))
+                with patch('sys.argv', ['study.py', str(root), str(root/'plan.json'), str(root/'output.json')]), patch('builtins.print'):
+                    main()
+                output = json.loads((root/'output.json').read_text())
+                self.assertEqual(output['status'], 'budget-censored')
+                self.assertEqual(sum(r['evaluated'] for r in output['variants']), 2)
+                self.assertEqual(sum(r['eligibleEvaluated'] for r in output['qualityEligibleVariants']), 1)
+                self.assertEqual(sum(r['budgetCensoredAllocations'] for r in output['qualityEligibleVariants']), 1)
+                self.assertEqual(output['comparisons'][0]['pairedTasks'], 0)
+                self.assertFalse(output['comparisons'][0]['complete'])
+                self.assertEqual(output['trials'][1]['acceptance']['passed'], patch_passed)
+
     def test_incident_keeps_raw_outcomes_but_invalidates_comparison_regardless_of_score(self):
         with TemporaryDirectory() as temporary:
             root = Path(temporary)

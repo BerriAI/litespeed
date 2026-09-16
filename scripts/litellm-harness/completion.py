@@ -1,7 +1,17 @@
 """Distinguish a normal answer from host guard stops that also leave an idle UI."""
 
 
+def budget_ceiling_stop(result):
+    """Match the host's non-retryable funding error, never model-written text."""
+    return result.get('kind') != 'codex' and result.get('status') == 'error' and any(
+        isinstance(error, str) and error.startswith('Provider request failed (HTTP 403, budget_exceeded).')
+        for error in (result.get('errors') or [])
+    )
+
+
 def completion_reason(result):
+    if budget_ceiling_stop(result):
+        return 'budget-ceiling'
     if result.get('timedOut'):
         return 'timeout'
     if result.get('interrupted'):

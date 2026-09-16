@@ -43,3 +43,7 @@ Control repetition2 (`8a992532`) finishes normally in **1,158.028seconds for$0.2
 Two control requests cost$0.072622546 together, **25.16% of the run**. At requests155 and172 a background-job completion notice changes the second prompt message while tools and the main system prompt stay equal. Cached input falls to4,652/159,656 and4,666/175,766tokens. The recorded prefix differences identify avoidable early-prompt churn; they do not measure the counterfactual saving from a different harness. This is additional evidence for the previously prepared chronological-notice experiment, without promoting its broader integration.
 
 The same posthoc one-file type diagnostic reports55errors for this control versus47for the base. As with the candidate, this is not a complete CI assessment.
+
+## Funding-stop reporting
+
+The reporter recognizes an errored Flash run carrying the host provider error `HTTP403, budget_exceeded` as `budget-ceiling`. A model-written final message cannot trigger that classification. Raw patches, checks, time and cost remain visible, but funding stops are excluded from quality comparisons and leave the planned repetition set incomplete. This implements the existing preallocation censorship rule; it changes no runtime, input, probe or selection threshold. The reporting tests pass44checks, including raw-score preservation whether a censored patch passes or fails acceptance.

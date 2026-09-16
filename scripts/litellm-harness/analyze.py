@@ -6,7 +6,7 @@ import re
 from pathlib import Path
 from trace_metrics import activations
 from action_usage import action_usage
-from completion import completion_reason
+from completion import budget_ceiling_stop, completion_reason
 from fixtures import fixture_profile_hash
 
 ROOT=Path(os.environ['LITELLM_CAMPAIGN_DIR'])
@@ -21,6 +21,7 @@ for p in sorted((ROOT/'runs').glob('*/result.json')):
     record['promptRevision']=result.get('promptRevision',task.get('prompt_revision',1))
     record['snapshotRevision']=result.get('snapshotRevision',task.get('snapshot_revision',1))
     record['completionReason']=completion_reason(result)
+    record['budgetCensored']=budget_ceiling_stop(result)
     record['completed']=record['completionReason']=='completed'
     record['taskPrompt']=task.get('prompt') or (directory/'prompt.txt').read_text().split('\n\nImplement the fix in this checkout')[0]
     if (directory/'harness-source.json').exists():

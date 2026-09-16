@@ -35,7 +35,7 @@ def supplemental_result(directory, specification):
 def paired_summary(rows, repetitions, control='control'):
     groups = defaultdict(list)
     for row in rows:
-        if row.get('evaluated') and not row.get('infrastructureIncident'):
+        if row.get('evaluated') and not row.get('infrastructureIncident') and not row.get('budgetCensored'):
             groups[(row['dataset'], row['case'], row['name'])].append(row)
     variants = sorted({r['name'] for r in rows} - {control})
     cases = sorted({(r['dataset'], r['case']) for r in rows})
@@ -104,6 +104,7 @@ def main():
             result = matches[0]
             row['run'] = result['run']
             row['infrastructureIncident'] = incidents.get(result['run'])
+            row['budgetCensored'] = bool(result.get('budgetCensored'))
             if timeout is not None and result.get('timeoutSeconds') != timeout:
                 raise ValueError('Trial timeout differs from its predeclared configuration.')
             if 'kind' in item and result.get('kind') != item['kind']:
@@ -139,10 +140,11 @@ def main():
         summaries.append(summary)
     quality_summaries = []
     for summary in summaries:
-        eligible = [r for r in rows if r['name'] == summary['variant'] and r['evaluated'] and not r.get('infrastructureIncident')]
+        eligible = [r for r in rows if r['name'] == summary['variant'] and r['evaluated'] and not r.get('infrastructureIncident') and not r.get('budgetCensored')]
         quality_summaries.append({'variant': summary['variant'], 'eligibleEvaluated': len(eligible),
                                  'successes': sum(r['success'] for r in eligible),
-                                 'incidentAllocations': sum(bool(r.get('infrastructureIncident')) for r in rows if r['name'] == summary['variant'])})
+                                 'incidentAllocations': sum(bool(r.get('infrastructureIncident')) for r in rows if r['name'] == summary['variant']),
+                                 'budgetCensoredAllocations': sum(bool(r.get('budgetCensored')) for r in rows if r['name'] == summary['variant'])})
     result = {'status': 'complete' if all(r['evaluated'] for r in rows) else 'interim',
               'note': 'Development selection only. Interim observed-task means can change as slower trials finish. Bootstrap resamples tasks, not attempts; it does not correct adaptive candidate selection or establish future generalization. Token prices exclude requests without usage and do not replace the campaign ledger.',
               'variants': summaries, 'qualityEligibleVariants': quality_summaries,
@@ -150,6 +152,9 @@ def main():
     if any(row.get('infrastructureIncident') for row in rows):
         result['status'] = 'infrastructure-interrupted'
         result['note'] += ' Original variants retain all raw evaluated results. qualityEligibleVariants and paired comparisons exclude every allocation named in the public host-sleep-transport incident regardless of score; those allocations remain in trials. No replacement result is substituted.'
+    if any(row.get('budgetCensored') for row in rows):
+        result['status'] = 'budget-censored'
+        result['note'] += ' Host-recorded budget-ceiling stops retain their raw results and charges, but are excluded from qualityEligibleVariants and paired comparisons regardless of patch score. An incomplete repetition set cannot establish a winner.'
     output.write_text(json.dumps(result, indent=2) + '\n')
     print(json.dumps({'status': result['status'], 'variants': summaries,
                       'comparisons': [{k: v for k, v in p.items() if k != 'pairs'} for p in result['comparisons']]}))

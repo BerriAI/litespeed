@@ -18,7 +18,7 @@ datasets = [Path(p).resolve() for p in sys.argv[2:]] or [root]
 fields = ['run', 'id', 'kind', 'label', 'promptRevision', 'snapshotRevision', 'harnessVersion',
           'harnessSha256', 'harnessCommit', 'completed', 'completionReason', 'status', 'exit', 'evaluationProtocol',
           'isolation', 'effort', 'timeoutSeconds', 'seconds', 'timedOut', 'interrupted',
-          'recovered', 'durationIncomplete', 'repairParent', 'requests', 'reportedRequests',
+          'recovered', 'durationIncomplete', 'repairParent', 'budgetCensored', 'requests', 'reportedRequests',
           'inputTokens', 'cachedTokens', 'outputTokens', 'computedUsd', 'acceptance',
           'toolCounts', 'exactRepeatedCalls', 'toolOutputCharacters', 'toolActiveSeconds',
           'modelSeconds', 'actionUsage', 'timeToFirstEditSeconds', 'reviewStartedSeconds', 'reviewModelRequests', 'activations',
