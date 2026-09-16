@@ -251,5 +251,12 @@
     "node": "test_billed_token_rates_follow_the_token_tier_the_breakdown_bills_at",
     "detail": "Reported cached-audio fallback rate is None rather than6e-7. The public probe separates this metadata from the mixed-bucket arithmetic failure."
   },
-  "interpretation": "Both controls reproduce the three0.06USD mixed-cache overcharges. This control finishes faster and costs less than the first candidate, while failing its functional checks. A final candidate is still needed for the predeclared comparison."
+  "interpretation": "Both controls reproduce the three0.06USD mixed-cache overcharges. This control finishes faster and costs less than the first candidate, while failing its functional checks. A final candidate is still needed for the predeclared comparison.",
+  "staticDiagnostic": {
+    "scope": "Same one-file diagnostic and interpreter as static-diagnostics.json; not a full CI verdict.",
+    "errors": 51,
+    "baseErrors": 47,
+    "additionalByRuleAndMessage": 4,
+    "details": "All four additions concern Final declarations inside loops or reassignment of Final variables."
+  }
 }

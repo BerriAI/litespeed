@@ -1,14 +1,14 @@
 {
-  "status": "interim",
+  "status": "complete",
   "note": "Development selection only. Interim observed-task means can change as slower trials finish. Bootstrap resamples tasks, not attempts; it does not correct adaptive candidate selection or establish future generalization. Token prices exclude requests without usage and do not replace the campaign ledger.",
   "variants": [
     {
       "variant": "billing-invariants",
-      "evaluated": 1,
+      "evaluated": 2,
       "expected": 2,
       "successes": 1,
-      "meanSeconds": 1021.281,
-      "tokenPricedUsd": 0.185974836,
+      "meanSeconds": 965.318,
+      "tokenPricedUsd": 0.35557508400000004,
       "trialsWithoutTokenPrice": 0
     },
     {
@@ -24,7 +24,7 @@
   "qualityEligibleVariants": [
     {
       "variant": "billing-invariants",
-      "eligibleEvaluated": 1,
+      "eligibleEvaluated": 2,
       "successes": 1,
       "incidentAllocations": 0,
       "budgetCensoredAllocations": 0
@@ -41,10 +41,21 @@
     {
       "variant": "billing-invariants",
       "control": "control",
-      "pairedTasks": 0,
+      "pairedTasks": 1,
       "expectedTasks": 1,
-      "complete": false,
-      "pairs": []
+      "complete": true,
+      "pairs": [
+        {
+          "dataset": "training7",
+          "case": "realtime-cached-audio-cost",
+          "successDelta": 0.5,
+          "secondsDelta": -77.34950000000003
+        }
+      ],
+      "successDelta": 0.5,
+      "secondsDelta": -77.34950000000003,
+      "taskBootstrap95": null,
+      "uncertaintyNote": "One task cannot estimate variation between tasks; no bootstrap interval is reported."
     }
   ],
   "trials": [
@@ -283,7 +294,71 @@
       "effort": "medium",
       "kind": "litellm-specific",
       "timeoutSeconds": 1800,
-      "evaluated": false
+      "evaluated": true,
+      "run": "replication-v55-billing-billing-invariants-r2-realtime-cached-audio-cost-cd8b99aa",
+      "infrastructureIncident": null,
+      "budgetCensored": false,
+      "success": false,
+      "completed": true,
+      "completionReason": "completed",
+      "seconds": 909.355,
+      "acceptance": {
+        "exit": 0,
+        "tests": 17,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0,
+        "passed": true
+      },
+      "computedUsd": 0.169600248,
+      "activations": {
+        "initialMapNotices": 1,
+        "contextToolCalls": 0,
+        "guideIdsShown": [
+          "billing-token-bucket-conservation"
+        ],
+        "unparsedContextPayloads": 0,
+        "finalReviewNotices": 1,
+        "guidedFinalReviewNotices": 0,
+        "finalReviewGuideIdsShown": [],
+        "batchedEditCalls": 0,
+        "completedBatchedEditCalls": 0,
+        "batchEditsRequested": 0,
+        "batchSizes": [],
+        "backgroundCommandNotices": 0,
+        "testFocusNotices": 1,
+        "explorationFocusNotices": 1,
+        "readCallsByEffectiveLimit": {
+          "160": 5,
+          "220": 1,
+          "200": 1,
+          "50": 5,
+          "60": 3,
+          "380": 1,
+          "140": 1,
+          "100": 1,
+          "180": 1,
+          "120": 4,
+          "90": 2,
+          "300": 1,
+          "30": 1,
+          "80": 2,
+          "40": 3,
+          "10": 4,
+          "12": 2
+        },
+        "defaultWindowReadCalls": null,
+        "readLimitProvenance": "unknown: saved arguments include host-injected defaults"
+      },
+      "originalSuccess": true,
+      "supplemental": {
+        "artifact": "billing-contract-probe.json",
+        "checks": 12,
+        "expectedChecks": 12,
+        "checksPassed": 9,
+        "exit": 0,
+        "passed": false
+      }
     }
   ]
 }

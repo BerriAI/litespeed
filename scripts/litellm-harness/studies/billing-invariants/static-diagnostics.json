@@ -1,6 +1,6 @@
 {
-  "generatedAt": "2026-09-16T21:05:08.856855+00:00",
-  "scope": "Posthoc one-file static diagnostic. Does not change frozen functional scores or selection rule; not a whole-repository CI verdict. All seven snapshots use the same installed basedpyright1.39.7 and interpreter with network denied. CI uses a separately provisioned gate environment and codebase-wide budgets; these counts do not establish its outcome.",
+  "generatedAt": "2026-09-16T21:51:10.515754+00:00",
+  "scope": "Posthoc one-file static diagnostic. Does not change frozen functional scores or selection rule; not a whole-repository CI verdict. All ten snapshots use the same installed basedpyright1.39.7 and interpreter with network denied. CI uses a separately provisioned gate environment and codebase-wide budgets; these counts do not establish its outcome.",
   "command": "python -m basedpyright --outputjson --pythonpath <same benchmark interpreter> litellm/litellm_core_utils/llm_cost_calc/utils.py",
   "comparisonMethod": "Additional diagnostics are a multiset difference by exact rule and message versus the historical base; line numbers describe each candidate and are not used for matching.",
   "sourceSha256": {
@@ -10,7 +10,10 @@
     "astra-r2": "3a942ad3a9c671fc6fcb77aa5cdfa254a93bbb6f44b0366b2df037805815855a",
     "flash-r1": "7ce563eb34a2410a41e00f9c741d26becc9f70e0a6c911b15eb6f1301f6af0b4",
     "flash-r2": "c276f7b1600478cbf14546daa66d2bb9171155a51098889ebe81fc3d8ef670a4",
-    "candidate": "793ba2d3dfcb6c975bbc3f9eafcca161fa348e00657143961f980b6ef9482185"
+    "candidate": "793ba2d3dfcb6c975bbc3f9eafcca161fa348e00657143961f980b6ef9482185",
+    "control-r2": "226db16e1c680cebf2478a57101380e82cdffaa46c2044be6f2632389874249f",
+    "control-r1": "984b93bd452aa76df476c0eb9c5b78a38d44a969a6ea13784e26273283a61c89",
+    "candidate-r2": "dcd7febccee07ca886c9c588389f1825b0d08d427ce869d4ffda2efd2d5670c5"
   },
   "observations": [
     {
@@ -337,6 +340,132 @@
           "rule": "reportGeneralTypeIssues",
           "line": 819,
           "message": "\"remaining\" is declared as Final and cannot be reassigned"
+        }
+      ]
+    },
+    {
+      "variant": "control-r2",
+      "summary": {
+        "filesAnalyzed": 1,
+        "errorCount": 55,
+        "warningCount": 0,
+        "informationCount": 0,
+        "timeInSec": 0.895
+      },
+      "additionalDiagnosticsByRuleAndMessage": [
+        {
+          "rule": "reportAny",
+          "line": 833,
+          "message": "Argument type is Any\n\u00a0\u00a0Argument corresponds to parameter \"o\" in function \"getattr\""
+        },
+        {
+          "rule": "reportAny",
+          "line": 834,
+          "message": "Argument type is Any\n\u00a0\u00a0Argument corresponds to parameter \"o\" in function \"getattr\""
+        },
+        {
+          "rule": "reportAny",
+          "line": 835,
+          "message": "Argument type is Any\n\u00a0\u00a0Argument corresponds to parameter \"o\" in function \"getattr\""
+        },
+        {
+          "rule": "reportGeneralTypeIssues",
+          "line": 850,
+          "message": "\"remaining\" is declared as Final and cannot be reassigned"
+        },
+        {
+          "rule": "reportGeneralTypeIssues",
+          "line": 852,
+          "message": "\"remaining\" is declared as Final and cannot be reassigned"
+        },
+        {
+          "rule": "reportGeneralTypeIssues",
+          "line": 1274,
+          "message": "\"cached_text\" is declared as Final and cannot be reassigned"
+        },
+        {
+          "rule": "reportGeneralTypeIssues",
+          "line": 1274,
+          "message": "\"cached_audio\" is declared as Final and cannot be reassigned"
+        },
+        {
+          "rule": "reportGeneralTypeIssues",
+          "line": 1274,
+          "message": "\"cached_image\" is declared as Final and cannot be reassigned"
+        }
+      ]
+    },
+    {
+      "variant": "control-r1",
+      "summary": {
+        "filesAnalyzed": 1,
+        "errorCount": 51,
+        "warningCount": 0,
+        "informationCount": 0,
+        "timeInSec": 0.916
+      },
+      "additionalDiagnosticsByRuleAndMessage": [
+        {
+          "rule": "reportGeneralTypeIssues",
+          "line": 812,
+          "message": "A \"Final\" variable cannot be assigned within a loop"
+        },
+        {
+          "rule": "reportGeneralTypeIssues",
+          "line": 815,
+          "message": "A \"Final\" variable cannot be assigned within a loop"
+        },
+        {
+          "rule": "reportGeneralTypeIssues",
+          "line": 974,
+          "message": "\"audio_cache_read_cost\" is declared as Final and cannot be reassigned"
+        },
+        {
+          "rule": "reportGeneralTypeIssues",
+          "line": 1601,
+          "message": "\"audio_cache_read_rate\" is declared as Final and cannot be reassigned"
+        }
+      ]
+    },
+    {
+      "variant": "candidate-r2",
+      "summary": {
+        "filesAnalyzed": 1,
+        "errorCount": 53,
+        "warningCount": 0,
+        "informationCount": 0,
+        "timeInSec": 0.977
+      },
+      "additionalDiagnosticsByRuleAndMessage": [
+        {
+          "rule": "reportGeneralTypeIssues",
+          "line": 801,
+          "message": "A \"Final\" variable cannot be assigned within a loop"
+        },
+        {
+          "rule": "reportGeneralTypeIssues",
+          "line": 802,
+          "message": "A \"Final\" variable cannot be assigned within a loop"
+        },
+        {
+          "rule": "reportGeneralTypeIssues",
+          "line": 804,
+          "message": "\"remaining\" is declared as Final and cannot be reassigned"
+        },
+        {
+          "rule": "reportGeneralTypeIssues",
+          "line": 959,
+          "message": "\"audio_cache_read_cost\" is declared as Final and cannot be reassigned"
+        },
+        {
+          "rule": "reportTypedDictNotRequiredAccess",
+          "line": 1431,
+          "message": "Could not access item in TypedDict\n\u00a0\u00a0\"cache_hit_token_details\" is not a required key in \"PromptTokensDetailsResult\", so access may result in runtime exception"
+        },
+        {
+          "rule": "reportGeneralTypeIssues",
+          "line": 1490,
+          "message": "\"cache_read_audio_cost_rate\" is declared as Final and cannot be reassigned"
         }
       ]
     }
