@@ -1,16 +1,16 @@
 {
   "createdAt": "2026-09-16T20:21:57.706395+00:00",
-  "statusAtFreeze": "Amended before first allocation: serial execution within existing uncommitted capacity; unresolved reservations remain fully charged against the ceiling.",
+  "statusAtFreeze": "Prepared only; paid admission paused pending billing reconciliation. No trial allocated.",
   "protocol": 7,
   "model": "fireworks_ai/deepseek-v4p1-flash",
   "control": "control",
   "repetitions": 2,
   "globalConcurrency": 3,
   "seed": 55160926,
-  "stopNewTrialsAtCommittedUsd": 99.7476864,
+  "stopNewTrialsAtCommittedUsd": 90,
   "purpose": "Test one scoped initial/explicit-query billing playbook after both Flash development attempts bypassed cache-write subtraction in a new nested-modality branch. Final-review text, tools, scheduling, navigation ranks and ordinary architecture remain unchanged. Candidate does not add experimental grouped edits, chronological notices or v53 navigation.",
   "selectionRule": "Require all four predeclared allocations and report normal completion, the unchanged17 reference checks, and12 public-contract checks. Strict success retains the existing reporter definition: normal completion plus reference acceptance plus all12 supplemental checks. Inspect mixed-bucket failures separately from known representation/private-helper couplings; do not rewrite scores. Compare cost and latency among correct delivered work; retain all failures. One known development task cannot establish future generalization or Astra superiority. No promotion solely from activation tests.",
-  "budgetAdmission": "After operator incident review and healthy gateway preflight, use only the existing uncommitted capacity. Keep every unknown reservation intact and the gateway hard ceiling at100USD. Stop new allocations if the next0.2523136USD request reservation cannot fit, any receipt is missing, or readiness fails. Preserve partial attempts as budget-censored or infrastructure-interrupted; require all four complete allocations before any comparison-based selection.",
+  "budgetAdmission": "Do not start while gateway is paused or billing is unresolved. Preserve unknown reservations; this plan grants no additional budget and does not amend interrupted studies.",
   "versions": {
     "control": {
       "commit": "f658678e104aa9a7b1f2a9ea5c415979c38b5aaf",
@@ -112,16 +112,5 @@
         "expectedChecks": 12
       }
     }
-  ],
-  "amendedAt": "2026-09-16T20:37:28.550286+00:00",
-  "controllerConcurrency": 1,
-  "amendment": {
-    "previousPlan": "plan-v1.json",
-    "reason": "The initial90USD cutoff was already below current conservative commitments. Reviewing the ledger revealed1.07233424USD of safe uncommitted capacity despite unresolved receipts. Use it serially under the unchanged hard ceiling; no new authorization or reservation release.",
-    "knownPricedUsd": 51.99733616,
-    "unknownReservedUsd": 46.93032960000001,
-    "committedUsd": 98.92766575999973,
-    "uncommittedUsd": 1.0723342400002736,
-    "unchanged": "Trial identities, order, tasks, source hashes, model, effort, deadlines, frozen runtimes, probe definitions and selection rule."
-  }
+  ]
 }

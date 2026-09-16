@@ -1,6 +1,6 @@
 # Billing token-bucket conservation candidate
 
-**Prepared only; not promoted or allocated.** Paid admission remains paused pending accounting reconciliation. This four-attempt development comparison does not amend or replace an interrupted study and grants no additional budget.
+**Unpromoted; serial comparison predeclared.** A preallocation amendment permits using only the existing safe budget headroom while retaining every unknown reservation. This four-attempt development comparison does not replace an interrupted study or grant additional budget.
 
 ## Evidence behind the change
 
@@ -18,7 +18,7 @@ The actual historical-base query produces no control playbook and exactly one ca
 
 ## Frozen paid comparison
 
-The [plan](plan.json) declares two repetitions per arm on the already inspected larger cached-audio task, Flash Medium, protocol7,1800seconds and the existing shared three-slot limit. Allocation stops at $90 committed to retain final-comparison capacity, and cannot start while admission is paused. The randomized order, both commits and runtime hashes are frozen. No September15 reserved prompt or outcome is used.
+The [plan](plan.json) declares two repetitions per arm on the already inspected larger cached-audio task, Flash Medium, protocol7,1800seconds and the existing shared three-slot limit. The original [plan v1](plan-v1.json) stopped at $90 committed, below the current conservative commitment. The amendment preserves that plan and all trial definitions, uses one controller slot, and stops new allocations when the next $0.2523136 request reservation cannot fit under the unchanged $100 ceiling. At amendment time $51.99733616 was priced, $46.9303296 remained reserved without receipts, and $1.07233424 was uncommitted. No unknown charge is released. The gateway must pass readiness and pauses on any newly missing receipt. A budget-cut-short attempt is reported as censored, with its raw outcome retained; no candidate selection is permitted from incomplete pairs. The randomized order, both commits and runtime hashes are frozen. No September15 reserved prompt or outcome is used.
 
 The original17 reference checks remain visible and unchanged. For this new comparison, the [supplemental probe](contract_probe.py) combines the unchanged seven representation/billing checks with the five public-path checks. Each component is hashed. A fresh execution gives **base2/12 and merged reference12/12**, with no network, fresh bytecode and snapshot-local import validation. [Qualification](qualification.json).
 
