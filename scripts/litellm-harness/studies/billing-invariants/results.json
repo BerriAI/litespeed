@@ -4,8 +4,12 @@
   "variants": [
     {
       "variant": "billing-invariants",
-      "evaluated": 0,
-      "expected": 2
+      "evaluated": 1,
+      "expected": 2,
+      "successes": 1,
+      "meanSeconds": 1021.281,
+      "tokenPricedUsd": 0.185974836,
+      "trialsWithoutTokenPrice": 0
     },
     {
       "variant": "control",
@@ -16,8 +20,8 @@
   "qualityEligibleVariants": [
     {
       "variant": "billing-invariants",
-      "eligibleEvaluated": 0,
-      "successes": 0,
+      "eligibleEvaluated": 1,
+      "successes": 1,
       "incidentAllocations": 0
     },
     {
@@ -47,7 +51,72 @@
       "effort": "medium",
       "kind": "litellm-specific",
       "timeoutSeconds": 1800,
-      "evaluated": false
+      "evaluated": true,
+      "run": "replication-v55-billing-billing-invariants-r1-realtime-cached-audio-cost-2a1e0941",
+      "infrastructureIncident": null,
+      "success": true,
+      "completed": true,
+      "completionReason": "completed",
+      "seconds": 1021.281,
+      "acceptance": {
+        "exit": 0,
+        "tests": 17,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0,
+        "passed": true
+      },
+      "computedUsd": 0.185974836,
+      "activations": {
+        "initialMapNotices": 1,
+        "contextToolCalls": 0,
+        "guideIdsShown": [
+          "billing-token-bucket-conservation"
+        ],
+        "unparsedContextPayloads": 0,
+        "finalReviewNotices": 1,
+        "guidedFinalReviewNotices": 0,
+        "finalReviewGuideIdsShown": [],
+        "batchedEditCalls": 0,
+        "completedBatchedEditCalls": 0,
+        "batchEditsRequested": 0,
+        "batchSizes": [],
+        "backgroundCommandNotices": 0,
+        "testFocusNotices": 1,
+        "explorationFocusNotices": 1,
+        "readCallsByEffectiveLimit": {
+          "160": 1,
+          "180": 2,
+          "200": 1,
+          "280": 1,
+          "320": 1,
+          "140": 1,
+          "70": 4,
+          "80": 5,
+          "300": 1,
+          "130": 1,
+          "110": 1,
+          "90": 3,
+          "40": 6,
+          "30": 4,
+          "120": 3,
+          "60": 5,
+          "45": 1,
+          "75": 2,
+          "100": 1
+        },
+        "defaultWindowReadCalls": null,
+        "readLimitProvenance": "unknown: saved arguments include host-injected defaults"
+      },
+      "originalSuccess": true,
+      "supplemental": {
+        "artifact": "billing-contract-probe.json",
+        "checks": 12,
+        "expectedChecks": 12,
+        "checksPassed": 12,
+        "exit": 0,
+        "passed": true
+      }
     },
     {
       "dataset": "training7",

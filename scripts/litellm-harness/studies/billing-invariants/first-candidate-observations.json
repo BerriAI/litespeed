@@ -1,0 +1,235 @@
+{
+  "generatedAt": "2026-09-16T20:58:18.285911+00:00",
+  "status": "first candidate only; three planned attempts remain; no promotion or quality winner",
+  "run": "replication-v55-billing-billing-invariants-r1-realtime-cached-audio-cost-2a1e0941",
+  "variant": "billing-invariants",
+  "harnessCommit": "dc4c7fc761183b8e20726dc845ee5c4d4fa929d4",
+  "completed": true,
+  "completionReason": "completed",
+  "seconds": 1021.281,
+  "tokenPricedUsd": 0.185974836,
+  "requests": 135,
+  "referenceAcceptance": {
+    "exit": 0,
+    "tests": 17,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0,
+    "passed": true
+  },
+  "supplemental": {
+    "checks": 12,
+    "checksPassed": 12,
+    "exit": 0,
+    "rows": [
+      {
+        "name": "representation/billing-cached-image-absent",
+        "pass": true,
+        "actualCost": 0.0015328,
+        "expectedCost": 0.0015328
+      },
+      {
+        "name": "representation/billing-cached-image-zero",
+        "pass": true,
+        "actualCost": 0.0015328,
+        "expectedCost": 0.0015328
+      },
+      {
+        "name": "representation/aggregate-token-values",
+        "pass": true,
+        "observed": {
+          "text_tokens": 64,
+          "audio_tokens": 228,
+          "image_tokens": null
+        },
+        "inputsUnchanged": true
+      },
+      {
+        "name": "representation/aggregate-input-billing",
+        "pass": true,
+        "actualCost": 0.0017728,
+        "expectedCost": 0.0017728
+      },
+      {
+        "name": "representation/partial-split-first",
+        "pass": true,
+        "observed": {
+          "text_tokens": 64,
+          "audio_tokens": 128,
+          "image_tokens": null
+        },
+        "inputsUnchanged": true
+      },
+      {
+        "name": "representation/partial-split-last",
+        "pass": true,
+        "observed": {
+          "text_tokens": 64,
+          "audio_tokens": 128,
+          "image_tokens": null
+        },
+        "inputsUnchanged": true
+      },
+      {
+        "name": "representation/explicit-cached-image-sum",
+        "pass": true,
+        "cachedImage": 3,
+        "inputsUnchanged": true
+      },
+      {
+        "name": "public-path/text-only",
+        "pass": true,
+        "inputCost": 0.435,
+        "expectedInputCost": 0.435,
+        "cacheReadCost": 0.12,
+        "expectedCacheReadCost": 0.12,
+        "reportedCachedAudioRate": 6e-07
+      },
+      {
+        "name": "public-path/audio-fallback",
+        "pass": true,
+        "inputCost": 0.955,
+        "expectedInputCost": 0.955,
+        "cacheReadCost": 0.12,
+        "expectedCacheReadCost": 0.12,
+        "reportedCachedAudioRate": 6e-07
+      },
+      {
+        "name": "public-path/audio-free",
+        "pass": true,
+        "inputCost": 0.907,
+        "expectedInputCost": 0.9069999999999999,
+        "cacheReadCost": 0.072,
+        "expectedCacheReadCost": 0.072,
+        "reportedCachedAudioRate": 0.0
+      },
+      {
+        "name": "public-path/audio-explicit",
+        "pass": true,
+        "inputCost": 0.939,
+        "expectedInputCost": 0.939,
+        "cacheReadCost": 0.104,
+        "expectedCacheReadCost": 0.104,
+        "reportedCachedAudioRate": 4e-07
+      },
+      {
+        "name": "public-path/ephemeral-creation-public-path",
+        "pass": true,
+        "inputCost": 0.001575,
+        "creationCost": 0.001575,
+        "expectedCost": 0.001575
+      }
+    ],
+    "importCount": 3,
+    "bytecodePolicy": "fresh cache path; reads from adjacent caches and all writes disabled"
+  },
+  "patchSha256": "264d602a4bac369b277c27716b79f761e737afda2ef377566e96fe24fc5fc5ef",
+  "toolCounts": {
+    "read_file": 44,
+    "grep": 30,
+    "bash": 51,
+    "edit_file": 33
+  },
+  "exactRepeatedCalls": 0,
+  "timeToFirstEditSeconds": 345.846,
+  "toolActiveSeconds": 172.769,
+  "modelSeconds": 797.185,
+  "reviewStartedSeconds": 998.464,
+  "reviewModelRequests": 1,
+  "actionUsage": {
+    "classificationVersion": 2,
+    "basis": "complete assistant request grouped by chosen next action; not tool marginal cost. shell-mentions-checks matches known checker words in a recorded command without inferring passing checks or adequate coverage.",
+    "pricing": {
+      "inputPerMillionUsd": 0.22,
+      "cachedPerMillionUsd": 0.007,
+      "outputPerMillionUsd": 0.66
+    },
+    "groups": {
+      "navigation": {
+        "requests": 59,
+        "inputTokens": 4295117,
+        "cachedTokens": 4181102,
+        "outputTokens": 23603,
+        "estimatedUsd": 0.069928994,
+        "cacheUnreportedRequests": 0,
+        "reportedModelSeconds": 310.6460000000001,
+        "durationUnreportedRequests": 0
+      },
+      "shell-command": {
+        "requests": 31,
+        "inputTokens": 3961767,
+        "cachedTokens": 3926942,
+        "outputTokens": 15174,
+        "estimatedUsd": 0.04516493400000001,
+        "cacheUnreportedRequests": 0,
+        "reportedModelSeconds": 189.44400000000002,
+        "durationUnreportedRequests": 0
+      },
+      "structured-edit": {
+        "requests": 27,
+        "inputTokens": 3057461,
+        "cachedTokens": 3028276,
+        "outputTokens": 16848,
+        "estimatedUsd": 0.03873831200000001,
+        "cacheUnreportedRequests": 0,
+        "reportedModelSeconds": 161.86400000000003,
+        "durationUnreportedRequests": 0
+      },
+      "shell-mentions-checks": {
+        "requests": 15,
+        "inputTokens": 2311260,
+        "cachedTokens": 2298436,
+        "outputTokens": 7773,
+        "estimatedUsd": 0.024040512000000003,
+        "cacheUnreportedRequests": 0,
+        "reportedModelSeconds": 87.91800000000002,
+        "durationUnreportedRequests": 0
+      },
+      "mixed-tools": {
+        "requests": 1,
+        "inputTokens": 174948,
+        "cachedTokens": 173764,
+        "outputTokens": 1517,
+        "estimatedUsd": 0.0024780479999999996,
+        "cacheUnreportedRequests": 0,
+        "reportedModelSeconds": 15.49,
+        "durationUnreportedRequests": 0
+      },
+      "text-only": {
+        "requests": 2,
+        "inputTokens": 356285,
+        "cachedTokens": 351428,
+        "outputTokens": 3175,
+        "estimatedUsd": 0.005624036,
+        "cacheUnreportedRequests": 0,
+        "reportedModelSeconds": 31.823,
+        "durationUnreportedRequests": 0
+      }
+    },
+    "assistantMessagesWithoutValidUsage": 0,
+    "breakdownRecordsWithoutValidUsage": 0,
+    "reconciliation": {
+      "inputTokens": {
+        "recorded": 14156838,
+        "attributed": 14156838,
+        "difference": 0
+      },
+      "cachedTokens": {
+        "recorded": 13959948,
+        "attributed": 13959948,
+        "difference": 0
+      },
+      "outputTokens": {
+        "recorded": 68090,
+        "attributed": 68090,
+        "difference": 0
+      },
+      "estimatedUsd": {
+        "recorded": 0.185974836,
+        "attributed": 0.18597483600000003,
+        "difference": -2.7755575615628914e-17
+      }
+    }
+  },
+  "interpretation": "Passes all17 original and12 predeclared supplemental checks, including all three mixed cache-write/audio cases earlier Flash patches failed. One development success does not attribute the difference to the guide or establish future generalization. The matched control and second repetitions are still pending. Request-category costs are whole requests, not marginal tool costs."
+}
