@@ -22,8 +22,8 @@ A separate v46 checkout combines the same feature mechanisms with the independen
 
 This is integration preparation only. The paid 16-trial comparison keeps the earlier declared commits; no version is substituted mid-study.
 
-## Eleven of sixteen observations
+## Thirteen of sixteen observations
 
-The combined arm has completed both MCP-auth attempts normally (52/52 checks in 456.05 and 520.84 seconds), one AWS-signing attempt normally (5/5 in 606.77 seconds), and one Databricks attempt normally (6/6 in 289.61 seconds). Its first legacy-streaming attempt times out with 12/16 original and 11/24 real-adapter checks.
+Both arms now complete both MCP-auth attempts normally with 52/52 checks. Across those two repetitions, the combined arm averages **35.77 seconds faster**. This is the only task with all declared repetitions in both arms so far; it does not establish the whole comparison's outcome.
 
-The control has both normal Databricks attempts, one normal MCP-auth attempt and one normal AWS-signing attempt, each passing all original checks. Both legacy-streaming attempts time out (7/16 and 14/16 original; 4/24 and 12/24 real-adapter checks). No task has both declared repetitions in both arms yet. These differently composed partial totals cannot establish a comparative gain. [Interim results](results.json).
+The combined arm also has both normal AWS-signing attempts (5/5 each), one normal Databricks attempt (6/6), and one legacy-streaming timeout (12/16 original, 11/24 real-adapter checks). The control has both normal Databricks attempts (6/6 each), one normal AWS attempt (5/5), and two legacy timeouts (7/16 and 14/16 original; 4/24 and 12/24 real-adapter checks). The remaining three attempts are pending. [Interim results](results.json).

@@ -4,8 +4,12 @@
   "variants": [
     {
       "variant": "astra",
-      "evaluated": 0,
-      "expected": 2
+      "evaluated": 1,
+      "expected": 2,
+      "successes": 0,
+      "meanSeconds": 460.293,
+      "tokenPricedUsd": null,
+      "trialsWithoutTokenPrice": 1
     },
     {
       "variant": "flash",
@@ -33,7 +37,30 @@
       "effort": "high",
       "kind": "codex",
       "timeoutSeconds": 1800,
-      "evaluated": false
+      "evaluated": true,
+      "success": false,
+      "completed": true,
+      "completionReason": "completed",
+      "seconds": 460.293,
+      "acceptance": {
+        "exit": 0,
+        "tests": 17,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0,
+        "passed": true
+      },
+      "computedUsd": null,
+      "activations": null,
+      "originalSuccess": true,
+      "supplemental": {
+        "artifact": "aggregation-probe.json",
+        "checks": 4,
+        "expectedChecks": 4,
+        "checksPassed": 1,
+        "exit": 0,
+        "passed": false
+      }
     },
     {
       "dataset": "training7",
