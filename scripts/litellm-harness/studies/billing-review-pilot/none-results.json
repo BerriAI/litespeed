@@ -1,0 +1,41 @@
+{
+  "generatedAt": "2026-09-16T22:24:01.419642+00:00",
+  "outcomes": [
+    {
+      "name": "generic",
+      "complete": true,
+      "finish": "stop",
+      "completionTokens": 945,
+      "characters": 3772,
+      "costUsd": 0.0025377000000000004
+    },
+    {
+      "name": "conservation",
+      "complete": true,
+      "finish": "stop",
+      "completionTokens": 1018,
+      "characters": 3572,
+      "costUsd": 0.00260216
+    }
+  ],
+  "assessment": {
+    "generic": {
+      "verifiedTaskViolations": 0,
+      "claims": [
+        {
+          "claim": "Cap-order allocation",
+          "assessment": "Not established as a task violation. The reviewer uses contradictory nested counts192 versus aggregate1. Candidate chooses text-first; reference yields a different amount, consistent with audio-first. The supplied task requires capping but no modality priority. Retain this reference difference and contract ambiguity."
+        },
+        {
+          "claim": "Absent audio-rate fallback differs in breakdown",
+          "assessment": "Disproved for the proposed example. Candidate and merged reference each return0.00004 for total and cache-read breakdown. The omitted billed-rate resolver supplies the fallback."
+        }
+      ]
+    },
+    "conservation": {
+      "verifiedTaskViolations": 0,
+      "assessment": "Retraces the original task example and correctly computes0.0015328, then reports no demonstrated defect. It does not construct the requested mixed cache-write case and misses the known0.06 overcharge."
+    }
+  },
+  "interpretation": "None effort returns final answers but no verified billing finding. Medium returns no final answer. Changing effort and output cap together prevents a clean causal effort comparison. Four responses on one known patch do not support production promotion."
+}

@@ -1,17 +1,19 @@
 {
   "schemaVersion": 3,
-  "status": "campaign-in-progress",
-  "generatedAt": "2026-09-16T21:51:10.715097+00:00",
+  "status": "campaign-budget-blocked",
+  "generatedAt": "2026-09-16T22:24:01.623404+00:00",
   "currentHarnessVersion": "2026-09-16.52",
   "gatewayAccounting": {
     "limitUsd": 100,
-    "knownUsd": 52.819461724,
+    "knownUsd": 52.839268174000004,
     "unknownReservedUsd": 46.93032960000001,
     "unknownRequests": 186,
     "pendingReservedUsd": 0,
-    "committedUsd": 99.74979132399973,
-    "admittedRequests": 28751,
-    "astraUsd": null
+    "committedUsd": 99.76959777399972,
+    "admittedRequests": 28755,
+    "astraUsd": null,
+    "minimumRequestReservedUsd": 0.23068738000000003,
+    "minimumRequestFits": false
   },
   "runs": [
     {

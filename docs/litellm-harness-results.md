@@ -1,16 +1,18 @@
 # LiteLLM harness campaign results
 
-Interim snapshot: 2026-09-16T21:51:10.715097+00:00. Current harness: **2026-09-16.52**.
+Interim snapshot: 2026-09-16T22:24:01.623404+00:00. Current harness: **2026-09-16.52**.
 
-**The campaign is still running. It has not established a quality win over Astra/Codex or production replacement readiness.**
+**Paid admission is blocked by the remaining budget capacity, including unresolved charges. No request is pending. Actual spending has not reached $100; Astra/Codex superiority and production replacement readiness remain unestablished.**
 
 The selectable architecture and replay workbench are implemented. The current work measures which mechanisms improve correct, completed patches and which add latency. Model-written critiques are hypotheses; executable checks decide whether a candidate works.
 
 ## Spending
 
-Confirmed token/header-priced charges: **$52.8195**. Missing receipts retain **$46.9303** across 186 requests; active requests reserve another **$0.0000**. The committed upper bound is **$99.7498** against the authorized **$100.00** ceiling. Reservations are not actual charges. Astra account billing is unavailable.
+Confirmed token/header-priced charges: **$52.8393**. Missing receipts retain **$46.9303** across 186 requests; active requests reserve another **$0.0000**. The committed upper bound is **$99.7696** against the authorized **$100.00** ceiling. Reservations are not actual charges. Astra account billing is unavailable.
 
 An [offline receipt reconciliation](../scripts/litellm-harness/studies/runner-receipt-recovery/README.md) subsequently matched 58 missing gateway records to independently persisted runner usage. Exact round binding agreed with 3,359 known receipts. It restored $0.07678 in token-priced charges and released $14.55740 in excess reservations; unmatched requests remain reserved. The original ledger and per-request reservation history are preserved.
+
+The remaining capacity is **$0.230402**, below the **$0.230687** reservation for a full input window and one output token. Smaller output reservations already enabled four [focused billing reviews](../scripts/litellm-harness/studies/billing-review-pilot/README.md); none of the 186 existing unknown requests was released. The supplied inference-only key cannot read the gateway billing endpoints needed to reconcile them.
 
 ## Controlled development observations
 
