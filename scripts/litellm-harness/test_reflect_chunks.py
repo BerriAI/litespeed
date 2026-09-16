@@ -12,14 +12,14 @@ class WindowedReflectionTests(unittest.TestCase):
         with TemporaryDirectory() as temporary:
             root = Path(temporary)
             old = {'role': 'assistant', 'createdAt': 1, 'content': 'testing', 'toolCalls': [
-                {'id': 'c1', 'name': 'bash', 'args': {}, 'execution': {'checkKey': 'pytest', 'command': 'pytest -q test_x.py', 'exitCode': 0}, 'output': '1 passed'}]}
+                {'id': 'c1', 'name': 'bash', 'args': {}, 'execution': {'command': 'pytest -q test_x.py', 'exitCode': 0}, 'output': '1 passed'}]}
             latest = [{'role': 'assistant', 'createdAt': n, 'content': str(n)} for n in range(2, 28)]
             (root / 'archives.json').write_text(json.dumps([{'messages': [old]}]))
             (root / 'messages.json').write_text(json.dumps([old] + latest))
             chunks, checks, coverage = trace_evidence(root)
             self.assertEqual([s['step'] for c in chunks for s in c], list(range(1, 28)))
             self.assertEqual(coverage['windows'], 3)
-            self.assertEqual(checks, [{'step': 1, 'tool': 'bash', 'command': 'pytest -q test_x.py', 'exitCode': 0}])
+            self.assertEqual(checks, [{'step': 1, 'tool': 'bash', 'command': 'pytest -q test_x.py', 'status': None, 'exitCode': 0, 'checkVerdictRecognized': False, 'output': '1 passed'}])
             self.assertIn('[omitted 90 characters]', excerpt('a' * 100, 10))
 
     def test_reserved_task_rejected_before_loading_reference_or_sending_request(self):
