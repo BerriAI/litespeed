@@ -9,3 +9,10 @@ The [candidate patch](candidate.patch) freezes the initial envelope's job notice
 The [plan](plan.json) compares two tasks, two repetitions and both arms, randomized under the same three-slot queue and 900-second protocol. Report activation, normal completion, raw acceptance, input/cache/output tokens, estimated cost and elapsed time. Bedrock's known error-wording oracle coupling remains disclosed. No session-affinity/provider change is included.
 
 Adapter scope: this experiment uses the OpenAI-compatible chat adapter. Anthropic and Codex adapters hoist system-role events into their instruction prefix. Before promoting the mechanism, constrain this event-placement behavior to adapters that serialize it chronologically, or separately validate a compatible representation. The frozen candidate remains unchanged for its planned Flash trials.
+
+## Result interpretation
+
+The first appended-job Bedrock trial has high cache reuse but times out. Its raw
+24/34 includes the separately documented [tag-order contradiction](../bedrock-tag-order/README.md)
+and six unstated error-wording requirements. These diagnostics do not change the
+frozen scores, count the timeout as completion, or establish a quality benefit.

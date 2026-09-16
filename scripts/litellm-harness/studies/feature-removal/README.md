@@ -42,6 +42,10 @@ do not overwrite the original plan or mix new runs into its results.
   the solver: only the tuple requirement was explicit. Six checks require an
   unstated error-message substring. The catalog retains the recorded input and
   metadata for audit; those wording failures are not six semantic defects.
+  A later [tag-order audit](../bedrock-tag-order/README.md) found a second
+  contradiction: the prompt asks for sorted tags at direct assume-role paths,
+  while four reference tests require the caller's unsorted sequence. A correct
+  permutation must not be described as missing tags from those failures alone.
 - The router-strategy oracle includes a test calling a new private helper by
   name. Keep that coupling separate from direct-entrypoint behavior failures.
   Its frozen generic metadata incorrectly says new private-helper tests were

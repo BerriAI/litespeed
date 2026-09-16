@@ -1,0 +1,130 @@
+{
+  "scope": "Focused excerpts selected using prior training failures. No hidden reference/tests/outcomes supplied to reviewer. Findings require host verification; not production judge evidence.",
+  "assessments": [
+    {
+      "case": "langfuse",
+      "effort": "none",
+      "completion": "normal nonempty; response in Chinese with multiple self-retractions",
+      "identifiedVerifiedWitness": false,
+      "finding": "Concluded langfuse_session_id missing guard, but supplied witness sets langfuse_session_id to the effective session and therefore falls in the rewrite branch, not the requested keep condition.",
+      "witnessCheck": "Candidate and exact human reference both use/return c1 and preserve session other-session at DEFAULT and ERROR. Guarded imports, fresh bytecode prefix.",
+      "retractedAllegations": "Several regex/empty-call/precedence allegations were raised then explicitly retracted in the response; not counted as surviving separate findings.",
+      "files": [
+        "langfuse-none-witness-candidate.json",
+        "langfuse-none-witness-reference.json"
+      ]
+    },
+    {
+      "case": "langfuse",
+      "effort": "medium",
+      "completion": "length limit; empty content",
+      "identifiedVerifiedWitness": false,
+      "finding": "No delivered finding; all 16384 completion tokens consumed."
+    },
+    {
+      "case": "router",
+      "effort": "none",
+      "completion": "normal nonempty",
+      "identifiedVerifiedWitness": false,
+      "finding": "Conditional None-return allegation is not supported: get_deployments_by_pattern always returns a list. The other-team direct-name witness has identical candidate/reference empty candidate sets and public-selection rejection, contrary to the proposed global-wildcard expectation.",
+      "files": [
+        "router-witness-candidate.json",
+        "router-witness-reference.json"
+      ]
+    },
+    {
+      "case": "router",
+      "effort": "medium",
+      "completion": "normal nonempty",
+      "identifiedVerifiedWitness": true,
+      "verifiedFinding": "Named team deployment must shadow global provider wildcard; candidate returns both IDs but actual request selection and reference return only the named team deployment.",
+      "refutedFinding": "The missing or () guard is not a defect for the real list-returning PatternRouter contract. No source definition of that helper was supplied initially.",
+      "files": [
+        "router-witness-candidate.json",
+        "router-witness-reference.json"
+      ]
+    }
+  ],
+  "completions": [
+    {
+      "case": "langfuse",
+      "effort": "none",
+      "finishReason": "stop",
+      "contentCharacters": 2601,
+      "usage": {
+        "completion_tokens": 1203,
+        "prompt_tokens": 9279,
+        "total_tokens": 10482,
+        "completion_tokens_details": {
+          "reasoning_tokens": 0
+        },
+        "prompt_tokens_details": {
+          "cached_tokens": 0
+        },
+        "output_tokens_details": {
+          "reasoning_tokens": 0
+        }
+      }
+    },
+    {
+      "case": "langfuse",
+      "effort": "medium",
+      "finishReason": "length",
+      "contentCharacters": 0,
+      "usage": {
+        "completion_tokens": 16384,
+        "prompt_tokens": 9304,
+        "total_tokens": 25688,
+        "completion_tokens_details": {
+          "reasoning_tokens": 16384
+        },
+        "prompt_tokens_details": {
+          "cached_tokens": 0
+        },
+        "output_tokens_details": {
+          "reasoning_tokens": 16384
+        }
+      }
+    },
+    {
+      "case": "router",
+      "effort": "none",
+      "finishReason": "stop",
+      "contentCharacters": 3062,
+      "usage": {
+        "completion_tokens": 774,
+        "prompt_tokens": 7813,
+        "total_tokens": 8587,
+        "completion_tokens_details": {
+          "reasoning_tokens": 0
+        },
+        "prompt_tokens_details": {
+          "cached_tokens": 0
+        },
+        "output_tokens_details": {
+          "reasoning_tokens": 0
+        }
+      }
+    },
+    {
+      "case": "router",
+      "effort": "medium",
+      "finishReason": "stop",
+      "contentCharacters": 2142,
+      "usage": {
+        "completion_tokens": 10880,
+        "prompt_tokens": 7838,
+        "total_tokens": 18718,
+        "completion_tokens_details": {
+          "reasoning_tokens": 10312
+        },
+        "prompt_tokens_details": {
+          "cached_tokens": 0
+        },
+        "output_tokens_details": {
+          "reasoning_tokens": 10312
+        }
+      }
+    }
+  ]
+}
