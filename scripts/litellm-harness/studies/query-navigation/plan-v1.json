@@ -95,7 +95,7 @@
       }
     },
     {
-      "dataset": "training2",
+      "dataset": "",
       "case": "mock-input-tokens",
       "name": "query-navigation",
       "kind": "litellm-specific",
@@ -105,7 +105,7 @@
       "timeoutSeconds": 900
     },
     {
-      "dataset": "training2",
+      "dataset": "",
       "case": "mock-input-tokens",
       "name": "control",
       "kind": "litellm-specific",
@@ -115,7 +115,7 @@
       "timeoutSeconds": 900
     },
     {
-      "dataset": "training2",
+      "dataset": "",
       "case": "mock-input-tokens",
       "name": "control",
       "kind": "litellm-specific",
@@ -139,7 +139,7 @@
       }
     },
     {
-      "dataset": "training2",
+      "dataset": "",
       "case": "mock-input-tokens",
       "name": "query-navigation",
       "kind": "litellm-specific",
@@ -148,11 +148,5 @@
       "effort": "medium",
       "timeoutSeconds": 900
     }
-  ],
-  "preAllocationCorrection": {
-    "at": "2026-09-16T12:28:31.574250+00:00",
-    "reason": "The known mock-input-tokens case is in training2, not the original dataset. Correct its dataset locator before any allocation; task, source, settings and order unchanged. The initial preflight detected the missing path.",
-    "previousPublicPlan": "plan-v1.json",
-    "allocatedTrialsBeforeCorrection": 0
-  }
+  ]
 }
