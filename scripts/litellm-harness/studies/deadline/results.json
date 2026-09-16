@@ -1,0 +1,116 @@
+{
+  "status": "interim",
+  "note": "Development selection only. Interim observed-task means can change as slower trials finish. Bootstrap resamples tasks, not attempts; it does not correct adaptive candidate selection or establish future generalization. Token prices exclude requests without usage and do not replace the campaign ledger.",
+  "variants": [
+    {
+      "variant": "extended",
+      "evaluated": 0,
+      "expected": 4
+    },
+    {
+      "variant": "standard",
+      "evaluated": 0,
+      "expected": 4
+    }
+  ],
+  "comparisons": [
+    {
+      "variant": "extended",
+      "control": "standard",
+      "pairedTasks": 0,
+      "expectedTasks": 2,
+      "complete": false,
+      "pairs": []
+    }
+  ],
+  "trials": [
+    {
+      "dataset": "",
+      "case": "team-member-budget",
+      "name": "extended",
+      "label": "replication-v49-deadline-extended-r1",
+      "commit": "8e0a6d40d66f13f73f6174073836ff43919c4282",
+      "effort": "medium",
+      "kind": "litellm-specific",
+      "timeoutSeconds": 1800,
+      "evaluated": false
+    },
+    {
+      "dataset": "",
+      "case": "team-member-budget",
+      "name": "standard",
+      "label": "replication-v49-deadline-standard-r1",
+      "commit": "8e0a6d40d66f13f73f6174073836ff43919c4282",
+      "effort": "medium",
+      "kind": "litellm-specific",
+      "timeoutSeconds": 900,
+      "evaluated": false
+    },
+    {
+      "dataset": "training5",
+      "case": "legacy-stream-pipeline",
+      "name": "standard",
+      "label": "replication-v49-deadline-standard-r1",
+      "commit": "8e0a6d40d66f13f73f6174073836ff43919c4282",
+      "effort": "medium",
+      "kind": "litellm-specific",
+      "timeoutSeconds": 900,
+      "evaluated": false
+    },
+    {
+      "dataset": "training5",
+      "case": "legacy-stream-pipeline",
+      "name": "extended",
+      "label": "replication-v49-deadline-extended-r1",
+      "commit": "8e0a6d40d66f13f73f6174073836ff43919c4282",
+      "effort": "medium",
+      "kind": "litellm-specific",
+      "timeoutSeconds": 1800,
+      "evaluated": false
+    },
+    {
+      "dataset": "",
+      "case": "team-member-budget",
+      "name": "standard",
+      "label": "replication-v49-deadline-standard-r2",
+      "commit": "8e0a6d40d66f13f73f6174073836ff43919c4282",
+      "effort": "medium",
+      "kind": "litellm-specific",
+      "timeoutSeconds": 900,
+      "evaluated": false
+    },
+    {
+      "dataset": "",
+      "case": "team-member-budget",
+      "name": "extended",
+      "label": "replication-v49-deadline-extended-r2",
+      "commit": "8e0a6d40d66f13f73f6174073836ff43919c4282",
+      "effort": "medium",
+      "kind": "litellm-specific",
+      "timeoutSeconds": 1800,
+      "evaluated": false
+    },
+    {
+      "dataset": "training5",
+      "case": "legacy-stream-pipeline",
+      "name": "extended",
+      "label": "replication-v49-deadline-extended-r2",
+      "commit": "8e0a6d40d66f13f73f6174073836ff43919c4282",
+      "effort": "medium",
+      "kind": "litellm-specific",
+      "timeoutSeconds": 1800,
+      "evaluated": false
+    },
+    {
+      "dataset": "training5",
+      "case": "legacy-stream-pipeline",
+      "name": "standard",
+      "label": "replication-v49-deadline-standard-r2",
+      "commit": "8e0a6d40d66f13f73f6174073836ff43919c4282",
+      "effort": "medium",
+      "kind": "litellm-specific",
+      "timeoutSeconds": 900,
+      "evaluated": false
+    }
+  ]
+}

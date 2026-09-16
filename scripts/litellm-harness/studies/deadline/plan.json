@@ -1,0 +1,130 @@
+{
+  "createdAt": "2026-09-16T11:00:42.629759+00:00",
+  "protocol": 7,
+  "model": "fireworks_ai/deepseek-v4p1-flash",
+  "control": "standard",
+  "repetitions": 2,
+  "globalConcurrency": 3,
+  "seed": 49160926,
+  "stopNewTrialsAtCommittedUsd": 78,
+  "purpose": "Known difficult development tasks: compare a 900-second versus1800-second execution ceiling with identical v46 model/harness/prompt policy. Selected after observed timeouts; not an estimate of general quality. No deadline hint is added to the task prompt. Determine whether more wall time yields normally completed correct patches or only longer wrong attempts.",
+  "selectionRule": "Compare complete repeated task pairs; retain original oracle and supplementary behavior limitations. Report absolute latency and price with correctness; longer limits are not automatically better. No reserved outcome informs this study.",
+  "reconstructionBase": "370f6fc500002b3e35ea7ac474107b2bb2a693b9",
+  "replayConfigPatchSha256": "cca60d78c60d55b85e772271239989ea223fc97c069404e7fb7b605d5f655ca9",
+  "unchangedFiles": {
+    "server/runner.ts": "c3a6cec38b247f0862f9fc05133eadf04ab03f42b8e01958d55dbe6d6ad119ae",
+    "server/tools.ts": "af76b826867e6607e952e900a14c6602910d1bb3d7adc0873ef859469d5a30e2",
+    "server/litellm-harness.ts": "8b7ae14594798801f6003f6bc239c263b64efe087d11373ae7a069e5fad24a31",
+    "shared/file-edits.ts": "f0ddb058bb54db41cd5c26cee1619cc0bca05ee7e5b931819873a58086bac172",
+    "scripts/litellm-harness/solve.ts": "3d56881002d5b84233b895a9c2bb90094a33bef5c2d5ec6c3fdff927788e0a73",
+    "scripts/litellm-harness/isolation.ts": "3dfaea69397d1928ccaf441b76dede08c5f9e49fcc84d5999e88327ca72c7891"
+  },
+  "supplementalSource": {
+    "path": "scripts/litellm-harness/studies/feature-effort/legacy-inheritance/real_stream_probe.py",
+    "sha256": "cefbc0b3d63bc05414f20b3357dc06a26e4b6eb30808f8636a820f46d3a86f7b"
+  },
+  "validation": {
+    "typecheck": "passed on main and runtime",
+    "focusedTypeScriptTests": 4,
+    "pythonWorkbenchTests": 41,
+    "productCodeUnchangedFromV46": true
+  },
+  "runs": [
+    {
+      "dataset": "",
+      "case": "team-member-budget",
+      "name": "extended",
+      "kind": "litellm-specific",
+      "label": "replication-v49-deadline-extended-r1",
+      "commit": "8e0a6d40d66f13f73f6174073836ff43919c4282",
+      "effort": "medium",
+      "timeoutSeconds": 1800
+    },
+    {
+      "dataset": "",
+      "case": "team-member-budget",
+      "name": "standard",
+      "kind": "litellm-specific",
+      "label": "replication-v49-deadline-standard-r1",
+      "commit": "8e0a6d40d66f13f73f6174073836ff43919c4282",
+      "effort": "medium",
+      "timeoutSeconds": 900
+    },
+    {
+      "dataset": "training5",
+      "case": "legacy-stream-pipeline",
+      "name": "standard",
+      "kind": "litellm-specific",
+      "label": "replication-v49-deadline-standard-r1",
+      "commit": "8e0a6d40d66f13f73f6174073836ff43919c4282",
+      "effort": "medium",
+      "timeoutSeconds": 900,
+      "supplemental": {
+        "artifact": "real-stream-probe.json",
+        "expectedChecks": 24
+      }
+    },
+    {
+      "dataset": "training5",
+      "case": "legacy-stream-pipeline",
+      "name": "extended",
+      "kind": "litellm-specific",
+      "label": "replication-v49-deadline-extended-r1",
+      "commit": "8e0a6d40d66f13f73f6174073836ff43919c4282",
+      "effort": "medium",
+      "timeoutSeconds": 1800,
+      "supplemental": {
+        "artifact": "real-stream-probe.json",
+        "expectedChecks": 24
+      }
+    },
+    {
+      "dataset": "",
+      "case": "team-member-budget",
+      "name": "standard",
+      "kind": "litellm-specific",
+      "label": "replication-v49-deadline-standard-r2",
+      "commit": "8e0a6d40d66f13f73f6174073836ff43919c4282",
+      "effort": "medium",
+      "timeoutSeconds": 900
+    },
+    {
+      "dataset": "",
+      "case": "team-member-budget",
+      "name": "extended",
+      "kind": "litellm-specific",
+      "label": "replication-v49-deadline-extended-r2",
+      "commit": "8e0a6d40d66f13f73f6174073836ff43919c4282",
+      "effort": "medium",
+      "timeoutSeconds": 1800
+    },
+    {
+      "dataset": "training5",
+      "case": "legacy-stream-pipeline",
+      "name": "extended",
+      "kind": "litellm-specific",
+      "label": "replication-v49-deadline-extended-r2",
+      "commit": "8e0a6d40d66f13f73f6174073836ff43919c4282",
+      "effort": "medium",
+      "timeoutSeconds": 1800,
+      "supplemental": {
+        "artifact": "real-stream-probe.json",
+        "expectedChecks": 24
+      }
+    },
+    {
+      "dataset": "training5",
+      "case": "legacy-stream-pipeline",
+      "name": "standard",
+      "kind": "litellm-specific",
+      "label": "replication-v49-deadline-standard-r2",
+      "commit": "8e0a6d40d66f13f73f6174073836ff43919c4282",
+      "effort": "medium",
+      "timeoutSeconds": 900,
+      "supplemental": {
+        "artifact": "real-stream-probe.json",
+        "expectedChecks": 24
+      }
+    }
+  ]
+}
