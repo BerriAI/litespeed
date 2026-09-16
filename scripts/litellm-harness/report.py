@@ -1,4 +1,4 @@
-"""Export allowlisted campaign measurements. Raw traces stay in the private directory."""
+"""Export the historical phase-1 study; later evaluations are reported separately. Raw traces stay in the private directory."""
 from datetime import datetime, timezone
 import json
 import os
@@ -62,10 +62,10 @@ for (_, group), expected in zip(groups, [21, 21, 7, 7]):
 mai_file = root / 'mai-audit.json'
 mai = json.loads(mai_file.read_text()) if mai_file.exists() else []
 data = {'schemaVersion': 2, 'generatedAt': datetime.now(timezone.utc).isoformat(),
-        'shippedHarnessVersion': '2026-09-15.13', 'benchmarkedHarnessVersions': ['2026-09-15.9', '2026-09-15.11'], 'postHocEvaluatedHarnessVersion': '2026-09-15.13',
+        'phase1FinalHarnessVersion': '2026-09-15.13', 'benchmarkedHarnessVersions': ['2026-09-15.9', '2026-09-15.11'], 'postHocEvaluatedHarnessVersion': '2026-09-15.13',
         'runtime': (json.loads((root / 'runtime-versions.json').read_text()) if (root / 'runtime-versions.json').exists() else None),
-        'runs': runs, 'tasks': tasks, 'gatewayAccounting': money, 'postHocMaiHttpAudit': mai, 'integrityReview': integrity, 'traceAudit': {'runs': len(audit), 'shellCommands': sum(r['commands'] for r in audit), 'flaggedCommands': sum(len(r['flags']) for r in audit), 'externalCalls': sum(len(r['externalCalls']) for r in audit)}}
-(destination / 'litellm-harness-results.json').write_text(json.dumps(data, indent=2) + '\n')
+        'runs': [r for r in runs if r in primary or r in followup or r in final_runs], 'tasks': tasks, 'gatewayAccounting': money, 'postHocMaiHttpAudit': mai, 'integrityReview': integrity, 'traceAudit': {'runs': len(audit), 'shellCommands': sum(r['commands'] for r in audit), 'flaggedCommands': sum(len(r['flags']) for r in audit), 'externalCalls': sum(len(r['externalCalls']) for r in audit)}}
+(destination / 'litellm-harness-phase1-results.json').write_text(json.dumps(data, indent=2) + '\n')
 
 def success(run):
     return bool((run['acceptance'] or {}).get('passed')) and run['completed']
@@ -80,10 +80,10 @@ def verdict(run):
     return f"{passed}/{result.get('tests', 0)}"
 
 lines = [
-    '# LiteLLM harness campaign results', '',
+    '# LiteLLM harness phase-1 results', '',
     '**This campaign does not establish that DeepSeek with this harness is better than Astra with Codex. Four original DeepSeek trials accessed the live checkout outside their historical snapshots, compromising the comparison.** The tables retain raw completed patches that pass every selected reference check, including affected trials; these counts are not an uncontaminated quality score. Some reference checks also impose private implementation details.', '',
-    'The shipped version is **v13**. Version 9 received the original 42-run comparison; v11 received a separately frozen seven-run follow-up. A later code review found that mixed team/router queries searched only proxy symbols. V13 fixes that search-area selection, recognizes area names inside Python symbols, and interleaves areas so a large proxy tree cannot consume the scan limit before router code is reached; it has focused regression tests, training replays and a separate seven-run evaluation on these already-known tasks. That final evaluation is post-hoc, not fresh held-out evidence. Do not pool the three harness versions. All three harness versions use the actual Litespeed runner and `fireworks_ai/deepseek-v4p1-flash`. The baseline is the installed Codex CLI with `gpt-6-astra`. Both routes request High reasoning and receive 900 seconds. DeepSeek uses its verified 1,048,576-token context window.', '',
-    'See the [protocol](../scripts/litellm-harness/README.md), [original plan](../scripts/litellm-harness/comparison-plan.json), [follow-up plan](../scripts/litellm-harness/replication-plan.json), [final known-task evaluation](../scripts/litellm-harness/final-evaluation-plan.json), and [all measurements and task revisions](litellm-harness-results.json).', '',
+    'The last version in this historical phase is **v13**. Later versions are evaluated separately in the [current campaign report](litellm-harness-results.md). Version 9 received the original 42-run comparison; v11 received a separately frozen seven-run follow-up. A later code review found that mixed team/router queries searched only proxy symbols. V13 fixes that search-area selection, recognizes area names inside Python symbols, and interleaves areas so a large proxy tree cannot consume the scan limit before router code is reached; it has focused regression tests, training replays and a separate seven-run evaluation on these already-known tasks. That final evaluation is post-hoc, not fresh held-out evidence. Do not pool the three harness versions. All three harness versions use the actual Litespeed runner and `fireworks_ai/deepseek-v4p1-flash`. The baseline is the installed Codex CLI with `gpt-6-astra`. Both routes request High reasoning and receive 900 seconds. DeepSeek uses its verified 1,048,576-token context window.', '',
+    'See the [protocol](../scripts/litellm-harness/README.md), [original plan](../scripts/litellm-harness/comparison-plan.json), [follow-up plan](../scripts/litellm-harness/replication-plan.json), [final known-task evaluation](../scripts/litellm-harness/final-evaluation-plan.json), and [all measurements and task revisions](litellm-harness-phase1-results.json).', '',
     '## Aggregate results', '',
     '| Route | Raw completed + all checks pass | Out-of-snapshot access | Median seconds | Timeouts | Known DeepSeek token subtotal |',
     '|---|---:|---:|---:|---:|---:|',
@@ -147,5 +147,5 @@ lines += ['', '## Trace counters', '',
           'The shipping workbench uses protocol 4: a macOS Seatbelt filesystem boundary blocks the live source and other campaign/reference files while permitting the current run and trusted runtime/dependencies. Networking remains available for model APIs; this is not complete adversarial isolation. Real training smoke runs verify the launcher separately. The v9/v11/v13 comparison series used protocol 3 and does not inherit this correction.', '',
           'Source hashes and task revisions are recorded. Production sessions do not automatically mutate the harness. The shipped guides were distilled from training/development cases, and the v11 follow-up was frozen before comparison outcomes were inspected. Neither a green model-written test nor a green focused reference selection proves the absence of other bugs.',
 ]
-(destination / 'litellm-harness-results.md').write_text('\n'.join(lines) + '\n')
+(destination / 'litellm-harness-phase1-results.md').write_text('\n'.join(lines) + '\n')
 print(json.dumps({'runs': len(runs), 'comparisonRuns': len(primary), 'followupRuns': len(followup), 'finalKnownTaskRuns': len(final_runs), 'gatewayAccounting': money}))
