@@ -98,6 +98,8 @@ python3 scripts/litellm-harness/batch.py /absolute/litespeed-checkout replicatio
 
 A batch never silently retries an allocated trial. New attempts use a new label. Freezing the runtime in a separate Git worktree keeps an ongoing batch reproducible while the next candidate changes. Excessive parallelism can produce host stalls and corrupt latency comparisons even when each individual batch has a reasonable worker count.
 
+Waiting trials acquire shared slots in ticket order, so a large controller cannot continually overtake an older queued experiment. Kernel file locks identify live tickets and release capacity after a process dies; stale tickets are removed without trusting a reused process ID. Queued time is outside the solver's recorded duration. Use the same scheduler version and capacity when comparing throughput.
+
 If a solver exits before writing its completion artifact, the launcher preserves a failed result and partial patch. For older dead runs, `recover.py RUN_DIRECTORY` extracts messages and receipts from the read-only state database after checking that the solver is gone. Recovered trials remain interrupted failures; their message-derived duration is incomplete and must be excluded from successful-run latency summaries. Never restore a recovered workspace into a new solver as though it were an untouched base.
 
 `analyze.py` reports provider-call time, the union of occupied tool intervals, per-tool summed latency, time to first edit and when final review began. Concurrent tool durations can overlap: do not add them to infer wall time. Use recorded timestamps rather than a critic model's estimates.

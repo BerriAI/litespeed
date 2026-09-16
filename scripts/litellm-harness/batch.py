@@ -5,7 +5,6 @@ Set LITELLM_CAMPAIGN_LOCK_DIR to ONE shared directory for all datasets/batches.
 Existing allocated trials are never silently retried; use a new label explicitly.
 """
 import concurrent.futures
-from contextlib import contextmanager
 import fcntl
 import json
 import os
@@ -13,7 +12,7 @@ from pathlib import Path
 import re
 import subprocess
 import sys
-import time
+from slots import shared_slot
 
 ROOT = Path(os.environ['LITELLM_CAMPAIGN_DIR']).resolve()
 LOCKS = Path(os.environ['LITELLM_CAMPAIGN_LOCK_DIR']).resolve()
@@ -34,26 +33,8 @@ with (LOCKS / 'capacity.lock').open('a') as lock:
     config.write_text(json.dumps({'capacity': CAPACITY}))
 
 
-@contextmanager
-def slot():
-    while True:
-        for index in range(CAPACITY):
-            lock = (LOCKS / ('slot-' + str(index) + '.lock')).open('a')
-            try:
-                fcntl.flock(lock, fcntl.LOCK_EX | fcntl.LOCK_NB)
-            except BlockingIOError:
-                lock.close()
-                continue
-            try:
-                yield
-            finally:
-                lock.close()
-            return
-        time.sleep(1)
-
-
 def run(case):
-    with slot(), (LOCKS / (LABEL + '-' + case + '.lock')).open('a') as lock:
+    with shared_slot(LOCKS, CAPACITY), (LOCKS / (LABEL + '-' + case + '.lock')).open('a') as lock:
         fcntl.flock(lock, fcntl.LOCK_EX)
         prior = list((ROOT / 'runs').glob(LABEL + '-' + case + '-*'))
         if prior:
