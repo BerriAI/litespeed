@@ -1,0 +1,685 @@
+diff --git a/litellm/llms/anthropic/chat/guardrail_translation/handler.py b/litellm/llms/anthropic/chat/guardrail_translation/handler.py
+index e486be1..84dc611 100644
+--- a/litellm/llms/anthropic/chat/guardrail_translation/handler.py
++++ b/litellm/llms/anthropic/chat/guardrail_translation/handler.py
+@@ -1011,6 +1011,15 @@ class AnthropicMessagesHandler(BaseTranslation):
+ 
+         return response
+ 
++    def post_call_hook_response(self, response: Any) -> Any:
++        """Convert an assembled OpenAI ``ModelResponse`` into the Anthropic Messages
++        response a legacy ``async_post_call_success_hook`` expects for this route.
++        Inputs that are not a ``ModelResponse`` (the hook's own native replacement,
++        for one) keep their identity."""
++        if not isinstance(response, ModelResponse):
++            return response
++        return LiteLLMAnthropicMessagesAdapter().translate_openai_response_to_anthropic(response=response)
++
+     async def process_output_streaming_response(
+         self,
+         responses_so_far: list[Any],
+diff --git a/litellm/llms/base_llm/guardrail_translation/base_translation.py b/litellm/llms/base_llm/guardrail_translation/base_translation.py
+index afd8e0f..3aa46c8 100644
+--- a/litellm/llms/base_llm/guardrail_translation/base_translation.py
++++ b/litellm/llms/base_llm/guardrail_translation/base_translation.py
+@@ -181,6 +181,17 @@ class BaseTranslation(ABC):
+         """
+         return responses_so_far
+ 
++    def post_call_hook_response(self, response: Any) -> Any:
++        """
++        Shape an assembled OpenAI ``ModelResponse`` for the endpoint's legacy
++        ``async_post_call_success_hook``.
++
++        The hook expects the endpoint's native non-streaming response, so an
++        endpoint whose wire shape differs from OpenAI overrides this. The base
++        implementation returns the input unchanged.
++        """
++        return response
++
+     def get_streaming_scan_key(self, responses_so_far: Sequence[object]) -> StreamingScanKey | None:
+         return None
+ 
+diff --git a/litellm/proxy/common_request_processing.py b/litellm/proxy/common_request_processing.py
+index 9720e4b..ca163eb 100644
+--- a/litellm/proxy/common_request_processing.py
++++ b/litellm/proxy/common_request_processing.py
+@@ -3340,12 +3340,22 @@ class ProxyBaseLLMRequestProcessing:
+         _response = assembled_response
+         try:
+             from litellm.proxy.proxy_server import llm_router as _global_llm_router
+-            from litellm.proxy.utils import _check_and_merge_model_level_guardrails
++            from litellm.proxy.utils import (
++                _check_and_merge_model_level_guardrails,
++                _pipeline_step_guardrail_names,
++                _streamable_post_call_pipelines,
++            )
+ 
+             guardrail_data = _check_and_merge_model_level_guardrails(data=captured_data, llm_router=_global_llm_router)
++            # Pipeline-managed legacy hooks already ran inside the streaming pipeline.
++            pipeline_managed: Final = _pipeline_step_guardrail_names(
++                _streamable_post_call_pipelines(guardrail_data, captured_user_api_key_dict)
++            )
+             for cb in litellm.callbacks:
+                 if not isinstance(cb, CustomGuardrail):
+                     continue
++                if cb.guardrail_name and cb.guardrail_name in pipeline_managed:
++                    continue
+                 if not cb.should_run_guardrail(
+                     data=guardrail_data,
+                     event_type=GuardrailEventHooks.post_call,
+diff --git a/litellm/proxy/policy_engine/pipeline_executor.py b/litellm/proxy/policy_engine/pipeline_executor.py
+index 9bc1094..c9b2e8c 100644
+--- a/litellm/proxy/policy_engine/pipeline_executor.py
++++ b/litellm/proxy/policy_engine/pipeline_executor.py
+@@ -121,6 +121,91 @@ class _StreamRewriteObserver(CustomGuardrail):
+         return outputs
+ 
+ 
++class _GuardrailInputsCollector:
++    """No-op guardrail used to read back the texts an endpoint translation extracts
++    from a response, so a legacy hook's replacement can be compared against the
++    text the streaming scan already saw."""
++
++    def __init__(self) -> None:
++        self.texts: list[str] | None = None
++
++    async def apply_guardrail(
++        self,
++        inputs: GenericGuardrailAPIInputs,
++        request_data: dict,  # mutable-ok: matches CustomGuardrail.apply_guardrail
++        input_type: Literal["request", "response"],
++        logging_obj: object = None,
++    ) -> GenericGuardrailAPIInputs:
++        self.texts = [text for text in (inputs.get("texts") or [])]
++        return inputs
++
++
++class _LegacyStreamRewriteTarget(CustomGuardrail):
++    """Stand-in handed to the endpoint translation in place of a streaming pipeline
++    step's legacy guardrail. The translation assembles the buffered stream and calls
++    ``apply_guardrail``; this target invokes the guardrail's own
++    ``async_post_call_success_hook`` once with the standard data and the assembled
++    response in the endpoint's native non-streaming shape, then reports the
++    replacement's text back so the translation can write it across the buffered
++    chunks. A replacement whose text cannot be mapped one-to-one onto the scanned
++    text (a tool-call-only rewrite, a different number of text pieces) is
++    undeliverable and the executor releases the original chunks."""
++
++    def __init__(
++        self,
++        inner: CustomGuardrail,
++        endpoint_translation: "BaseTranslation",
++        user_api_key_dict: "UserAPIKeyAuth | None",
++        data: dict,  # mutable-ok: same request-payload shape the hook mutates
++        litellm_logging_obj: "LiteLLMLoggingObj | None",
++    ) -> None:
++        super().__init__(guardrail_name=inner.guardrail_name)
++        self.inner: Final = inner
++        self.endpoint_translation: Final = endpoint_translation
++        self.user_api_key_dict: Final = user_api_key_dict
++        self.data: Final = data
++        self.litellm_logging_obj: Final = litellm_logging_obj
++        self.rewrote = False
++
++    def structured_messages_cover_full_request(self) -> bool:
++        return self.inner.structured_messages_cover_full_request()
++
++    @_logged_by_inner_guardrail
++    async def apply_guardrail(
++        self,
++        inputs: GenericGuardrailAPIInputs,
++        request_data: dict,  # mutable-ok: matches CustomGuardrail.apply_guardrail
++        input_type: Literal["request", "response"],
++        logging_obj: "LiteLLMLoggingObj | None" = None,
++    ) -> GenericGuardrailAPIInputs:
++        replacement: Final = await self.inner.async_post_call_success_hook(
++            user_api_key_dict=self.user_api_key_dict,
++            data=self.data,
++            response=self.endpoint_translation.post_call_hook_response(request_data.get("response")),
++        )
++        if replacement is None:
++            return inputs
++        rewritten: Final = await self._replacement_texts(replacement)
++        scanned: Final = list(inputs.get("texts") or [])
++        if rewritten is None or len(rewritten) != len(scanned):
++            raise UndeliverableStreamRewrite(self.guardrail_name or "unknown")
++        if rewritten != scanned:
++            self.rewrote = True
++        return {**inputs, "texts": rewritten}
++
++    async def _replacement_texts(self, replacement: object) -> list[str] | None:
++        """Rescan the hook's native replacement through the same endpoint translation
++        to read the text pieces it now carries."""
++        collector: Final = _GuardrailInputsCollector()
++        await self.endpoint_translation.process_output_response(
++            response=replacement,
++            guardrail_to_apply=collector,
++            litellm_logging_obj=self.litellm_logging_obj,
++            user_api_key_dict=self.user_api_key_dict,
++        )
++        return collector.texts
++
++
+ def _prepare_hook_input(
+     step: PipelineStep,
+     callback: CustomGuardrail,
+@@ -324,6 +409,49 @@ class PipelineExecutor:
+         if not callback.records_own_guardrail_information:
+             add_guardrail_to_applied_guardrails_header(request_data=hook_input, guardrail_name=step.guardrail)
+ 
++    @staticmethod
++    async def _run_legacy_streaming_step(
++        step: PipelineStep,
++        callback: CustomGuardrail,
++        endpoint_translation: "BaseTranslation",
++        streaming_chunks: list[object],  # mutable-ok: shared buffered-stream chunks the translation rewrites in place
++        hook_input: dict[str, object],  # mutable-ok: same request-payload shape as data
++        user_api_key_dict: "UserAPIKeyAuth | None",
++        litellm_logging_obj: "LiteLLMLoggingObj | None",
++    ) -> None:
++        """Run one streaming post_call step through the guardrail's own legacy
++        ``async_post_call_success_hook``. The endpoint translation assembles the
++        buffered stream and hands the target the assembled response; the target
++        invokes the hook once with the native non-streaming response and reports the
++        replacement's text back so a translation supporting ended-stream write-back
++        can deliver it. A replacement that cannot be delivered is discarded: the
++        buffered chunks go back to the originals and the step passes."""
++        target: Final = _LegacyStreamRewriteTarget(
++            inner=callback,
++            endpoint_translation=endpoint_translation,
++            user_api_key_dict=user_api_key_dict,
++            data=hook_input,
++            litellm_logging_obj=litellm_logging_obj,
++        )
++        deliver_rewrites: Final = type(endpoint_translation).delivers_ended_stream_text_rewrites
++        originals: Final = copy.deepcopy(streaming_chunks)
++        try:
++            await endpoint_translation.process_output_streaming_response(
++                responses_so_far=streaming_chunks,
++                guardrail_to_apply=target,
++                litellm_logging_obj=litellm_logging_obj,
++                user_api_key_dict=user_api_key_dict,
++                request_data=hook_input,
++                deliver_ended_stream_rewrites=deliver_rewrites,
++            )
++        except UndeliverableStreamRewrite:
++            _release_original_chunks(step.guardrail, streaming_chunks, originals)
++        else:
++            if target.rewrote and not deliver_rewrites:
++                _release_original_chunks(step.guardrail, streaming_chunks, originals)
++        if not callback.records_own_guardrail_information:
++            add_guardrail_to_applied_guardrails_header(request_data=hook_input, guardrail_name=step.guardrail)
++
+     @staticmethod
+     async def _run_step(
+         step: PipelineStep,
+@@ -379,22 +507,40 @@ class PipelineExecutor:
+                     if isinstance(response, dict):
+                         callback.mark_pre_call_hook_ran(response)
+             elif mode == "post_call" and streaming_chunks is not None:
+-                if not use_unified or endpoint_translation is None:
++                if endpoint_translation is None:
++                    return (
++                        "error",
++                        None,
++                        f"Guardrail '{step.guardrail}' cannot run in a streaming pipeline without an endpoint translation",
++                        None,
++                    )
++                if use_unified:
++                    await PipelineExecutor._run_streaming_step(
++                        step=step,
++                        callback=callback,
++                        endpoint_translation=endpoint_translation,
++                        streaming_chunks=streaming_chunks,
++                        hook_input=hook_input,
++                        user_api_key_dict=user_api_key_dict,
++                        litellm_logging_obj=data.get("litellm_logging_obj"),
++                    )
++                elif PipelineExecutor.has_native_post_call_success_hook(callback):
++                    await PipelineExecutor._run_legacy_streaming_step(
++                        step=step,
++                        callback=callback,
++                        endpoint_translation=endpoint_translation,
++                        streaming_chunks=streaming_chunks,
++                        hook_input=hook_input,
++                        user_api_key_dict=user_api_key_dict,
++                        litellm_logging_obj=data.get("litellm_logging_obj"),
++                    )
++                else:
+                     return (
+                         "error",
+                         None,
+                         f"Guardrail '{step.guardrail}' does not support streaming pipeline execution",
+                         None,
+                     )
+-                await PipelineExecutor._run_streaming_step(
+-                    step=step,
+-                    callback=callback,
+-                    endpoint_translation=endpoint_translation,
+-                    streaming_chunks=streaming_chunks,
+-                    hook_input=hook_input,
+-                    user_api_key_dict=user_api_key_dict,
+-                    litellm_logging_obj=data.get("litellm_logging_obj"),
+-                )
+                 response = None
+             elif mode == "post_call":
+                 response = await target.async_post_call_success_hook(
+@@ -433,10 +579,25 @@ class PipelineExecutor:
+ 
+     @staticmethod
+     def supports_unified_execution(callback: CustomGuardrail) -> bool:
+-        """Whether this guardrail runs through the unified apply_guardrail path,
+-        the interface streaming pipeline execution requires."""
++        """Whether this guardrail runs through the unified apply_guardrail path."""
+         return "apply_guardrail" in type(callback).__dict__ and not callback.use_native_lifecycle_hooks
+ 
++    @staticmethod
++    def has_native_post_call_success_hook(callback: CustomGuardrail) -> bool:
++        """Whether this guardrail defines its own legacy
++        ``async_post_call_success_hook``, the other interface a streaming pipeline
++        step can run (including guardrails that keep their native lifecycle hooks)."""
++        return "async_post_call_success_hook" in type(callback).__dict__
++
++    @staticmethod
++    def supports_streaming_execution(callback: CustomGuardrail) -> bool:
++        """Whether this guardrail can run as a streaming pipeline step: through the
++        unified apply_guardrail path, or through its own legacy post-call success
++        hook."""
++        return PipelineExecutor.supports_unified_execution(
++            callback
++        ) or PipelineExecutor.has_native_post_call_success_hook(callback)
++
+     @staticmethod
+     def find_guardrail_callback(guardrail_name: str) -> CustomGuardrail | None:
+         """Look up an initialized guardrail callback by name from litellm.callbacks."""
+diff --git a/litellm/proxy/utils.py b/litellm/proxy/utils.py
+index 8b36061..28911b0 100644
+--- a/litellm/proxy/utils.py
++++ b/litellm/proxy/utils.py
+@@ -514,9 +514,9 @@ def _merge_pipeline_metadata_writes(
+         _merge_pipeline_metadata_bucket(data, bucket_key, modified_data.get(bucket_key))
+ 
+ 
+-def _pipeline_step_supports_unified_streaming(guardrail_name: str) -> bool:
++def _pipeline_step_supports_streaming(guardrail_name: str) -> bool:
+     callback: Final = PipelineExecutor.find_guardrail_callback(guardrail_name)
+-    return callback is not None and PipelineExecutor.supports_unified_execution(callback)
++    return callback is not None and PipelineExecutor.supports_streaming_execution(callback)
+ 
+ 
+ def _post_call_pipelines(data: Mapping[str, object]) -> tuple[tuple[str, "GuardrailPipeline"], ...]:
+@@ -541,14 +541,15 @@ def _warn_background_skips_post_call_pipelines(data: Mapping[str, object]) -> No
+ def _pipeline_is_streamable(policy_name: str, pipeline: "GuardrailPipeline") -> bool:
+     unsupported: Final = tuple(
+         dict.fromkeys(
+-            step.guardrail for step in pipeline.steps if not _pipeline_step_supports_unified_streaming(step.guardrail)
++            step.guardrail for step in pipeline.steps if not _pipeline_step_supports_streaming(step.guardrail)
+         )
+     )
+     if not unsupported:
+         return True
+     verbose_proxy_logger.warning(
+-        "Policy '%s' has post_call pipeline guardrails without the unified apply_guardrail interface, "
+-        "which streaming pipelines need; the stream skips the pipeline and its guardrails run on their own: %s",
++        "Policy '%s' has post_call pipeline guardrails without a streaming interface (the unified "
++        "apply_guardrail path or their own async_post_call_success_hook), which streaming pipelines need; "
++        "the stream skips the pipeline and its guardrails run on their own: %s",
+         policy_name,
+         ", ".join(unsupported),
+     )
+diff --git a/tests/test_litellm/llms/anthropic/chat/guardrail_translation/test_anthropic_guardrail_handler.py b/tests/test_litellm/llms/anthropic/chat/guardrail_translation/test_anthropic_guardrail_handler.py
+index bf40f78..a416696 100644
+--- a/tests/test_litellm/llms/anthropic/chat/guardrail_translation/test_anthropic_guardrail_handler.py
++++ b/tests/test_litellm/llms/anthropic/chat/guardrail_translation/test_anthropic_guardrail_handler.py
+@@ -2156,3 +2156,35 @@ class TestAnthropicMessagesHandlerStreamingScanKey:
+         assert open_key == StreamingScanKey(texts=("hi",))
+         assert len(ended_key.tool_calls) == 1 and "get_weather" in ended_key.tool_calls[0]
+         assert ended_key != open_key
++
++
++class TestPostCallHookResponse:
++    """post_call_hook_response shapes the assembled response for a legacy hook."""
++
++    def _model_response(self, content: str, finish_reason: str = "stop"):
++        from litellm.types.utils import Choices, Message, ModelResponse, Usage
++
++        return ModelResponse(
++            id="chatcmpl-1",
++            choices=[Choices(index=0, message=Message(content=content, role="assistant"), finish_reason=finish_reason)],
++            model="claude-3",
++            usage=Usage(prompt_tokens=5, completion_tokens=2, total_tokens=7),
++        )
++
++    def test_translates_completed_text_response(self):
++        response = AnthropicMessagesHandler().post_call_hook_response(self._model_response("hello world"))
++
++        assert response["type"] == "message"
++        assert response["role"] == "assistant"
++        assert response["content"] == [{"type": "text", "text": "hello world"}]
++        assert response["stop_reason"] == "end_turn"
++        assert response["usage"]["input_tokens"] == 5
++        assert response["usage"]["output_tokens"] == 2
++
++    def test_preserves_length_finish_reason(self):
++        response = AnthropicMessagesHandler().post_call_hook_response(self._model_response("hi", finish_reason="length"))
++        assert response["stop_reason"] == "max_tokens"
++
++    def test_non_model_response_keeps_identity(self):
++        native = {"type": "message", "role": "assistant", "content": []}
++        assert AnthropicMessagesHandler().post_call_hook_response(native) is native
+diff --git a/tests/test_litellm/proxy/guardrails/test_deferred_guardrail_logging.py b/tests/test_litellm/proxy/guardrails/test_deferred_guardrail_logging.py
+index 8fde4cc..a5aaa60 100644
+--- a/tests/test_litellm/proxy/guardrails/test_deferred_guardrail_logging.py
++++ b/tests/test_litellm/proxy/guardrails/test_deferred_guardrail_logging.py
+@@ -1454,3 +1454,47 @@ class TestArmDeferredStreamDispatch:
+         )
+ 
+         assert logging_obj._on_deferred_stream_complete is None
++
++
++@pytest.mark.asyncio
++async def test_pipeline_managed_legacy_hook_is_not_rerun_by_deferred_audit(monkeypatch):
++    """A legacy post-call success hook already run as a streaming pipeline step must
++    not be invoked a second time by the deferred end-of-stream audit."""
++    calls = []
++
++    class LegacyHookGuardrail(CustomGuardrail):
++        def __init__(self):
++            super().__init__(
++                guardrail_name="managed",
++                default_on=True,
++                event_hook=GuardrailEventHooks.post_call,
++            )
++
++        async def async_post_call_success_hook(self, data, user_api_key_dict, response):
++            calls.append(response)
++            return response
++
++    guardrail = LegacyHookGuardrail()
++    monkeypatch.setattr(litellm, "callbacks", [guardrail])
++    monkeypatch.setattr("litellm.proxy.proxy_server.llm_router", None, raising=False)
++
++    from litellm.types.proxy.policy_engine.pipeline_types import GuardrailPipeline, PipelineStep
++
++    pipeline = GuardrailPipeline(mode="post_call", steps=[PipelineStep(guardrail="managed", on_fail="block")])
++    captured_data = {
++        "model": "gpt-4",
++        "metadata": {"_guardrail_pipelines": [("response-governance", pipeline)]},
++    }
++    mock_logging_obj = MagicMock()
++    mock_logging_obj.model_call_details = {"metadata": {}}
++    _attach_mock_success_dispatch(mock_logging_obj, AsyncMock())
++
++    await ProxyBaseLLMRequestProcessing._run_deferred_stream_guardrails(
++        captured_data=captured_data,
++        captured_user_api_key_dict=UserAPIKeyAuth(api_key="test", request_route="/v1/chat/completions"),
++        captured_logging_obj=mock_logging_obj,
++        assembled_response=MagicMock(),
++        cache_hit=False,
++    )
++
++    assert calls == []
+diff --git a/tests/test_litellm/proxy/policy_engine/test_pipeline_executor.py b/tests/test_litellm/proxy/policy_engine/test_pipeline_executor.py
+index 54ef1f7..9953d96 100644
+--- a/tests/test_litellm/proxy/policy_engine/test_pipeline_executor.py
++++ b/tests/test_litellm/proxy/policy_engine/test_pipeline_executor.py
+@@ -1153,3 +1153,195 @@ async def test_streaming_step_restores_chunks_when_translation_refuses_the_rewri
+ 
+     _assert_passed_with_discard_warning(result, caplog)
+     assert chunks == [_chunk()]
++
++
++# ─────────────────────────────────────────────────────────────────────────────
++# Legacy post-call success hooks as streaming pipeline steps
++# ─────────────────────────────────────────────────────────────────────────────
++
++
++def _assembled_model_response(text: str):
++    from litellm.types.utils import Choices, Message, ModelResponse
++
++    return ModelResponse(
++        id="chatcmpl-legacy",
++        choices=[Choices(index=0, message=Message(content=text, role="assistant"), finish_reason="stop")],
++        model="m",
++    )
++
++
++class _LegacyHookTranslation:
++    """Models the contract the endpoint translations expose: the assembled OpenAI
++    response is handed to the target under request_data["response"], and the native
++    response is scanned back through process_output_response."""
++
++    delivers_ended_stream_text_rewrites = True
++
++    def __init__(self, assembled):
++        self.assembled = assembled
++
++    def post_call_hook_response(self, response):
++        return {"texts": [response.choices[0].message.content]}
++
++    async def process_output_streaming_response(
++        self,
++        responses_so_far,
++        guardrail_to_apply,
++        litellm_logging_obj=None,
++        user_api_key_dict=None,
++        request_data=None,
++        deliver_ended_stream_rewrites=False,
++    ):
++        request_data["response"] = self.assembled
++        scanned = responses_so_far[0]["text"]
++        outputs = await guardrail_to_apply.apply_guardrail(
++            inputs={"texts": [scanned]},
++            request_data=request_data,
++            input_type="response",
++            logging_obj=litellm_logging_obj,
++        )
++        if deliver_ended_stream_rewrites and outputs["texts"] and outputs["texts"][0] != scanned:
++            responses_so_far[0]["text"] = outputs["texts"][0]
++        return responses_so_far
++
++    async def process_output_response(
++        self, response, guardrail_to_apply, litellm_logging_obj=None, user_api_key_dict=None, request_data=None
++    ):
++        await guardrail_to_apply.apply_guardrail(
++            inputs={"texts": list(response["texts"])},
++            request_data=request_data or {},
++            input_type="response",
++            logging_obj=litellm_logging_obj,
++        )
++        return response
++
++
++class _LegacyHookGuardrail(CustomGuardrail):
++    """Overrides only the legacy post-call success hook, and keeps native lifecycle
++    hooks on, so it is eligible without unified apply_guardrail support."""
++
++    use_native_lifecycle_hooks = True
++
++    def __init__(self, hook):
++        super().__init__(guardrail_name="legacy", event_hook="post_call", default_on=True)
++        self.hook = hook
++        self.calls = []
++
++    async def async_post_call_success_hook(self, data, user_api_key_dict, response):
++        self.calls.append(response)
++        return self.hook(response)
++
++
++async def _run_legacy_step(guardrail, translation, chunks):
++    return await PipelineExecutor.execute_steps(
++        steps=[PipelineStep(guardrail="legacy", on_pass="allow", on_fail="block", on_error="next")],
++        mode="post_call",
++        data={"model": "m"},
++        user_api_key_dict=MagicMock(),
++        call_type="completion",
++        policy_name="p",
++        streaming_chunks=chunks,
++        endpoint_translation=translation,
++    )
++
++
++@pytest.mark.asyncio
++async def test_legacy_streaming_step_invokes_hook_once_and_delivers_rewrite(monkeypatch):
++    guardrail = _LegacyHookGuardrail(lambda native: {"texts": [native["texts"][0].upper()]})
++    monkeypatch.setattr(litellm, "callbacks", [guardrail])
++    chunks = [{"text": "hello world"}]
++
++    result = await _run_legacy_step(guardrail, _LegacyHookTranslation(_assembled_model_response("hello world")), chunks)
++
++    assert result.terminal_action == "allow"
++    assert [step.outcome for step in result.step_results] == ["pass"]
++    assert guardrail.calls == [{"texts": ["hello world"]}]
++    assert chunks[0]["text"] == "HELLO WORLD"
++
++
++@pytest.mark.asyncio
++async def test_legacy_streaming_step_releases_original_stream_when_hook_returns_none(monkeypatch):
++    guardrail = _LegacyHookGuardrail(lambda native: None)
++    monkeypatch.setattr(litellm, "callbacks", [guardrail])
++    chunks = [{"text": "hello world"}]
++
++    result = await _run_legacy_step(guardrail, _LegacyHookTranslation(_assembled_model_response("hello world")), chunks)
++
++    assert result.terminal_action == "allow"
++    assert [step.outcome for step in result.step_results] == ["pass"]
++    assert len(guardrail.calls) == 1
++    assert chunks[0]["text"] == "hello world"
++
++
++@pytest.mark.asyncio
++async def test_legacy_streaming_step_discards_unmappable_rewrite(monkeypatch, caplog):
++    guardrail = _LegacyHookGuardrail(lambda native: {"texts": ["a", "b"]})
++    monkeypatch.setattr(litellm, "callbacks", [guardrail])
++    chunks = [{"text": "hello world"}]
++
++    with caplog.at_level(logging.WARNING, logger="LiteLLM Proxy"):
++        result = await _run_legacy_step(
++            guardrail, _LegacyHookTranslation(_assembled_model_response("hello world")), chunks
++        )
++
++    assert result.terminal_action == "allow"
++    assert [step.outcome for step in result.step_results] == ["pass"]
++    assert chunks[0]["text"] == "hello world"
++    assert any("'legacy'" in record.getMessage() and "discarded" in record.getMessage() for record in caplog.records)
++
++
++class _NoWriteBackLegacyTranslation(_LegacyHookTranslation):
++    delivers_ended_stream_text_rewrites = False
++
++
++@pytest.mark.asyncio
++async def test_legacy_streaming_step_discards_rewrite_without_write_back(monkeypatch, caplog):
++    guardrail = _LegacyHookGuardrail(lambda native: {"texts": [native["texts"][0].upper()]})
++    monkeypatch.setattr(litellm, "callbacks", [guardrail])
++    chunks = [{"text": "hello world"}]
++
++    with caplog.at_level(logging.WARNING, logger="LiteLLM Proxy"):
++        result = await _run_legacy_step(
++            guardrail,
++            _NoWriteBackLegacyTranslation(_assembled_model_response("hello world")),
++            chunks,
++        )
++
++    assert result.terminal_action == "allow"
++    assert [step.outcome for step in result.step_results] == ["pass"]
++    assert chunks[0]["text"] == "hello world"
++    assert any("'legacy'" in record.getMessage() and "discarded" in record.getMessage() for record in caplog.records)
++
++
++@pytest.mark.asyncio
++async def test_legacy_streaming_step_missing_translation_is_execution_error(monkeypatch):
++    guardrail = _LegacyHookGuardrail(lambda native: None)
++    monkeypatch.setattr(litellm, "callbacks", [guardrail])
++
++    result = await PipelineExecutor.execute_steps(
++        steps=[PipelineStep(guardrail="legacy", on_pass="allow", on_fail="next", on_error="next")],
++        mode="post_call",
++        data={"model": "m"},
++        user_api_key_dict=MagicMock(),
++        call_type="completion",
++        policy_name="p",
++        streaming_chunks=[{"text": "hello"}],
++        endpoint_translation=None,
++    )
++
++    assert [step.outcome for step in result.step_results] == ["error"]
++
++
++@pytest.mark.asyncio
++async def test_legacy_streaming_step_blocking_exception_terminates_delivery(monkeypatch):
++    def block(native):
++        raise HTTPException(status_code=400, detail={"error": "output blocked"})
++
++    guardrail = _LegacyHookGuardrail(block)
++    monkeypatch.setattr(litellm, "callbacks", [guardrail])
++    chunks = [{"text": "hello world"}]
++
++    result = await _run_legacy_step(guardrail, _LegacyHookTranslation(_assembled_model_response("hello world")), chunks)
++
++    assert [step.outcome for step in result.step_results] == ["fail"]
++    assert result.terminal_action == "block"
+diff --git a/tests/test_litellm/proxy/utils/proxy_logging/test_guardrail_pipeline.py b/tests/test_litellm/proxy/utils/proxy_logging/test_guardrail_pipeline.py
+index 73dd674..1804f88 100644
+--- a/tests/test_litellm/proxy/utils/proxy_logging/test_guardrail_pipeline.py
++++ b/tests/test_litellm/proxy/utils/proxy_logging/test_guardrail_pipeline.py
+@@ -1522,6 +1522,32 @@ def test_streamable_post_call_pipelines_keeps_supported_and_drops_unsupported(
+     assert not any("'governed'" in message for message in _warnings(caplog))
+ 
+ 
++def test_streamable_post_call_pipelines_keeps_legacy_post_call_success_hook(
++    make_user_api_key_auth, monkeypatch
++):
++    class LegacyHookGuardrail(CustomGuardrail):
++        async def async_post_call_success_hook(self, data, user_api_key_dict, response):
++            return None
++
++    class IteratorOnlyGuardrail(CustomGuardrail):
++        async def async_post_call_streaming_iterator_hook(self, user_api_key_dict, response, request_data):
++            async for chunk in response:
++                yield chunk
++
++    legacy = LegacyHookGuardrail(guardrail_name="gr-legacy", event_hook=GuardrailEventHooks.post_call)
++    iterator_only = IteratorOnlyGuardrail(guardrail_name="gr-iterator", event_hook=GuardrailEventHooks.post_call)
++    monkeypatch.setattr(litellm, "callbacks", [legacy, iterator_only])
++    governed = GuardrailPipeline(mode="post_call", steps=[PipelineStep(guardrail="gr-legacy", on_fail="block")])
++    iterator_pipeline = GuardrailPipeline(
++        mode="post_call", steps=[PipelineStep(guardrail="gr-iterator", on_fail="block")]
++    )
++    data = {"metadata": {"_guardrail_pipelines": [("governed", governed), ("iterator-only", iterator_pipeline)]}}
++
++    streamable = _streamable_post_call_pipelines(data, make_user_api_key_auth(request_route="/v1/chat/completions"))
++
++    assert streamable == (("governed", governed),)
++
++
+ def test_streamable_post_call_pipelines_is_empty_on_route_without_translation(
+     make_user_api_key_auth, monkeypatch, caplog
+ ):
+@@ -1594,6 +1620,7 @@ async def test_streaming_iterator_hook_releases_stream_when_pipeline_guardrail_l
+         "callbacks",
+         [NativeOnlyGuardrail(guardrail_name="gr-post", event_hook=GuardrailEventHooks.post_call, default_on=False)],
+     )
++    monkeypatch.setattr("litellm.proxy.proxy_server.llm_router", None, raising=False)
+     data = _post_call_pipeline_data(stream=True)
+     chunks = _stream_chunks()
+     delivered: List[Any] = []
+@@ -1616,8 +1643,15 @@ async def test_streaming_iterator_hook_releases_stream_when_pipeline_guardrail_l
+     assert out.get("stream") is True
+     assert [item is chunk for item, chunk in zip(delivered, chunks)] == [True, True]
+     assert len(delivered) == 2
+-    assert seen.get("count") is None
+-    assert any("'response-governance'" in message and "gr-post" in message for message in _warnings(caplog))
++    if native_lifecycle:
++        # apply_guardrail with native lifecycle hooks has no streaming interface: the
++        # pipeline is skipped and the stream is released unchanged.
++        assert seen.get("count") is None
++        assert any("'response-governance'" in message and "gr-post" in message for message in _warnings(caplog))
++    else:
++        # Its own async_post_call_success_hook makes it a streaming pipeline step.
++        assert seen.get("count") == 1
++        assert not any("'response-governance'" in message for message in _warnings(caplog))
+ 
+ 
+ @pytest.mark.asyncio

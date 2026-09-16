@@ -1,0 +1,86 @@
+[
+  {
+    "id": "realtime-parallel-release",
+    "reason": "Base test module imports a symbol introduced by the merged patch; no failing behavior can be qualified.",
+    "details": [
+      "E   ImportError: cannot import name 'REALTIME_SESSION_SUCCESS_LOGGED_KEY' from 'litellm.constants'"
+    ],
+    "base": {
+      "exit": 4,
+      "tests": 1,
+      "failures": 0,
+      "errors": 1,
+      "skipped": 0
+    },
+    "reference": {
+      "exit": 0,
+      "tests": 6,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    }
+  },
+  {
+    "id": "capability-backfill",
+    "reason": "Base test module imports a symbol introduced by the merged patch; no failing behavior can be qualified.",
+    "details": [
+      "E   ImportError: cannot import name 'match_fill_missing_generalizations' from 'litellm.litellm_core_utils.fallback_generalizations'"
+    ],
+    "base": {
+      "exit": 4,
+      "tests": 1,
+      "failures": 0,
+      "errors": 1,
+      "skipped": 0
+    },
+    "reference": {
+      "exit": 0,
+      "tests": 7,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    }
+  },
+  {
+    "id": "access-log-path-filter",
+    "reason": "Base test module imports a symbol introduced by the merged patch; no failing behavior can be qualified.",
+    "details": [
+      "E   ImportError: cannot import name 'AccessLogPathFilter' from 'litellm._logging'"
+    ],
+    "base": {
+      "exit": 4,
+      "tests": 1,
+      "failures": 0,
+      "errors": 1,
+      "skipped": 0
+    },
+    "reference": {
+      "exit": 0,
+      "tests": 14,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    }
+  },
+  {
+    "id": "openinference-message-budget",
+    "reason": "Base test module imports a symbol introduced by the merged patch; no failing behavior can be qualified.",
+    "details": [
+      "E   ImportError: cannot import name 'MAX_MESSAGE_ATTRS_PER_SPAN' from 'litellm.integrations.otel.mappers.utils'"
+    ],
+    "base": {
+      "exit": 4,
+      "tests": 1,
+      "failures": 0,
+      "errors": 1,
+      "skipped": 0
+    },
+    "reference": {
+      "exit": 0,
+      "tests": 6,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    }
+  }
+]

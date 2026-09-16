@@ -59,6 +59,17 @@ describe('provider protocol', () => {
     expect(JSON.parse(calls.get(1)!)).toEqual({ pattern: '*.ts' });
     expect(chunks.find(c => c.type === 'usage')?.usage).toEqual({ inputTokens: 42, outputTokens: 12, cachedTokens: 8 });
   });
+  it.each([0, 0.0123, undefined, null, -1, '0.0123', 'Infinity'])('preserves valid reported usage cost %s without using streaming headers', async cost => {
+    const base = await mock((_req, res) => {
+      res.writeHead(200, { 'Content-Type': 'text/event-stream', 'x-litellm-response-cost': '0' });
+      res.end(frame(choice({ content: 'done' }, 'stop')) + frame({ choices: [], usage: { prompt_tokens: 42, completion_tokens: 12, cost } }) + 'data: [DONE]\n\n');
+    });
+    const chunks = await collect(provider(base));
+    const report = chunks.find(c => c.type === 'usage')?.usage;
+    expect(report).toMatchObject({ inputTokens: 42, outputTokens: 12 });
+    if (typeof cost === 'number' && cost >= 0) expect(report?.cost).toBe(cost);
+    else expect(report).not.toHaveProperty('cost');
+  });
   it('parses CR/LF split boundaries and multiline SSE data', async () => {
     const bytes = new TextEncoder().encode('event: custom\r\ndata: {"a":\r\ndata: 1}\r\n\r\n');
     const response = new Response(new ReadableStream({ start(controller) { for (const byte of bytes) controller.enqueue(new Uint8Array([byte])); controller.close(); } }));
@@ -257,6 +268,20 @@ describe('provider protocol', () => {
     expect(received.body.system).toEqual([{ type: 'text', text: 'system', cache_control: { type: 'ephemeral' } }]);
     expect(received.body.tools.at(-1).cache_control).toEqual({ type: 'ephemeral' });
     expect(chunks.at(-1)?.usage).toEqual({ inputTokens: 17, outputTokens: 6, cachedTokens: 4 });
+  });
+  it.each([undefined, 0, 0.02])('uses only closing Anthropic usage for reported cost %s', async cost => {
+    const base = await mock((_req, res) => {
+      res.writeHead(200, { 'Content-Type': 'text/event-stream' });
+      res.end([
+        { type: 'message_start', message: { usage: { input_tokens: 10, cost: 0 } } },
+        { type: 'message_delta', delta: { stop_reason: 'end_turn' }, usage: { output_tokens: 6, cost } },
+        { type: 'message_stop' },
+      ].map(frame).join(''));
+    });
+    const chunks = await collect({ ...provider(base), kind: 'anthropic' });
+    expect(chunks.at(-1)?.usage).toMatchObject({ inputTokens: 10, outputTokens: 6 });
+    if (cost === undefined) expect(chunks.at(-1)?.usage).not.toHaveProperty('cost');
+    else expect(chunks.at(-1)?.usage?.cost).toBe(cost);
   });
   it('maps tool messages with image parts into Anthropic tool_result text and image blocks', async () => {
     let received: any;

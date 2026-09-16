@@ -1,0 +1,402 @@
+[
+  {
+    "dataset": "",
+    "base": "9f67a58198ec2b2d992a88812e2fae3c304bfd2e",
+    "reference": "a73e77079818a74d8bb54db591766a71de727301",
+    "id": "converse-config",
+    "valid": true,
+    "snapshotRevision": 2,
+    "testNodesHash": "a3ae9288fdf80ff29c88505943d94ba5fada0130559fc60c448a683007807822",
+    "results": {
+      "base": {
+        "exit": 1,
+        "tests": 2,
+        "failures": 2,
+        "errors": 0,
+        "skipped": 0
+      },
+      "reference": {
+        "exit": 0,
+        "tests": 2,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      }
+    }
+  },
+  {
+    "dataset": "",
+    "base": "0c21b30cb72aab7f56ab88bda47c00243aab1e0c",
+    "reference": "1249f84b10e39f1ad7ddfffb0fe11069abe0d2f1",
+    "id": "vertex-version-path",
+    "valid": true,
+    "snapshotRevision": 2,
+    "testNodesHash": "09781305dda47b8248889faad8540a47afc6b13c68d14237c5f7076b665da3e4",
+    "results": {
+      "base": {
+        "exit": 1,
+        "tests": 6,
+        "failures": 4,
+        "errors": 0,
+        "skipped": 0
+      },
+      "reference": {
+        "exit": 0,
+        "tests": 6,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      }
+    }
+  },
+  {
+    "dataset": "",
+    "base": "336269cfec7be29acc573d561fa8fbfe83e7e345",
+    "reference": "0c127caedb3438ebe7f82d04fc51024d534cce6d",
+    "id": "anthropic-image-guardrail",
+    "valid": true,
+    "snapshotRevision": 2,
+    "testNodesHash": "6c1dc10628cb5187e991c85abfaf45d4c3e9ca1743ee0b147fd64dfe9b76cde9",
+    "results": {
+      "base": {
+        "exit": 1,
+        "tests": 5,
+        "failures": 2,
+        "errors": 0,
+        "skipped": 0
+      },
+      "reference": {
+        "exit": 0,
+        "tests": 5,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      }
+    }
+  },
+  {
+    "dataset": "",
+    "base": "4b281e7892937b9710e5a679d8fa75e8b0d99fac",
+    "reference": "141185268450a248cb5bb251da3ac503273a1648",
+    "id": "anthropic-tool-document",
+    "valid": true,
+    "snapshotRevision": 2,
+    "testNodesHash": "775e9361ea49926830a312f48865a2b16c1fe18154ed30ae1db7c9077dd9129c",
+    "results": {
+      "base": {
+        "exit": 1,
+        "tests": 2,
+        "failures": 2,
+        "errors": 0,
+        "skipped": 0
+      },
+      "reference": {
+        "exit": 0,
+        "tests": 2,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      }
+    }
+  },
+  {
+    "dataset": "",
+    "base": "fc161faa96a27f16d90d1aee6e4fc0574f679dd9",
+    "reference": "8b2983bd909ef408e59072fb77ff87cb0f9865e5",
+    "id": "databricks-reasoning",
+    "valid": true,
+    "snapshotRevision": 2,
+    "testNodesHash": "a861744a11609afd4812d586fd190cea5b73f2554ab9c847b158572532a01233",
+    "results": {
+      "base": {
+        "exit": 1,
+        "tests": 6,
+        "failures": 4,
+        "errors": 0,
+        "skipped": 0
+      },
+      "reference": {
+        "exit": 0,
+        "tests": 6,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      }
+    }
+  },
+  {
+    "dataset": "",
+    "base": "8b2983bd909ef408e59072fb77ff87cb0f9865e5",
+    "reference": "b7dad8b44e30e87e6ae174ea6f58054e17cfc8a5",
+    "id": "empty-choices",
+    "valid": true,
+    "snapshotRevision": 2,
+    "testNodesHash": "260757e3fcb61224cd07da5006da2216b5619cb9cdfa3eec6ce8a846afc97fde",
+    "results": {
+      "base": {
+        "exit": 1,
+        "tests": 13,
+        "failures": 11,
+        "errors": 0,
+        "skipped": 0
+      },
+      "reference": {
+        "exit": 0,
+        "tests": 13,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      }
+    }
+  },
+  {
+    "dataset": "",
+    "base": "11ec6f7a364952252c56ca26c3f79e1b483ad480",
+    "reference": "e907e5ee9b562ab0160eab8cd6245eb4f40c9256",
+    "id": "dashscope-rerank",
+    "valid": true,
+    "snapshotRevision": 2,
+    "testNodesHash": "b6236a7666842392e4bbe85d6816408fd8b6f899924b1d8922691d4588bc20f2",
+    "results": {
+      "base": {
+        "exit": 1,
+        "tests": 10,
+        "failures": 8,
+        "errors": 0,
+        "skipped": 0
+      },
+      "reference": {
+        "exit": 0,
+        "tests": 10,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      }
+    }
+  },
+  {
+    "dataset": "",
+    "base": "b7dad8b44e30e87e6ae174ea6f58054e17cfc8a5",
+    "reference": "2000642592670baf38c46f4c6e3bcb851c59d79e",
+    "id": "router-candidates",
+    "valid": true,
+    "snapshotRevision": 2,
+    "testNodesHash": "2e0840b088379a94908ad3d22e6661ea9cf32b4b83934a80a643ca5b09469bee",
+    "results": {
+      "base": {
+        "exit": 1,
+        "tests": 1,
+        "failures": 1,
+        "errors": 0,
+        "skipped": 0
+      },
+      "reference": {
+        "exit": 0,
+        "tests": 1,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      }
+    }
+  },
+  {
+    "dataset": "",
+    "base": "29fe1e895f8392712d11a296bd51ebbcce826e8d",
+    "reference": "b0071f363f8dd55a3a252e61f51f088ac5bab73c",
+    "id": "router-strategy-isolation",
+    "valid": true,
+    "snapshotRevision": 2,
+    "testNodesHash": "7cec9f2fcb16fdfe39b1b0101dbd6c3a4a538cbb51abe8eda0abe1aabb0afe8d",
+    "results": {
+      "base": {
+        "exit": 1,
+        "tests": 9,
+        "failures": 9,
+        "errors": 0,
+        "skipped": 0
+      },
+      "reference": {
+        "exit": 0,
+        "tests": 9,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      }
+    }
+  },
+  {
+    "dataset": "",
+    "base": "35451ecc7b3a2a9a2309091d397c3d21cd71ca29",
+    "reference": "d963e9fa6e770e359bdf17bbf2c47c729667e1b6",
+    "id": "team-member-budget",
+    "valid": true,
+    "snapshotRevision": 2,
+    "testNodesHash": "28a865eb5abaa8ea349b0af091d3ddd2384073b7ea53eef33d872591f3487c64",
+    "results": {
+      "base": {
+        "exit": 1,
+        "tests": 5,
+        "failures": 3,
+        "errors": 0,
+        "skipped": 0
+      },
+      "reference": {
+        "exit": 0,
+        "tests": 5,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      }
+    }
+  },
+  {
+    "dataset": "training2",
+    "base": "2bf065f97d8b5cbc20fa1d57371b3c320baace38",
+    "reference": "f84034f5007ccf3be7e17a8bed401f12b94f51e8",
+    "id": "mock-input-tokens",
+    "valid": true,
+    "snapshotRevision": 2,
+    "testNodesHash": "f6afdfca6ff9055e0c17985cfc2e838d7ba512381aca630bf63d234dc8bd38f0",
+    "results": {
+      "base": {
+        "exit": 1,
+        "tests": 6,
+        "failures": 5,
+        "errors": 0,
+        "skipped": 0
+      },
+      "reference": {
+        "exit": 0,
+        "tests": 6,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      }
+    }
+  },
+  {
+    "dataset": "training2",
+    "base": "d44e52a3cbfe3bd3c4163602763a4585b9d69d76",
+    "reference": "e11be9de21c0a9934b121fdadbfbc60eebcaea63",
+    "id": "mcp-optional-discovery",
+    "valid": true,
+    "snapshotRevision": 2,
+    "testNodesHash": "1bfd2f991d3f12fa7db7eb23f6687562dbc6a39e8b702bbe9adb15bef692af77",
+    "results": {
+      "base": {
+        "exit": 1,
+        "tests": 29,
+        "failures": 11,
+        "errors": 0,
+        "skipped": 0
+      },
+      "reference": {
+        "exit": 0,
+        "tests": 29,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      }
+    }
+  },
+  {
+    "dataset": "training2",
+    "base": "eb45a088d3d3c255118d0effb41e4613af0907c0",
+    "reference": "fc161faa96a27f16d90d1aee6e4fc0574f679dd9",
+    "id": "langfuse-session-traces",
+    "valid": true,
+    "snapshotRevision": 2,
+    "testNodesHash": "8dc6080819404476013f222a8b89bd662142cfc69ef00625963802178009c8d5",
+    "results": {
+      "base": {
+        "exit": 1,
+        "tests": 60,
+        "failures": 26,
+        "errors": 0,
+        "skipped": 0
+      },
+      "reference": {
+        "exit": 0,
+        "tests": 60,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      }
+    }
+  },
+  {
+    "dataset": "training2",
+    "base": "0e088337a27b86b40d9730f355d2888bf429551d",
+    "reference": "53f3e70f02fabb1b06d5ad694cb788bcc9fd188e",
+    "id": "responses-custom-guardrail",
+    "valid": true,
+    "snapshotRevision": 2,
+    "testNodesHash": "5290741fcb01e915d5bf21b20493dd662bde16f321f136370ba33ab7b4ef5fe4",
+    "results": {
+      "base": {
+        "exit": 1,
+        "tests": 15,
+        "failures": 12,
+        "errors": 0,
+        "skipped": 0
+      },
+      "reference": {
+        "exit": 0,
+        "tests": 15,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      }
+    }
+  },
+  {
+    "dataset": "training2",
+    "base": "17e9b2329e274aa1fd74039ba92b60acb62cd62f",
+    "reference": "d44e52a3cbfe3bd3c4163602763a4585b9d69d76",
+    "id": "mcp-auth-challenge",
+    "valid": true,
+    "snapshotRevision": 2,
+    "testNodesHash": "92473be2a1dc67cc357faef6174a8f3d0ff5181e08875ea27fc6b50c267e018f",
+    "results": {
+      "base": {
+        "exit": 1,
+        "tests": 52,
+        "failures": 49,
+        "errors": 0,
+        "skipped": 0
+      },
+      "reference": {
+        "exit": 0,
+        "tests": 52,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      }
+    }
+  },
+  {
+    "dataset": "training2",
+    "base": "c1a83fc0051f41e59c7a5bf227208d725e566f0b",
+    "reference": "c79c73f8591110b96b893a3a04a4a3c9b7d28270",
+    "id": "bedrock-session-tags",
+    "valid": true,
+    "snapshotRevision": 2,
+    "testNodesHash": "95351cea7986e06e5b8e0f35cfc769f42c0bc96e13903905a14f9b58c5da7f96",
+    "results": {
+      "base": {
+        "exit": 1,
+        "tests": 34,
+        "failures": 33,
+        "errors": 0,
+        "skipped": 0
+      },
+      "reference": {
+        "exit": 0,
+        "tests": 34,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      }
+    }
+  }
+]

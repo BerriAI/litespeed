@@ -1,0 +1,116 @@
+{
+  "createdAt": "2026-09-16T09:33:42.195148+00:00",
+  "protocol": 7,
+  "model": "fireworks_ai/deepseek-v4p1-flash",
+  "control": "control",
+  "repetitions": 2,
+  "globalConcurrency": 3,
+  "timeoutSeconds": 900,
+  "seed": 47160926,
+  "stopNewTrialsAtCommittedUsd": 86,
+  "purpose": "Known-task development test of one test-output-retention instruction, prompted by repeated pytest selections with changing shell filters. Both arms share v45 including final-output bookkeeping. Existing acceptance and normal delivery stay primary; inspect test reruns, tool output volume, elapsed time and token cost without treating the heuristic audit as causal savings. No reserved-task input or outcome is used.",
+  "selectionRule": "Consider only complete task pairs. Do not promote solely for fewer detected filter changes or a raw implementation-coupled score. Preserve semantic/oracle limitations and report any latency or cost tradeoff. If incomplete or inconsistent, keep experimental.",
+  "versions": {
+    "control": {
+      "commit": "3d9836557fc5c796ee0bddce30009ad322cbcc33",
+      "harnessSha256": "289d87fab233f89eb955746378fa0f7e31be06f69acfdcbb50455192742d87bd",
+      "runnerSha256": "2cb8061f9a6a808d4478e3ee2acc495f5c2ad73d3892c3c1b2f046c37ca4e6d7"
+    },
+    "retain-output": {
+      "commit": "4b8173f85aeb0e31416545f403da3853b5ce560a",
+      "harnessSha256": "5bf6ad473b0aee0f7b1b2e9ee46ee711d58ed13f3079a0acd13648d7a72c1c9b",
+      "runnerSha256": "2cb8061f9a6a808d4478e3ee2acc495f5c2ad73d3892c3c1b2f046c37ca4e6d7"
+    }
+  },
+  "patchSha256": "32991c483685e8c0f2d99282fa20758c750b6419c70293da532973e07688e0e7",
+  "runs": [
+    {
+      "dataset": "",
+      "case": "router-strategy-isolation",
+      "name": "retain-output",
+      "kind": "litellm-specific",
+      "label": "replication-v47-output-retain-output-r2",
+      "commit": "4b8173f85aeb0e31416545f403da3853b5ce560a",
+      "effort": "medium"
+    },
+    {
+      "dataset": "training5",
+      "case": "legacy-stream-pipeline",
+      "name": "control",
+      "kind": "litellm-specific",
+      "label": "replication-v47-output-control-r2",
+      "commit": "3d9836557fc5c796ee0bddce30009ad322cbcc33",
+      "effort": "medium",
+      "supplemental": {
+        "artifact": "real-stream-probe.json",
+        "expectedChecks": 24
+      }
+    },
+    {
+      "dataset": "training5",
+      "case": "legacy-stream-pipeline",
+      "name": "control",
+      "kind": "litellm-specific",
+      "label": "replication-v47-output-control-r1",
+      "commit": "3d9836557fc5c796ee0bddce30009ad322cbcc33",
+      "effort": "medium",
+      "supplemental": {
+        "artifact": "real-stream-probe.json",
+        "expectedChecks": 24
+      }
+    },
+    {
+      "dataset": "training5",
+      "case": "legacy-stream-pipeline",
+      "name": "retain-output",
+      "kind": "litellm-specific",
+      "label": "replication-v47-output-retain-output-r2",
+      "commit": "4b8173f85aeb0e31416545f403da3853b5ce560a",
+      "effort": "medium",
+      "supplemental": {
+        "artifact": "real-stream-probe.json",
+        "expectedChecks": 24
+      }
+    },
+    {
+      "dataset": "",
+      "case": "router-strategy-isolation",
+      "name": "control",
+      "kind": "litellm-specific",
+      "label": "replication-v47-output-control-r1",
+      "commit": "3d9836557fc5c796ee0bddce30009ad322cbcc33",
+      "effort": "medium"
+    },
+    {
+      "dataset": "",
+      "case": "router-strategy-isolation",
+      "name": "control",
+      "kind": "litellm-specific",
+      "label": "replication-v47-output-control-r2",
+      "commit": "3d9836557fc5c796ee0bddce30009ad322cbcc33",
+      "effort": "medium"
+    },
+    {
+      "dataset": "training5",
+      "case": "legacy-stream-pipeline",
+      "name": "retain-output",
+      "kind": "litellm-specific",
+      "label": "replication-v47-output-retain-output-r1",
+      "commit": "4b8173f85aeb0e31416545f403da3853b5ce560a",
+      "effort": "medium",
+      "supplemental": {
+        "artifact": "real-stream-probe.json",
+        "expectedChecks": 24
+      }
+    },
+    {
+      "dataset": "",
+      "case": "router-strategy-isolation",
+      "name": "retain-output",
+      "kind": "litellm-specific",
+      "label": "replication-v47-output-retain-output-r1",
+      "commit": "4b8173f85aeb0e31416545f403da3853b5ce560a",
+      "effort": "medium"
+    }
+  ]
+}

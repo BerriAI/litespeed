@@ -1,0 +1,47 @@
+{
+  "rows": [
+    {
+      "case": "no-global-pattern-team-fallback",
+      "patternsType": "list",
+      "candidateIDs": [
+        "team-wild"
+      ],
+      "selected": "team-wild",
+      "claimExpectedIDs": [
+        "team-wild"
+      ],
+      "pass": true
+    },
+    {
+      "case": "none-review-other-team-direct-name",
+      "patternsType": "list",
+      "candidateIDs": [],
+      "selected": "BadRequestError: litellm.BadRequestError: You passed in model=gpt-4o. There are no healthy deployments for this model",
+      "claimExpectedIDs": [
+        "global-wild"
+      ],
+      "pass": false
+    },
+    {
+      "case": "medium-review-named-team-shadows-global",
+      "patternsType": "list",
+      "candidateIDs": [
+        "global-wild",
+        "named-team"
+      ],
+      "selected": "named-team",
+      "claimExpectedIDs": [
+        "named-team"
+      ],
+      "pass": false
+    }
+  ],
+  "passed": false,
+  "imports": {
+    "packageOrigin": "litellm/__init__.py",
+    "allLiteLLMModulesWithinWorkspace": true,
+    "moduleCount": 816
+  },
+  "bytecodePolicy": "fresh cache path; reads from adjacent caches and all writes disabled",
+  "exit": 0
+}

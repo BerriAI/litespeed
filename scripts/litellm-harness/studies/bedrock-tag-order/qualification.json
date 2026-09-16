@@ -1,0 +1,170 @@
+{
+  "scope": "Post-hoc training audit of a prompt/oracle contradiction, not replacement acceptance scoring. pass checks preserved tag values and assumed credentials; sortedByKey is reported separately.",
+  "probeSha256": "d9f74968846aae1d8a6118bb03e1626c720e275b858d6f8827a36b9b250f823c",
+  "run": "replication-v31-jobs-appended-jobs-r2-bedrock-session-tags-780037f9",
+  "rawAcceptance": {
+    "tests": 34,
+    "failures": 10,
+    "passed": false
+  },
+  "completion": {
+    "timedOut": true,
+    "seconds": 901.023
+  },
+  "rows": [
+    {
+      "rows": [
+        {
+          "case": "direct",
+          "pass": false,
+          "errorType": "TypeError",
+          "error": "BaseAWSLLM._auth_with_aws_role() got an unexpected keyword argument 'aws_session_tags'. Did you mean 'aws_session_name'?"
+        },
+        {
+          "case": "external-id",
+          "pass": false,
+          "errorType": "TypeError",
+          "error": "BaseAWSLLM._auth_with_aws_role() got an unexpected keyword argument 'aws_session_tags'. Did you mean 'aws_session_name'?"
+        },
+        {
+          "case": "cross-account",
+          "pass": false,
+          "errorType": "TypeError",
+          "error": "BaseAWSLLM._auth_with_aws_role() got an unexpected keyword argument 'aws_session_tags'. Did you mean 'aws_session_name'?"
+        },
+        {
+          "case": "same-account",
+          "pass": false,
+          "errorType": "TypeError",
+          "error": "BaseAWSLLM._auth_with_aws_role() got an unexpected keyword argument 'aws_session_tags'. Did you mean 'aws_session_name'?"
+        }
+      ],
+      "passed": false,
+      "imports": {
+        "packageOrigin": "litellm/__init__.py",
+        "allLiteLLMModulesWithinWorkspace": true,
+        "moduleCount": 809
+      },
+      "bytecodePolicy": "fresh cache path; reads from adjacent caches and all writes disabled",
+      "name": "base",
+      "revision": "c1a83fc0051f41e59c7a5bf227208d725e566f0b",
+      "exit": 0
+    },
+    {
+      "rows": [
+        {
+          "case": "direct",
+          "pass": true,
+          "tagValuesPreserved": true,
+          "tupleShape": true,
+          "keysInSentOrder": [
+            "team",
+            "env"
+          ],
+          "sortedByKey": false
+        },
+        {
+          "case": "external-id",
+          "pass": true,
+          "tagValuesPreserved": true,
+          "tupleShape": true,
+          "keysInSentOrder": [
+            "team",
+            "env"
+          ],
+          "sortedByKey": false
+        },
+        {
+          "case": "cross-account",
+          "pass": true,
+          "tagValuesPreserved": true,
+          "tupleShape": true,
+          "keysInSentOrder": [
+            "team",
+            "env"
+          ],
+          "sortedByKey": false
+        },
+        {
+          "case": "same-account",
+          "pass": true,
+          "tagValuesPreserved": true,
+          "tupleShape": true,
+          "keysInSentOrder": [
+            "team",
+            "env"
+          ],
+          "sortedByKey": false
+        }
+      ],
+      "passed": true,
+      "imports": {
+        "packageOrigin": "litellm/__init__.py",
+        "allLiteLLMModulesWithinWorkspace": true,
+        "moduleCount": 809
+      },
+      "bytecodePolicy": "fresh cache path; reads from adjacent caches and all writes disabled",
+      "name": "reference",
+      "revision": "c79c73f8591110b96b893a3a04a4a3c9b7d28270",
+      "exit": 0
+    },
+    {
+      "rows": [
+        {
+          "case": "direct",
+          "pass": true,
+          "tagValuesPreserved": true,
+          "tupleShape": true,
+          "keysInSentOrder": [
+            "env",
+            "team"
+          ],
+          "sortedByKey": true
+        },
+        {
+          "case": "external-id",
+          "pass": true,
+          "tagValuesPreserved": true,
+          "tupleShape": true,
+          "keysInSentOrder": [
+            "env",
+            "team"
+          ],
+          "sortedByKey": true
+        },
+        {
+          "case": "cross-account",
+          "pass": true,
+          "tagValuesPreserved": true,
+          "tupleShape": true,
+          "keysInSentOrder": [
+            "env",
+            "team"
+          ],
+          "sortedByKey": true
+        },
+        {
+          "case": "same-account",
+          "pass": true,
+          "tagValuesPreserved": true,
+          "tupleShape": true,
+          "keysInSentOrder": [
+            "env",
+            "team"
+          ],
+          "sortedByKey": true
+        }
+      ],
+      "passed": true,
+      "imports": {
+        "packageOrigin": "litellm/__init__.py",
+        "allLiteLLMModulesWithinWorkspace": true,
+        "moduleCount": 810
+      },
+      "bytecodePolicy": "fresh cache path; reads from adjacent caches and all writes disabled",
+      "name": "candidate",
+      "revision": null,
+      "exit": 0
+    }
+  ]
+}

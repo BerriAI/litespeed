@@ -1,0 +1,317 @@
+diff --git a/litellm/integrations/langfuse/langfuse.py b/litellm/integrations/langfuse/langfuse.py
+index 9576eab..f4dce62 100644
+--- a/litellm/integrations/langfuse/langfuse.py
++++ b/litellm/integrations/langfuse/langfuse.py
+@@ -2,6 +2,7 @@
+ #    On success, logs events to Langfuse
+ import inspect
+ import os
++import re
+ import traceback
+ from collections.abc import Callable, Iterable, Mapping
+ from datetime import datetime
+@@ -57,6 +58,70 @@ _DENIED_STEERING_KEYS: Final = frozenset({"headers", "endpoint", "caching_groups
+ _NO_METADATA: Final[Mapping[str, object]] = MappingProxyType({})
+ _REDACTED_PROXY_HEADERS: Final[frozenset[str]] = frozenset({"authorization", "cookie", "referer"})
+ 
++# Session headers the proxy accepts. When the proxy derives ``litellm_trace_id``
++# from one of these, the id identifies the *session*, not an individual call, so
++# Langfuse must not upsert every call of the session onto one trace.
++_GENERIC_SESSION_ID_HEADER_RE: Final = re.compile(r"^x-.+-session-id$", re.IGNORECASE)
++_BARE_SESSION_ID_HEADER: Final = "x-session-id"
++_EXPLICIT_TRACE_ID_HEADERS: Final = ("x-litellm-trace-id", "langfuse_trace_id")
++# Codex sends its conversation uuid in unprefixed headers (see
++# ``litellm/proxy/litellm_pre_call_utils.py``).
++_CODEX_SESSION_ID_HEADERS: Final = ("session-id", "session_id", "thread-id", "conversation_id")
++_CODEX_CLIENT_PREFIX_RE: Final = re.compile(r"^codex[-_ /]", re.IGNORECASE)
++# Session-id values must be non-empty strings of alphanumerics, hyphens, or underscores.
++_SESSION_ID_VALUE_RE: Final = re.compile(r"^[a-zA-Z0-9_\-]{8,}$")
++
++
++def _is_codex_user_agent(user_agent: object) -> bool:
++    """True when ``user_agent`` belongs to a first-party Codex client."""
++    return isinstance(user_agent, str) and bool(_CODEX_CLIENT_PREFIX_RE.match(user_agent))
++
++
++def _is_session_alias_trace_id(trace_id: object, litellm_params: object) -> bool:
++    """
++    Return True when ``trace_id`` is merely an alias for the request's session.
++
++    The proxy copies a client-supplied session header (``x-litellm-session-id``,
++    a vendor ``x-<vendor>-session-id``, or Codex's unprefixed session headers)
++    into ``litellm_trace_id``. Logging that value as the Langfuse trace id would
++    upsert every call in the session onto a single trace, so callers must split
++    per call instead.
++
++    A trace id is only treated as an alias when a recognised session header
++    carries *exactly* that value. An explicit trace id (``x-litellm-trace-id`` /
++    ``langfuse_trace_id``) always wins and is never rewritten.
++    """
++    if not isinstance(trace_id, str) or not trace_id:
++        return False
++    if not isinstance(litellm_params, dict):
++        return False
++    proxy_server_request = litellm_params.get("proxy_server_request")
++    if not isinstance(proxy_server_request, dict):
++        return False
++    headers = proxy_server_request.get("headers")
++    if not isinstance(headers, dict):
++        return False
++
++    normalized: Final = {
++        key.lower(): value for key, value in headers.items() if isinstance(key, str)
++    }
++    if any(header in normalized for header in _EXPLICIT_TRACE_ID_HEADERS):
++        return False
++
++    is_codex: Final = _is_codex_user_agent(normalized.get("user-agent"))
++    for header_name, value in normalized.items():
++        if value != trace_id:
++            continue
++        if header_name == "x-litellm-session-id":
++            return True
++        if not _SESSION_ID_VALUE_RE.match(value):
++            continue
++        if header_name == _BARE_SESSION_ID_HEADER or _GENERIC_SESSION_ID_HEADER_RE.match(header_name):
++            return True
++        if is_codex and header_name in _CODEX_SESSION_ID_HEADERS:
++            return True
++    return False
++
+ 
+ def _object_mapping(value: object) -> Mapping[str, object] | None:
+     """Return ``value`` as an opaque mapping when it is a dict."""
+@@ -609,6 +674,11 @@ class LangFuseLogger:
+             # This allows continuing an existing trace while still returning the correct trace_id
+             if existing_trace_id is not None:
+                 trace_id = existing_trace_id
++            elif litellm_call_id and _is_session_alias_trace_id(trace_id, litellm_params):
++                # The resolved trace id is only a session header alias, so it
++                # would upsert every call of the session onto one Langfuse
++                # trace. Use the per-call id so each call gets its own trace.
++                trace_id = litellm_call_id
+             requested_trace_keys: Final = _as_steering_key_sequence(clean_metadata.pop("update_trace_keys", ()))
+             update_trace_keys: Final = (
+                 requested_trace_keys if _as_steering_flag(litellm.langfuse_enable_update_trace_keys) else ()
+diff --git a/tests/test_litellm/integrations/test_langfuse.py b/tests/test_litellm/integrations/test_langfuse.py
+index d36878e..0073aa9 100644
+--- a/tests/test_litellm/integrations/test_langfuse.py
++++ b/tests/test_litellm/integrations/test_langfuse.py
+@@ -499,6 +499,217 @@ class TestLangfuseUsageDetails(unittest.TestCase):
+         # litellm_trace_id should be preferred over litellm_call_id
+         assert self.last_trace_kwargs.get("id") == "trace-id-from-kwargs"
+ 
++    def _log_v2(self, *, litellm_trace_id, litellm_params, litellm_call_id, metadata=None):
++        """Run ``_log_langfuse_v2`` with the given ids and return the trace id it used."""
++        payload = self._build_standard_logging_payload()
++        kwargs = self._build_langfuse_kwargs(payload)
++        if litellm_trace_id is not None:
++            kwargs["litellm_trace_id"] = litellm_trace_id
++        self.last_trace_kwargs = {}
++
++        with patch(
++            "litellm.integrations.langfuse.langfuse._add_prompt_to_generation_params",
++            side_effect=lambda generation_params, **kwargs: generation_params,
++            create=True,
++        ):
++            trace_id, _ = self.logger._log_langfuse_v2(
++                user_id="user-1",
++                metadata=metadata or {},
++                litellm_params=litellm_params,
++                output=None,
++                start_time=datetime.datetime.utcnow(),
++                end_time=datetime.datetime.utcnow(),
++                kwargs=kwargs,
++                optional_params={},
++                input=None,
++                response_obj=None,
++                level="DEFAULT",
++                litellm_call_id=litellm_call_id,
++            )
++        return trace_id
++
++    @staticmethod
++    def _litellm_params_with_headers(headers):
++        return {"metadata": {}, "proxy_server_request": {"headers": headers}}
++
++    def test_session_alias_trace_id_is_split_per_call(self):
++        """A trace id that is only an ``x-litellm-session-id`` alias must be
++        replaced by the per-call id so each call lands on its own trace."""
++        session_id = "session-alias-1234"
++        params = self._litellm_params_with_headers({"x-litellm-session-id": session_id})
++
++        trace_id = self._log_v2(
++            litellm_trace_id=session_id,
++            litellm_params=params,
++            litellm_call_id="call-id-1",
++        )
++
++        assert trace_id == "call-id-1"
++        assert self.last_trace_kwargs.get("id") == "call-id-1"
++
++    def test_session_alias_split_for_default_and_error_levels(self):
++        session_id = "session-alias-1234"
++        params = self._litellm_params_with_headers({"x-litellm-session-id": session_id})
++        payload = self._build_standard_logging_payload()
++        kwargs = self._build_langfuse_kwargs(payload)
++        kwargs["litellm_trace_id"] = session_id
++
++        for level in ("DEFAULT", "ERROR"):
++            self.last_trace_kwargs = {}
++            with patch(
++                "litellm.integrations.langfuse.langfuse._add_prompt_to_generation_params",
++                side_effect=lambda generation_params, **kwargs: generation_params,
++                create=True,
++            ):
++                trace_id, _ = self.logger._log_langfuse_v2(
++                    user_id="user-1",
++                    metadata={},
++                    litellm_params=params,
++                    output=None,
++                    start_time=datetime.datetime.utcnow(),
++                    end_time=datetime.datetime.utcnow(),
++                    kwargs=kwargs,
++                    optional_params={},
++                    input=None,
++                    response_obj=None,
++                    level=level,
++                    litellm_call_id="call-id-1",
++                )
++            assert trace_id == "call-id-1"
++            assert self.last_trace_kwargs.get("id") == "call-id-1"
++
++    def test_vendor_session_alias_is_split_per_call(self):
++        session_id = "e96634a3-fa28-4083-b354-55542e2dca01"
++        params = self._litellm_params_with_headers({"X-Claude-Code-Session-Id": session_id})
++
++        trace_id = self._log_v2(
++            litellm_trace_id=session_id,
++            litellm_params=params,
++            litellm_call_id="call-id-2",
++        )
++
++        assert trace_id == "call-id-2"
++        assert self.last_trace_kwargs.get("id") == "call-id-2"
++
++    def test_bare_session_alias_is_split_per_call(self):
++        session_id = "opencode-session-1"
++        params = self._litellm_params_with_headers({"X-Session-Id": session_id})
++
++        trace_id = self._log_v2(
++            litellm_trace_id=session_id,
++            litellm_params=params,
++            litellm_call_id="call-id-3",
++        )
++
++        assert trace_id == "call-id-3"
++
++    def test_codex_session_alias_is_split_only_for_codex_user_agent(self):
++        session_id = "codex-thread-12345"
++        headers = {"session-id": session_id, "user-agent": "codex_cli_rs/0.1.0"}
++        params = self._litellm_params_with_headers(headers)
++
++        trace_id = self._log_v2(
++            litellm_trace_id=session_id,
++            litellm_params=params,
++            litellm_call_id="call-id-4",
++        )
++        assert trace_id == "call-id-4"
++
++        non_codex_params = self._litellm_params_with_headers(
++            {"session-id": session_id, "user-agent": "curl/8.0"}
++        )
++        trace_id = self._log_v2(
++            litellm_trace_id=session_id,
++            litellm_params=non_codex_params,
++            litellm_call_id="call-id-5",
++        )
++        assert trace_id == session_id
++
++    def test_short_vendor_session_alias_value_is_kept(self):
++        """The vendor ``x-<vendor>-session-id`` rule requires an 8+ char value."""
++        session_id = "short"
++        params = self._litellm_params_with_headers({"x-claude-code-session-id": session_id})
++
++        trace_id = self._log_v2(
++            litellm_trace_id=session_id,
++            litellm_params=params,
++            litellm_call_id="call-id-6",
++        )
++
++        assert trace_id == session_id
++
++    def test_explicit_trace_id_header_wins_over_session_alias(self):
++        session_id = "session-alias-1234"
++        params = self._litellm_params_with_headers(
++            {"x-litellm-session-id": session_id, "x-litellm-trace-id": session_id}
++        )
++
++        trace_id = self._log_v2(
++            litellm_trace_id=session_id,
++            litellm_params=params,
++            litellm_call_id="call-id-7",
++        )
++
++        assert trace_id == session_id
++
++    def test_langfuse_trace_id_header_wins_over_session_alias(self):
++        session_id = "session-alias-1234"
++        params = self._litellm_params_with_headers(
++            {"x-litellm-session-id": session_id, "langfuse_trace_id": session_id}
++        )
++
++        trace_id = self._log_v2(
++            litellm_trace_id=session_id,
++            litellm_params=params,
++            litellm_call_id="call-id-8",
++        )
++
++        assert trace_id == session_id
++
++    def test_explicit_existing_trace_id_wins_over_session_alias(self):
++        session_id = "session-alias-1234"
++        params = self._litellm_params_with_headers({"x-litellm-session-id": session_id})
++
++        trace_id = self._log_v2(
++            litellm_trace_id=session_id,
++            litellm_params=params,
++            litellm_call_id="call-id-9",
++            metadata={"existing_trace_id": "existing-trace-id"},
++        )
++
++        assert trace_id == "existing-trace-id"
++        assert self.last_trace_kwargs.get("id") == "existing-trace-id"
++
++    def test_missing_call_id_keeps_session_alias(self):
++        session_id = "session-alias-1234"
++        params = self._litellm_params_with_headers({"x-litellm-session-id": session_id})
++
++        trace_id = self._log_v2(
++            litellm_trace_id=session_id,
++            litellm_params=params,
++            litellm_call_id=None,
++        )
++
++        assert trace_id == session_id
++
++    def test_no_proxy_headers_keeps_trace_id(self):
++        trace_id = self._log_v2(
++            litellm_trace_id="trace-id-from-kwargs",
++            litellm_params={"metadata": {}},
++            litellm_call_id="call-id-10",
++        )
++
++        assert trace_id == "trace-id-from-kwargs"
++
++    def test_null_proxy_headers_keeps_trace_id(self):
++        trace_id = self._log_v2(
++            litellm_trace_id="session-alias-1234",
++            litellm_params={"metadata": {}, "proxy_server_request": {"headers": None}},
++            litellm_call_id="call-id-11",
++        )
++
++        assert trace_id == "session-alias-1234"
++
+     CANARY = "sk-lf-canary-SECRET-d4e5f6"
+ 
+     def _canary_request_metadata(self):

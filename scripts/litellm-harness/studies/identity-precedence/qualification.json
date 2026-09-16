@@ -1,0 +1,224 @@
+{
+  "baseCommit": "eb45a088d3d3c255118d0effb41e4613af0907c0",
+  "referenceCommit": "fc161faa96a27f16d90d1aee6e4fc0574f679dd9",
+  "probeSha256": "6f58c21b25fc8e87e49ad488d6093a4ee1296b9b6d1802b56920ffcf746cd019",
+  "oldReferenceDirectoryHasPackage": false,
+  "oldReferenceImportWasLiveCheckout": true,
+  "results": {
+    "base": {
+      "exit": 0,
+      "rows": [
+        {
+          "level": "DEFAULT",
+          "session": "trace-alpha",
+          "headers": {},
+          "expected": "call-unique",
+          "used": "trace-alpha",
+          "returned": "trace-alpha",
+          "pass": false
+        },
+        {
+          "level": "DEFAULT",
+          "session": "session-beta",
+          "headers": {},
+          "expected": "trace-alpha",
+          "used": "trace-alpha",
+          "returned": "trace-alpha",
+          "pass": true
+        },
+        {
+          "level": "DEFAULT",
+          "session": "session-beta",
+          "headers": {
+            "langfuse_session_id": "session-beta"
+          },
+          "expected": "call-unique",
+          "used": "trace-alpha",
+          "returned": "trace-alpha",
+          "pass": false
+        },
+        {
+          "level": "ERROR",
+          "session": "trace-alpha",
+          "headers": {},
+          "expected": "call-unique",
+          "used": "trace-alpha",
+          "returned": "trace-alpha",
+          "pass": false
+        },
+        {
+          "level": "ERROR",
+          "session": "session-beta",
+          "headers": {},
+          "expected": "trace-alpha",
+          "used": "trace-alpha",
+          "returned": "trace-alpha",
+          "pass": true
+        },
+        {
+          "level": "ERROR",
+          "session": "session-beta",
+          "headers": {
+            "langfuse_session_id": "session-beta"
+          },
+          "expected": "call-unique",
+          "used": "trace-alpha",
+          "returned": "trace-alpha",
+          "pass": false
+        }
+      ],
+      "imports": {
+        "packageOrigin": "litellm/__init__.py",
+        "allLiteLLMModulesWithinWorkspace": true,
+        "moduleCount": 809
+      },
+      "sourceHashes": {
+        "litellm/integrations/langfuse/langfuse.py": "fb18232fee2bc9f4c549b8af025d1f24b5e6061eeffaa8823222db3af61069e5"
+      }
+    },
+    "reference": {
+      "exit": 0,
+      "rows": [
+        {
+          "level": "DEFAULT",
+          "session": "trace-alpha",
+          "headers": {},
+          "expected": "call-unique",
+          "used": "call-unique",
+          "returned": "call-unique",
+          "pass": true
+        },
+        {
+          "level": "DEFAULT",
+          "session": "session-beta",
+          "headers": {},
+          "expected": "trace-alpha",
+          "used": "trace-alpha",
+          "returned": "trace-alpha",
+          "pass": true
+        },
+        {
+          "level": "DEFAULT",
+          "session": "session-beta",
+          "headers": {
+            "langfuse_session_id": "session-beta"
+          },
+          "expected": "call-unique",
+          "used": "call-unique",
+          "returned": "call-unique",
+          "pass": true
+        },
+        {
+          "level": "ERROR",
+          "session": "trace-alpha",
+          "headers": {},
+          "expected": "call-unique",
+          "used": "call-unique",
+          "returned": "call-unique",
+          "pass": true
+        },
+        {
+          "level": "ERROR",
+          "session": "session-beta",
+          "headers": {},
+          "expected": "trace-alpha",
+          "used": "trace-alpha",
+          "returned": "trace-alpha",
+          "pass": true
+        },
+        {
+          "level": "ERROR",
+          "session": "session-beta",
+          "headers": {
+            "langfuse_session_id": "session-beta"
+          },
+          "expected": "call-unique",
+          "used": "call-unique",
+          "returned": "call-unique",
+          "pass": true
+        }
+      ],
+      "imports": {
+        "packageOrigin": "litellm/__init__.py",
+        "allLiteLLMModulesWithinWorkspace": true,
+        "moduleCount": 809
+      },
+      "sourceHashes": {
+        "litellm/integrations/langfuse/langfuse.py": "68d1035c9ab5270c5552534b74db0c539c4d9b6388f769b89ba2cccee4848a89"
+      }
+    },
+    "candidate": {
+      "exit": 0,
+      "rows": [
+        {
+          "level": "DEFAULT",
+          "session": "trace-alpha",
+          "headers": {},
+          "expected": "call-unique",
+          "used": "call-unique",
+          "returned": "call-unique",
+          "pass": true
+        },
+        {
+          "level": "DEFAULT",
+          "session": "session-beta",
+          "headers": {},
+          "expected": "trace-alpha",
+          "used": "call-unique",
+          "returned": "call-unique",
+          "pass": false
+        },
+        {
+          "level": "DEFAULT",
+          "session": "session-beta",
+          "headers": {
+            "langfuse_session_id": "session-beta"
+          },
+          "expected": "call-unique",
+          "used": "call-unique",
+          "returned": "call-unique",
+          "pass": true
+        },
+        {
+          "level": "ERROR",
+          "session": "trace-alpha",
+          "headers": {},
+          "expected": "call-unique",
+          "used": "call-unique",
+          "returned": "call-unique",
+          "pass": true
+        },
+        {
+          "level": "ERROR",
+          "session": "session-beta",
+          "headers": {},
+          "expected": "trace-alpha",
+          "used": "call-unique",
+          "returned": "call-unique",
+          "pass": false
+        },
+        {
+          "level": "ERROR",
+          "session": "session-beta",
+          "headers": {
+            "langfuse_session_id": "session-beta"
+          },
+          "expected": "call-unique",
+          "used": "call-unique",
+          "returned": "call-unique",
+          "pass": true
+        }
+      ],
+      "imports": {
+        "packageOrigin": "litellm/__init__.py",
+        "allLiteLLMModulesWithinWorkspace": true,
+        "moduleCount": 809
+      }
+    }
+  },
+  "candidateRun": "replication-p6-ablation-control-r1-langfuse-session-traces-434c82c9",
+  "qualificationStatus": "Requalified on fresh archives of exact commits; replaces v1 reference attribution. Behavioral outcomes unchanged.",
+  "provenanceCorrection": "The former reference directory contained only tests and importing from it resolves to the live editable checkout. The earlier reference result is not evidence about the recorded commit. This rerun verifies package and all loaded LiteLLM module paths; bytecode reads/writes cannot use adjacent caches.",
+  "method": "Fresh git archives of recorded commits; candidate workspaces unchanged; bytecode reads redirected to an empty private path and writes disabled; all loaded LiteLLM modules asserted inside selected snapshot.",
+  "timestamp": "2026-09-16T02:54:18.352082+00:00"
+}

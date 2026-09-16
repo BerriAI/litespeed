@@ -1,0 +1,202 @@
+{
+  "run": "replication-v50-larger-flash-r1-realtime-cached-audio-cost-f4875007",
+  "scope": "Posthoc audit of the final saved visible tool transcript. No hidden Codex reasoning inspected. Tool sequence is one-based unique call order; existing scores unchanged. Recorded command summaries are not independent coverage or correctness guarantees.",
+  "totalToolCalls": 163,
+  "completionSeconds": 1017.864,
+  "priceUsd": 0.187538058,
+  "timeToFirstEditSeconds": 176.464,
+  "modelSeconds": 573.068,
+  "toolActiveSeconds": 386.796,
+  "actionUsage": {
+    "classificationVersion": 2,
+    "basis": "complete assistant request grouped by chosen next action; not tool marginal cost. shell-mentions-checks matches known checker words in a recorded command without inferring passing checks or adequate coverage.",
+    "pricing": {
+      "inputPerMillionUsd": 0.22,
+      "cachedPerMillionUsd": 0.007,
+      "outputPerMillionUsd": 0.66
+    },
+    "groups": {
+      "navigation": {
+        "requests": 38,
+        "inputTokens": 2559930,
+        "cachedTokens": 2483072,
+        "outputTokens": 13597,
+        "estimatedUsd": 0.04326428400000001,
+        "cacheUnreportedRequests": 0,
+        "reportedModelSeconds": 125.84500000000003,
+        "durationUnreportedRequests": 0
+      },
+      "mixed-tools": {
+        "requests": 2,
+        "inputTokens": 94702,
+        "cachedTokens": 89568,
+        "outputTokens": 922,
+        "estimatedUsd": 0.0023649760000000004,
+        "cacheUnreportedRequests": 0,
+        "reportedModelSeconds": 7.5969999999999995,
+        "durationUnreportedRequests": 0
+      },
+      "shell-command": {
+        "requests": 48,
+        "inputTokens": 5585233,
+        "cachedTokens": 5531390,
+        "outputTokens": 19177,
+        "estimatedUsd": 0.06322201000000001,
+        "cacheUnreportedRequests": 0,
+        "reportedModelSeconds": 194.938,
+        "durationUnreportedRequests": 0
+      },
+      "structured-edit": {
+        "requests": 26,
+        "inputTokens": 2870684,
+        "cachedTokens": 2845954,
+        "outputTokens": 18302,
+        "estimatedUsd": 0.03744159800000001,
+        "cacheUnreportedRequests": 0,
+        "reportedModelSeconds": 131.00599999999997,
+        "durationUnreportedRequests": 0
+      },
+      "shell-mentions-checks": {
+        "requests": 21,
+        "inputTokens": 3002972,
+        "cachedTokens": 2980110,
+        "outputTokens": 9370,
+        "estimatedUsd": 0.03207461,
+        "cacheUnreportedRequests": 0,
+        "reportedModelSeconds": 85.10800000000002,
+        "durationUnreportedRequests": 0
+      },
+      "job-poll-or-wait": {
+        "requests": 4,
+        "inputTokens": 594366,
+        "cachedTokens": 591904,
+        "outputTokens": 248,
+        "estimatedUsd": 0.0048486480000000005,
+        "cacheUnreportedRequests": 0,
+        "reportedModelSeconds": 7.372999999999999,
+        "durationUnreportedRequests": 0
+      },
+      "text-only": {
+        "requests": 2,
+        "inputTokens": 335712,
+        "cachedTokens": 333776,
+        "outputTokens": 2363,
+        "estimatedUsd": 0.004321932,
+        "cacheUnreportedRequests": 0,
+        "reportedModelSeconds": 21.201,
+        "durationUnreportedRequests": 0
+      }
+    },
+    "assistantMessagesWithoutValidUsage": 0,
+    "breakdownRecordsWithoutValidUsage": 0,
+    "reconciliation": {
+      "inputTokens": {
+        "recorded": 15043599,
+        "attributed": 15043599,
+        "difference": 0
+      },
+      "cachedTokens": {
+        "recorded": 14855774,
+        "attributed": 14855774,
+        "difference": 0
+      },
+      "outputTokens": {
+        "recorded": 63979,
+        "attributed": 63979,
+        "difference": 0
+      },
+      "estimatedUsd": {
+        "recorded": 0.187538058,
+        "attributed": 0.18753805800000004,
+        "difference": -2.7755575615628914e-17
+      }
+    }
+  },
+  "observations": [
+    {
+      "oneBasedToolSequence": 65,
+      "tool": "bash",
+      "status": "completed",
+      "interpretation": "Structured price-map edit rejected by the 2 MiB limit; host correction is version 52.",
+      "observedSummary": []
+    },
+    {
+      "oneBasedToolSequence": 107,
+      "tool": "bash",
+      "status": "completed",
+      "interpretation": "A broader test selection reports 13 passed / 8 setup errors under --noconftest; enabling the ordinary fixture path at 109 reports 8 passed.",
+      "observedSummary": [
+        "13 passed, 1 warning, 8 errors in 2.08s"
+      ]
+    },
+    {
+      "oneBasedToolSequence": 110,
+      "tool": "bash",
+      "status": "completed",
+      "interpretation": "Broader cost tests report78failed/371passed. This is not evidence those checks were waste.",
+      "observedSummary": [
+        "78 failed, 371 passed, 1 warning in 6.35s"
+      ]
+    },
+    {
+      "oneBasedToolSequence": 111,
+      "tool": "bash",
+      "status": "completed",
+      "interpretation": "Focused failure identifies KeyError for cached_tokens_details in the candidate implementation.",
+      "observedSummary": [
+        "E       KeyError: 'cached_tokens_details'",
+        "1 failed, 1 warning in 0.45s"
+      ]
+    },
+    {
+      "oneBasedToolSequence": 113,
+      "tool": "edit_file",
+      "status": "completed",
+      "interpretation": "Candidate changes optional dictionary access to get() at both affected cost paths.",
+      "observedSummary": []
+    },
+    {
+      "oneBasedToolSequence": 114,
+      "tool": "bash",
+      "status": "completed",
+      "interpretation": "Same broader selection now reports 448 passed / 1 failed; remaining failure constructs BilledTokenRates without the newly added field.",
+      "observedSummary": [
+        "E       TypeError: BilledTokenRates.__init__() missing 1 required positional argument: 'cache_read_input_audio_token_cost'",
+        "1 failed, 448 passed, 1 warning in 3.89s"
+      ]
+    },
+    {
+      "oneBasedToolSequence": 118,
+      "tool": "edit_file",
+      "status": "completed",
+      "interpretation": "Candidate updates that expected rate object with the new audio-rate field.",
+      "observedSummary": []
+    },
+    {
+      "oneBasedToolSequence": 119,
+      "tool": "bash",
+      "status": "completed",
+      "interpretation": "Same broader selection now reports 449 passed.",
+      "observedSummary": [
+        "449 passed, 1 warning in 3.75s"
+      ]
+    },
+    {
+      "oneBasedToolSequence": 147,
+      "tool": "edit_file",
+      "status": "completed",
+      "interpretation": "Late inspection adds the audio-rate field to registration inheritance and model-info projection.",
+      "observedSummary": []
+    },
+    {
+      "oneBasedToolSequence": 151,
+      "tool": "bash",
+      "status": "completed",
+      "interpretation": "Recorded combined check reports 668 passed; candidate tests were modified, and this is not an independent host acceptance verdict.",
+      "observedSummary": [
+        "668 passed, 427 warnings in 43.14s"
+      ]
+    }
+  ],
+  "lesson": "Do not suppress broader checks solely to reduce call count. Here they exposed an actual candidate compatibility problem. Model-request categories identify investigation targets, not automatically wasted cost."
+}

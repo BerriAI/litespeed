@@ -1,0 +1,21 @@
+{
+  "id": "responses-custom-guardrail",
+  "base": "0e088337a27b86b40d9730f355d2888bf429551d",
+  "reference": "53f3e70f02fabb1b06d5ad694cb788bcc9fd188e",
+  "input_provenance": "Retrospective requirements curated from the public change and acceptance behavior, not an original pre-merge issue. The same requirements go to every solver; reference code and tests are withheld.",
+  "test_nodes": [
+    "tests/test_litellm/llms/openai/responses/test_openai_responses_guardrail_handler.py::TestOpenAIResponsesHandlerToolCallExtraction::test_extract_tool_call_from_function_call_output",
+    "tests/test_litellm/llms/openai/responses/test_openai_responses_guardrail_handler.py::TestOpenAIResponsesHandlerToolCallExtraction::test_extract_custom_tool_call_input_as_arguments",
+    "tests/test_litellm/llms/openai/responses/test_openai_responses_guardrail_handler.py::TestOpenAIResponsesHandlerToolCallExtraction::test_process_output_response_writes_tool_call_rewrites_back",
+    "tests/test_litellm/llms/openai/responses/test_openai_responses_guardrail_handler.py::TestOpenAIResponsesHandlerToolCallExtraction::test_process_output_response_ignores_tool_call_rewrites_in_another_shape",
+    "tests/test_litellm/llms/openai/responses/test_openai_responses_guardrail_handler.py::TestOpenAIResponsesHandlerToolCallExtraction::test_process_output_response_warns_when_guardrail_drops_tool_calls",
+    "tests/test_litellm/llms/openai/responses/test_openai_responses_guardrail_handler.py::TestOpenAIResponsesHandlerToolCallExtraction::test_process_output_response_keeps_a_nameless_custom_tool_call_nameless",
+    "tests/test_litellm/llms/openai/responses/test_openai_responses_guardrail_handler.py::TestOpenAIResponsesHandlerStreamingOutputProcessing::test_deliver_ended_stream_rewrites_syncs_custom_tool_call_events",
+    "tests/test_litellm/llms/openai/responses/test_openai_responses_guardrail_handler.py::TestOpenAIResponsesHandlerStreamingOutputProcessing::test_deliver_ended_stream_rewrites_keep_a_nameless_custom_tool_call_nameless",
+    "tests/test_litellm/llms/openai/responses/test_openai_responses_guardrail_handler.py::TestOpenAIResponsesHandlerStreamingOutputProcessing::test_deliver_ended_stream_rewrites_syncs_typed_custom_tool_call_events",
+    "tests/test_litellm/llms/openai/responses/test_openai_responses_guardrail_handler.py::TestOpenAIResponsesHandlerStreamingOutputProcessing::test_deliver_ended_stream_custom_tool_call_rewrite_without_matching_events_fails_closed",
+    "tests/test_litellm/llms/openai/responses/test_openai_responses_guardrail_handler.py::TestOpenAIResponsesHandlerStreamingScanKey::test_completed_event_with_a_custom_tool_call_changes_the_key",
+    "tests/test_litellm/llms/openai/responses/test_openai_responses_guardrail_handler.py::TestOpenAIResponsesHandlerStreamingScanKey::test_completed_event_reads_every_output_text_part"
+  ],
+  "oracle_note": "Tests import pre-existing (not new) private surfaces: OpenAIResponsesHandler._extract_output_text_and_images, get_streaming_scan_key, process_output_response, process_output_streaming_response; none calls a newly introduced helper, so no test is excluded on that ground. The parent snapshot must already provide CustomToolCallOutputItem, ResponseCustomToolCall, ResponseCustomToolCallInput{Delta,Done}Event, OutputItem{Added,Done}Event and ResponseCompletedEvent, and the renamed helper tool_call_dict_from_output_item must be importable from litellm.completion_extras.litellm_responses_transformation.transformation. The exact warning substring is asserted by one test, so it is a required diagnostic, not merely stylistic."
+}

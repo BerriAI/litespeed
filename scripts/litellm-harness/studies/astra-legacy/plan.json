@@ -1,0 +1,38 @@
+{
+  "createdAt": "2026-09-16T07:58:32.973721+00:00",
+  "protocol": 6,
+  "model": "gpt-6-astra",
+  "control": "astra",
+  "repetitions": 2,
+  "globalConcurrency": 3,
+  "timeoutSeconds": 900,
+  "purpose": "Diagnostic on a known difficult training task after inspecting Flash failures. Two Codex/Astra attempts with the same isolated snapshot and real endpoint probe. Not reserved evaluation, not randomized concurrent paired latency comparison, and Astra account dollar charges are unavailable. No future outcomes are opened.",
+  "supplemental": {
+    "artifact": "real-stream-probe.json",
+    "expectedChecks": 24
+  },
+  "supplementalSource": {
+    "path": "scripts/litellm-harness/studies/feature-effort/legacy-inheritance/real_stream_probe.py",
+    "sha256": "cefbc0b3d63bc05414f20b3357dc06a26e4b6eb30808f8636a820f46d3a86f7b"
+  },
+  "runs": [
+    {
+      "dataset": "training5",
+      "case": "legacy-stream-pipeline",
+      "name": "astra",
+      "kind": "codex",
+      "label": "replication-v41-astra-legacy-r1",
+      "commit": "05f3011b4c5000d1fbb384a2d237856d2120c72c",
+      "effort": "high"
+    },
+    {
+      "dataset": "training5",
+      "case": "legacy-stream-pipeline",
+      "name": "astra",
+      "kind": "codex",
+      "label": "replication-v41-astra-legacy-r2",
+      "commit": "05f3011b4c5000d1fbb384a2d237856d2120c72c",
+      "effort": "high"
+    }
+  ]
+}

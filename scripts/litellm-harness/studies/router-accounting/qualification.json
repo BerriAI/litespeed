@@ -1,0 +1,323 @@
+{
+  "scope": "Post-hoc training diagnostic. Original nine-check acceptance and completion statuses are unchanged. No new private helper names are called.",
+  "probeSha256": "9f543d53b5904998f29c712a4231d647b5572650bd34269e7726851060854c9c",
+  "rows": [
+    {
+      "rows": [
+        {
+          "case": "sync-group-override",
+          "pass": false,
+          "errorType": "AssertionError",
+          "error": "Override selector leaked into callbacks"
+        },
+        {
+          "case": "async-group-override",
+          "pass": false,
+          "errorType": "AssertionError",
+          "error": "Override selector leaked into callbacks"
+        },
+        {
+          "case": "sync-deployment-override",
+          "pass": false,
+          "errorType": "AssertionError",
+          "error": "Expected 1 pre-call checks; observed {'sync': 0, 'async': 0}"
+        },
+        {
+          "case": "async-deployment-override",
+          "pass": false,
+          "errorType": "AssertionError",
+          "error": "Override selector leaked into callbacks"
+        },
+        {
+          "case": "sync-default-accounting",
+          "pass": true,
+          "preCallCounts": {
+            "sync": 2,
+            "async": 0
+          }
+        },
+        {
+          "case": "async-default-accounting",
+          "pass": true,
+          "preCallCounts": {
+            "sync": 0,
+            "async": 2
+          }
+        },
+        {
+          "case": "sync-pass-through-override",
+          "pass": false,
+          "errorType": "AssertionError",
+          "error": "Expected 1 pre-call checks; observed {'sync': 0, 'async': 0}"
+        },
+        {
+          "case": "async-pass-through-override",
+          "pass": false,
+          "errorType": "AssertionError",
+          "error": "Expected 1 pre-call checks; observed {'sync': 0, 'async': 0}"
+        }
+      ],
+      "passed": false,
+      "imports": {
+        "packageOrigin": "litellm/__init__.py",
+        "allLiteLLMModulesWithinWorkspace": true,
+        "moduleCount": 926
+      },
+      "bytecodePolicy": "fresh cache path; reads from adjacent caches and all writes disabled",
+      "name": "base",
+      "exit": 0,
+      "revision": "29fe1e895f8392712d11a296bd51ebbcce826e8d"
+    },
+    {
+      "rows": [
+        {
+          "case": "sync-group-override",
+          "pass": true,
+          "preCallCounts": {
+            "sync": 2,
+            "async": 0
+          }
+        },
+        {
+          "case": "async-group-override",
+          "pass": true,
+          "preCallCounts": {
+            "sync": 0,
+            "async": 2
+          }
+        },
+        {
+          "case": "sync-deployment-override",
+          "pass": true,
+          "preCallCounts": {
+            "sync": 2,
+            "async": 0
+          }
+        },
+        {
+          "case": "async-deployment-override",
+          "pass": true,
+          "preCallCounts": {
+            "sync": 0,
+            "async": 2
+          }
+        },
+        {
+          "case": "sync-default-accounting",
+          "pass": true,
+          "preCallCounts": {
+            "sync": 2,
+            "async": 0
+          }
+        },
+        {
+          "case": "async-default-accounting",
+          "pass": true,
+          "preCallCounts": {
+            "sync": 0,
+            "async": 2
+          }
+        },
+        {
+          "case": "sync-pass-through-override",
+          "pass": true,
+          "preCallCounts": {
+            "sync": 2,
+            "async": 0
+          }
+        },
+        {
+          "case": "async-pass-through-override",
+          "pass": true,
+          "preCallCounts": {
+            "sync": 0,
+            "async": 2
+          }
+        }
+      ],
+      "passed": true,
+      "imports": {
+        "packageOrigin": "litellm/__init__.py",
+        "allLiteLLMModulesWithinWorkspace": true,
+        "moduleCount": 926
+      },
+      "bytecodePolicy": "fresh cache path; reads from adjacent caches and all writes disabled",
+      "name": "reference",
+      "exit": 0,
+      "revision": "b0071f363f8dd55a3a252e61f51f088ac5bab73c"
+    },
+    {
+      "rows": [
+        {
+          "case": "sync-group-override",
+          "pass": true,
+          "preCallCounts": {
+            "sync": 2,
+            "async": 0
+          }
+        },
+        {
+          "case": "async-group-override",
+          "pass": true,
+          "preCallCounts": {
+            "sync": 0,
+            "async": 2
+          }
+        },
+        {
+          "case": "sync-deployment-override",
+          "pass": true,
+          "preCallCounts": {
+            "sync": 2,
+            "async": 0
+          }
+        },
+        {
+          "case": "async-deployment-override",
+          "pass": true,
+          "preCallCounts": {
+            "sync": 0,
+            "async": 2
+          }
+        },
+        {
+          "case": "sync-default-accounting",
+          "pass": true,
+          "preCallCounts": {
+            "sync": 2,
+            "async": 0
+          }
+        },
+        {
+          "case": "async-default-accounting",
+          "pass": true,
+          "preCallCounts": {
+            "sync": 0,
+            "async": 2
+          }
+        },
+        {
+          "case": "sync-pass-through-override",
+          "pass": true,
+          "preCallCounts": {
+            "sync": 2,
+            "async": 0
+          }
+        },
+        {
+          "case": "async-pass-through-override",
+          "pass": true,
+          "preCallCounts": {
+            "sync": 0,
+            "async": 2
+          }
+        }
+      ],
+      "passed": true,
+      "imports": {
+        "packageOrigin": "litellm/__init__.py",
+        "allLiteLLMModulesWithinWorkspace": true,
+        "moduleCount": 926
+      },
+      "bytecodePolicy": "fresh cache path; reads from adjacent caches and all writes disabled",
+      "name": "ablation-control-timeout",
+      "exit": 0,
+      "revision": null
+    },
+    {
+      "rows": [
+        {
+          "case": "sync-group-override",
+          "pass": true,
+          "preCallCounts": {
+            "sync": 2,
+            "async": 0
+          }
+        },
+        {
+          "case": "async-group-override",
+          "pass": true,
+          "preCallCounts": {
+            "sync": 0,
+            "async": 2
+          }
+        },
+        {
+          "case": "sync-deployment-override",
+          "pass": true,
+          "preCallCounts": {
+            "sync": 2,
+            "async": 0
+          }
+        },
+        {
+          "case": "async-deployment-override",
+          "pass": true,
+          "preCallCounts": {
+            "sync": 0,
+            "async": 2
+          }
+        },
+        {
+          "case": "sync-default-accounting",
+          "pass": true,
+          "preCallCounts": {
+            "sync": 2,
+            "async": 0
+          }
+        },
+        {
+          "case": "async-default-accounting",
+          "pass": true,
+          "preCallCounts": {
+            "sync": 0,
+            "async": 2
+          }
+        },
+        {
+          "case": "sync-pass-through-override",
+          "pass": true,
+          "preCallCounts": {
+            "sync": 2,
+            "async": 0
+          }
+        },
+        {
+          "case": "async-pass-through-override",
+          "pass": true,
+          "preCallCounts": {
+            "sync": 0,
+            "async": 2
+          }
+        }
+      ],
+      "passed": true,
+      "imports": {
+        "packageOrigin": "litellm/__init__.py",
+        "allLiteLLMModulesWithinWorkspace": true,
+        "moduleCount": 926
+      },
+      "bytecodePolicy": "fresh cache path; reads from adjacent caches and all writes disabled",
+      "name": "read480-normal",
+      "exit": 0,
+      "revision": null
+    }
+  ],
+  "originalRuns": {
+    "ablation-control-timeout": {
+      "run": "replication-p6-ablation-control-r1-router-strategy-isolation-ad5bb49e",
+      "seconds": 901.461,
+      "completed": false,
+      "acceptancePassed": 8,
+      "acceptanceChecks": 9
+    },
+    "read480-normal": {
+      "run": "replication-p6-ablation-read-480-r1-router-strategy-isolation-0880fcba",
+      "seconds": 655.797,
+      "completed": true,
+      "acceptancePassed": 8,
+      "acceptanceChecks": 9
+    }
+  },
+  "qualificationHistory": "Initial rpm=2 probe incorrectly expected two group selections to be admitted; the reference itself failed four checks because existing selection applies its own admission headroom. It was not qualified. The revised diagnostic uses rpm=100 and wraps existing selector pre-call methods to count actual calls; the wrappers invoke the original implementations."
+}

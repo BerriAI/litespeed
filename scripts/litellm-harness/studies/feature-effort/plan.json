@@ -1,0 +1,157 @@
+{
+  "createdAt": "2026-09-16T02:41:18.048784+00:00",
+  "protocol": 6,
+  "repetitions": 2,
+  "control": "medium",
+  "seed": 27160926,
+  "runs": [
+    {
+      "dataset": "training5",
+      "case": "stream-tool-rewrite-membership",
+      "name": "high",
+      "effort": "high",
+      "commit": "c7e6826341989fd6ebf3588b53901087b2fa7a56",
+      "label": "replication-v24-features-high-r1"
+    },
+    {
+      "dataset": "training5",
+      "case": "stream-tool-rewrite-membership",
+      "name": "medium",
+      "effort": "medium",
+      "commit": "c7e6826341989fd6ebf3588b53901087b2fa7a56",
+      "label": "replication-v24-features-medium-r1"
+    },
+    {
+      "dataset": "training5",
+      "case": "aws-signing-off-loop",
+      "name": "medium",
+      "effort": "medium",
+      "commit": "c7e6826341989fd6ebf3588b53901087b2fa7a56",
+      "label": "replication-v24-features-medium-r1"
+    },
+    {
+      "dataset": "training5",
+      "case": "aws-signing-off-loop",
+      "name": "high",
+      "effort": "high",
+      "commit": "c7e6826341989fd6ebf3588b53901087b2fa7a56",
+      "label": "replication-v24-features-high-r1"
+    },
+    {
+      "dataset": "training5",
+      "case": "background-responses-pipeline",
+      "name": "high",
+      "effort": "high",
+      "commit": "c7e6826341989fd6ebf3588b53901087b2fa7a56",
+      "label": "replication-v24-features-high-r1"
+    },
+    {
+      "dataset": "training5",
+      "case": "background-responses-pipeline",
+      "name": "medium",
+      "effort": "medium",
+      "commit": "c7e6826341989fd6ebf3588b53901087b2fa7a56",
+      "label": "replication-v24-features-medium-r1"
+    },
+    {
+      "dataset": "training5",
+      "case": "legacy-stream-pipeline",
+      "name": "medium",
+      "effort": "medium",
+      "commit": "c7e6826341989fd6ebf3588b53901087b2fa7a56",
+      "label": "replication-v24-features-medium-r1"
+    },
+    {
+      "dataset": "training5",
+      "case": "legacy-stream-pipeline",
+      "name": "high",
+      "effort": "high",
+      "commit": "c7e6826341989fd6ebf3588b53901087b2fa7a56",
+      "label": "replication-v24-features-high-r1"
+    },
+    {
+      "dataset": "training5",
+      "case": "stream-tool-rewrite-membership",
+      "name": "high",
+      "effort": "high",
+      "commit": "c7e6826341989fd6ebf3588b53901087b2fa7a56",
+      "label": "replication-v24-features-high-r2"
+    },
+    {
+      "dataset": "training5",
+      "case": "stream-tool-rewrite-membership",
+      "name": "medium",
+      "effort": "medium",
+      "commit": "c7e6826341989fd6ebf3588b53901087b2fa7a56",
+      "label": "replication-v24-features-medium-r2"
+    },
+    {
+      "dataset": "training5",
+      "case": "aws-signing-off-loop",
+      "name": "medium",
+      "effort": "medium",
+      "commit": "c7e6826341989fd6ebf3588b53901087b2fa7a56",
+      "label": "replication-v24-features-medium-r2"
+    },
+    {
+      "dataset": "training5",
+      "case": "aws-signing-off-loop",
+      "name": "high",
+      "effort": "high",
+      "commit": "c7e6826341989fd6ebf3588b53901087b2fa7a56",
+      "label": "replication-v24-features-high-r2-oom1",
+      "replacesGatewayOutageRun": "replication-v24-features-high-r2-aws-signing-off-loop-1961d65e"
+    },
+    {
+      "dataset": "training5",
+      "case": "background-responses-pipeline",
+      "name": "high",
+      "effort": "high",
+      "commit": "c7e6826341989fd6ebf3588b53901087b2fa7a56",
+      "label": "replication-v24-features-high-r2-oom1",
+      "replacesGatewayOutageRun": "replication-v24-features-high-r2-background-responses-pipeline-7be062e2"
+    },
+    {
+      "dataset": "training5",
+      "case": "background-responses-pipeline",
+      "name": "medium",
+      "effort": "medium",
+      "commit": "c7e6826341989fd6ebf3588b53901087b2fa7a56",
+      "label": "replication-v24-features-medium-r2-oom1",
+      "replacesGatewayOutageRun": "replication-v24-features-medium-r2-background-responses-pipeline-198c967a"
+    },
+    {
+      "dataset": "training5",
+      "case": "legacy-stream-pipeline",
+      "name": "medium",
+      "effort": "medium",
+      "commit": "c7e6826341989fd6ebf3588b53901087b2fa7a56",
+      "label": "replication-v24-features-medium-r2"
+    },
+    {
+      "dataset": "training5",
+      "case": "legacy-stream-pipeline",
+      "name": "high",
+      "effort": "high",
+      "commit": "c7e6826341989fd6ebf3588b53901087b2fa7a56",
+      "label": "replication-v24-features-high-r2"
+    }
+  ],
+  "purpose": "Compare Medium and High on four qualified training tasks spanning async AWS signing and multi-module guardrail pipelines. Frozen v24 harness; explicit pre-existing fixtures loaded identically for solver and scorer.",
+  "selectionRule": "Complete task-paired repetitions; normal completion and original behavioral acceptance. Report cost, time, activation, fixture profile and oracle limitations. No held-out claims.",
+  "execution": {
+    "timeoutSeconds": 900,
+    "sharedSolverConcurrency": 3
+  },
+  "revision": 2,
+  "gatewayOutageAmendment": {
+    "at": "2026-09-16T06:34:41.187134+00:00",
+    "audit": "../gateway-memory/outage.json",
+    "reason": "Replace every allocation affected by the verified local gateway OOM, irrespective of candidate score. Original records, partial work and costs retained. Frozen source, task, effort, deadline and shared concurrency unchanged.",
+    "failedRuns": [
+      "replication-v24-features-medium-r2-background-responses-pipeline-198c967a",
+      "replication-v24-features-high-r2-background-responses-pipeline-7be062e2",
+      "replication-v24-features-high-r2-aws-signing-off-loop-1961d65e"
+    ]
+  }
+}

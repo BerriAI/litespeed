@@ -1,0 +1,21 @@
+diff --git a/server/litellm-harness.ts b/server/litellm-harness.ts
+index 0563b3b..af64f52 100644
+--- a/server/litellm-harness.ts
++++ b/server/litellm-harness.ts
+@@ -4,7 +4,7 @@ import path from 'node:path';
+ import fg from 'fast-glob';
+ import type { ToolDefinition } from '../shared/types.js';
+ 
+-export const LITELLM_HARNESS_VERSION='2026-09-15.30';
++export const LITELLM_HARNESS_VERSION='2026-09-15.32';
+ export const litellmContextTool:ToolDefinition={type:'function',function:{name:'litellm_context',description:'Navigate the current LiteLLM checkout. Give a task query to find relevant definitions, inline conditions and existing tests. Give a source path to see its symbol outline and test partners; add a symbol name to read that definition with numbered lines, or callers to find functions invoking a named helper in that file. Reads only this workspace, never Git history or remote answers.',parameters:{type:'object',properties:{query:{type:'string',maxLength:1000},path:{type:'string',maxLength:500},symbol:{type:'string',maxLength:200},callers:{type:'string',maxLength:200,description:'Python helper name whose call sites and enclosing functions to find; requires path.'}},additionalProperties:false}}};
+ 
+ const playbooks = [
+@@ -69,6 +69,7 @@ const playbooks = [
+       'A clean Redis miss and an unreachable Redis server differ. A stale per-process in-memory value must not hide an expired authoritative counter. Audit the actual cache-read path used by _counter_can_apply_adjustment, not only the normal get_current_spend path.',
+       'After a reservation disappears, its original delta is no longer meaningful. The database spend used for reseeding is a lagging floor; successful post-call recovery must also preserve the current settled request cost. increment_spend_counters may skip keys already handled as reserved, so merely reseeding can silently lose that cost.',
+       'Counter expiry affects mutations, not only admission reads. Trace _set_reserved_entry_actual_cost into _counter_can_apply_adjustment and its actual cache reader before changing SpendCounterReseed.coalesced. A negative reservation adjustment authorized by a stale local value can recreate an expired Redis counter below zero; a DB-floor reseed alone can lose the settled request cost because reserved keys skip the direct increment.',
++      'Recovery probes must use stale local values both above and below the intended recovered total. Choosing only a large DB floor can hide a stale-high in-memory reservation. Check Redis and the per-process copy independently after settlement; a correct Redis value does not prove the local cache is correct. Trace whether the existing monotonic repair helper preserves an obsolete local value and whether the authoritative atomic update result is reflected locally. Preserve real concurrent increments and the distinct unreachable-Redis fallback; do not blindly lower every counter.',
+       'Keep pre-call reservation resizing separate from post-call settlement/release. Do not apply post-call recovery semantics to an in-flight reservation, or change ordinary team/user admission behavior without evidence.'
+     ]
+   }

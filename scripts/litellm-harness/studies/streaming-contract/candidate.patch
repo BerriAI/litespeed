@@ -1,0 +1,50 @@
+diff --git a/server/litellm-harness.ts b/server/litellm-harness.ts
+index d58e71d..3c1e409 100644
+--- a/server/litellm-harness.ts
++++ b/server/litellm-harness.ts
+@@ -4,10 +4,20 @@ import path from 'node:path';
+ import fg from 'fast-glob';
+ import type { ToolDefinition } from '../shared/types.js';
+ 
+-export const LITELLM_HARNESS_VERSION='2026-09-15.34';
++export const LITELLM_HARNESS_VERSION='2026-09-16.39';
+ export const litellmContextTool:ToolDefinition={type:'function',function:{name:'litellm_context',description:'Navigate the current LiteLLM checkout. Give a task query to find relevant definitions, inline conditions and existing tests. Give a source path to see its symbol outline and test partners; add a symbol name to read that definition with numbered lines, or callers to find functions invoking a named helper in that file. Reads only this workspace, never Git history or remote answers.',parameters:{type:'object',properties:{query:{type:'string',maxLength:1000},path:{type:'string',maxLength:500},symbol:{type:'string',maxLength:200},callers:{type:'string',maxLength:200,description:'Python helper name whose call sites and enclosing functions to find; requires path.'}},additionalProperties:false}}};
+ 
+ const playbooks = [
++  {
++    id: 'streaming-legacy-hook-boundaries',
++    matches: (query:string) => /(?:guardrail|pipeline)/i.test(query) && /stream/i.test(query) && /(?:legacy|post.?call)/i.test(query),
++    paths: ['litellm/proxy/policy_engine/pipeline_executor.py', 'litellm/llms/openai/chat/guardrail_translation/handler.py', 'litellm/llms/anthropic/chat/guardrail_translation/handler.py', 'litellm/llms/openai/responses/guardrail_translation/handler.py'],
++    lessons: [
++      'Buffered guardrail hooks cross different wire formats: Chat Completions chunks, Anthropic Messages SSE bytes, and Responses events/envelopes. Trace the endpoint translation that already assembles and exposes the hook response, then the path that writes a replacement back to the actual buffered events. A generic stream_chunk_builder call can work for chat while skipping a Responses hook entirely. Verify the current adapters and preserve the endpoint-native hook input.',
++      'Use the real affected translators in a small executable probe with their existing chunk shapes. Check one rewrite, a None return, a blocking exception and an ordinary error; inspect both the hook input and the resulting stream. A fake translator or a chat-only happy path can hide a broken Responses rewrite. For shared streaming machinery, inspect the chat, Messages and Responses counterparts before declaring coverage.',
++      'Clarify whether a custom hook includes an override inherited from an intermediate class. Looking only in the leaf class __dict__ excludes that override as well as the base no-op; normal method resolution distinguishes them. Exercise direct and inherited overrides when the intended contract includes both, including native-lifecycle opt-ins. Existing dispatch rules may intentionally require a local definition, so preserve their semantics unless the requested behavior changes them.',
++    ],
++  },
+   {
+     id: 'langfuse-trace-session-precedence',
+     matches: (query:string) => /langfuse/i.test(query) && /(?:trace|session)/i.test(query),
+diff --git a/tests/litellm-harness.test.ts b/tests/litellm-harness.test.ts
+index d7cfaaa..4453cf5 100644
+--- a/tests/litellm-harness.test.ts
++++ b/tests/litellm-harness.test.ts
+@@ -11,6 +11,19 @@ describe('LiteLLM repository navigation',()=>{
+   const put=async(name:string,text='')=>{await mkdir(join(root,name,'..'),{recursive:true});await writeFile(join(root,name),text);};
+   beforeEach(async()=>{root=await mkdtemp(join(tmpdir(),'litellm-navigation-'));await put('litellm/__init__.py');await put('litellm/llms/example/chat/transformation.py','class Config:\n    def transform_request(self, value):\n        return value\n\n    def other(self):\n        return 2\n');await put('tests/test_litellm/llms/example/chat/test_transformation.py','def test_mapping(): pass\n');});
+   afterEach(async()=>{await rm(root,{recursive:true,force:true});});
++  it('shows streaming-hook guidance only for a matching task with a relevant current source',async()=>{
++    const signal=new AbortController().signal;
++    const query='Allow legacy post-call guardrails in buffered streaming pipelines';
++    const missing=JSON.parse(await litellmContext(root,{query},signal));
++    expect(JSON.stringify(missing)).not.toContain('streaming-legacy-hook-boundaries');
++    await put('litellm/proxy/policy_engine/pipeline_executor.py','class PipelineExecutor: pass\n');
++    const matching=JSON.parse(await litellmContext(root,{query},signal));
++    expect(JSON.stringify(matching)).toContain('streaming-legacy-hook-boundaries');
++    for(const unrelated of ['streaming guardrail latency','post-call logging callback','legacy background Responses audit','streaming parser output']){
++      const result=await litellmContext(root,{query:unrelated},signal);
++      expect(result).not.toContain('streaming-legacy-hook-boundaries');
++    }
++  });
+   it('connects a provider task to source, existing tests and exact method boundaries',async()=>{
+     const signal=new AbortController().signal;
+     const found=JSON.parse(await litellmContext(root,{query:'example chat mapping'},signal));

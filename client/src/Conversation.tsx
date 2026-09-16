@@ -1,6 +1,7 @@
 import { cacheHitLabel, usagePhase } from '../../shared/usage';
 import { shuntLabel } from '../../shared/shunt';
 import { steeringContent } from '../../shared/steering-presentation';
+import { litellmHarnessNoteTitle } from '../../shared/litellm-presentation';
 import { conversationBlocks } from './conversation-blocks';
 import { createContext, useContext, memo, useLayoutEffect, useRef, useState, type ReactNode } from 'react';
 import type { QuestionRequest } from '../../shared/questions';
@@ -31,7 +32,7 @@ function CopyCode({ children }: { children: React.ReactNode }) {
   }
   return <CopyButton text={text(children).replace(/\n$/, '')} label="Copy code" />;
 }
-export const toolLabels: Record<string, string> = { wait_tasks:'Wait for tasks',resolve_task:'Record task resolution', bulk_read:'Shunt reader',code_write:'Shunt writer', read_file: 'Read file', write_file: 'Write file', edit_file: 'Edit file', glob: 'Find files', grep: 'Search code', bash: 'Run command', web_fetch: 'Fetch page', web_search: 'Search web', view_image: 'View image', todo_write: 'Update plan', todo_read: 'Read plan', task: 'Research task', sidekick: 'Sidekick', delegate: 'Worker', verify: 'Driver verification', takeover: 'Driver takeover', ask_user: 'Ask a question', history_search: 'Search history', memory_remember: 'Remember fact', memory_forget: 'Forget fact', memory_recall: 'Recall memory' };
+export const toolLabels: Record<string, string> = { litellm_context:'Navigate LiteLLM', wait_tasks:'Wait for tasks',resolve_task:'Record task resolution', bulk_read:'Shunt reader',code_write:'Shunt writer', read_file: 'Read file', write_file: 'Write file', edit_file: 'Edit file', glob: 'Find files', grep: 'Search code', bash: 'Run command', web_fetch: 'Fetch page', web_search: 'Search web', view_image: 'View image', todo_write: 'Update plan', todo_read: 'Read plan', task: 'Research task', sidekick: 'Sidekick', delegate: 'Worker', verify: 'Driver verification', takeover: 'Driver takeover', ask_user: 'Ask a question', history_search: 'Search history', memory_remember: 'Remember fact', memory_forget: 'Forget fact', memory_recall: 'Recall memory' };
 function ToolCard({ tool }: { tool: ToolCall }) {
   const working = tool.status === 'running' || tool.status === 'pending' || tool.execution?.status === 'running';
   const failed = tool.status === 'error' || executionFailed(tool.execution);
@@ -41,7 +42,9 @@ function ToolCard({ tool }: { tool: ToolCall }) {
     {tool.output&&<div className="shunt-answer"><Markdown content={tool.output}/></div>}
     {tool.shunt&&<details className="shunt-sources"><summary>{tool.shunt.sources.length} source{tool.shunt.sources.length===1?'':'s'}{tool.shunt.target?` → ${tool.shunt.target}`:''}</summary>{tool.shunt.sources.map((source,index)=><div key={index}><code>{source.path}</code> · {source.lines} lines · {source.bytes} bytes<small>sha256 {source.sha256}</small></div>)}</details>}
   </section>;
-  const title = (tool.name === 'capability' ? `${String(tool.args.operation)} ${String(tool.args.query ?? tool.args.name ?? '')}` : '') || tool.waitingForWorkspace || tool.args?.path || tool.args?.command || tool.args?.pattern || tool.args?.url;
+  const navigationTitle=tool.name==='litellm_context'
+    ? `${String(tool.args.path??tool.args.query??'repository map')}${typeof tool.args.symbol==='string'?` · ${tool.args.symbol}`:typeof tool.args.callers==='string'?` · callers of ${tool.args.callers}`:''}` : '';
+  const title = (tool.name === 'capability' ? `${String(tool.args.operation)} ${String(tool.args.query ?? tool.args.name ?? '')}` : '') || tool.waitingForWorkspace || navigationTitle || tool.args?.path || tool.args?.command || tool.args?.pattern || tool.args?.url;
   // Sidecar interception is VISIBLE by design (design note 4.5): the summary
   // row is tagged with the interceptor's name, and the expanded body shows the
   // unmodified original arguments above the (modified) executed ones.
@@ -76,7 +79,7 @@ export function Conversation({ detail, connection, onDecide, onAllowAll, onFork,
   }, [atBottom, inline]);
   return <WorkerRowsContext.Provider value={workerProjection(detail)}><div className="conversation-shell"><div className="conversation-scroll" ref={scroll} onScroll={e => { const el = e.currentTarget; setAtBottom(el.scrollHeight - el.scrollTop - el.clientHeight < 100); }}><div className="conversation-content">
     <div className="conversation-start"><span />{new Date(detail.session.createdAt).toLocaleDateString(undefined, { month: 'long', day: 'numeric' })}<span /></div>
-    {groups.map(({ message, startsRun, endsRun, closesTranscript, runUsage, steps }, index) => <MessageView lead={detail.session.architecture?.kind==='litefusion'} driver={!inline && Boolean(detail.session.architecture)} workerNoun={detail.session.architecture?.kind === 'expert-fusion' ? 'expert' : 'worker'} key={message.id} message={message} running={running && message.id === last?.id} grouped={message.role === 'assistant' && !startsRun} tail={endsRun} live={running && closesTranscript && index === groups.length - 1} runUsage={runUsage} steps={steps} expanded={steps.some(step=>step.toolCalls?.some(call=>call.taskId&&detail.tasks?.some(task=>task.id===call.taskId&&['queued','running','blocked'].includes(task.status))))||(expandedSteps.get(message.id)??inline)} onExpand={open => setExpandedSteps(current => { const next = new Map(current); next.set(message.id,open); return next; })} inline={inline} workActivity={workActivity} onFork={() => onFork(message.id)} disabled={busy || running} readOnly={readOnly} renderTask={readOnly ? undefined : renderTask} />)}
+    {groups.map(({ message, startsRun, endsRun, closesTranscript, runUsage, steps }, index) => <MessageView lead={detail.session.architecture?.kind==='litefusion'} driver={!inline && Boolean(detail.session.architecture) && detail.session.architecture?.kind!=='litellm-specific'} workerNoun={detail.session.architecture?.kind === 'expert-fusion' ? 'expert' : 'worker'} key={message.id} message={message} running={running && message.id === last?.id} grouped={message.role === 'assistant' && !startsRun} tail={endsRun} live={running && closesTranscript && index === groups.length - 1} runUsage={runUsage} steps={steps} expanded={steps.some(step=>step.toolCalls?.some(call=>call.taskId&&detail.tasks?.some(task=>task.id===call.taskId&&['queued','running','blocked'].includes(task.status))))||(expandedSteps.get(message.id)??inline)} onExpand={open => setExpandedSteps(current => { const next = new Map(current); next.set(message.id,open); return next; })} inline={inline} workActivity={workActivity} onFork={() => onFork(message.id)} disabled={busy || running} readOnly={readOnly} renderTask={readOnly ? undefined : renderTask} />)}
     {!detail.messages.length && <div className="session-empty"><Logo /><h2>{readOnly ? 'No transcript yet.' : 'A fresh start.'}</h2><p>{readOnly ? 'Research messages will appear here when available. This view cannot start a run.' : 'Give your agent a task. It will work in this session’s workspace.'}</p></div>}
     {!readOnly && detail.questions?.map(renderQuestion)}
     {!readOnly && detail.permissions.map(request => <Approval key={request.id} request={request} onDecide={onDecide} onAllowAll={onAllowAll} busy={busy} />)}
@@ -124,7 +127,10 @@ function toolGroups(tools: ToolCall[]): ToolCall[][] {
 function MessageView({ lead, driver, workerNoun, message, running, grouped, tail, live, runUsage, steps, workActivity, onFork, disabled, readOnly, renderTask, inline, expanded, onExpand }: { expanded: boolean; onExpand: (open: boolean) => void; lead?:boolean; driver: boolean; workerNoun: string; message: Message; running: boolean; grouped: boolean; tail: boolean; live: boolean; runUsage?: Usage; steps: Message[]; workActivity?: string|false; onFork: () => void; disabled: boolean; readOnly?: boolean; inline?: boolean; renderTask?: (tool: ToolCall, message: Message, expanded: boolean) => ReactNode }) {
   const steering = steeringContent(message);
   if (steering !== undefined) message = { ...message, content: steering };
-  if (message.role === 'system' && steering === undefined) return <div className="system-message"><Terminal size={12} />{message.content}</div>;
+  if (message.role === 'system' && steering === undefined) {
+    const title=litellmHarnessNoteTitle(message.content);
+    return title?<details className="harness-note"><summary><Terminal size={12}/>{title}<ChevronRight size={12} className="disclosure-chevron"/></summary><pre>{message.content}</pre></details>:<div className="system-message"><Terminal size={12} />{message.content}</div>;
+  }
   const assistant = message.role === 'assistant';
   const content = assistant ? withoutVerificationNotice(message.content, message.receipts) : message.content;
   return <article className={`message ${assistant ? 'assistant-message' : 'user-message'}${grouped ? ' grouped' : ''}`} aria-label={assistant ? 'Assistant message' : inline ? 'Assignment' : 'Your message'}>

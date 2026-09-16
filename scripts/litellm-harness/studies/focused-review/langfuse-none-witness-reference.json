@@ -1,0 +1,25 @@
+{
+  "rows": [
+    {
+      "level": "DEFAULT",
+      "used": "c1",
+      "returned": "c1",
+      "session": "other-session",
+      "pass": true
+    },
+    {
+      "level": "ERROR",
+      "used": "c1",
+      "returned": "c1",
+      "session": "other-session",
+      "pass": true
+    }
+  ],
+  "passed": true,
+  "imports": {
+    "packageOrigin": "litellm/__init__.py",
+    "allLiteLLMModulesWithinWorkspace": true,
+    "moduleCount": 809
+  },
+  "bytecodePolicy": "fresh cache path; reads from adjacent caches and all writes disabled"
+}

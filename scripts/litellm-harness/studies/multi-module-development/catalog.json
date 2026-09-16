@@ -1,0 +1,20 @@
+[
+  {
+    "id": "realtime-cached-audio-cost",
+    "split": "dev",
+    "revision": "6e9e08475ac37128f435ddc1d13347081637748a",
+    "prompt": "Realtime cached audio input is overbilled because the nested cached_tokens_details split is lost. Preserve optional text/audio/image cached-token details through realtime and Responses usage normalization and conversion back to Responses usage. Combine the nested split across response.done events, including when only some events supply it, without mutating input usage. Omit the optional nested key from serialized usage when no split was supplied; preserve existing cache-write fields and their absence.\n\nUse cache_read_input_audio_token_cost for cached audio, falling back to cache_read_input_token_cost when the audio rate is absent. Expose that audio rate through model-info lookups and the token-cost breakdown, and make the breakdown agree with input billing. Remove cached tokens from the corresponding full-rate text/audio/image buckets without going negative; cap the nested allocation at the aggregate cached count. Preserve existing billing when nested details are absent, along with existing tier/region/custom-price behavior.\n\nApply these historical cost-map corrections for this offline task (USD per token, not a request to look up current prices): set cache_read_input_audio_token_cost to 0.0000004 for gpt-realtime, gpt-realtime-1.5 and gpt-realtime-2025-08-28; set both audio and text cache-read rates to 0.0000004 for azure/gpt-realtime-2025-08-28 and azure/gpt-realtime-1.5-2026-02-23; set the audio cache-read rate to 0.0000003 for azure/gpt-realtime-mini and azure/gpt-realtime-mini-2025-10-06; add the text cache-read rate 0.00000006 for gpt-realtime-mini. Preserve other existing prices.\n\nFor example, 116 input text tokens and 167 input audio tokens, with 192 cached tokens split into 64 text and 128 audio, should charge 52 full-rate text, 39 full-rate audio, and the cached buckets once each. At text/audio rates 0.000004/0.000032 and both cached rates 0.0000004, the input cost is 0.0015328.",
+    "source_pr": "https://github.com/BerriAI/litellm/pull/40627",
+    "reference_paths": [
+      "litellm",
+      "enterprise",
+      "model_prices_and_context_window.json"
+    ],
+    "exclude_test_names": [
+      "test_realtime_combine_sums_nested_cached_tokens_details",
+      "test_realtime_combine_keeps_cached_split_when_only_one_usage_has_details",
+      "test_usage_without_cached_tokens_details_omits_key"
+    ],
+    "oracle_note": "Curated before qualification/solvers. Three changed tests are excluded because their module imports newly introduced CachedTokensDetails; aggregation and optional-key behavior are covered by a separately predeclared probe using existing entrypoints without that type name. Remaining reference checks may still couple to rate representation; qualification is not proof of complete coverage."
+  }
+]

@@ -1,0 +1,80 @@
+{
+  "createdAt": "2026-09-15T18:58:18.244728-07:00",
+  "protocol": 6,
+  "repetitions": 2,
+  "runs": [
+    {
+      "dataset": "training2",
+      "case": "mcp-auth-challenge",
+      "commit": "3fee39e7c56d02575cecf74c87a774ee83b6f1a9",
+      "name": "control",
+      "effort": "medium",
+      "label": "replication-v22-effort-medium-r1"
+    },
+    {
+      "dataset": "training2",
+      "case": "mcp-auth-challenge",
+      "commit": "a60c5d9556a69f8c795c514f81dfcda279fc3d7b",
+      "name": "activity",
+      "effort": "medium",
+      "label": "replication-v24-test-activity-r1"
+    },
+    {
+      "dataset": "",
+      "case": "router-strategy-isolation",
+      "commit": "3fee39e7c56d02575cecf74c87a774ee83b6f1a9",
+      "name": "control",
+      "effort": "medium",
+      "label": "replication-v22-effort-medium-r1"
+    },
+    {
+      "dataset": "",
+      "case": "router-strategy-isolation",
+      "commit": "a60c5d9556a69f8c795c514f81dfcda279fc3d7b",
+      "name": "activity",
+      "effort": "medium",
+      "label": "replication-v24-test-activity-r1"
+    },
+    {
+      "dataset": "",
+      "case": "router-strategy-isolation",
+      "commit": "3fee39e7c56d02575cecf74c87a774ee83b6f1a9",
+      "name": "control",
+      "effort": "medium",
+      "label": "replication-v22-effort-medium-r2"
+    },
+    {
+      "dataset": "",
+      "case": "router-strategy-isolation",
+      "commit": "a60c5d9556a69f8c795c514f81dfcda279fc3d7b",
+      "name": "activity",
+      "effort": "medium",
+      "label": "replication-v24-test-activity-r2"
+    },
+    {
+      "dataset": "training2",
+      "case": "mcp-auth-challenge",
+      "commit": "3fee39e7c56d02575cecf74c87a774ee83b6f1a9",
+      "name": "control",
+      "effort": "medium",
+      "label": "replication-v22-effort-medium-r2"
+    },
+    {
+      "dataset": "training2",
+      "case": "mcp-auth-challenge",
+      "commit": "a60c5d9556a69f8c795c514f81dfcda279fc3d7b",
+      "name": "activity",
+      "effort": "medium",
+      "label": "replication-v24-test-activity-r2"
+    }
+  ],
+  "hypothesis": "Recognizing completed test-like activity, separately from safely attributable pass/fail receipts, activates the intended nudge for environment-prefixed Python commands and prevents late unbounded testing.",
+  "controlProvenance": "Four predeclared pending Medium rows reused from effort-study-plan.json before any matching control result existed. Do not relaunch these rows.",
+  "selectionDataOnly": true,
+  "successNote": "Normal completion and raw acceptance retained; router private-helper coupling reported separately. Inspect activation in every candidate.",
+  "execution": {
+    "timeoutSeconds": 900,
+    "sharedSolverConcurrency": 3,
+    "protocol": 6
+  }
+}

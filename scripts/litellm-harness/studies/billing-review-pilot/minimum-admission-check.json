@@ -1,0 +1,11 @@
+{
+  "at": "2026-09-16T22:25:03.155764+00:00",
+  "status": 403,
+  "code": "budget_exceeded",
+  "requestedOutputTokens": 1,
+  "upstreamRequestAdmitted": false,
+  "ledgerUnchanged": true,
+  "ledgerSha256": "526e67a493a25e6d2b522a16332ec91b391c0c18bb65e6a97e438c114a948d61",
+  "recordsBeforeAndAfter": 28755,
+  "committedUsd": 99.76959777399972
+}

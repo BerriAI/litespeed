@@ -1,0 +1,29 @@
+{
+  "at": "2026-09-16T19:58:02.434157+00:00",
+  "status": "Integration prepared; unpromoted and not a paid-trial result",
+  "commit": "425f12ef3ead330c53469fbd7601ea8891606df0",
+  "version": "2026-09-16.54",
+  "patchAppliesTo": "18ac10d7d67237f834cf80af6c03d5fa503f40cc",
+  "patchSha256": "9f70f8d50d92010928b633eb6935fc43a0e2b070f9d486dd72224349186b0161",
+  "changes": "Grouped edits and chronological job notices integrated with v52 shared price-map limits and v45 delivered-output fix. No v53 navigation or v51 tool guidance.",
+  "validation": {
+    "typecheck": "passed",
+    "fullSuite": {
+      "passed": 2151,
+      "skipped": 1,
+      "failed": 0,
+      "maxWorkers": 2
+    },
+    "build": "passed",
+    "browser": {
+      "passed": 2
+    },
+    "terminal": "Real PTY picker, saved model, Plan navigation and narrow layout pass"
+  },
+  "negativeControl": "Both ordinary and grouped price-map history tests failed before dynamic cap was forwarded into the grouped-edit helper; both pass after.",
+  "experimentBoundary": "Frozen paid runtimes and inputs unchanged. This patch applies to public main commit, so private branch availability is not required.",
+  "publicReconstruction": {
+    "changedFilesByteMatched": 17,
+    "patchAppliedToFreshPublicArchive": true
+  }
+}

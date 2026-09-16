@@ -1,0 +1,57 @@
+{
+  "createdAt": "2026-09-16T07:25:57.227005+00:00",
+  "protocol": 6,
+  "control": "control",
+  "repetitions": 2,
+  "seed": 39160926,
+  "hypothesis": "A short endpoint-aware stream guide improves completed patches on the inspected legacy-hook task, including real Responses behavior, without adding a second model or granting extra tools.",
+  "selectionDataOnly": true,
+  "scope": "Single known development task. No held-out or cross-task generalization claim. Both arms use production v34 mechanisms, same provider/model/Medium effort, 900-second deadline and three global slots. Only guide text, its activation test and version differ.",
+  "execution": {
+    "timeoutSeconds": 900,
+    "sharedSolverConcurrency": 3
+  },
+  "supplemental": {
+    "artifact": "real-stream-probe.json",
+    "expectedChecks": 24
+  },
+  "supplementalQualification": "../feature-effort/legacy-inheritance/real-stream-results.json",
+  "supplementalSource": "../feature-effort/legacy-inheritance/real_stream_probe.py",
+  "decision": "Compare normal completion plus original acceptance and all 24 qualified real-adapter checks. Preserve each dimension separately and every timeout. This is adaptive training selection after inspecting earlier failures. No automatic promotion.",
+  "runs": [
+    {
+      "dataset": "training5",
+      "case": "legacy-stream-pipeline",
+      "name": "stream-guide",
+      "label": "replication-v39-streams-stream-guide-r1",
+      "commit": "85119eacb8640c6f1000ff48a246e50e4be53675",
+      "effort": "medium"
+    },
+    {
+      "dataset": "training5",
+      "case": "legacy-stream-pipeline",
+      "name": "control",
+      "label": "replication-v39-streams-control-r1",
+      "commit": "05f3011b4c5000d1fbb384a2d237856d2120c72c",
+      "effort": "medium"
+    },
+    {
+      "dataset": "training5",
+      "case": "legacy-stream-pipeline",
+      "name": "stream-guide",
+      "label": "replication-v39-streams-stream-guide-r2",
+      "commit": "85119eacb8640c6f1000ff48a246e50e4be53675",
+      "effort": "medium"
+    },
+    {
+      "dataset": "training5",
+      "case": "legacy-stream-pipeline",
+      "name": "control",
+      "label": "replication-v39-streams-control-r2",
+      "commit": "05f3011b4c5000d1fbb384a2d237856d2120c72c",
+      "effort": "medium"
+    }
+  ],
+  "supplementalSha256": "cefbc0b3d63bc05414f20b3357dc06a26e4b6eb30808f8636a820f46d3a86f7b",
+  "supplementalSourceCommit": "8102c32"
+}

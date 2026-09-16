@@ -1,0 +1,22 @@
+{
+  "createdAt": "2026-09-16T21:30:20.026734+00:00",
+  "status": "exploratory diagnostic frozen before execution; does not amend original study scoring or selection",
+  "seed": 56160926,
+  "cases": 16,
+  "rateVariants": [
+    "fallback",
+    "zero",
+    "explicit"
+  ],
+  "checks": 48,
+  "contract": "Text partitions into cached text, writes and full-rate text; audio partitions into cached and full-rate audio. Aggregate cached equals sum of the two cached buckets. Compare independent closed-form cost, cache-read breakdown and usage immutability below/above200k prompt tokens.",
+  "sourceSha256": "932bb3110e9c40ba6786d6ed11ecc09b27e792ba7e4ce6ffc499cc13cc35d521",
+  "qualification": "Execute on historical base and merged-reference snapshots before inspecting model outcomes. A reference failure requires inspection, not automatic candidate rejection.",
+  "limitations": [
+    "Synthetic supported generic inputs, not observed production invoices.",
+    "No model receives the probe, seed, outcomes or reference source.",
+    "No change to17original+12predeclared supplemental checks or the four-attempt selection rule."
+  ],
+  "amendedAt": "2026-09-16T21:30:59.925219+00:00",
+  "preexecutionAmendment": "Allow an absent cache-read cost when its expected monetary value is zero, avoiding the already-known representation coupling. Seed, inputs and arithmetic are unchanged; no snapshot execution occurred before this correction."
+}

@@ -1,0 +1,56 @@
+{
+  "scope": "Second completed development pair, one attempt per arm. Trace differences are descriptive and do not isolate a specific intervention.",
+  "rows": [
+    {
+      "run": "replication-v48-breadth-plain-r1-proxy-call-id-header-c75ae51f",
+      "kind": "single",
+      "seconds": 449.035,
+      "computedUsd": 0.064124024,
+      "completed": true,
+      "acceptance": {
+        "exit": 0,
+        "tests": 5,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0,
+        "passed": true
+      },
+      "toolCounts": {
+        "bash": 33,
+        "grep": 3,
+        "read_file": 14,
+        "edit_file": 4,
+        "wait": 4,
+        "bash_output": 3
+      },
+      "timeToFirstEditSeconds": 65.942,
+      "reviewModelRequests": null
+    },
+    {
+      "run": "replication-v48-breadth-specialized-r1-proxy-call-id-header-b42948f6",
+      "kind": "litellm-specific",
+      "seconds": 104.505,
+      "computedUsd": 0.015602182,
+      "completed": true,
+      "acceptance": {
+        "exit": 0,
+        "tests": 5,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0,
+        "passed": true
+      },
+      "toolCounts": {
+        "grep": 5,
+        "litellm_context": 1,
+        "read_file": 7,
+        "bash": 8,
+        "edit_file": 3,
+        "bash_output": 2
+      },
+      "timeToFirstEditSeconds": 32.479,
+      "reviewModelRequests": 2
+    }
+  ],
+  "inspection": "The specialized patch resolves the requested ID precedence inline. The ordinary patch adds a helper with extra type filtering. Both pass all five original checks. Ordinary execution includes broader streaming-client-disconnect billing checks with failures and some later isolated passes; their root cause was not independently qualified here. Do not count all extra tests as proven waste."
+}

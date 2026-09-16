@@ -1,0 +1,50 @@
+{
+  "createdAt": "2026-09-16T04:09:06.282341+00:00",
+  "protocol": 6,
+  "control": "control",
+  "repetitions": 2,
+  "seed": 32160926,
+  "runs": [
+    {
+      "dataset": "",
+      "case": "team-member-budget",
+      "name": "control",
+      "label": "replication-v32-counters-control-r2",
+      "commit": "a37b3d38fc7bb39e9b16e460af7db4fca8843ada",
+      "effort": "medium"
+    },
+    {
+      "dataset": "",
+      "case": "team-member-budget",
+      "name": "counter-values",
+      "label": "replication-v32-counters-counter-values-r2",
+      "commit": "60abb3ac9a289f528dbff82940280e18e4dc5940",
+      "effort": "medium"
+    },
+    {
+      "dataset": "",
+      "case": "team-member-budget",
+      "name": "counter-values",
+      "label": "replication-v32-counters-counter-values-r1",
+      "commit": "60abb3ac9a289f528dbff82940280e18e4dc5940",
+      "effort": "medium"
+    },
+    {
+      "dataset": "",
+      "case": "team-member-budget",
+      "name": "control",
+      "label": "replication-v32-counters-control-r1",
+      "commit": "a37b3d38fc7bb39e9b16e460af7db4fca8843ada",
+      "effort": "medium"
+    }
+  ],
+  "hypothesis": "A counter-recovery guide naming relative stale/DB values and both cache layers prevents self-tests that pass only because the chosen DB floor exceeds the stale local reservation.",
+  "selectionDataOnly": true,
+  "scope": "One previously inspected training case; cannot estimate variation across future tasks. Candidate changes one matched budget-guide lesson only.",
+  "successNote": "Normal completion plus all five original checks, including both Redis and local cache in the expiry case. Inspect guide activation and test values as well as cost/time. Do not infer efficacy from one outcome or automatically promote generated critique.",
+  "execution": {
+    "timeoutSeconds": 900,
+    "sharedSolverConcurrency": 3
+  },
+  "motivationRun": "replication-v27-review-control-r2-team-member-budget-4e9901d0"
+}

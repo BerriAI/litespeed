@@ -1,0 +1,8 @@
+{
+  "pausedAt": "2026-09-16T05:53:59.827837+00:00",
+  "reason": "Temporarily pause new v17 feature-removal admissions so the current targeted candidate comparisons finish sooner. Existing child batches continue normally; no active model request is canceled. The predeclared row order and frozen runtimes remain unchanged. Retain incomplete study status; do not infer a winning ablation.",
+  "resumeCondition": "Resume after current targeted paired comparisons have been assessed, within the unchanged campaign ceiling.",
+  "resumed": true,
+  "resumedAt": "2026-09-16T06:50:36.427227+00:00",
+  "resumeReason": "Completed counter-value, guided-final-review and reasoning-effort comparisons have been assessed; the gateway is repaired. Resume the remaining broad study in its frozen order alongside targeted replacements under the unchanged global three-slot limit."
+}

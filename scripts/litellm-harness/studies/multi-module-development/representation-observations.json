@@ -1,0 +1,545 @@
+{
+  "status": "posthoc diagnostic; not replacement acceptance",
+  "trigger": "First Astra repetition passed17/17 reference checks but1/4predeclared supplemental checks. Allthree failures are exclusively cachedImage0 versusNone; supplied token sums/input immutability match.",
+  "scope": "Check both representations against input-billing arithmetic and aggregate nonzero image values. The primary four-check probe and study scores remain unchanged. Apply this same diagnostic to all four planned attempts as they finish.",
+  "probeSha256": "43440ad587358382faab2e5fd12807b7daac86bb152c6ede0d1b5919ee719a48",
+  "sourceFilesVerified": [
+    "litellm/cost_calculator.py",
+    "litellm/litellm_core_utils/llm_cost_calc/utils.py",
+    "litellm/model_prices_and_context_window_backup.json",
+    "litellm/responses/litellm_completion_transformation/transformation.py",
+    "litellm/responses/utils.py",
+    "litellm/types/llms/base.py",
+    "litellm/types/llms/openai.py",
+    "litellm/types/utils.py",
+    "litellm/utils.py",
+    "model_prices_and_context_window.json"
+  ],
+  "sourceRevisions": {
+    "base": "9e1ed40db3376dc8e7b9392aa104653ca22d3fdb",
+    "reference": "6e9e08475ac37128f435ddc1d13347081637748a"
+  },
+  "observations": {
+    "base": {
+      "rows": [
+        {
+          "name": "billing-cached-image-absent",
+          "pass": false,
+          "actualCost": 0.0029888,
+          "expectedCost": 0.0015328
+        },
+        {
+          "name": "billing-cached-image-zero",
+          "pass": false,
+          "actualCost": 0.0029888,
+          "expectedCost": 0.0015328
+        },
+        {
+          "name": "aggregate-token-values",
+          "pass": false,
+          "observed": {
+            "text_tokens": null,
+            "audio_tokens": null,
+            "image_tokens": null
+          },
+          "inputsUnchanged": true
+        },
+        {
+          "name": "aggregate-input-billing",
+          "pass": false,
+          "actualCost": 0.0046288,
+          "expectedCost": 0.0017728
+        },
+        {
+          "name": "partial-split-first",
+          "pass": false,
+          "observed": {
+            "text_tokens": null,
+            "audio_tokens": null,
+            "image_tokens": null
+          },
+          "inputsUnchanged": true
+        },
+        {
+          "name": "partial-split-last",
+          "pass": false,
+          "observed": {
+            "text_tokens": null,
+            "audio_tokens": null,
+            "image_tokens": null
+          },
+          "inputsUnchanged": true
+        },
+        {
+          "name": "explicit-cached-image-sum",
+          "pass": false,
+          "cachedImage": null,
+          "inputsUnchanged": true
+        }
+      ],
+      "passed": false,
+      "imports": {
+        "packageOrigin": "litellm/__init__.py",
+        "allLiteLLMModulesWithinWorkspace": true,
+        "moduleCount": 813
+      },
+      "bytecodePolicy": "fresh cache path; reads from adjacent caches and all writes disabled",
+      "exit": 0
+    },
+    "reference": {
+      "rows": [
+        {
+          "name": "billing-cached-image-absent",
+          "pass": true,
+          "actualCost": 0.0015328,
+          "expectedCost": 0.0015328
+        },
+        {
+          "name": "billing-cached-image-zero",
+          "pass": true,
+          "actualCost": 0.0015328,
+          "expectedCost": 0.0015328
+        },
+        {
+          "name": "aggregate-token-values",
+          "pass": true,
+          "observed": {
+            "text_tokens": 64,
+            "audio_tokens": 228,
+            "image_tokens": null
+          },
+          "inputsUnchanged": true
+        },
+        {
+          "name": "aggregate-input-billing",
+          "pass": true,
+          "actualCost": 0.0017728,
+          "expectedCost": 0.0017728
+        },
+        {
+          "name": "partial-split-first",
+          "pass": true,
+          "observed": {
+            "text_tokens": 64,
+            "audio_tokens": 128,
+            "image_tokens": null
+          },
+          "inputsUnchanged": true
+        },
+        {
+          "name": "partial-split-last",
+          "pass": true,
+          "observed": {
+            "text_tokens": 64,
+            "audio_tokens": 128,
+            "image_tokens": null
+          },
+          "inputsUnchanged": true
+        },
+        {
+          "name": "explicit-cached-image-sum",
+          "pass": true,
+          "cachedImage": 3,
+          "inputsUnchanged": true
+        }
+      ],
+      "passed": true,
+      "imports": {
+        "packageOrigin": "litellm/__init__.py",
+        "allLiteLLMModulesWithinWorkspace": true,
+        "moduleCount": 813
+      },
+      "bytecodePolicy": "fresh cache path; reads from adjacent caches and all writes disabled",
+      "exit": 0
+    },
+    "astra-r1": {
+      "rows": [
+        {
+          "name": "billing-cached-image-absent",
+          "pass": true,
+          "actualCost": 0.0015328,
+          "expectedCost": 0.0015328
+        },
+        {
+          "name": "billing-cached-image-zero",
+          "pass": true,
+          "actualCost": 0.0015328,
+          "expectedCost": 0.0015328
+        },
+        {
+          "name": "aggregate-token-values",
+          "pass": true,
+          "observed": {
+            "text_tokens": 64,
+            "audio_tokens": 228,
+            "image_tokens": 0
+          },
+          "inputsUnchanged": true
+        },
+        {
+          "name": "aggregate-input-billing",
+          "pass": true,
+          "actualCost": 0.0017728,
+          "expectedCost": 0.0017728
+        },
+        {
+          "name": "partial-split-first",
+          "pass": true,
+          "observed": {
+            "text_tokens": 64,
+            "audio_tokens": 128,
+            "image_tokens": 0
+          },
+          "inputsUnchanged": true
+        },
+        {
+          "name": "partial-split-last",
+          "pass": true,
+          "observed": {
+            "text_tokens": 64,
+            "audio_tokens": 128,
+            "image_tokens": 0
+          },
+          "inputsUnchanged": true
+        },
+        {
+          "name": "explicit-cached-image-sum",
+          "pass": true,
+          "cachedImage": 3,
+          "inputsUnchanged": true
+        }
+      ],
+      "passed": true,
+      "imports": {
+        "packageOrigin": "litellm/__init__.py",
+        "allLiteLLMModulesWithinWorkspace": true,
+        "moduleCount": 813
+      },
+      "bytecodePolicy": "fresh cache path; reads from adjacent caches and all writes disabled",
+      "exit": 0
+    },
+    "flash-r1": {
+      "rows": [
+        {
+          "name": "billing-cached-image-absent",
+          "pass": true,
+          "actualCost": 0.0015328,
+          "expectedCost": 0.0015328
+        },
+        {
+          "name": "billing-cached-image-zero",
+          "pass": true,
+          "actualCost": 0.0015328,
+          "expectedCost": 0.0015328
+        },
+        {
+          "name": "aggregate-token-values",
+          "pass": true,
+          "observed": {
+            "text_tokens": 64,
+            "audio_tokens": 228,
+            "image_tokens": 0
+          },
+          "inputsUnchanged": true
+        },
+        {
+          "name": "aggregate-input-billing",
+          "pass": true,
+          "actualCost": 0.0017728,
+          "expectedCost": 0.0017728
+        },
+        {
+          "name": "partial-split-first",
+          "pass": true,
+          "observed": {
+            "text_tokens": 64,
+            "audio_tokens": 128,
+            "image_tokens": 0
+          },
+          "inputsUnchanged": true
+        },
+        {
+          "name": "partial-split-last",
+          "pass": true,
+          "observed": {
+            "text_tokens": 64,
+            "audio_tokens": 128,
+            "image_tokens": 0
+          },
+          "inputsUnchanged": true
+        },
+        {
+          "name": "explicit-cached-image-sum",
+          "pass": true,
+          "cachedImage": 3,
+          "inputsUnchanged": true
+        }
+      ],
+      "passed": true,
+      "imports": {
+        "packageOrigin": "litellm/__init__.py",
+        "allLiteLLMModulesWithinWorkspace": true,
+        "moduleCount": 813
+      },
+      "bytecodePolicy": "fresh cache path; reads from adjacent caches and all writes disabled",
+      "exit": 0
+    },
+    "astra-r2": {
+      "rows": [
+        {
+          "name": "billing-cached-image-absent",
+          "pass": true,
+          "actualCost": 0.0015328,
+          "expectedCost": 0.0015328
+        },
+        {
+          "name": "billing-cached-image-zero",
+          "pass": true,
+          "actualCost": 0.0015328,
+          "expectedCost": 0.0015328
+        },
+        {
+          "name": "aggregate-token-values",
+          "pass": true,
+          "observed": {
+            "text_tokens": 64,
+            "audio_tokens": 228,
+            "image_tokens": 0
+          },
+          "inputsUnchanged": true
+        },
+        {
+          "name": "aggregate-input-billing",
+          "pass": true,
+          "actualCost": 0.0017728,
+          "expectedCost": 0.0017728
+        },
+        {
+          "name": "partial-split-first",
+          "pass": true,
+          "observed": {
+            "text_tokens": 64,
+            "audio_tokens": 128,
+            "image_tokens": 0
+          },
+          "inputsUnchanged": true
+        },
+        {
+          "name": "partial-split-last",
+          "pass": true,
+          "observed": {
+            "text_tokens": 64,
+            "audio_tokens": 128,
+            "image_tokens": 0
+          },
+          "inputsUnchanged": true
+        },
+        {
+          "name": "explicit-cached-image-sum",
+          "pass": true,
+          "cachedImage": 3,
+          "inputsUnchanged": true
+        }
+      ],
+      "passed": true,
+      "imports": {
+        "packageOrigin": "litellm/__init__.py",
+        "allLiteLLMModulesWithinWorkspace": true,
+        "moduleCount": 813
+      },
+      "bytecodePolicy": "fresh cache path; reads from adjacent caches and all writes disabled",
+      "exit": 0
+    },
+    "flash-r2": {
+      "rows": [
+        {
+          "name": "billing-cached-image-absent",
+          "pass": true,
+          "actualCost": 0.0015328,
+          "expectedCost": 0.0015328
+        },
+        {
+          "name": "billing-cached-image-zero",
+          "pass": true,
+          "actualCost": 0.0015328,
+          "expectedCost": 0.0015328
+        },
+        {
+          "name": "aggregate-token-values",
+          "pass": true,
+          "observed": {
+            "text_tokens": 64,
+            "audio_tokens": 228,
+            "image_tokens": null
+          },
+          "inputsUnchanged": true
+        },
+        {
+          "name": "aggregate-input-billing",
+          "pass": true,
+          "actualCost": 0.0017728,
+          "expectedCost": 0.0017728
+        },
+        {
+          "name": "partial-split-first",
+          "pass": true,
+          "observed": {
+            "text_tokens": 64,
+            "audio_tokens": 128,
+            "image_tokens": null
+          },
+          "inputsUnchanged": true
+        },
+        {
+          "name": "partial-split-last",
+          "pass": true,
+          "observed": {
+            "text_tokens": 64,
+            "audio_tokens": 128,
+            "image_tokens": null
+          },
+          "inputsUnchanged": true
+        },
+        {
+          "name": "explicit-cached-image-sum",
+          "pass": true,
+          "cachedImage": 3,
+          "inputsUnchanged": true
+        }
+      ],
+      "passed": true,
+      "imports": {
+        "packageOrigin": "litellm/__init__.py",
+        "allLiteLLMModulesWithinWorkspace": true,
+        "moduleCount": 813
+      },
+      "bytecodePolicy": "fresh cache path; reads from adjacent caches and all writes disabled",
+      "exit": 0
+    }
+  },
+  "pendingLabels": [],
+  "originalFirstAstra": {
+    "run": "replication-v50-larger-astra-r1-realtime-cached-audio-cost-9b295f3f",
+    "seconds": 460.293,
+    "normalCompletion": true,
+    "referencePassed": 17,
+    "referenceTotal": 17,
+    "supplementalPassed": 1,
+    "supplementalTotal": 4
+  },
+  "interpretation": "Base0/7, reference7/7, all four planned Astra/Flash attempts7/7. All four finish normally; reference counts17,16 for both models. Original supplemental counts Astra1,1 and Flash1,4 remain unchanged, hence strict0/2both. Mean Flash1050.7455sec/$0.444071438total versus Astra512.11sec/unknownUSD. The diagnostic supports the tested billing and aggregation behavior only, not complete correctness or equivalence of all consumers.",
+  "firstFlash": {
+    "run": "replication-v50-larger-flash-r1-realtime-cached-audio-cost-f4875007",
+    "seconds": 1017.864,
+    "completed": true,
+    "computedUsd": 0.187538058,
+    "requests": 141,
+    "modelSeconds": 573.068,
+    "toolActiveSeconds": 386.796,
+    "timeToFirstEditSeconds": 176.464,
+    "reviewStartedSeconds": 995.305,
+    "reviewModelRequests": 2,
+    "activations": {
+      "initialMapNotices": 1,
+      "contextToolCalls": 1,
+      "guideIdsShown": [],
+      "unparsedContextPayloads": 0,
+      "finalReviewNotices": 1,
+      "guidedFinalReviewNotices": 0,
+      "finalReviewGuideIdsShown": [],
+      "batchedEditCalls": 24,
+      "completedBatchedEditCalls": 22,
+      "batchEditsRequested": 44,
+      "batchSizes": [
+        3,
+        2,
+        1,
+        2,
+        1,
+        2,
+        4,
+        1,
+        2,
+        1,
+        3,
+        1,
+        1,
+        8,
+        1,
+        1,
+        1,
+        2,
+        1,
+        1,
+        2,
+        1,
+        1,
+        1
+      ],
+      "backgroundCommandNotices": 1,
+      "testFocusNotices": 1,
+      "explorationFocusNotices": 1,
+      "readCallsByEffectiveLimit": {
+        "160": 3,
+        "140": 1,
+        "120": 4,
+        "80": 5,
+        "50": 2,
+        "40": 5,
+        "280": 1,
+        "90": 1,
+        "180": 1,
+        "110": 1,
+        "260": 1,
+        "60": 4,
+        "130": 2,
+        "100": 1,
+        "25": 3,
+        "70": 2,
+        "30": 2,
+        "20": 2,
+        "15": 1,
+        "12": 1,
+        "10": 1
+      },
+      "defaultWindowReadCalls": null,
+      "readLimitProvenance": "unknown: saved arguments include host-injected defaults"
+    },
+    "referencePassed": 17,
+    "referenceTotal": 17,
+    "supplementalPassed": 1,
+    "supplementalTotal": 4
+  },
+  "secondRepetitions": {
+    "astra-r2": {
+      "run": "replication-v50-larger-astra-r2-realtime-cached-audio-cost-90d3beee",
+      "seconds": 563.927,
+      "completed": true,
+      "computedUsd": null,
+      "requests": null,
+      "acceptance": {
+        "exit": 1,
+        "tests": 17,
+        "failures": 1,
+        "errors": 0,
+        "skipped": 0,
+        "passed": false
+      }
+    },
+    "flash-r2": {
+      "run": "replication-v50-larger-flash-r2-realtime-cached-audio-cost-1f7c3b55",
+      "seconds": 1083.627,
+      "completed": true,
+      "computedUsd": 0.25653338,
+      "requests": 187,
+      "acceptance": {
+        "exit": 1,
+        "tests": 17,
+        "failures": 1,
+        "errors": 0,
+        "skipped": 0,
+        "passed": false
+      }
+    }
+  }
+}

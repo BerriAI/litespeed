@@ -1,0 +1,65 @@
+diff --git a/server/litellm-harness.ts b/server/litellm-harness.ts
+index 8d20fa9..32b1225 100644
+--- a/server/litellm-harness.ts
++++ b/server/litellm-harness.ts
+@@ -4,7 +4,7 @@ import path from 'node:path';
+ import fg from 'fast-glob';
+ import type { ToolDefinition } from '../shared/types.js';
+ 
+-export const LITELLM_HARNESS_VERSION='2026-09-16.46';
++export const LITELLM_HARNESS_VERSION='2026-09-16.51';
+ export function litellmEditTool(tool:ToolDefinition):ToolDefinition {
+   if(tool.function.name!=='edit_file')return tool;
+   return {...tool,function:{...tool.function,
+@@ -12,6 +12,7 @@ export function litellmEditTool(tool:ToolDefinition):ToolDefinition {
+     parameters:{...tool.function.parameters,required:['path'],properties:{...(tool.function.parameters.properties as object),edits:{type:'array',minItems:1,maxItems:32,items:{type:'object',additionalProperties:false,properties:{old_string:{type:'string',minLength:1},new_string:{type:'string'},replace_all:{type:'boolean'}},required:['old_string','new_string']}}}}
+   }};
+ }
++export const litellmBashGuidance=' For focused pytest checks, use --tb=short -q without piping to tail or grep: shell filters discard failure details before this tool can return them. Output is already bounded; if a check may exceed the job buffer, save it to a log and read that log instead of rerunning solely to change a display filter.';
+ export const litellmContextTool:ToolDefinition={type:'function',function:{name:'litellm_context',description:'Navigate the current LiteLLM checkout. Give a task query to find relevant definitions, inline conditions and existing tests. Give a source path to see its symbol outline and test partners; add a symbol name to read that definition with numbered lines, or callers to find functions invoking a named helper in that file. Reads only this workspace, never Git history or remote answers.',parameters:{type:'object',properties:{query:{type:'string',maxLength:1000},path:{type:'string',maxLength:500},symbol:{type:'string',maxLength:200},callers:{type:'string',maxLength:200,description:'Python helper name whose call sites and enclosing functions to find; requires path.'}},additionalProperties:false}}};
+ 
+ const playbooks = [
+diff --git a/server/runner.ts b/server/runner.ts
+index 52f0f8f..95a27c0 100644
+--- a/server/runner.ts
++++ b/server/runner.ts
+@@ -1,4 +1,4 @@
+-import { litellmContext, litellmContextTool, litellmEditTool, litellmInstructions, litellmReview, litellmTestFocus, litellmExplorationFocus } from './litellm-harness.js';
++import { litellmContext, litellmContextTool, litellmEditTool, litellmInstructions, litellmReview, litellmTestFocus, litellmExplorationFocus, litellmBashGuidance } from './litellm-harness.js';
+ import { LiteFusionDiscovery } from './litefusion-discovery.js';
+ import { liteFusionReadiness, type LiteFusionReadiness } from '../shared/litefusion-readiness.js';
+ import { unavailableRoute } from './litefusion-availability.js';
+@@ -1536,7 +1536,8 @@ export class Runner {
+     // a deliberate ceiling expansion recorded in docs/delegation.md).
+     const architectureTools=session.architecture?.kind==='litellm-specific'&&!run.child?toolDefinitions.map(litellmEditTool):toolDefinitions;
+     const readTools = policy.shuntProvider ? architectureTools.map(tool => tool.function.name==='read_file' ? {...tool,function:{...tool.function,parameters:{...tool.function.parameters,properties:{...(tool.function.parameters.properties as object),direct_reason:{type:'string',minLength:1,maxLength:1000,description:'Why you need source directly for exact reasoning, debugging or recovery instead of a Shunt answer.'}}}}} : tool) : architectureTools;
+-    const availableTools = [...readTools,...(session.architecture?.kind==='litellm-specific'&&!run.child?[litellmContextTool]:[]), ...(policy.shuntProvider?shuntTools:[]), ...(session.architecture&&session.architecture.kind!=='litellm-specific'&&!run.child?(policy.litefusion?[liteFusionDelegateTool,waitTasksTool,resolveTaskTool,verifyTool]:session.architecture.kind==='sidekick-fusion'?[sidekickTool]:[delegateTool,verifyTool,takeoverTool]):[]), historySearchTool, toolOutputPageTool, bashOutputTool, killShellTool, waitTool, viewImageTool, webSearchTool, updateGoalTool, ...(run.litefusionRole?[workerRequestTool,...(run.litefusionRole.execution==='review'?[verifyTool]:[])]:[]), ...(gateway.size?[capabilityTool]:[]), ...(policy.memory&&!run.child?memoryToolDefinitions:[]), questionTool, ...externalTools.filter(t => t.function.name !== 'ask_user')].filter(t=>allowed(t.function.name)||(strictDriver&&['write_file','edit_file','code_write'].includes(t.function.name)&&policyAllows(t.function.name==='code_write'?'write_file':t.function.name)&&(t.function.name!=='code_write'||baseAllowed('read_file'))));
++    const describedTools = session.architecture?.kind==='litellm-specific'&&!run.child ? readTools.map(tool=>tool.function.name==='bash'?{...tool,function:{...tool.function,description:tool.function.description+litellmBashGuidance}}:tool) : readTools;
++    const availableTools = [...describedTools,...(session.architecture?.kind==='litellm-specific'&&!run.child?[litellmContextTool]:[]), ...(policy.shuntProvider?shuntTools:[]), ...(session.architecture&&session.architecture.kind!=='litellm-specific'&&!run.child?(policy.litefusion?[liteFusionDelegateTool,waitTasksTool,resolveTaskTool,verifyTool]:session.architecture.kind==='sidekick-fusion'?[sidekickTool]:[delegateTool,verifyTool,takeoverTool]):[]), historySearchTool, toolOutputPageTool, bashOutputTool, killShellTool, waitTool, viewImageTool, webSearchTool, updateGoalTool, ...(run.litefusionRole?[workerRequestTool,...(run.litefusionRole.execution==='review'?[verifyTool]:[])]:[]), ...(gateway.size?[capabilityTool]:[]), ...(policy.memory&&!run.child?memoryToolDefinitions:[]), questionTool, ...externalTools.filter(t => t.function.name !== 'ask_user')].filter(t=>allowed(t.function.name)||(strictDriver&&['write_file','edit_file','code_write'].includes(t.function.name)&&policyAllows(t.function.name==='code_write'?'write_file':t.function.name)&&(t.function.name!=='code_write'||baseAllowed('read_file'))));
+     // An ignored invalid rules file must be visible in the session detail, not
+     // only when a prompt happens to occur. The child transcript inherits the
+     // parent's captured rules; the parent already carries the notice.
+diff --git a/tests/litellm-harness-runner.test.ts b/tests/litellm-harness-runner.test.ts
+index 8316f5f..75bef9e 100644
+--- a/tests/litellm-harness-runner.test.ts
++++ b/tests/litellm-harness-runner.test.ts
+@@ -43,6 +43,19 @@ describe('LiteLLM-specific runner integration',()=>{
+     expect(requests[0].tools.map((t:any)=>t.function.name)).not.toContain('litellm_context');
+     expect(store.messages(plain.id).some(m=>m.content.startsWith('LiteLLM starting locations'))).toBe(false);
+   });
++  it('places focused pytest guidance on the actual bash definition without mutating Single model tools',async()=>{
++    const session=store.createSession({workspace:root,providerId:'test',model:'model',permissionMode:'auto',architecture:{kind:'litellm-specific'}});
++    runner.start(session.id,'Explain this checkout.');await runner.whenIdle();
++    const specialized=requests[0].tools.find((tool:any)=>tool.function.name==='bash').function;
++    expect(specialized.description).toContain('without piping to tail or grep');
++    expect(specialized.description).toContain('if a check may exceed the job buffer');
++    expect(specialized.parameters.properties.command).toEqual({type:'string'});
++    requests=[];const plain=store.createSession({workspace:root,providerId:'test',model:'model',permissionMode:'auto'});
++    runner.start(plain.id,'Explain this checkout.');await runner.whenIdle();
++    const ordinary=requests[0].tools.find((tool:any)=>tool.function.name==='bash').function;
++    expect(ordinary.description).not.toContain('without piping to tail or grep');
++    expect(ordinary.parameters).toEqual(specialized.parameters);
++  });
+   it.each(['build','plan'] as const)('supplies current source locations before the first %s request without recording edits',async(mode)=>{
+     const session=store.createSession({workspace:root,providerId:'test',model:'model',permissionMode:'auto',mode,architecture:{kind:'litellm-specific'}});
+     runner.start(session.id,'Explain example code.');await runner.whenIdle();

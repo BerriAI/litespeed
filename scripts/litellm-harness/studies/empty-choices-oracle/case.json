@@ -1,0 +1,23 @@
+{
+  "id": "empty-choices",
+  "base": "8b2983bd909ef408e59072fb77ff87cb0f9865e5",
+  "reference": "b7dad8b44e30e87e6ae174ea6f58054e17cfc8a5",
+  "prompt": "Treat an explicit empty choices list as a valid upstream response, including in shared dictionary-to-response conversion, sync/async conversion to streaming, stream response construction and the Anthropic compatibility adapter. Return an empty choices list without raising APIError or IndexError and without fabricating an assistant choice. Preserve usage-only responses. Missing choices and choices of the wrong type (including null) remain malformed and should raise APIError with a useful diagnostic identifying choices and the supplied type. Existing tests that deliberately reject [] encode the old behavior and must be updated for this change.",
+  "test_nodes": [
+    "tests/llm_translation/test_llm_response_utils/test_convert_dict_to_chat_completion.py::TestMissingChoicesGuard::test_convert_to_model_response_object_empty_choices_returns_empty_list",
+    "tests/llm_translation/test_llm_response_utils/test_convert_dict_to_chat_completion.py::TestMissingChoicesGuard::test_convert_to_model_response_object_null_choices_raises_api_error",
+    "tests/test_litellm/litellm_core_utils/llm_response_utils/test_convert_dict_to_response.py::test_convert_empty_choices_response",
+    "tests/test_litellm/litellm_core_utils/llm_response_utils/test_convert_dict_to_response.py::test_convert_empty_choices_response_async",
+    "tests/test_litellm/litellm_core_utils/llm_response_utils/test_convert_dict_to_response.py::test_convert_missing_choices_raises_api_error",
+    "tests/test_litellm/litellm_core_utils/llm_response_utils/test_convert_dict_to_response.py::test_convert_non_list_choices_raises_api_error",
+    "tests/test_litellm/litellm_core_utils/test_streaming_handler.py::test_dispatch_cached_response_without_choices_is_an_empty_chunk",
+    "tests/test_litellm/litellm_core_utils/test_streaming_handler.py::test_cached_response_without_choices_streams_a_single_stop_chunk",
+    "tests/test_litellm/llms/anthropic/experimental_pass_through/adapters/test_anthropic_experimental_pass_through_adapters_transformation.py::test_translate_openai_response_to_anthropic_empty_choices",
+    "tests/test_litellm/test_main.py::test_completion_missing_role"
+  ],
+  "source_paths": [
+    "litellm/litellm_core_utils/llm_response_utils/convert_dict_to_response.py",
+    "litellm/litellm_core_utils/streaming_handler.py",
+    "litellm/llms/anthropic/experimental_pass_through/adapters/transformation.py"
+  ]
+}

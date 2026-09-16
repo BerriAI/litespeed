@@ -1,0 +1,70 @@
+diff --git a/litellm/router.py b/litellm/router.py
+index 88601e5..291c32b 100644
+--- a/litellm/router.py
++++ b/litellm/router.py
+@@ -11188,8 +11188,8 @@ class Router:
+         return self._deployment_ids(
+             (
+                 *self._get_all_deployments(model_name=resolved, team_id=team_id),
+-                *(self.pattern_router.route(resolved) or ()),
+-                *((team_router.route(resolved) or ()) if team_router is not None else ()),
++                *self.pattern_router.get_deployments_by_pattern(model=resolved),
++                *((team_router.get_deployments_by_pattern(model=resolved) or ()) if team_router is not None else ()),
+             )
+         )
+ 
+diff --git a/tests/test_litellm/test_router.py b/tests/test_litellm/test_router.py
+index 1e0327e..5f22d7c 100644
+--- a/tests/test_litellm/test_router.py
++++ b/tests/test_litellm/test_router.py
+@@ -15049,6 +15049,50 @@ def test_get_candidate_model_ids_for_route_covers_model_name_and_pattern():
+     assert "dep-wild" in router.get_candidate_model_ids_for_route(model="openai/gpt-4o-some-new-model")
+ 
+ 
++def test_get_candidate_model_ids_for_route_resolves_unprefixed_name_against_provider_wildcard():
++    """
++    A provider-qualified wildcard deployment ("openai/*") is reachable by an unprefixed
++    model name ("gpt-4o"): the router qualifies the request with the provider it resolves
++    for the name before pattern matching, so ``get_model_list("gpt-4o")`` returns it.
++    ``get_candidate_model_ids_for_route`` must reuse that same resolution (rather than
++    matching the raw name against the pattern), otherwise a pre-call check sees no
++    candidate for a route the router actually resolves.
++
++    Direct group names and team-scoped patterns keep their existing precedence.
++    """
++    router = Router(
++        model_list=[
++            {
++                "model_name": "grp",
++                "litellm_params": {"model": "openai/gpt-4o", "api_key": "sk-a", "api_base": "https://x.invalid"},
++                "model_info": {"id": "dep-a"},
++            },
++            {
++                "model_name": "openai/*",
++                "litellm_params": {"model": "openai/*", "api_key": "sk-c", "api_base": "https://x.invalid"},
++                "model_info": {"id": "dep-wild"},
++            },
++            {
++                "model_name": "team-public-grp",
++                "litellm_params": {"model": "openai/gpt-4o", "api_key": "sk-d", "api_base": "https://x.invalid"},
++                "model_info": {"id": "dep-team-wild", "team_id": "teamA", "team_public_model_name": "openai/*"},
++            },
++        ]
++    )
++
++    # The unprefixed name resolves to the provider-qualified wildcard, as get_model_list agrees.
++    assert {d["model_info"]["id"] for d in router.get_model_list(model_name="gpt-4o") or ()} >= {"dep-wild"}
++    assert router.get_candidate_model_ids_for_route(model="gpt-4o") == frozenset({"dep-wild"})
++
++    # A direct group name still resolves to its own members.
++    assert router.get_candidate_model_ids_for_route(model="grp") == frozenset({"dep-a"})
++
++    # Team-scoped wildcard patterns resolve too, unioned with the global match.
++    assert router.get_candidate_model_ids_for_route(model="gpt-4o", team_id="teamA") == frozenset(
++        {"dep-wild", "dep-team-wild"}
++    )
++
++
+ def test_deployment_ids_stringifies_ids_and_skips_entries_without_a_model_info_id():
+     deployments = (
+         {"model_info": {"id": "a"}},

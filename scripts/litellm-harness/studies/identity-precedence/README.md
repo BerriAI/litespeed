@@ -1,0 +1,35 @@
+# A passing training patch with a missing keep condition
+
+This is supplemental **training evidence**, discovered after the original run. The Langfuse candidate passed all 60 original acceptance cases but omitted a condition stated in its task: keep a trace ID that differs from the session ID when the `langfuse_session_id` header does not equal that session ID.
+
+A DeepSeek windowed critic proposed this gap. The six-case [probe](probe.py) confirmed it through `log_event_on_langfuse`, with a mocked Langfuse SDK and distinct trace, session and call IDs. Both DEFAULT and ERROR paths are covered.
+
+| Implementation | Supplemental checks satisfied |
+|---|---:|
+| Starting snapshot | 2/6 |
+| Recorded candidate, originally 60/60 | 4/6 |
+| Human reference | 6/6 |
+
+[Qualification outputs](qualification.json) retain each expected, transmitted and returned ID. Original acceptance tests, results and the frozen feature-removal study are unchanged. These new checks can inform subsequent training; they are not held-out evaluation results. The case does not establish that the reference is free of other bugs.
+
+## Reproduce
+
+[Task metadata](task.json) contains the base/reference commits and original acceptance selection. In an isolated checkout with the LiteLLM test dependencies installed, run `probe.py` with `PYTHONPATH` set to that checkout, `LITELLM_LOCAL_MODEL_COST_MAP=True`, and `PYTHON_DOTENV_DISABLED=1`. Apply [the recorded candidate patch](observed-candidate.patch) to a separate base checkout to reproduce its result. The probe prints per-case `pass` booleans; its process exit indicates execution errors, not whether every case passed.
+
+No actual Langfuse requests are made. IDs are synthetic. This directory contains no private model traces, gateway configuration or credentials.
+
+## Subsequent guide experiment
+
+[The predeclared plan](plan.json) compares the v22 control with [one guide addition](identity-guide.patch), twice each. Both the original acceptance and all six supplemental checks must pass, with a normal completed response. The guide derives from training failures; this experiment is development selection. The public copy removes local worktree paths and adds the reporting schema; it retains the original trial identities, commits and order. Run `study.py` with this plan after `analyze.py`; missing supplemental artifacts leave a trial unevaluated. The probe's zero exit alone is insufficient.
+
+Both guide attempts completed and passed the original 60 checks plus all six supplemental checks. One of the two controls passed both sets; the other missed the keep condition. The guide appeared in both candidate traces. Mean elapsed time was 391 seconds with the guide versus 385 for controls; the experiment does not establish a speed benefit. [Results](results.json) retain each attempt. This one-task regression check supports adding the narrowly triggered guide in v26; it cannot estimate broader task quality or an advantage over Astra.
+
+## Reference provenance correction
+
+The first qualification selected a tests-only directory for the reference. Python resolved that import to the live editable checkout, so its reference attribution was invalid. [The original output](qualification-v1-invalid-reference.json) is retained for the audit trail. [The replacement qualification](qualification.json) uses fresh Git archives of the exact recorded base and reference commits, verifies every loaded LiteLLM module belongs to the selected snapshot, and disables adjacent bytecode reuse. All base, candidate and reference outcomes are unchanged.
+
+For subsequent reproduction, run the interpreter with `-B`, followed by `scripts/litellm-harness/probe_runner.py`, the absolute checkout path and the absolute probe path. The runner verifies import origins and prints an explicit `passed` verdict. A tests-only directory is rejected.
+
+## Starting-snapshot cache audit
+
+Some trial baselines inherited generated Python bytecode from host probes. [The audit](../../snapshot-hygiene-audit.json) identifies affected trials, verifies all present Python source against its Git base, and retains original results. All 12 affected trials reproduced their original acceptance verdict and counts with adjacent caches disabled. All 19 supplemental reruns verified import origins; previously recorded per-case results were unchanged. Only generated caches were removed from reusable starting snapshots; existing trial workspaces and patches were preserved. The launcher now rejects cached starting snapshots.

@@ -1,0 +1,284 @@
+[
+  {
+    "dataset": "",
+    "case": "anthropic-image-guardrail",
+    "query": "Anthropic message guardrails drop image blocks whose source type is url. Forward URL sources as URL strings, including images nested in tool results. For base64 sources with media_type, supply a data URL preserving that MIME type; keep raw base64 as a fallback when media_type is absent. Ignore malformed sources and unsupported file sources. Preserve the original message content.",
+    "expectedSourcePaths": [
+      "litellm/llms/anthropic/chat/guardrail_translation/handler.py"
+    ],
+    "expectedTestPaths": [
+      "tests/test_litellm/llms/anthropic/chat/guardrail_translation/test_anthropic_guardrail_handler.py"
+    ]
+  },
+  {
+    "dataset": "",
+    "case": "anthropic-tool-document",
+    "query": "The Anthropic /v1/messages compatibility bridge loses document blocks inside tool_result content. Translate supported document blocks using the same document handling as ordinary user content, preserving mixed text and document content.",
+    "expectedSourcePaths": [
+      "litellm/llms/anthropic/experimental_pass_through/adapters/transformation.py"
+    ],
+    "expectedTestPaths": [
+      "tests/test_litellm/llms/anthropic/experimental_pass_through/adapters/test_anthropic_experimental_pass_through_adapters_transformation.py"
+    ]
+  },
+  {
+    "dataset": "",
+    "case": "converse-config",
+    "query": "Fix Bedrock Converse request mapping: request-level configuration such as guardrailConfig and performanceConfig must not also appear inside inferenceConfig. Preserve guarded-text behavior and ordinary inference parameters.",
+    "expectedSourcePaths": [
+      "litellm/llms/bedrock/chat/converse_transformation.py"
+    ],
+    "expectedTestPaths": [
+      "tests/test_litellm/llms/bedrock/chat/test_converse_transformation.py"
+    ]
+  },
+  {
+    "dataset": "",
+    "case": "dashscope-rerank",
+    "query": "DashScope rerank calls should use the native text-rerank service path rather than the OpenAI-compatible path. Fix DashScope and its Qwen brand aliases while respecting explicitly configured API bases and existing chat behavior.",
+    "expectedSourcePaths": [
+      "litellm/llms/dashscope/common_utils.py",
+      "litellm/llms/dashscope/qwen_ai_platform.py",
+      "litellm/llms/dashscope/qwencloud.py",
+      "litellm/llms/dashscope/rerank/transformation.py"
+    ],
+    "expectedTestPaths": [
+      "tests/test_litellm/llms/dashscope/test_dashscope_rerank_transformation.py",
+      "tests/test_litellm/llms/dashscope/test_qwen_brand_aliases.py",
+      "tests/test_litellm/rerank_api/test_main.py"
+    ]
+  },
+  {
+    "dataset": "",
+    "case": "databricks-reasoning",
+    "query": "Databricks chat responses can carry thinking in reasoning_content, its reasoning alias, structured reasoning content blocks, or <think> tags inside string content. Preserve reasoning_content and visible answer text in normal and streaming responses, including reasoning-only chunks. Existing structured reasoning blocks take precedence over top-level fields. A string with <think> tags must separate reasoning from the visible answer. Preserve existing tool and citation behavior.",
+    "expectedSourcePaths": [
+      "litellm/llms/databricks/chat/transformation.py",
+      "litellm/types/llms/databricks.py"
+    ],
+    "expectedTestPaths": [
+      "tests/test_litellm/llms/databricks/chat/test_databricks_chat_transformation.py"
+    ]
+  },
+  {
+    "dataset": "",
+    "case": "empty-choices",
+    "query": "Treat an explicit empty choices list as a valid upstream response, including in shared dictionary-to-response conversion, sync/async conversion to streaming, stream response construction and the Anthropic compatibility adapter. Return an empty choices list without raising APIError or IndexError and without fabricating an assistant choice. Preserve usage-only responses. Missing choices and choices of the wrong type (including null) remain malformed and should raise APIError with a useful diagnostic identifying choices and the supplied type. Existing tests that deliberately reject [] encode the old behavior and must be updated for this change.",
+    "expectedSourcePaths": [
+      "litellm/litellm_core_utils/llm_response_utils/convert_dict_to_response.py",
+      "litellm/litellm_core_utils/streaming_handler.py",
+      "litellm/llms/anthropic/experimental_pass_through/adapters/transformation.py"
+    ],
+    "expectedTestPaths": [
+      "tests/llm_translation/test_llm_response_utils/test_convert_dict_to_chat_completion.py",
+      "tests/test_litellm/litellm_core_utils/llm_response_utils/test_convert_dict_to_response.py",
+      "tests/test_litellm/litellm_core_utils/test_streaming_handler.py",
+      "tests/test_litellm/llms/anthropic/experimental_pass_through/adapters/test_anthropic_experimental_pass_through_adapters_transformation.py",
+      "tests/test_litellm/test_main.py"
+    ]
+  },
+  {
+    "dataset": "",
+    "case": "router-candidates",
+    "query": "Router candidate deployment IDs must resolve unprefixed model names against provider-qualified wildcard deployments. Use the router's existing resolution semantics, preserving direct group names and team-scoped resolution.",
+    "expectedSourcePaths": [
+      "litellm/router.py"
+    ],
+    "expectedTestPaths": [
+      "tests/test_litellm/test_router.py"
+    ]
+  },
+  {
+    "dataset": "",
+    "case": "router-strategy-isolation",
+    "query": "A per-request routing_strategy override registers its selector in global callbacks and affects unrelated requests. Isolate override selectors while retaining their per-call rate-limit accounting across sync, async and pass-through routing.",
+    "expectedSourcePaths": [
+      "litellm/router.py"
+    ],
+    "expectedTestPaths": [
+      "tests/test_litellm/router_strategy/test_router_routing_groups.py"
+    ]
+  },
+  {
+    "dataset": "",
+    "case": "team-member-budget",
+    "query": "Team member budget enforcement allows a request at the exact cap and can lose enforcement after Redis counters expire. Enforce the boundary and retain correct accumulated spend when rebuilding expired counters. Preserve ordinary team/user budget behavior.",
+    "expectedSourcePaths": [
+      "litellm/proxy/auth/user_api_key_auth.py",
+      "litellm/proxy/proxy_server.py",
+      "litellm/proxy/spend_tracking/budget_reservation.py"
+    ],
+    "expectedTestPaths": [
+      "tests/test_litellm/proxy/auth/test_user_api_key_auth.py",
+      "tests/test_litellm/proxy/test_budget_reservation.py",
+      "tests/test_litellm/proxy/test_proxy_server.py"
+    ]
+  },
+  {
+    "dataset": "",
+    "case": "vertex-version-path",
+    "query": "Vertex requests fail when api_base ends with /v1 or /v1beta1: the generated URL omits project, location and model. Make these version-only bases work for streaming and non-streaming requests. Preserve bare hosts, full custom paths and Gemini behavior.",
+    "expectedSourcePaths": [
+      "litellm/llms/vertex_ai/vertex_llm_base.py"
+    ],
+    "expectedTestPaths": [
+      "tests/test_litellm/llms/vertex_ai/test_vertex_llm_base.py"
+    ]
+  },
+  {
+    "dataset": "training2",
+    "case": "bedrock-session-tags",
+    "query": "Add AWS STS session-tag support (`aws_session_tags`) to LiteLLM's AWS-backed providers.\n\nPublic configuration: deployments/credentials accept `aws_session_tags` as a list of `{'Key': <str>, 'Value': <str>}` dicts, defaulting to None. It must round-trip through `LiteLLM_Params`/`CredentialLiteLLMParams` and appear in `model_dump(exclude_none=True)`. Register `aws_session_tags` alongside the other AWS credential kwargs (AWS_CREDENTIAL_KWARGS_KEYS, BaseAWSLLM's AWS credential param list, Bedrock auth-parameter keys) and add it to the proxy's banned request-body params: caller-supplied `aws_session_tags` at the top level or under `extra_body` must raise ValueError naming the param, and caller-supplied AWS identity selectors (including tags) must be stripped when merging deployment request params.\n\nCredential resolution: `BaseAWSLLM.get_credentials(...)`, `_auth_with_aws_role`, the IRSA cross-account and same-account assume-role paths, `_get_boto_credentials_from_optional_params`, and `_sig",
+    "expectedSourcePaths": [
+      "litellm/litellm_core_utils/get_litellm_params.py",
+      "litellm/llms/bedrock/base_aws_llm.py",
+      "litellm/llms/bedrock/batches/handler.py",
+      "litellm/llms/bedrock/chat/converse_handler.py",
+      "litellm/llms/bedrock/common_utils.py",
+      "litellm/llms/bedrock/embed/embedding.py",
+      "litellm/llms/sagemaker/chat/handler.py",
+      "litellm/llms/sagemaker/completion/handler.py",
+      "litellm/proxy/auth/auth_utils.py",
+      "litellm/proxy/management_endpoints/model_management_endpoints.py",
+      "litellm/types/llms/bedrock.py",
+      "litellm/types/router.py"
+    ],
+    "expectedTestPaths": [
+      "tests/test_litellm/llms/bedrock/batches/test_handler.py",
+      "tests/test_litellm/llms/bedrock/chat/invoke_transformations/test_bedrock_chat_invoke_transformations_anthropic_claude3_transformation.py",
+      "tests/test_litellm/llms/bedrock/chat/test_bedrock_converse_handler.py",
+      "tests/test_litellm/llms/bedrock/embed/test_bedrock_embedding.py",
+      "tests/test_litellm/llms/bedrock/test_base_aws_llm.py",
+      "tests/test_litellm/llms/bedrock/test_bedrock_common_utils.py",
+      "tests/test_litellm/llms/sagemaker/test_sagemaker_chat_handler.py",
+      "tests/test_litellm/llms/sagemaker/test_sagemaker_completion_handler.py",
+      "tests/test_litellm/proxy/management_endpoints/test_model_management_endpoints.py",
+      "tests/test_litellm/types/test_router.py"
+    ]
+  },
+  {
+    "dataset": "training2",
+    "case": "langfuse-session-traces",
+    "query": "In litellm's Langfuse integration, when a request's trace id was produced from a session header rather than given explicitly, each call in the session must be logged as its own Langfuse trace instead of upserting one trace per session.\n\nBehavior: In the Langfuse logging path, resolve the trace id used for the Langfuse trace and returned to callers. If no existing trace id is supplied and the incoming trace id is merely a session alias, use the call's litellm_call_id as the trace id (the returned trace_id must equal the trace id used). Session aliases are recognized from litellm_params['proxy_server_request']['headers'] (keys compared case-insensitively): a header whose value equals the trace id and whose name is `x-litellm-session-id`, or matches `x-<...>-session-id` (e.g. `x-session-id`, `x-claude-code-session-id`) when the trace id is at least 8 chars of `[A-Za-z0-9_-]`, or the codex-only names `session-id`, `session_id`, `thread-id`, `conversation_id` under the same 8-char rule when",
+    "expectedSourcePaths": [
+      "litellm/integrations/langfuse/langfuse.py"
+    ],
+    "expectedTestPaths": [
+      "tests/test_litellm/integrations/test_langfuse.py"
+    ]
+  },
+  {
+    "dataset": "training2",
+    "case": "mcp-auth-challenge",
+    "query": "Modify LiteLLM's experimental MCP gateway sign-in so \"gateway-owned\" authentication (not only gateway-managed OAuth2 servers) controls which servers advertise the gateway's aggregate authorization server.\n\n1) MCPServer.advertises_gateway_authorization_server (public property): when auth_type == oauth2, return True only if the server is gateway-managed oauth2 and does not use the per-server oauth relay. For other OAuth-family modes (e.g. oauth2_id_jag, oauth_delegate, true_passthrough) return False. For auth_type None/absent, none, api_key, bearer_token, basic, authorization, token, aws_sigv4, return True unless extra_headers contains a header whose name (case-insensitively) is authorization, x-api-key, api-key, or apikey; then return False.\n\n2) An anonymous request to a single per-server path whose resolved target advertises gateway-owned sign-in must answer 401 with a WWW-Authenticate challenge advertising the per-server protected-resource metadata in the same URL spelling the request",
+    "expectedSourcePaths": [
+      "litellm/proxy/_experimental/mcp_server/auth/user_api_key_auth_mcp.py",
+      "litellm/proxy/_experimental/mcp_server/discoverable_endpoints.py",
+      "litellm/proxy/_experimental/mcp_server/gateway_dcr_flow.py",
+      "litellm/types/mcp_server/mcp_server_manager.py"
+    ],
+    "expectedTestPaths": [
+      "tests/test_litellm/proxy/_experimental/mcp_server/auth/test_user_api_key_auth_mcp.py",
+      "tests/test_litellm/proxy/_experimental/mcp_server/test_discoverable_endpoints.py",
+      "tests/test_litellm/proxy/_experimental/mcp_server/test_gateway_dcr_flow.py"
+    ]
+  },
+  {
+    "dataset": "training2",
+    "case": "mcp-optional-discovery",
+    "query": "Extend the MCP client class in litellm/experimental_mcp_client/client.py so its three optional discovery methods tolerate servers that do not implement them.\n\nPublic API (signatures unchanged): MCPClient(server_url=...), and async methods list_prompts(), list_resources(), list_resource_templates(), each returning an iterable of items (prompt/resource/resource-template objects exposing .name).\n\nRequired behavior, using the server capabilities returned by the MCP initialize handshake for the same session that would carry the request:\n- list_prompts is gated on the `prompts` capability; list_resources and list_resource_templates are both gated on the `resources` capability.\n- If the relevant capability is absent from the initialize result (capability object present but field missing, or only an unrelated capability advertised), do not send the corresponding list request; return an empty iterable. Emit no warning or error logs.\n- If the capability is present, send the list request once and",
+    "expectedSourcePaths": [
+      "litellm/experimental_mcp_client/client.py"
+    ],
+    "expectedTestPaths": [
+      "tests/test_litellm/experimental_mcp_client/test_mcp_client.py"
+    ]
+  },
+  {
+    "dataset": "training2",
+    "case": "mock-input-tokens",
+    "query": "Repository: litellm (parent snapshot, before this change). Implement this behavior.\n\n1) Budget-reservation metadata. In the proxy spend-tracking path (reserve_budget_for_request in litellm/proxy/spend_tracking/budget_reservation.py), the reservation dict returned must additionally carry an `input_tokens` entry holding the input token count computed for the admitted request. Required assertion: for an admitted request whose tokenizable content is `hello` on `gpt-4o`, the returned reservation's `input_tokens` must equal `litellm.token_counter(model=\"gpt-4o\", text=\"hello\")` (a positive integer). If none could be computed, the value must be `None`. All pre-existing reservation fields (reserved_cost, entries, finalized, input_cost, ...) keep their current meaning.\n\n2) Mock usage reflects admission tokens. `litellm.completion(..., mock_response=...)` must, when the caller passes admission metadata, report the admitted input token count as the mock response's prompt tokens. Metadata may be su",
+    "expectedSourcePaths": [
+      "litellm/main.py",
+      "litellm/proxy/spend_tracking/budget_reservation.py"
+    ],
+    "expectedTestPaths": [
+      "tests/test_litellm/proxy/spend_tracking/test_budget_reservation.py",
+      "tests/test_litellm/test_main.py"
+    ]
+  },
+  {
+    "dataset": "training2",
+    "case": "responses-custom-guardrail",
+    "query": "Extend litellm's OpenAI Responses API guardrail handler so freeform/grammar custom tool calls are handled like function calls.\n\n1. Output-item extraction (existing OpenAIResponsesHandler._extract_output_text_and_images): items with type \"custom_tool_call\" \u2014 supplied as a plain dict, as litellm's CustomToolCallOutputItem, or as openai's ResponseCustomToolCall \u2014 must be appended to tool_calls_to_check as {\"id\": <call_id>, \"type\": \"function\", \"function\": {\"name\": <name>, \"arguments\": <input>}, \"index\": <output_idx>}; the custom payload field is `input`, not `arguments`. texts_to_check stays empty.\n\n2. Non-streaming process_output_response: pre-guardrail tool calls are passed to the guardrail and its returned tool_calls are mapped back onto the response output items by position (function_call -> `arguments`, custom_tool_call -> `input`), for both dict and typed (ResponsesAPIResponse) responses, preserving each item's type/class. A tool call's `name` is written only when it changed; in part",
+    "expectedSourcePaths": [
+      "litellm/completion_extras/litellm_responses_transformation/transformation.py",
+      "litellm/llms/openai/responses/guardrail_translation/handler.py"
+    ],
+    "expectedTestPaths": [
+      "tests/test_litellm/llms/openai/responses/test_openai_responses_guardrail_handler.py"
+    ]
+  },
+  {
+    "dataset": "training5",
+    "case": "aws-signing-off-loop",
+    "query": "Prevent AWS credential refresh and SigV4 signing from blocking the event loop in these asynchronous LiteLLM routes: Bedrock single-input embedding requests (including Titan, Nova and TwelveLabs), async invoke status polling, ApplyGuardrail content checks, invoke guardrail checks, and Bedrock Mantle requests. Credential loading and request preparation/signing on these paths must run in a worker thread so unrelated coroutines can make progress during a blocking refresh.\n\nPreserve the existing sign_request_off_loop_if_aws interface and make it recognize Mantle configurations as AWS signers even though Mantle uses a composed signer. Do not require a particular new marker class or inheritance design. Preserve existing synchronous signing and the request methods, headers, payloads and returned response shapes. Signed requests must still contain the SigV4 Authorization header and use the supplied credentials. Bearer-token authentication must keep its existing behavior and avoid the SigV4 cred",
+    "expectedSourcePaths": [
+      "litellm/llms/bedrock/base_aws_llm.py",
+      "litellm/llms/bedrock/embed/embedding.py",
+      "litellm/llms/bedrock_mantle/common_utils.py",
+      "litellm/proxy/guardrails/guardrail_hooks/bedrock_guardrails.py"
+    ],
+    "expectedTestPaths": [
+      "tests/test_litellm/llms/bedrock/embed/test_bedrock_async_invoke_embedding.py",
+      "tests/test_litellm/llms/bedrock/embed/test_bedrock_embedding.py",
+      "tests/test_litellm/llms/bedrock_mantle/test_bedrock_mantle_transformation.py",
+      "tests/test_litellm/proxy/guardrails/guardrail_hooks/test_bedrock_guardrails.py",
+      "tests/test_litellm/proxy/guardrails/guardrail_hooks/test_bedrock_invoke_guardrail_checks.py"
+    ]
+  },
+  {
+    "dataset": "training5",
+    "case": "background-responses-pipeline",
+    "query": "Run applicable post_call policy pipelines when a background Responses API result is retrieved. In the aget_responses request-processing path, attach the response's model-scoped policies after pre_call_hook has run, since that hook may decode or replace the response_id. Resolve the originating model group from the response ID's deployment identity through the existing router. Use that model group together with the current caller's team alias, key alias and request tags for policy matching, then attach only post_call pipelines. Preserve existing metadata conventions for pipeline definitions, pipeline-managed guardrails, applied policies/guardrails and policy sources. Avoid attaching a policy twice. Use the model group for matching without rewriting the retrieval's model field.\n\nDo not perform this response-ID attachment on the aresponses submission path. Missing policy engine, router, resolvable response identity, model or applicable post_call policy must not produce a new failure. Prese",
+    "expectedSourcePaths": [
+      "litellm/proxy/common_request_processing.py",
+      "litellm/proxy/policy_engine/response_retrieval.py",
+      "litellm/proxy/utils.py"
+    ],
+    "expectedTestPaths": [
+      "tests/test_litellm/proxy/test_common_request_processing.py",
+      "tests/test_litellm/proxy/utils/proxy_logging/test_guardrail_pipeline.py"
+    ]
+  },
+  {
+    "dataset": "training5",
+    "case": "legacy-stream-pipeline",
+    "query": "Allow legacy post-call guardrails to run as policy-pipeline steps on buffered streams. A guardrail with its own async_post_call_success_hook must be eligible even without unified apply_guardrail support, including guardrails that opt into native lifecycle hooks. Invoke the legacy hook once with the standard data, user API key and assembled response in the endpoint's native non-streaming shape.\n\nAdd the translation interface BaseTranslation.post_call_hook_response(response), whose default returns its input unchanged. AnthropicMessagesHandler implements the same method: convert an assembled OpenAI ModelResponse into an Anthropic Messages response, preserving text, finish reason and input/output usage; for an ordinary completed text response this means type=message, role=assistant, text content blocks and stop_reason=end_turn. Non-ModelResponse inputs retain their identity.\n\nIf the legacy hook returns None, release the original stream. If it returns a replacement, rescan through the same ",
+    "expectedSourcePaths": [
+      "litellm/llms/anthropic/chat/guardrail_translation/handler.py",
+      "litellm/llms/base_llm/guardrail_translation/base_translation.py",
+      "litellm/proxy/common_request_processing.py",
+      "litellm/proxy/policy_engine/pipeline_executor.py",
+      "litellm/proxy/utils.py"
+    ],
+    "expectedTestPaths": [
+      "tests/test_litellm/llms/anthropic/chat/guardrail_translation/test_anthropic_guardrail_handler.py",
+      "tests/test_litellm/proxy/policy_engine/test_pipeline_executor.py",
+      "tests/test_litellm/proxy/test_proxy_logging_hook_detection.py",
+      "tests/test_litellm/proxy/utils/proxy_logging/test_guardrail_pipeline.py"
+    ]
+  },
+  {
+    "dataset": "training5",
+    "case": "stream-tool-rewrite-membership",
+    "query": "A post-call policy pipeline can deliver guardrail rewrites into buffered streaming responses. If the returned tool-call list has a different number of calls from the list given to the guardrail, discard that step's entire rewrite and deliver its original buffered chunks. Apply this to both dropped and added calls, even on translations that normally support writing back text and tool-call changes. Do not partially deliver associated text changes from the discarded step.\n\nCover Chat completion chunks, Anthropic SSE and Responses events through the existing streaming pipeline. Use the existing warning behavior: log at WARNING on the LiteLLM Proxy logger, naming the guardrail and including \"discarded\". Preserve the existing applied-guardrail/header behavior. Same-count tool-call edits and text rewrites continue to follow the translation's write-back capability, and non-writing translations retain their existing discard behavior. Preserve existing handling of absent tool-call fields. Do not",
+    "expectedSourcePaths": [
+      "litellm/proxy/policy_engine/pipeline_executor.py"
+    ],
+    "expectedTestPaths": [
+      "tests/test_litellm/proxy/policy_engine/test_pipeline_executor.py",
+      "tests/test_litellm/proxy/utils/proxy_logging/test_guardrail_pipeline.py"
+    ]
+  }
+]

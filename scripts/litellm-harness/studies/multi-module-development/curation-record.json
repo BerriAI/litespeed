@@ -1,0 +1,19 @@
+{
+  "frozenAt": "2026-09-16T11:19:49.930676+00:00",
+  "phase": "before qualification and before any solver allocation",
+  "selectionCandidates": 1,
+  "selectedCase": "realtime-cached-audio-cost",
+  "excludedTests": [
+    "test_realtime_combine_sums_nested_cached_tokens_details",
+    "test_realtime_combine_keeps_cached_split_when_only_one_usage_has_details",
+    "test_usage_without_cached_tokens_details_omits_key"
+  ],
+  "reason": "The changed test_cost_calculator.py imports a new concrete type at module scope, which would fail base collection even for tests concerned only with behavioral aggregation. No import shim or model outcome is used. A separate four-check semantic probe covers the omitted behavior through the existing realtime processor and Usage serialization.",
+  "supplemental": {
+    "path": "scripts/litellm-harness/studies/multi-module-development/aggregation_probe.py",
+    "sha256": "cbe0e291995cdaa42a0fd4eccee4f4e6a6b795a45207032efcf9cf55f6393735",
+    "expectedChecks": 4,
+    "mustQualifyBaseAndReferenceBeforeSolverUse": true
+  },
+  "qualificationRepairs": "None. Preserve a failed original or supplemental qualification; do not tune from solver results."
+}

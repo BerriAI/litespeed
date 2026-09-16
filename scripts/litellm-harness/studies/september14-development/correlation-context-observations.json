@@ -1,0 +1,357 @@
+{
+  "plan": {
+    "purpose": "Posthoc lifecycle observations on a complete development pair; not a qualified replacement oracle. Selected after inspecting candidate patches.",
+    "base": "6e9e08475ac37128f435ddc1d13347081637748a",
+    "reference": "08a78a39826759c26a8e08b853d52af75ecbfc1d",
+    "probeSha256": "04d65f5740e6f804663b7f3044de3faa5be0eb639daf8a77cafd86d35458e9e7",
+    "expectedChecks": 6,
+    "runs": {
+      "specialized": "replication-v48-breadth-specialized-r1-correlation-logging-cost-f1105fbb",
+      "plain": "replication-v48-breadth-plain-r1-correlation-logging-cost-aa3475e5"
+    }
+  },
+  "snapshots": {
+    "base": {
+      "rows": [
+        {
+          "name": "disabled-construction",
+          "pass": false,
+          "context": [
+            "disabled-trace",
+            "disabled-session"
+          ],
+          "sanitizeCalls": 2
+        },
+        {
+          "name": "enabled-restore-without-resanitizing",
+          "pass": false,
+          "context": [
+            "outer-trace",
+            "outer-session"
+          ],
+          "sanitizeCalls": 2
+        },
+        {
+          "name": "disabled-then-enabled:older-stream-close",
+          "pass": false,
+          "before": [
+            "newer-trace",
+            "newer-session"
+          ],
+          "after": [
+            "outer-trace",
+            "outer-session"
+          ]
+        },
+        {
+          "name": "disabled-then-enabled:guarded-finalizer",
+          "pass": true,
+          "before": [
+            "newer-after-close-trace",
+            "newer-after-close-session"
+          ],
+          "after": [
+            "newer-after-close-trace",
+            "newer-after-close-session"
+          ]
+        },
+        {
+          "name": "sync-then-async:older-stream-close",
+          "pass": false,
+          "before": [
+            "newer-trace",
+            "newer-session"
+          ],
+          "after": [
+            "outer-trace",
+            "outer-session"
+          ]
+        },
+        {
+          "name": "sync-then-async:guarded-finalizer",
+          "pass": true,
+          "before": [
+            "newer-after-close-trace",
+            "newer-after-close-session"
+          ],
+          "after": [
+            "newer-after-close-trace",
+            "newer-after-close-session"
+          ]
+        }
+      ],
+      "passed": false,
+      "imports": {
+        "packageOrigin": "litellm/__init__.py",
+        "allLiteLLMModulesWithinWorkspace": true,
+        "moduleCount": 814
+      },
+      "bytecodePolicy": "fresh cache path; reads from adjacent caches and all writes disabled",
+      "exit": 0,
+      "sourceSha256": "76b998325df17c9b6c6faebe697362cf1c828d23290453d785056fad565180ae"
+    },
+    "reference": {
+      "rows": [
+        {
+          "name": "disabled-construction",
+          "pass": true,
+          "context": [
+            "outer-trace",
+            "outer-session"
+          ],
+          "sanitizeCalls": 0
+        },
+        {
+          "name": "enabled-restore-without-resanitizing",
+          "pass": true,
+          "context": [
+            "outer-trace",
+            "outer-session"
+          ],
+          "sanitizeCalls": 0
+        },
+        {
+          "name": "disabled-then-enabled:older-stream-close",
+          "pass": false,
+          "before": [
+            "newer-trace",
+            "newer-session"
+          ],
+          "after": [
+            "outer-trace",
+            "outer-session"
+          ]
+        },
+        {
+          "name": "disabled-then-enabled:guarded-finalizer",
+          "pass": true,
+          "before": [
+            "newer-after-close-trace",
+            "newer-after-close-session"
+          ],
+          "after": [
+            "newer-after-close-trace",
+            "newer-after-close-session"
+          ]
+        },
+        {
+          "name": "sync-then-async:older-stream-close",
+          "pass": false,
+          "before": [
+            "newer-trace",
+            "newer-session"
+          ],
+          "after": [
+            "outer-trace",
+            "outer-session"
+          ]
+        },
+        {
+          "name": "sync-then-async:guarded-finalizer",
+          "pass": true,
+          "before": [
+            "newer-after-close-trace",
+            "newer-after-close-session"
+          ],
+          "after": [
+            "newer-after-close-trace",
+            "newer-after-close-session"
+          ]
+        }
+      ],
+      "passed": false,
+      "imports": {
+        "packageOrigin": "litellm/__init__.py",
+        "allLiteLLMModulesWithinWorkspace": true,
+        "moduleCount": 814
+      },
+      "bytecodePolicy": "fresh cache path; reads from adjacent caches and all writes disabled",
+      "exit": 0,
+      "sourceSha256": "6595246b2b1ba285132997cc9ea4ef5113aa812e74e279fb71e84e502d189d29"
+    },
+    "specialized": {
+      "rows": [
+        {
+          "name": "disabled-construction",
+          "pass": true,
+          "context": [
+            "outer-trace",
+            "outer-session"
+          ],
+          "sanitizeCalls": 0
+        },
+        {
+          "name": "enabled-restore-without-resanitizing",
+          "pass": true,
+          "context": [
+            "outer-trace",
+            "outer-session"
+          ],
+          "sanitizeCalls": 0
+        },
+        {
+          "name": "disabled-then-enabled:older-stream-close",
+          "pass": false,
+          "before": [
+            "newer-trace",
+            "newer-session"
+          ],
+          "after": [
+            "outer-trace",
+            "outer-session"
+          ]
+        },
+        {
+          "name": "disabled-then-enabled:guarded-finalizer",
+          "pass": true,
+          "before": [
+            "newer-after-close-trace",
+            "newer-after-close-session"
+          ],
+          "after": [
+            "newer-after-close-trace",
+            "newer-after-close-session"
+          ]
+        },
+        {
+          "name": "sync-then-async:older-stream-close",
+          "pass": false,
+          "before": [
+            "newer-trace",
+            "newer-session"
+          ],
+          "after": [
+            "outer-trace",
+            "outer-session"
+          ]
+        },
+        {
+          "name": "sync-then-async:guarded-finalizer",
+          "pass": true,
+          "before": [
+            "newer-after-close-trace",
+            "newer-after-close-session"
+          ],
+          "after": [
+            "newer-after-close-trace",
+            "newer-after-close-session"
+          ]
+        }
+      ],
+      "passed": false,
+      "imports": {
+        "packageOrigin": "litellm/__init__.py",
+        "allLiteLLMModulesWithinWorkspace": true,
+        "moduleCount": 814
+      },
+      "bytecodePolicy": "fresh cache path; reads from adjacent caches and all writes disabled",
+      "exit": 0,
+      "sourceSha256": "828eda874b7e081f5715c477cb0a4a71bb9e57281c3de9bf32591e42649cfd0a",
+      "candidatePatchSha256": "22e0d20d15106d25df178243046b655877049dce9b8cf1c9846d2a79ba1aad09"
+    },
+    "plain": {
+      "rows": [
+        {
+          "name": "disabled-construction",
+          "pass": true,
+          "context": [
+            "outer-trace",
+            "outer-session"
+          ],
+          "sanitizeCalls": 0
+        },
+        {
+          "name": "enabled-restore-without-resanitizing",
+          "pass": true,
+          "context": [
+            "outer-trace",
+            "outer-session"
+          ],
+          "sanitizeCalls": 0
+        },
+        {
+          "name": "disabled-then-enabled:older-stream-close",
+          "pass": true,
+          "before": [
+            "newer-trace",
+            "newer-session"
+          ],
+          "after": [
+            "newer-trace",
+            "newer-session"
+          ]
+        },
+        {
+          "name": "disabled-then-enabled:guarded-finalizer",
+          "pass": true,
+          "before": [
+            "newer-after-close-trace",
+            "newer-after-close-session"
+          ],
+          "after": [
+            "newer-after-close-trace",
+            "newer-after-close-session"
+          ]
+        },
+        {
+          "name": "sync-then-async:older-stream-close",
+          "pass": true,
+          "before": [
+            "newer-trace",
+            "newer-session"
+          ],
+          "after": [
+            "newer-trace",
+            "newer-session"
+          ]
+        },
+        {
+          "name": "sync-then-async:guarded-finalizer",
+          "pass": true,
+          "before": [
+            "newer-after-close-trace",
+            "newer-after-close-session"
+          ],
+          "after": [
+            "newer-after-close-trace",
+            "newer-after-close-session"
+          ]
+        }
+      ],
+      "passed": true,
+      "imports": {
+        "packageOrigin": "litellm/__init__.py",
+        "allLiteLLMModulesWithinWorkspace": true,
+        "moduleCount": 814
+      },
+      "bytecodePolicy": "fresh cache path; reads from adjacent caches and all writes disabled",
+      "exit": 0,
+      "sourceSha256": "d7cfc0f0a3cdf1855e1faeed5aa84ba8d467b2d1466c9529b180847d569d57a1",
+      "candidatePatchSha256": "14ed94faff55388bcb2a606ff5104fe3fe855d39c58bf9cc968dc1933c45e648"
+    }
+  },
+  "status": "posthoc-development-observations",
+  "limitations": [
+    "Selected after inspecting two completed patches; not predeclared acceptance.",
+    "The merged reference fails two close-order observations, so these six checks do not form a qualified replacement oracle.",
+    "Close-order behavior also fails on the historical base; this does not establish a regression newly introduced by the specialized patch.",
+    "The disabled-to-enabled observation explicitly changes a process-global flag; the sync-to-async observation keeps that flag enabled.",
+    "One development task and one attempt per arm cannot establish a comparative quality or speed advantage."
+  ],
+  "traceObservations": {
+    "specialized": {
+      "stepsAreOneBased": true,
+      "guardAddedStep": 52,
+      "guardRemovedStep": 66,
+      "finalAnswerSteps": [
+        112,
+        114
+      ],
+      "originalChecksPassed": 19
+    },
+    "plain": {
+      "originalChecksPassed": 19,
+      "normalCompletion": true
+    }
+  }
+}

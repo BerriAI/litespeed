@@ -1,0 +1,21 @@
+diff --git a/server/litellm-harness.ts b/server/litellm-harness.ts
+index ed1465e..577d8af 100644
+--- a/server/litellm-harness.ts
++++ b/server/litellm-harness.ts
+@@ -4,7 +4,7 @@ import path from 'node:path';
+ import fg from 'fast-glob';
+ import type { ToolDefinition } from '../shared/types.js';
+ 
+-export const LITELLM_HARNESS_VERSION='2026-09-15.24';
++export const LITELLM_HARNESS_VERSION='2026-09-15.25';
+ export const litellmContextTool:ToolDefinition={type:'function',function:{name:'litellm_context',description:'Navigate the current LiteLLM checkout. Give a task query to find relevant definitions, inline conditions and existing tests. Give a source path to see its symbol outline and test partners; add a symbol name to read that definition with numbered lines, or callers to find functions invoking a named helper in that file. Reads only this workspace, never Git history or remote answers.',parameters:{type:'object',properties:{query:{type:'string',maxLength:1000},path:{type:'string',maxLength:500},symbol:{type:'string',maxLength:200},callers:{type:'string',maxLength:200,description:'Python helper name whose call sites and enclosing functions to find; requires path.'}},additionalProperties:false}}};
+ 
+ const playbooks = [
+@@ -24,6 +24,7 @@ const playbooks = [
+     paths: ['litellm/router.py', 'litellm/router_strategy/simple_shuffle.py', 'litellm/router_strategy/lowest_tpm_rpm_v2.py'],
+     lessons: [
+       'Router resolution is ordered, not a union of matching deployments. Inspect aliases, routing groups, _try_early_resolve_deployments_for_model_not_in_names, team/wildcard/default resolution and _get_all_deployments in their existing order. A candidate-list helper should follow that precedence without accidentally applying fallbacks or admission checks.',
++      'When candidate IDs must match actual routing, get_model_list and an old union-oriented docstring are not the request-selection contract. Inspect get_available_deployment and _common_checks_available_deployment. Probe overlapping global/team wildcard and named-team routes: compare membership with the path actual selection takes, not with a new test that restates the proposed union. A fix for unprefixed names can otherwise add deployments that would never serve that request.',
+       'A per-request strategy override must not replace the router-wide selector or add a callback globally. Inspect _get_strategy_selector and _build_strategy_selector for state registration; keep request-local configuration local.',
+       'Removing global callback registration can also remove necessary request accounting. Trace the chosen selector through direct deployment, affinity and normal selection return paths, including sync, async and pass-through methods. Preserve pre_call_check / async_pre_call_check for a request-local selector without running those checks twice for the default selector.',
+       'Write the counterexample that distinguishes the override from the default: two consecutive requests with different strategies, a direct deployment return, or a fallback/default candidate. Avoid testing only the new helper in isolation.'

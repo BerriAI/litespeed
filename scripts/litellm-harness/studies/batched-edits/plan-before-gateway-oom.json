@@ -1,0 +1,113 @@
+{
+  "createdAt": "2026-09-16T03:29:59.244763+00:00",
+  "protocol": 6,
+  "repetitions": 2,
+  "control": "control",
+  "seed": 29160926,
+  "runs": [
+    {
+      "dataset": "training5",
+      "case": "background-responses-pipeline",
+      "name": "batched-edits",
+      "label": "replication-v29-edits-batched-edits-r1",
+      "commit": "16bfa137d089a68f8a768f3043b644514b750aea",
+      "effort": "medium"
+    },
+    {
+      "dataset": "training5",
+      "case": "aws-signing-off-loop",
+      "name": "control",
+      "label": "replication-v29-edits-control-r1",
+      "commit": "5a095ded6b1f79db5725aca6b3db6a29ed6a9293",
+      "effort": "medium"
+    },
+    {
+      "dataset": "training5",
+      "case": "legacy-stream-pipeline",
+      "name": "control",
+      "label": "replication-v29-edits-control-r2",
+      "commit": "5a095ded6b1f79db5725aca6b3db6a29ed6a9293",
+      "effort": "medium"
+    },
+    {
+      "dataset": "training5",
+      "case": "background-responses-pipeline",
+      "name": "control",
+      "label": "replication-v29-edits-control-r2",
+      "commit": "5a095ded6b1f79db5725aca6b3db6a29ed6a9293",
+      "effort": "medium"
+    },
+    {
+      "dataset": "training5",
+      "case": "background-responses-pipeline",
+      "name": "control",
+      "label": "replication-v29-edits-control-r1",
+      "commit": "5a095ded6b1f79db5725aca6b3db6a29ed6a9293",
+      "effort": "medium"
+    },
+    {
+      "dataset": "training5",
+      "case": "legacy-stream-pipeline",
+      "name": "batched-edits",
+      "label": "replication-v29-edits-batched-edits-r2",
+      "commit": "16bfa137d089a68f8a768f3043b644514b750aea",
+      "effort": "medium"
+    },
+    {
+      "dataset": "training5",
+      "case": "legacy-stream-pipeline",
+      "name": "batched-edits",
+      "label": "replication-v29-edits-batched-edits-r1",
+      "commit": "16bfa137d089a68f8a768f3043b644514b750aea",
+      "effort": "medium"
+    },
+    {
+      "dataset": "training5",
+      "case": "background-responses-pipeline",
+      "name": "batched-edits",
+      "label": "replication-v29-edits-batched-edits-r2",
+      "commit": "16bfa137d089a68f8a768f3043b644514b750aea",
+      "effort": "medium"
+    },
+    {
+      "dataset": "training5",
+      "case": "aws-signing-off-loop",
+      "name": "batched-edits",
+      "label": "replication-v29-edits-batched-edits-r2",
+      "commit": "16bfa137d089a68f8a768f3043b644514b750aea",
+      "effort": "medium"
+    },
+    {
+      "dataset": "training5",
+      "case": "aws-signing-off-loop",
+      "name": "control",
+      "label": "replication-v29-edits-control-r2",
+      "commit": "5a095ded6b1f79db5725aca6b3db6a29ed6a9293",
+      "effort": "medium"
+    },
+    {
+      "dataset": "training5",
+      "case": "aws-signing-off-loop",
+      "name": "batched-edits",
+      "label": "replication-v29-edits-batched-edits-r1",
+      "commit": "16bfa137d089a68f8a768f3043b644514b750aea",
+      "effort": "medium"
+    },
+    {
+      "dataset": "training5",
+      "case": "legacy-stream-pipeline",
+      "name": "control",
+      "label": "replication-v29-edits-control-r1",
+      "commit": "5a095ded6b1f79db5725aca6b3db6a29ed6a9293",
+      "effort": "medium"
+    }
+  ],
+  "hypothesis": "A bounded array of exact edits in one file reduces model round trips in multi-module changes without reducing completed correct patches. Each candidate also shares its edit calculation with terminal approval previews.",
+  "selectionDataOnly": true,
+  "successNote": "Normal completed response and all original qualified checks. Compare quality before latency/cost. Inspect batching activation; a non-activated trial is not evidence that grouped edits are ineffective.",
+  "execution": {
+    "timeoutSeconds": 900,
+    "sharedSolverConcurrency": 3
+  },
+  "activationNote": "Track batchedEditCalls, completedBatchedEditCalls, batchEditsRequested and batchSizes alongside total model requests."
+}

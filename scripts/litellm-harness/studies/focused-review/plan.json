@@ -1,0 +1,15 @@
+{
+  "createdAt": "2026-09-16T03:41:36.659522+00:00",
+  "cases": [
+    "langfuse",
+    "router"
+  ],
+  "efforts": [
+    "none",
+    "medium"
+  ],
+  "maxTokens": 16384,
+  "retries": 0,
+  "scope": "Focused function excerpts; compare completion and verified findings to previous full-file reviewer failures. Shared three-slot queue.",
+  "successCriteria": "Normal nonempty completion; manually check whether it identifies demonstrated omitted keep condition (Langfuse) or overlapping global/team precedence mismatch (router). Count false allegations and incomplete answers as well."
+}

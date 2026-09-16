@@ -1,0 +1,303 @@
+{
+  "status": "infrastructure-interrupted",
+  "note": "Development selection only. Interim observed-task means can change as slower trials finish. Bootstrap resamples tasks, not attempts; it does not correct adaptive candidate selection or establish future generalization. Token prices exclude requests without usage and do not replace the campaign ledger. Original variants retain all raw evaluated results. qualityEligibleVariants and paired comparisons exclude every allocation named in the public host-sleep-transport incident regardless of score; those allocations remain in trials. No replacement result is substituted.",
+  "variants": [
+    {
+      "variant": "control",
+      "evaluated": 2,
+      "expected": 4,
+      "successes": 0,
+      "meanSeconds": 2.545,
+      "tokenPricedUsd": null,
+      "trialsWithoutTokenPrice": 2
+    },
+    {
+      "variant": "query-navigation",
+      "evaluated": 2,
+      "expected": 4,
+      "successes": 0,
+      "meanSeconds": 2.5015,
+      "tokenPricedUsd": null,
+      "trialsWithoutTokenPrice": 2
+    }
+  ],
+  "qualityEligibleVariants": [
+    {
+      "variant": "control",
+      "eligibleEvaluated": 0,
+      "successes": 0,
+      "incidentAllocations": 2
+    },
+    {
+      "variant": "query-navigation",
+      "eligibleEvaluated": 0,
+      "successes": 0,
+      "incidentAllocations": 2
+    }
+  ],
+  "comparisons": [
+    {
+      "variant": "query-navigation",
+      "control": "control",
+      "pairedTasks": 0,
+      "expectedTasks": 2,
+      "complete": false,
+      "pairs": []
+    }
+  ],
+  "trials": [
+    {
+      "dataset": "training7",
+      "case": "realtime-cached-audio-cost",
+      "name": "control",
+      "label": "replication-v53-query-control-r2",
+      "commit": "0fdc384563c46f5baede5818808c292a988004d6",
+      "effort": "medium",
+      "kind": "litellm-specific",
+      "timeoutSeconds": 1800,
+      "evaluated": true,
+      "run": "replication-v53-query-control-r2-realtime-cached-audio-cost-4dd48416",
+      "infrastructureIncident": "host-sleep-transport",
+      "success": false,
+      "completed": false,
+      "completionReason": "runner-error",
+      "seconds": 2.012,
+      "acceptance": {
+        "exit": 1,
+        "tests": 17,
+        "failures": 13,
+        "errors": 0,
+        "skipped": 0,
+        "passed": false
+      },
+      "computedUsd": null,
+      "activations": {
+        "initialMapNotices": 1,
+        "contextToolCalls": 0,
+        "guideIdsShown": [],
+        "unparsedContextPayloads": 0,
+        "finalReviewNotices": 0,
+        "guidedFinalReviewNotices": 0,
+        "finalReviewGuideIdsShown": [],
+        "batchedEditCalls": 0,
+        "completedBatchedEditCalls": 0,
+        "batchEditsRequested": 0,
+        "batchSizes": [],
+        "backgroundCommandNotices": 0,
+        "testFocusNotices": 0,
+        "explorationFocusNotices": 0,
+        "readCallsByEffectiveLimit": {},
+        "defaultWindowReadCalls": null,
+        "readLimitProvenance": "unknown: saved arguments include host-injected defaults"
+      },
+      "originalSuccess": false,
+      "supplemental": {
+        "artifact": "representation-probe.json",
+        "checks": 7,
+        "expectedChecks": 7,
+        "checksPassed": 0,
+        "exit": 0,
+        "passed": false
+      }
+    },
+    {
+      "dataset": "training7",
+      "case": "realtime-cached-audio-cost",
+      "name": "query-navigation",
+      "label": "replication-v53-query-query-navigation-r1",
+      "commit": "3bae1851ae107d9689054bb75869b07eff5a6ef0",
+      "effort": "medium",
+      "kind": "litellm-specific",
+      "timeoutSeconds": 1800,
+      "evaluated": true,
+      "run": "replication-v53-query-query-navigation-r1-realtime-cached-audio-cost-fc104939",
+      "infrastructureIncident": "host-sleep-transport",
+      "success": false,
+      "completed": false,
+      "completionReason": "runner-error",
+      "seconds": 2.21,
+      "acceptance": {
+        "exit": 1,
+        "tests": 17,
+        "failures": 13,
+        "errors": 0,
+        "skipped": 0,
+        "passed": false
+      },
+      "computedUsd": null,
+      "activations": {
+        "initialMapNotices": 1,
+        "contextToolCalls": 0,
+        "guideIdsShown": [],
+        "unparsedContextPayloads": 0,
+        "finalReviewNotices": 0,
+        "guidedFinalReviewNotices": 0,
+        "finalReviewGuideIdsShown": [],
+        "batchedEditCalls": 0,
+        "completedBatchedEditCalls": 0,
+        "batchEditsRequested": 0,
+        "batchSizes": [],
+        "backgroundCommandNotices": 0,
+        "testFocusNotices": 0,
+        "explorationFocusNotices": 0,
+        "readCallsByEffectiveLimit": {},
+        "defaultWindowReadCalls": null,
+        "readLimitProvenance": "unknown: saved arguments include host-injected defaults"
+      },
+      "originalSuccess": false,
+      "supplemental": {
+        "artifact": "representation-probe.json",
+        "checks": 7,
+        "expectedChecks": 7,
+        "checksPassed": 0,
+        "exit": 0,
+        "passed": false
+      }
+    },
+    {
+      "dataset": "training7",
+      "case": "realtime-cached-audio-cost",
+      "name": "control",
+      "label": "replication-v53-query-control-r1",
+      "commit": "0fdc384563c46f5baede5818808c292a988004d6",
+      "effort": "medium",
+      "kind": "litellm-specific",
+      "timeoutSeconds": 1800,
+      "evaluated": true,
+      "run": "replication-v53-query-control-r1-realtime-cached-audio-cost-f73d5415",
+      "infrastructureIncident": "host-sleep-transport",
+      "success": false,
+      "completed": false,
+      "completionReason": "runner-error",
+      "seconds": 3.078,
+      "acceptance": {
+        "exit": 1,
+        "tests": 17,
+        "failures": 13,
+        "errors": 0,
+        "skipped": 0,
+        "passed": false
+      },
+      "computedUsd": null,
+      "activations": {
+        "initialMapNotices": 1,
+        "contextToolCalls": 0,
+        "guideIdsShown": [],
+        "unparsedContextPayloads": 0,
+        "finalReviewNotices": 0,
+        "guidedFinalReviewNotices": 0,
+        "finalReviewGuideIdsShown": [],
+        "batchedEditCalls": 0,
+        "completedBatchedEditCalls": 0,
+        "batchEditsRequested": 0,
+        "batchSizes": [],
+        "backgroundCommandNotices": 0,
+        "testFocusNotices": 0,
+        "explorationFocusNotices": 0,
+        "readCallsByEffectiveLimit": {},
+        "defaultWindowReadCalls": null,
+        "readLimitProvenance": "unknown: saved arguments include host-injected defaults"
+      },
+      "originalSuccess": false,
+      "supplemental": {
+        "artifact": "representation-probe.json",
+        "checks": 7,
+        "expectedChecks": 7,
+        "checksPassed": 0,
+        "exit": 0,
+        "passed": false
+      }
+    },
+    {
+      "dataset": "training2",
+      "case": "mock-input-tokens",
+      "name": "query-navigation",
+      "label": "replication-v53-query-query-navigation-r1",
+      "commit": "3bae1851ae107d9689054bb75869b07eff5a6ef0",
+      "effort": "medium",
+      "kind": "litellm-specific",
+      "timeoutSeconds": 900,
+      "evaluated": true,
+      "run": "replication-v53-query-query-navigation-r1-mock-input-tokens-0258d424",
+      "infrastructureIncident": "host-sleep-transport",
+      "success": false,
+      "completed": false,
+      "completionReason": "runner-error",
+      "seconds": 2.793,
+      "acceptance": {
+        "exit": 1,
+        "tests": 6,
+        "failures": 5,
+        "errors": 0,
+        "skipped": 0,
+        "passed": false
+      },
+      "computedUsd": null,
+      "activations": {
+        "initialMapNotices": 1,
+        "contextToolCalls": 0,
+        "guideIdsShown": [
+          "budget-cache-reconciliation"
+        ],
+        "unparsedContextPayloads": 0,
+        "finalReviewNotices": 0,
+        "guidedFinalReviewNotices": 0,
+        "finalReviewGuideIdsShown": [],
+        "batchedEditCalls": 0,
+        "completedBatchedEditCalls": 0,
+        "batchEditsRequested": 0,
+        "batchSizes": [],
+        "backgroundCommandNotices": 0,
+        "testFocusNotices": 0,
+        "explorationFocusNotices": 0,
+        "readCallsByEffectiveLimit": {},
+        "defaultWindowReadCalls": null,
+        "readLimitProvenance": "unknown: saved arguments include host-injected defaults"
+      }
+    },
+    {
+      "dataset": "training2",
+      "case": "mock-input-tokens",
+      "name": "control",
+      "label": "replication-v53-query-control-r2",
+      "commit": "0fdc384563c46f5baede5818808c292a988004d6",
+      "effort": "medium",
+      "kind": "litellm-specific",
+      "timeoutSeconds": 900,
+      "evaluated": false
+    },
+    {
+      "dataset": "training2",
+      "case": "mock-input-tokens",
+      "name": "control",
+      "label": "replication-v53-query-control-r1",
+      "commit": "0fdc384563c46f5baede5818808c292a988004d6",
+      "effort": "medium",
+      "kind": "litellm-specific",
+      "timeoutSeconds": 900,
+      "evaluated": false
+    },
+    {
+      "dataset": "training7",
+      "case": "realtime-cached-audio-cost",
+      "name": "query-navigation",
+      "label": "replication-v53-query-query-navigation-r2",
+      "commit": "3bae1851ae107d9689054bb75869b07eff5a6ef0",
+      "effort": "medium",
+      "kind": "litellm-specific",
+      "timeoutSeconds": 1800,
+      "evaluated": false
+    },
+    {
+      "dataset": "training2",
+      "case": "mock-input-tokens",
+      "name": "query-navigation",
+      "label": "replication-v53-query-query-navigation-r2",
+      "commit": "3bae1851ae107d9689054bb75869b07eff5a6ef0",
+      "effort": "medium",
+      "kind": "litellm-specific",
+      "timeoutSeconds": 900,
+      "evaluated": false
+    }
+  ]
+}

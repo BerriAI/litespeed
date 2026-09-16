@@ -1,0 +1,99 @@
+{
+  "createdAt": "2026-09-16T05:15:58.553Z",
+  "commit": "58eb44c",
+  "pattern": "_get_all_deployments",
+  "file": "litellm/router.py",
+  "rows": [
+    {
+      "arm": "native",
+      "repetition": 1,
+      "elapsedMs": 19.79133300000001,
+      "snapshotMs": 0,
+      "snapshotFiles": 0,
+      "matchingLines": 10
+    },
+    {
+      "arm": "shell-with-history",
+      "repetition": 1,
+      "elapsedMs": 2035.9036660000002,
+      "snapshotMs": 2019.883583,
+      "snapshotFiles": 1787,
+      "matchingLines": 10
+    },
+    {
+      "arm": "shell-with-history",
+      "repetition": 2,
+      "elapsedMs": 1148.2259170000002,
+      "snapshotMs": 1144.1421249999999,
+      "snapshotFiles": 1787,
+      "matchingLines": 10
+    },
+    {
+      "arm": "native",
+      "repetition": 2,
+      "elapsedMs": 14.534833000000162,
+      "snapshotMs": 0,
+      "snapshotFiles": 0,
+      "matchingLines": 10
+    },
+    {
+      "arm": "native",
+      "repetition": 3,
+      "elapsedMs": 12.33383300000014,
+      "snapshotMs": 0,
+      "snapshotFiles": 0,
+      "matchingLines": 10
+    },
+    {
+      "arm": "shell-with-history",
+      "repetition": 3,
+      "elapsedMs": 1129.9681250000003,
+      "snapshotMs": 1125.6776669999995,
+      "snapshotFiles": 1787,
+      "matchingLines": 10
+    },
+    {
+      "arm": "shell-with-history",
+      "repetition": 4,
+      "elapsedMs": 1221.302208,
+      "snapshotMs": 1218.2912500000002,
+      "snapshotFiles": 1787,
+      "matchingLines": 10
+    },
+    {
+      "arm": "native",
+      "repetition": 4,
+      "elapsedMs": 14.440875000000233,
+      "snapshotMs": 0,
+      "snapshotFiles": 0,
+      "matchingLines": 10
+    },
+    {
+      "arm": "native",
+      "repetition": 5,
+      "elapsedMs": 12.804291999999805,
+      "snapshotMs": 0,
+      "snapshotFiles": 0,
+      "matchingLines": 10
+    },
+    {
+      "arm": "shell-with-history",
+      "repetition": 5,
+      "elapsedMs": 1097.9550840000002,
+      "snapshotMs": 1094.2922079999998,
+      "snapshotFiles": 1787,
+      "matchingLines": 10
+    }
+  ],
+  "limitations": "Read-only observational microbenchmark on one shared desktop; shell arm includes two bounded snapshots but omits history persistence, hooks and actual model latency. Tools can differ in search semantics and limits. No solver-quality inference.",
+  "summary": {
+    "native": {
+      "medianMs": 14.440875000000233,
+      "meanMs": 14.78103320000007
+    },
+    "shell-with-history": {
+      "medianMs": 1148.2259170000002,
+      "meanMs": 1326.6710000000003
+    }
+  }
+}

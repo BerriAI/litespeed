@@ -1,0 +1,25 @@
+{
+  "at": "2026-09-16T09:08:37.694964+00:00",
+  "status": "Integration prepared; no promotion or paid-trial claim",
+  "commit": "370f6fc500002b3e35ea7ac474107b2bb2a693b9",
+  "version": "2026-09-16.46",
+  "patchAppliesTo": "7faf6883c01fb0191412e03d1e60a2736ae93f39",
+  "changes": "Same grouped-edit and chronological-job features as the frozen v44 candidate, plus the independently reproduced v45 final-output bookkeeping fix. No new streaming guide or inspection preference.",
+  "validation": {
+    "typecheck": "passed",
+    "fullSuite": {
+      "passed": 2146,
+      "skipped": 1,
+      "failed": 0,
+      "maxWorkers": 2
+    },
+    "build": "passed",
+    "browser": {
+      "passed": 2,
+      "checks": "Permissions, grouped edits, actual final output read, no redundant reminder or duplicate answer, chronological notices, Undo, saved model and Plan."
+    },
+    "terminal": "Real PTY picker, saved model, Plan navigation and narrow layout pass"
+  },
+  "negativeControl": "The new browser assertion fails without the final-output fix and passes with it.",
+  "experimentBoundary": "The 16-trial study remains frozen on v44 versus its declared v34-based control. This integration checkout is not substituted into its arms."
+}

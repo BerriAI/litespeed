@@ -1,0 +1,49 @@
+{
+  "createdAt": "2026-09-16T21:13:43.221430+00:00",
+  "status": "prepared; unpromoted; no paid comparison planned or allocated",
+  "baseCommit": "93f49c61315b60e7af395428704bbd0c5e0bb5eb",
+  "candidateCommit": "c6d5f28f086021d7f816976f8c2a7c71ae6a5de5",
+  "candidateVersion": "2026-09-16.56",
+  "applicationBaseline": "Production52 at the public base commit; does not include experimental v55 billing guidance, v53 navigation, or v54 grouped editing.",
+  "change": "Acceptance-time capture of an explicitly referenced root CLAUDE.md for the LiteLLM-specific architecture when ordinary reads need no interception.",
+  "files": {
+    "server/litellm-harness.ts": "11d9e0dc6c3f316b69c2b77384eb22ab287646be94b49398ebf9c99136f28ad4",
+    "server/runner.ts": "6fa3f55ffe582b0791b47a70ab584d8fbd273e3b892cb99d6d37d9d5cc6c9793",
+    "server/tools.ts": "846fc3e76d3e338247da4dace9aef64ede32a5877bc5b7658413353b7f110111",
+    "tests/litellm-harness-runner.test.ts": "4a9d8346e7ae546a53dc76cc59b059e71a5f4984e69f3b35c586b1ffe8262504",
+    "tests/profile-runner.test.ts": "1fe59a8f921984523205d2e9ab63774984d2e5d245c2a02885b67eea38a5bfc2",
+    "tests/project-guidance.test.ts": "27f2a6e93af5ccdc9f199684caa42de50004c6fd916cdbf799639223797e8a44"
+  },
+  "patchSha256": "b1db5b04c63c61c2c841f49cb36f022799d5365b6fd0a0dc41d406ea98968ae5",
+  "validation": {
+    "negativeControls": {
+      "failed": 4,
+      "passed": 28,
+      "scope": "New guidance and provider-boundary regressions before implementation."
+    },
+    "focusedTestsPassed": 116,
+    "finalFullTestsPassed": 2181,
+    "finalFullTestsSkipped": 1,
+    "typecheck": "passed",
+    "build": "passed",
+    "reconstruction": {
+      "changedFiles": 6,
+      "allChangedBytesMatch": true,
+      "method": "Fresh archive of public base plus candidate.patch"
+    }
+  },
+  "bounds": {
+    "maxFileBytes": 262144,
+    "maxCharactersPerFile": 24000,
+    "rootOnly": true,
+    "recursiveReferences": false,
+    "followsRemoteReferences": false
+  },
+  "limitations": [
+    "No evidence yet that automatic guidance loading reduces type errors, latency, or cost.",
+    "The provider fixture proves initial delivery and turn-snapshot stability, not model adherence.",
+    "Only an explicit line directing Read CLAUDE.md or Read @CLAUDE.md (optionally a list item) activates this fixed file. It is not a Markdown include system.",
+    "Any hooks, sidecars, non-allow read rule, or profile without read_file disables the added automatic capture. Existing captured project guidance is unchanged.",
+    "The active v55 study retains both frozen runtimes and all original inputs."
+  ]
+}

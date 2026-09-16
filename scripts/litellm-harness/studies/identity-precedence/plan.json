@@ -1,0 +1,53 @@
+{
+  "createdAt": "2026-09-15T18:52:21.197546-07:00",
+  "protocol": 6,
+  "repetitions": 2,
+  "seed": 23160926,
+  "runs": [
+    {
+      "name": "control",
+      "commit": "3fee39e7c56d02575cecf74c87a774ee83b6f1a9",
+      "dataset": "training2",
+      "case": "langfuse-session-traces",
+      "label": "replication-v23-identity-control-r1",
+      "effort": "medium"
+    },
+    {
+      "name": "identity-guide",
+      "commit": "ff767bd749c6ddb50a6938e9ea1f194719bf7ba5",
+      "dataset": "training2",
+      "case": "langfuse-session-traces",
+      "label": "replication-v23-identity-identity-guide-r1",
+      "effort": "medium"
+    },
+    {
+      "name": "identity-guide",
+      "commit": "ff767bd749c6ddb50a6938e9ea1f194719bf7ba5",
+      "dataset": "training2",
+      "case": "langfuse-session-traces",
+      "label": "replication-v23-identity-identity-guide-r2",
+      "effort": "medium"
+    },
+    {
+      "name": "control",
+      "commit": "3fee39e7c56d02575cecf74c87a774ee83b6f1a9",
+      "dataset": "training2",
+      "case": "langfuse-session-traces",
+      "label": "replication-v23-identity-control-r2",
+      "effort": "medium"
+    }
+  ],
+  "hypothesis": "A guide about distinct IDs and keep/rewrite precedence closes the explicitly requested Langfuse exception missed by the original 60-case oracle.",
+  "criterion": "Normal completion, original 60-case acceptance, and all six supplemental public-entrypoint checks. Report both separately. Original frozen ablation and historical scores are unchanged.",
+  "probe": "probe.py",
+  "selectionDataOnly": true,
+  "supplemental": {
+    "artifact": "identity-probe.json",
+    "expectedChecks": 6
+  },
+  "execution": {
+    "timeoutSeconds": 900,
+    "sharedSolverConcurrency": 3,
+    "protocol": 6
+  }
+}

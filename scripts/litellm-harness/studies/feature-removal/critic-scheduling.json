@@ -1,0 +1,5 @@
+{
+  "at": "2026-09-16T07:27:50.701922+00:00",
+  "activeChildAtRestart": false,
+  "change": "Remaining optional windowed critiques now acquire one of the same three global slots. Completed syntheses reused; no paid request interrupted or automatically retried. The old sequential critic ran outside the three-solver limit, so earlier periods could have a fourth model request alongside three solvers. Solver limit itself unchanged; wall-time comparisons remain observational."
+}

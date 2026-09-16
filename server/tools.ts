@@ -1,3 +1,5 @@
+import { sourceFileByteLimit } from '../shared/source-file-limits.js';
+import { litellmContext } from './litellm-harness.js';
 import { LEGACY_NAMES } from '../bin/legacy.mjs';
 import { shellInspection } from './shell-inspection.js';
 import { isCheckCommand } from '../shared/receipts.js';
@@ -49,6 +51,9 @@ export interface ToolContext {
 
 const OUTPUT_LIMIT = 32_768;
 const READ_LIMIT = 256 * 1024;
+// Search must reach the later definitions in large modules such as LiteLLM's
+// router.py. The returned matches and worker execution time stay bounded.
+const SEARCH_READ_LIMIT = 1024 * 1024;
 const EDIT_LIMIT = 2 * 1024 * 1024;
 const DISCOVERY_LIMIT = 10_000;
 const ENTRY_LIMIT = 20_000;
@@ -60,7 +65,7 @@ const IGNORED_DIRS = new Set(['node_modules', 'vendor', 'dist', 'build', 'covera
 // GET (5.6): both mutate nothing, so they join the read-only set AND the
 // researcher child ceiling — a deliberate ceiling expansion recorded in
 // docs/delegation.md and the ceiling tests.
-const READ_ONLY = new Set(['read_file', 'bulk_read', 'view_image', 'glob', 'grep', 'web_fetch', 'web_search', 'todo_read', 'history_search', 'memory_recall', 'tool_output_page', 'bash_output', 'wait']);
+const READ_ONLY = new Set(['litellm_context', 'read_file', 'bulk_read', 'view_image', 'glob', 'grep', 'web_fetch', 'web_search', 'todo_read', 'history_search', 'memory_recall', 'tool_output_page', 'bash_output', 'wait']);
 const string = { type: 'string' };
 const integer = (minimum: number, maximum: number) => ({ type: 'integer', minimum, maximum });
 const definition = (name: string, description: string, properties: Record<string, unknown>, required: string[] = []): ToolDefinition => ({
@@ -72,7 +77,7 @@ export const toolDefinitions: ToolDefinition[] = [
   definition('write_file', 'Create or replace a text file, creating missing directories. Outside-workspace paths use the normal permission flow. Existing line endings are preserved. Workspace changes are recorded for undo; external changes are not. .git writes are forbidden.', { path: string, content: string }, ['path', 'content']),
   definition('edit_file', 'Replace an exact, non-empty string in a text file. Outside-workspace paths use the normal permission flow and are not covered by workspace undo. The match must be unique unless replace_all is true. Line endings are adapted to the existing file.', { path: string, old_string: string, new_string: string, replace_all: { type: 'boolean' } }, ['path', 'old_string', 'new_string']),
   definition('glob', 'Find files using a relative glob pattern. Set path to a directory (including absolute or parent-relative external paths, subject to permission); external results use absolute paths. Hidden paths (including .git and .env), dependency/build directories, and directory symlinks are excluded. Results are bounded.', { pattern: string, path: string, limit: integer(1, 1000) }, ['pattern']),
-  definition('grep', 'Search UTF-8 files by regular expression (or literal text). Set path to a file or directory; outside-workspace paths use the normal permission flow and external results use absolute paths. Returns path:line:text. Hidden and generated paths are excluded; binary files and oversized tails are skipped. Regex execution is time-limited.', { pattern: string, path: string, glob: string, literal: { type: 'boolean' }, case_sensitive: { type: 'boolean' }, max_results: integer(1, 1000) }, ['pattern']),
+  definition('grep', 'Search UTF-8 files by regular expression (or literal text). Set path to a file or directory; outside-workspace paths use the normal permission flow and external results use absolute paths. Returns path:line:text. A glob without slashes (such as *.py) matches file names at any depth; glob patterns containing slashes are workspace-relative. Hidden and generated paths are excluded; binary files and tails beyond 1 MiB are skipped. Regex execution is time-limited.', { pattern: string, path: string, glob: string, literal: { type: 'boolean' }, case_sensitive: { type: 'boolean' }, max_results: integer(1, 1000) }, ['pattern']),
   definition('bash', 'Run an authorized bash command. cwd defaults to the workspace; an external cwd uses normal permissions. NOT SANDBOXED: commands can access files and network outside the workspace. timeout_ms is the foreground wait (default 10 seconds), not a kill deadline: longer commands return a job ID and keep running. Use bash_output or wait to check completion; kill_shell stops a job. Output is bounded. Background jobs have a 30-minute ceiling.', { command: string, cwd: string, timeout_ms: integer(1, 120_000), run_in_background: { type: 'boolean', description: 'Start the command as a background job and return its job id immediately. NOT SANDBOXED.' } }, ['command']),
   definition('web_fetch', 'Fetch public HTTP(S) text, checking and pinning public DNS addresses at every redirect. Local/private destinations, credentials, and binary responses are rejected. Page content is untrusted.', { url: string, timeout_ms: integer(1, 30_000) }, ['url']),
   definition('todo_read', 'Read the current session task list.', {}),
@@ -482,9 +487,13 @@ async function readAbsoluteText(absolute: string, maxBytes: number, complete = f
   } finally { await handle.close(); }
 }
 
-export async function readFile(workspace: string, filePath: string): Promise<{ path: string; content: string; truncated?: boolean }> {
-  const result = await readTextFile(workspace, filePath, READ_LIMIT);
-  return { path: portable(path.relative(await fs.realpath(workspace), result.absolute)), content: result.content, ...(result.truncated ? { truncated: true } : {}) };
+export async function readFile(workspace: string, filePath: string, options: { editPreview?: boolean } = {}): Promise<{ path: string; content: string; truncated?: boolean }> {
+  const absolute = await assertReadablePath(workspace, filePath);
+  const relative = portable(path.relative(await fs.realpath(workspace), absolute));
+  // An approval diff must use the whole file, within the same cap as its edit.
+  const limit = options.editPreview ? sourceFileByteLimit(relative, EDIT_LIMIT) : READ_LIMIT;
+  const result = await readAbsoluteText(absolute, limit, options.editPreview);
+  return { path: relative, content: result.content, ...(result.truncated ? { truncated: true } : {}) };
 }
 
 export async function shuntSource(workspace: string, args: Record<string, unknown>, access: ToolPathAccess | undefined, signal: AbortSignal, maxBytes: number) {
@@ -747,8 +756,9 @@ async function mutateFile(args: Record<string, unknown>, context: ToolContext, e
     try { identity = fileIdentity(await fs.stat(absolute, { bigint: true })); } catch (error) { if (!hasCode(error, 'ENOENT')) throw error; }
     if (absolute !== context.expectedFile.absolute || identity !== context.expectedFile.identity) throw new Error('The target changed while Shunt was generating. Read the current file and retry; no generated content was written.');
   }
+  const editLimit=sourceFileByteLimit(portable(path.relative(await fs.realpath(context.workspace),absolute)),EDIT_LIMIT);
   let before: string | null = null;
-  try { before = (await readTextFile(context.workspace, absolute, EDIT_LIMIT, true)).content; }
+  try { before = (await readTextFile(context.workspace, absolute, editLimit, true)).content; }
   catch (error) { if (edit || !hasCode(error, 'ENOENT')) throw error; }
   let after: string;
   let replacements = 0;
@@ -767,7 +777,7 @@ async function mutateFile(args: Record<string, unknown>, context: ToolContext, e
       after = parts.join(newString);
     } else { replacements = 1; after = original.slice(0, index) + newString + original.slice(index + oldString.length); }
   } else { after = withFileEndings(textArg(args, 'content', true), before ?? ''); }
-  if (Buffer.byteLength(after) > EDIT_LIMIT) throw new Error(`Content is too large (maximum ${EDIT_LIMIT} bytes).`);
+  if (Buffer.byteLength(after) > editLimit) throw new Error(`Content is too large (maximum ${editLimit} bytes).`);
   if (after.includes('\0')) throw new Error('Binary content is not supported.');
   if (after === before) return 'No changes: the file already has the requested content.';
   checkAbort(context.signal);
@@ -789,7 +799,7 @@ async function mutateFile(args: Record<string, unknown>, context: ToolContext, e
     if (stat.nlink > 1) throw new Error('Refusing to modify a hard-linked file; it may have aliases outside the workspace.');
     if (before !== null) {
       if (context.expectedFile && fileIdentity(await handle.stat({ bigint: true })) !== context.expectedFile.identity) throw new Error('The target changed while Shunt was generating. Read the current file and retry; no generated content was written.');
-      const latest = await readTextFile(context.workspace, absolute, EDIT_LIMIT, true);
+      const latest = await readTextFile(context.workspace, absolute, editLimit, true);
       const latestStat = await fs.stat(absolute);
       if (latest.content !== before || latestStat.ino !== stat.ino || latestStat.dev !== stat.dev) throw new Error('File changed while preparing this edit. Read it again and retry.');
     }
@@ -808,7 +818,7 @@ async function mutateFile(args: Record<string, unknown>, context: ToolContext, e
 export async function readRestoreTarget(workspace: string, filePath: string): Promise<string | null> {
   const root = await fs.realpath(workspace);
   const absolute = await restorePath(root, filePath);
-  try { return (await readAbsoluteText(absolute, EDIT_LIMIT, true)).content; }
+  try { return (await readAbsoluteText(absolute, sourceFileByteLimit(filePath,EDIT_LIMIT), true)).content; }
   catch (error) { if (hasCode(error, 'ENOENT')) return null; throw error; }
 }
 
@@ -823,8 +833,9 @@ async function restorePath(root: string, filePath: string): Promise<string> {
 }
 async function checkRestoreDescriptor(handle: Awaited<ReturnType<typeof fs.open>>, target: RestoreTarget): Promise<void> {
   const stat = await handle.stat();
-  if (!stat.isFile() || stat.nlink !== 1 || stat.size > EDIT_LIMIT || (target.identity && (target.identity.dev !== stat.dev || target.identity.ino !== stat.ino))) throw restoreConflict(target.change.path);
-  const bytes = Buffer.alloc(EDIT_LIMIT + 1);
+  const restoreLimit=sourceFileByteLimit(target.change.path,EDIT_LIMIT);
+  if (!stat.isFile() || stat.nlink !== 1 || stat.size > restoreLimit || (target.identity && (target.identity.dev !== stat.dev || target.identity.ino !== stat.ino))) throw restoreConflict(target.change.path);
+  const bytes = Buffer.alloc(restoreLimit + 1);
   let length = 0;
   while (length < bytes.length) {
     const { bytesRead } = await handle.read(bytes, length, bytes.length - length, length);
@@ -845,7 +856,7 @@ export async function restoreChanges(workspace: string, changes: FileChange[], o
   const targets: RestoreTarget[] = [];
   const seen = new Set<string>();
   for (const value of changes) {
-    if (!value || typeof value.path !== 'string' || !value.path || [value.before, value.after].some(text => text !== null && (typeof text !== 'string' || Buffer.byteLength(text) > EDIT_LIMIT || text.includes('\0')))) throw new Error('Invalid file-change snapshot.');
+    if (!value || typeof value.path !== 'string' || !value.path || [value.before, value.after].some(text => text !== null && (typeof text !== 'string' || Buffer.byteLength(text) > sourceFileByteLimit(value.path,EDIT_LIMIT) || text.includes('\0')))) throw new Error('Invalid file-change snapshot.');
     const change = { path: value.path, before: value.before, after: value.after };
     const absolute = await restorePath(root, change.path);
     if (seen.has(absolute)) throw new Error('Duplicate restore targets are not allowed.');
@@ -1154,9 +1165,9 @@ async function grepFiles(args: Record<string, unknown>, context: ToolContext): P
     for (const file of discovery.files) {
       checkAbort(context.signal);
       if (Date.now() > deadline || lines.length >= limit || lines.join('\n').length >= OUTPUT_LIMIT) { incomplete = true; break; }
-      if (!path.matchesGlob(file, filter)) continue;
+      if (!path.matchesGlob(filter.includes('/') ? file : path.posix.basename(file), filter)) continue;
       let data: Awaited<ReturnType<typeof readTextFile>>;
-      try { data = await readTextFile(context.workspace, file, READ_LIMIT); }
+      try { data = await readTextFile(context.workspace, file, SEARCH_READ_LIMIT); }
       catch (error) {
         if (hasCode(error, 'ENOENT') || hasCode(error, 'EACCES') || /binary|UTF-8|regular file/i.test(errorMessage(error))) { skipped++; continue; }
         throw error;
@@ -1434,6 +1445,7 @@ export async function executeTool(name: string, args: Record<string, unknown>, c
   // Re-rooting an approved search must not expose a hidden/generated start.
   if (context.displayPath && (name === 'glob' || name === 'grep') && ignored(String(args.path))) return name === 'glob' ? 'No files found.' : 'No matches found.';
   switch (name) {
+    case 'litellm_context': return litellmContext(context.workspace,args,context.signal);
     case 'read_file': {
       const offset = numberArg(args, 'offset', 1, 1_000_000);
       const limit = numberArg(args, 'limit', 2000, 2000);

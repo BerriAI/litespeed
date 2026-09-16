@@ -1,0 +1,22 @@
+--- a/server/litellm-harness.ts
++++ b/server/litellm-harness.ts
+@@ -4,7 +4,7 @@
+ import fg from 'fast-glob';
+ import type { ToolDefinition } from '../shared/types.js';
+ 
+-export const LITELLM_HARNESS_VERSION='2026-09-15.34';
++export const LITELLM_HARNESS_VERSION='2026-09-15.38';
+ export const litellmContextTool:ToolDefinition={type:'function',function:{name:'litellm_context',description:'Navigate the current LiteLLM checkout. Give a task query to find relevant definitions, inline conditions and existing tests. Give a source path to see its symbol outline and test partners; add a symbol name to read that definition with numbered lines, or callers to find functions invoking a named helper in that file. Reads only this workspace, never Git history or remote answers.',parameters:{type:'object',properties:{query:{type:'string',maxLength:1000},path:{type:'string',maxLength:500},symbol:{type:'string',maxLength:200},callers:{type:'string',maxLength:200,description:'Python helper name whose call sites and enclosing functions to find; requires path.'}},additionalProperties:false}}};
+ 
+ const playbooks = [
+@@ -247,7 +247,9 @@
+     return JSON.stringify({path:file,lines:lines.length,symbols:selected.slice(0,100),moreSymbols:selected.length>100,references,tests},null,2);
+   }
+   const aliases:Record<string,string>={conversion:'convert',translation:'transform',streaming:'stream',configuration:'config',authentication:'auth',authorization:'auth',parameters:'params',retries:'retry'};
+-  const tokens=[...new Set(words(String(args.query??'')).flatMap(word=>[word,...(aliases[word]?[aliases[word]]:[])]))].slice(0,24);
++  const queryWords=words(String(args.query??''));
++  const orderedWords=[...queryWords.filter(word=>word.includes('_')),...queryWords];
++  const tokens=[...new Set(orderedWords.flatMap(word=>[word,...(aliases[word]?[aliases[word]]:[])]))].slice(0,24);
+   const ui=/\b(ui|dashboard|frontend|react|component)\b/i.test(String(args.query??''));
+   const ranked=files.filter(p=>!p.startsWith('tests/')&&(ui||!p.startsWith('ui/'))).map(p=>({path:p,score:tokens.reduce((score,word)=>score+(p.toLowerCase().includes(word)?(p.split('/').includes(word)?5:2):0),0)})).filter(p=>p.score>0).sort((a,b)=>b.score-a.score||a.path.length-b.path.length||a.path.localeCompare(b.path)).slice(0,8);
+   const symbols=tokens.length&&!ui?await matchingSymbols(workspace,files,tokens,signal):undefined;

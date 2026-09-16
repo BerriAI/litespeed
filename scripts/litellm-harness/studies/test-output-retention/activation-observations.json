@@ -1,0 +1,146 @@
+{
+  "generatedAt": "2026-09-16T10:37:37.321025+00:00",
+  "scope": "Two completed candidate observations, not the completed comparison. Actual first/last outbound request bodies verify delivery of the instruction; static command syntax cannot inspect nested-script behavior or prove causal waste. Saved originals unchanged. Steps here use one-based message indices; the earlier first-activation-audit uses its explicitly named zero-based messageIndex.",
+  "trials": [
+    {
+      "run": "replication-v47-output-retain-output-r2-router-strategy-isolation-b21e08d3",
+      "commands": [
+        {
+          "step": 106,
+          "directOutputFilter": true,
+          "logRetentionSyntax": false
+        },
+        {
+          "step": 108,
+          "directOutputFilter": true,
+          "logRetentionSyntax": false
+        },
+        {
+          "step": 110,
+          "directOutputFilter": true,
+          "logRetentionSyntax": false
+        },
+        {
+          "step": 116,
+          "directOutputFilter": true,
+          "logRetentionSyntax": false
+        },
+        {
+          "step": 119,
+          "directOutputFilter": true,
+          "logRetentionSyntax": false
+        },
+        {
+          "step": 123,
+          "directOutputFilter": true,
+          "logRetentionSyntax": false
+        },
+        {
+          "step": 129,
+          "directOutputFilter": true,
+          "logRetentionSyntax": false
+        },
+        {
+          "step": 135,
+          "directOutputFilter": true,
+          "logRetentionSyntax": false
+        }
+      ],
+      "pytestCommandCount": 8,
+      "filteredCount": 8,
+      "retentionSyntaxCount": 0,
+      "outboundInstructionEvidence": [
+        {
+          "position": "first",
+          "requestSha256": "cd84b3637faa33c695131bf61b69b7aa101d1853f590a84098460ea054e71ba4",
+          "instructionPresent": true
+        },
+        {
+          "position": "last",
+          "requestSha256": "357144993fd7c4dbfbbcf10a5d7bad2e612850fed24180d6216820424199192d",
+          "instructionPresent": true
+        }
+      ]
+    },
+    {
+      "run": "replication-v47-output-retain-output-r2-legacy-stream-pipeline-c15168ea",
+      "commands": [
+        {
+          "step": 145,
+          "directOutputFilter": true,
+          "logRetentionSyntax": false
+        },
+        {
+          "step": 163,
+          "directOutputFilter": true,
+          "logRetentionSyntax": false
+        },
+        {
+          "step": 169,
+          "directOutputFilter": true,
+          "logRetentionSyntax": false
+        },
+        {
+          "step": 175,
+          "directOutputFilter": true,
+          "logRetentionSyntax": false
+        },
+        {
+          "step": 178,
+          "directOutputFilter": true,
+          "logRetentionSyntax": false
+        },
+        {
+          "step": 182,
+          "directOutputFilter": true,
+          "logRetentionSyntax": false
+        },
+        {
+          "step": 184,
+          "directOutputFilter": true,
+          "logRetentionSyntax": false
+        },
+        {
+          "step": 188,
+          "directOutputFilter": true,
+          "logRetentionSyntax": false
+        },
+        {
+          "step": 190,
+          "directOutputFilter": true,
+          "logRetentionSyntax": false
+        },
+        {
+          "step": 192,
+          "directOutputFilter": true,
+          "logRetentionSyntax": false
+        },
+        {
+          "step": 194,
+          "directOutputFilter": true,
+          "logRetentionSyntax": false
+        },
+        {
+          "step": 196,
+          "directOutputFilter": true,
+          "logRetentionSyntax": false
+        }
+      ],
+      "pytestCommandCount": 12,
+      "filteredCount": 12,
+      "retentionSyntaxCount": 0,
+      "outboundInstructionEvidence": [
+        {
+          "position": "first",
+          "requestSha256": "75171714bfb6528abf9e5665784647ba5f41a7fe4d68bc7c7d348f3c02ead529",
+          "instructionPresent": true
+        },
+        {
+          "position": "last",
+          "requestSha256": "0bb59e4d8290a0277c0de1524157ddba2fa1724740ab9e128881e8fa700f85a3",
+          "instructionPresent": true
+        }
+      ]
+    }
+  ]
+}

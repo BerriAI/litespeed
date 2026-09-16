@@ -1,0 +1,10 @@
+{
+  "createdAt": "2026-09-16T22:21:39.579701+00:00",
+  "scope": "Check final reviewer examples after receipt. Not a change to the coding-study oracle and not a new blind benchmark.",
+  "sourceSha256": "8c546a8192f149e550af37e1d6d7164c35ad415a012a24aa792a38630960c970",
+  "interpretation": "A passing row means the alleged example follows independently calculated billing, not a detected defect. The cap-order row uses the candidate reported text-first allocation; the task does not require a different modality priority. The existing mixed cache-write failure remains separate and was not found by either reviewer.",
+  "variants": [
+    "candidate-r2",
+    "merged-reference"
+  ]
+}

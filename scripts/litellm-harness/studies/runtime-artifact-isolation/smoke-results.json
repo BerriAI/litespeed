@@ -1,0 +1,40 @@
+{
+  "eligible": true,
+  "rows": [
+    {
+      "name": "flash",
+      "run": "replication-protocol7-smoke-flash-converse-config-280476a2",
+      "protocol": 7,
+      "kind": "litellm-specific",
+      "completionReason": "completed",
+      "acceptance": {
+        "exit": 0,
+        "tests": 2,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0,
+        "passed": true
+      },
+      "passed": true,
+      "seconds": 69.162
+    },
+    {
+      "name": "astra",
+      "run": "replication-protocol7-smoke-astra-converse-config-6ea71abd",
+      "protocol": 7,
+      "kind": "codex",
+      "completionReason": "completed",
+      "acceptance": {
+        "exit": 0,
+        "tests": 2,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0,
+        "passed": true
+      },
+      "passed": true,
+      "seconds": 127.799
+    }
+  ],
+  "interpretation": "Both actual model routes finish the known training smoke normally and pass its two checks. This validates launch viability, not comparative quality or complete adversarial isolation."
+}

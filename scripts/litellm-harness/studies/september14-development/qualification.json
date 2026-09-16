@@ -1,0 +1,485 @@
+[
+  {
+    "id": "health-read-failure",
+    "valid": true,
+    "snapshotRevision": 2,
+    "testNodesHash": "9aa609378c0626661fc6d3acb452409b9411a0d918db7d60c51b42eb829c118b",
+    "results": {
+      "base": {
+        "exit": 1,
+        "tests": 1,
+        "failures": 1,
+        "errors": 0,
+        "skipped": 0
+      },
+      "reference": {
+        "exit": 0,
+        "tests": 1,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      }
+    },
+    "fixtureProfileHash": "643d5437104296e21d906ecb15b2c96ad278f20cfc4af53b12bb6069bd853726"
+  },
+  {
+    "id": "prompt-security-queued",
+    "valid": true,
+    "snapshotRevision": 2,
+    "testNodesHash": "ecaa1253b39d56d1bce3d93ca90d764b91a43fea3d5c56f62e2eacd3ac7dbab9",
+    "results": {
+      "base": {
+        "exit": 1,
+        "tests": 4,
+        "failures": 2,
+        "errors": 0,
+        "skipped": 0
+      },
+      "reference": {
+        "exit": 0,
+        "tests": 4,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      }
+    },
+    "fixtureProfileHash": "643d5437104296e21d906ecb15b2c96ad278f20cfc4af53b12bb6069bd853726"
+  },
+  {
+    "id": "proxy-call-id-header",
+    "valid": true,
+    "snapshotRevision": 2,
+    "testNodesHash": "a06eef35a5e375d059b0fd15054b33b43818ae952bd657b3e402fb4020245d4a",
+    "results": {
+      "base": {
+        "exit": 1,
+        "tests": 5,
+        "failures": 4,
+        "errors": 0,
+        "skipped": 0
+      },
+      "reference": {
+        "exit": 0,
+        "tests": 5,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      }
+    },
+    "fixtureProfileHash": "643d5437104296e21d906ecb15b2c96ad278f20cfc4af53b12bb6069bd853726"
+  },
+  {
+    "id": "forwarded-http-headers",
+    "valid": true,
+    "snapshotRevision": 2,
+    "testNodesHash": "3d67940c618ff9e1e2f0e10f297f40c6fdec599cf7a033405f616cd2db6e9187",
+    "results": {
+      "base": {
+        "exit": 1,
+        "tests": 2,
+        "failures": 2,
+        "errors": 0,
+        "skipped": 0
+      },
+      "reference": {
+        "exit": 0,
+        "tests": 2,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      }
+    },
+    "fixtureProfileHash": "643d5437104296e21d906ecb15b2c96ad278f20cfc4af53b12bb6069bd853726"
+  },
+  {
+    "id": "internal-param-filter",
+    "valid": true,
+    "snapshotRevision": 2,
+    "testNodesHash": "99fd326b1c5dc274bdaf3b1e36023e5ead9dbdbc415492e7e5e93f0f07eb127b",
+    "results": {
+      "base": {
+        "exit": 1,
+        "tests": 1,
+        "failures": 1,
+        "errors": 0,
+        "skipped": 0
+      },
+      "reference": {
+        "exit": 0,
+        "tests": 1,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      }
+    },
+    "fixtureProfileHash": "643d5437104296e21d906ecb15b2c96ad278f20cfc4af53b12bb6069bd853726"
+  },
+  {
+    "id": "team-organization-models",
+    "valid": true,
+    "snapshotRevision": 2,
+    "testNodesHash": "726715f7718c02616e2612a7a4eda781f709325c7874e558b770b5a69fc4634a",
+    "results": {
+      "base": {
+        "exit": 1,
+        "tests": 6,
+        "failures": 6,
+        "errors": 0,
+        "skipped": 0
+      },
+      "reference": {
+        "exit": 0,
+        "tests": 6,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      }
+    },
+    "fixtureProfileHash": "643d5437104296e21d906ecb15b2c96ad278f20cfc4af53b12bb6069bd853726"
+  },
+  {
+    "id": "team-cooldown-alternatives",
+    "valid": true,
+    "snapshotRevision": 2,
+    "testNodesHash": "4906d33db116e771e7b9110eb25fb776f83f15a048b5abd510e19540317f4af7",
+    "results": {
+      "base": {
+        "exit": 1,
+        "tests": 3,
+        "failures": 1,
+        "errors": 0,
+        "skipped": 0
+      },
+      "reference": {
+        "exit": 0,
+        "tests": 3,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      }
+    },
+    "fixtureProfileHash": "643d5437104296e21d906ecb15b2c96ad278f20cfc4af53b12bb6069bd853726"
+  },
+  {
+    "id": "realtime-parallel-release",
+    "valid": false,
+    "snapshotRevision": 2,
+    "testNodesHash": "1a0c9eac4252f0c847eb4a55814b5c005ee5bb15db56009774384b94419d6aa4",
+    "results": {
+      "base": {
+        "exit": 4,
+        "tests": 1,
+        "failures": 0,
+        "errors": 1,
+        "skipped": 0
+      },
+      "reference": {
+        "exit": 0,
+        "tests": 6,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      }
+    },
+    "fixtureProfileHash": "643d5437104296e21d906ecb15b2c96ad278f20cfc4af53b12bb6069bd853726"
+  },
+  {
+    "id": "capability-backfill",
+    "valid": false,
+    "snapshotRevision": 2,
+    "testNodesHash": "1f814c3c8589352f0e56982c5dccd66e519e1be8991ca895621a60de8e025bac",
+    "results": {
+      "base": {
+        "exit": 4,
+        "tests": 1,
+        "failures": 0,
+        "errors": 1,
+        "skipped": 0
+      },
+      "reference": {
+        "exit": 0,
+        "tests": 7,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      }
+    },
+    "fixtureProfileHash": "643d5437104296e21d906ecb15b2c96ad278f20cfc4af53b12bb6069bd853726"
+  },
+  {
+    "id": "organization-own-memberships",
+    "valid": true,
+    "snapshotRevision": 2,
+    "testNodesHash": "7db85b3071f5b77aa08b301467304c34c4b7a33e8427117b4f8d27617e7627ef",
+    "results": {
+      "base": {
+        "exit": 1,
+        "tests": 2,
+        "failures": 2,
+        "errors": 0,
+        "skipped": 0
+      },
+      "reference": {
+        "exit": 0,
+        "tests": 2,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      }
+    },
+    "fixtureProfileHash": "643d5437104296e21d906ecb15b2c96ad278f20cfc4af53b12bb6069bd853726"
+  },
+  {
+    "id": "session-read-and-statusline",
+    "valid": true,
+    "snapshotRevision": 2,
+    "testNodesHash": "d314d9f1b38bd91b3c6b86660f0fbed58911909636206c7dcefda3dae6ae9ead",
+    "results": {
+      "base": {
+        "exit": 1,
+        "tests": 24,
+        "failures": 6,
+        "errors": 0,
+        "skipped": 0
+      },
+      "reference": {
+        "exit": 0,
+        "tests": 24,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      }
+    },
+    "fixtureProfileHash": "643d5437104296e21d906ecb15b2c96ad278f20cfc4af53b12bb6069bd853726"
+  },
+  {
+    "id": "login-credentials-hint",
+    "valid": true,
+    "snapshotRevision": 2,
+    "testNodesHash": "bcb18464b6a93faaf88acfb9a561b609fae7cf8821cea89dbfa839a241392b74",
+    "results": {
+      "base": {
+        "exit": 1,
+        "tests": 7,
+        "failures": 3,
+        "errors": 0,
+        "skipped": 0
+      },
+      "reference": {
+        "exit": 0,
+        "tests": 7,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      }
+    },
+    "fixtureProfileHash": "8c826420d36998a07a4d846cf2270dbfd919626e38bb7c7df6fe42c9e3d7d8e7"
+  },
+  {
+    "id": "async-success-once",
+    "valid": true,
+    "snapshotRevision": 2,
+    "testNodesHash": "52b1413082de3d6aeb801328a7854c7e714bb9e68d7756685ff685ed43f1dbdc",
+    "results": {
+      "base": {
+        "exit": 1,
+        "tests": 1,
+        "failures": 1,
+        "errors": 0,
+        "skipped": 0
+      },
+      "reference": {
+        "exit": 0,
+        "tests": 1,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      }
+    },
+    "fixtureProfileHash": "643d5437104296e21d906ecb15b2c96ad278f20cfc4af53b12bb6069bd853726"
+  },
+  {
+    "id": "prometheus-rate-limit-provider",
+    "valid": true,
+    "snapshotRevision": 2,
+    "testNodesHash": "37ac34178f573684012a01d69da13c48494d2b4fe4caf09cf092bbc29a3da335",
+    "results": {
+      "base": {
+        "exit": 1,
+        "tests": 3,
+        "failures": 1,
+        "errors": 0,
+        "skipped": 0
+      },
+      "reference": {
+        "exit": 0,
+        "tests": 3,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      }
+    },
+    "fixtureProfileHash": "643d5437104296e21d906ecb15b2c96ad278f20cfc4af53b12bb6069bd853726"
+  },
+  {
+    "id": "access-log-path-filter",
+    "valid": false,
+    "snapshotRevision": 2,
+    "testNodesHash": "a9024c2652faefb1e88a2188c6ee9ddba626a4e59bf83a7122f330e154578bf9",
+    "results": {
+      "base": {
+        "exit": 4,
+        "tests": 1,
+        "failures": 0,
+        "errors": 1,
+        "skipped": 0
+      },
+      "reference": {
+        "exit": 0,
+        "tests": 14,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      }
+    },
+    "fixtureProfileHash": "643d5437104296e21d906ecb15b2c96ad278f20cfc4af53b12bb6069bd853726"
+  },
+  {
+    "id": "all-deployments-cooldown",
+    "valid": true,
+    "snapshotRevision": 2,
+    "testNodesHash": "fe6ef5a4c7dc55e8808d25105b96cf39efda12e223f6b605d7c6cd0f56cf50f8",
+    "results": {
+      "base": {
+        "exit": 1,
+        "tests": 5,
+        "failures": 5,
+        "errors": 0,
+        "skipped": 0
+      },
+      "reference": {
+        "exit": 0,
+        "tests": 5,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      }
+    },
+    "fixtureProfileHash": "643d5437104296e21d906ecb15b2c96ad278f20cfc4af53b12bb6069bd853726"
+  },
+  {
+    "id": "mapped-error-response-headers",
+    "valid": true,
+    "snapshotRevision": 2,
+    "testNodesHash": "547bad703651cb5a77b3f3678b2fd515578534a0b468358ce608fc57a1555d03",
+    "results": {
+      "base": {
+        "exit": 1,
+        "tests": 1,
+        "failures": 1,
+        "errors": 0,
+        "skipped": 0
+      },
+      "reference": {
+        "exit": 0,
+        "tests": 1,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      }
+    },
+    "fixtureProfileHash": "643d5437104296e21d906ecb15b2c96ad278f20cfc4af53b12bb6069bd853726"
+  },
+  {
+    "id": "file-extension-allowlist",
+    "valid": true,
+    "snapshotRevision": 2,
+    "testNodesHash": "9d04d77862ffe2b06936ee4c901ba9e6502cc2d45cc61e3cfedb70e6161fccc0",
+    "results": {
+      "base": {
+        "exit": 1,
+        "tests": 8,
+        "failures": 6,
+        "errors": 0,
+        "skipped": 0
+      },
+      "reference": {
+        "exit": 0,
+        "tests": 8,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      }
+    },
+    "fixtureProfileHash": "643d5437104296e21d906ecb15b2c96ad278f20cfc4af53b12bb6069bd853726"
+  },
+  {
+    "id": "openinference-message-budget",
+    "valid": false,
+    "snapshotRevision": 2,
+    "testNodesHash": "9cf2c6375aa6c80d6db9568d7ae87379e9409eebf308c4a817a1571acf47f120",
+    "results": {
+      "base": {
+        "exit": 4,
+        "tests": 1,
+        "failures": 0,
+        "errors": 1,
+        "skipped": 0
+      },
+      "reference": {
+        "exit": 0,
+        "tests": 6,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      }
+    },
+    "fixtureProfileHash": "643d5437104296e21d906ecb15b2c96ad278f20cfc4af53b12bb6069bd853726"
+  },
+  {
+    "id": "correlation-logging-cost",
+    "valid": true,
+    "snapshotRevision": 2,
+    "testNodesHash": "5ca933f49ec91144d8498429f17f9af0a2a6f70554b761a11bc7d7ede665e3f8",
+    "results": {
+      "base": {
+        "exit": 1,
+        "tests": 19,
+        "failures": 2,
+        "errors": 0,
+        "skipped": 0
+      },
+      "reference": {
+        "exit": 0,
+        "tests": 19,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      }
+    },
+    "fixtureProfileHash": "643d5437104296e21d906ecb15b2c96ad278f20cfc4af53b12bb6069bd853726"
+  },
+  {
+    "id": "issuer-virtual-key-policy",
+    "valid": true,
+    "snapshotRevision": 2,
+    "testNodesHash": "6f1d41e3f4ab82605a088f3ac021340fa600733ceb2c15f8b42bad0bd63b48a3",
+    "results": {
+      "base": {
+        "exit": 1,
+        "tests": 5,
+        "failures": 5,
+        "errors": 0,
+        "skipped": 0
+      },
+      "reference": {
+        "exit": 0,
+        "tests": 5,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      }
+    },
+    "fixtureProfileHash": "643d5437104296e21d906ecb15b2c96ad278f20cfc4af53b12bb6069bd853726"
+  }
+]

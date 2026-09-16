@@ -1,0 +1,190 @@
+{
+  "createdAt": "2026-09-16T08:25:12.228217+00:00",
+  "protocol": 7,
+  "model": "fireworks_ai/deepseek-v4p1-flash",
+  "control": "control",
+  "repetitions": 2,
+  "globalConcurrency": 3,
+  "timeoutSeconds": 900,
+  "seed": 44160926,
+  "stopNewTrialsAtCommittedUsd": 88,
+  "purpose": "Combined-mechanism development validation against current v34 control, while independent component studies finish. Four already-inspected training tasks test provider translation, auth discovery, cross-module async behavior and difficult streaming. Chosen for mechanism coverage before these combined outcomes, not reserved future evaluation. Same effort and task/dependency profile per arm.",
+  "supplementalSource": {
+    "path": "scripts/litellm-harness/studies/feature-effort/legacy-inheritance/real_stream_probe.py",
+    "sha256": "cefbc0b3d63bc05414f20b3357dc06a26e4b6eb30808f8636a820f46d3a86f7b"
+  },
+  "runs": [
+    {
+      "dataset": "training2",
+      "case": "mcp-auth-challenge",
+      "name": "combined",
+      "kind": "litellm-specific",
+      "label": "replication-v44-combined-combined-r2",
+      "commit": "3737757ecf1d2652cbf60a0abc49f4568e668adb",
+      "effort": "medium"
+    },
+    {
+      "dataset": "training5",
+      "case": "legacy-stream-pipeline",
+      "name": "combined",
+      "kind": "litellm-specific",
+      "label": "replication-v44-combined-combined-r1",
+      "commit": "3737757ecf1d2652cbf60a0abc49f4568e668adb",
+      "effort": "medium",
+      "supplemental": {
+        "artifact": "real-stream-probe.json",
+        "expectedChecks": 24
+      }
+    },
+    {
+      "dataset": "training5",
+      "case": "legacy-stream-pipeline",
+      "name": "control",
+      "kind": "litellm-specific",
+      "label": "replication-v44-combined-control-r2",
+      "commit": "b06f9fd2c25f03382f26b6d8a5dbbe38a53ae8ea",
+      "effort": "medium",
+      "supplemental": {
+        "artifact": "real-stream-probe.json",
+        "expectedChecks": 24
+      }
+    },
+    {
+      "dataset": "",
+      "case": "databricks-reasoning",
+      "name": "control",
+      "kind": "litellm-specific",
+      "label": "replication-v44-combined-control-r1",
+      "commit": "b06f9fd2c25f03382f26b6d8a5dbbe38a53ae8ea",
+      "effort": "medium"
+    },
+    {
+      "dataset": "training5",
+      "case": "aws-signing-off-loop",
+      "name": "combined",
+      "kind": "litellm-specific",
+      "label": "replication-v44-combined-combined-r2",
+      "commit": "3737757ecf1d2652cbf60a0abc49f4568e668adb",
+      "effort": "medium"
+    },
+    {
+      "dataset": "training2",
+      "case": "mcp-auth-challenge",
+      "name": "combined",
+      "kind": "litellm-specific",
+      "label": "replication-v44-combined-combined-r1",
+      "commit": "3737757ecf1d2652cbf60a0abc49f4568e668adb",
+      "effort": "medium"
+    },
+    {
+      "dataset": "training5",
+      "case": "legacy-stream-pipeline",
+      "name": "control",
+      "kind": "litellm-specific",
+      "label": "replication-v44-combined-control-r1",
+      "commit": "b06f9fd2c25f03382f26b6d8a5dbbe38a53ae8ea",
+      "effort": "medium",
+      "supplemental": {
+        "artifact": "real-stream-probe.json",
+        "expectedChecks": 24
+      }
+    },
+    {
+      "dataset": "",
+      "case": "databricks-reasoning",
+      "name": "combined",
+      "kind": "litellm-specific",
+      "label": "replication-v44-combined-combined-r2",
+      "commit": "3737757ecf1d2652cbf60a0abc49f4568e668adb",
+      "effort": "medium"
+    },
+    {
+      "dataset": "training2",
+      "case": "mcp-auth-challenge",
+      "name": "control",
+      "kind": "litellm-specific",
+      "label": "replication-v44-combined-control-r1",
+      "commit": "b06f9fd2c25f03382f26b6d8a5dbbe38a53ae8ea",
+      "effort": "medium"
+    },
+    {
+      "dataset": "training5",
+      "case": "aws-signing-off-loop",
+      "name": "control",
+      "kind": "litellm-specific",
+      "label": "replication-v44-combined-control-r1",
+      "commit": "b06f9fd2c25f03382f26b6d8a5dbbe38a53ae8ea",
+      "effort": "medium"
+    },
+    {
+      "dataset": "",
+      "case": "databricks-reasoning",
+      "name": "control",
+      "kind": "litellm-specific",
+      "label": "replication-v44-combined-control-r2",
+      "commit": "b06f9fd2c25f03382f26b6d8a5dbbe38a53ae8ea",
+      "effort": "medium"
+    },
+    {
+      "dataset": "training5",
+      "case": "aws-signing-off-loop",
+      "name": "combined",
+      "kind": "litellm-specific",
+      "label": "replication-v44-combined-combined-r1",
+      "commit": "3737757ecf1d2652cbf60a0abc49f4568e668adb",
+      "effort": "medium"
+    },
+    {
+      "dataset": "training2",
+      "case": "mcp-auth-challenge",
+      "name": "control",
+      "kind": "litellm-specific",
+      "label": "replication-v44-combined-control-r2",
+      "commit": "b06f9fd2c25f03382f26b6d8a5dbbe38a53ae8ea",
+      "effort": "medium"
+    },
+    {
+      "dataset": "",
+      "case": "databricks-reasoning",
+      "name": "combined",
+      "kind": "litellm-specific",
+      "label": "replication-v44-combined-combined-r1",
+      "commit": "3737757ecf1d2652cbf60a0abc49f4568e668adb",
+      "effort": "medium"
+    },
+    {
+      "dataset": "training5",
+      "case": "aws-signing-off-loop",
+      "name": "control",
+      "kind": "litellm-specific",
+      "label": "replication-v44-combined-control-r2",
+      "commit": "b06f9fd2c25f03382f26b6d8a5dbbe38a53ae8ea",
+      "effort": "medium"
+    },
+    {
+      "dataset": "training5",
+      "case": "legacy-stream-pipeline",
+      "name": "combined",
+      "kind": "litellm-specific",
+      "label": "replication-v44-combined-combined-r2",
+      "commit": "3737757ecf1d2652cbf60a0abc49f4568e668adb",
+      "effort": "medium",
+      "supplemental": {
+        "artifact": "real-stream-probe.json",
+        "expectedChecks": 24
+      }
+    }
+  ],
+  "amendment": {
+    "createdAt": "2026-09-16T08:38:50.298981+00:00",
+    "priorProtocol": 6,
+    "protocol": 7,
+    "oldAllocatedTrials": 0,
+    "reason": "Runtime benchmark artifacts were readable under protocol 6. Preserve the original plan, freeze the same stronger isolation in both arms before any allocation, and require actual Flash and Astra smoke passes. Tasks, order, labels, effort, timeout and supplemental requirements unchanged.",
+    "commits": {
+      "control": "b06f9fd2c25f03382f26b6d8a5dbbe38a53ae8ea",
+      "combined": "3737757ecf1d2652cbf60a0abc49f4568e668adb"
+    }
+  },
+  "smokeGate": "Both actual model routes must complete converse-config and pass acceptance under protocol 7."
+}

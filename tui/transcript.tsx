@@ -16,6 +16,7 @@ import {
 } from './transcriptModel.js';
 import { activityActors, activitySections, conversationGroups, usageLabel, type ActivityEntry } from './conversation.js';
 import { steeringContent } from '../shared/steering-presentation.js';
+import { litellmHarnessNoteTitle } from '../shared/litellm-presentation.js';
 import { Button } from './ui.js';
 import { terminalText } from './protocol.js';
 import { toolRow, reasoningSummary, stableStreamingMarkdown } from './transcriptModel.js';
@@ -38,6 +39,15 @@ export const RAIL_BORDER = {
  * a row built from one needs no wrapper padding. */
 const ACTIVITY_TEXT = 3;
 const ACTIVITY_CHEVRON = 1;
+
+function HarnessNoteRow({title,content}:{title:string;content:string}) {
+  const theme=useTheme(),settings=useTranscriptSettings(),[expanded,setExpanded]=useState(false);
+  const open=expanded||settings.toolDetails;
+  return <box marginTop={1} paddingLeft={ACTIVITY_CHEVRON} flexDirection="column" flexShrink={0}>
+    <Button tone="muted" onPress={()=>setExpanded(!expanded)}>{`${open?'▾':'▸'} ${title}`}</Button>
+    {open&&<text paddingLeft={ACTIVITY_TEXT-ACTIVITY_CHEVRON} fg={toHex(theme.textMuted)} wrapMode="word">{terminalText(content,true)}</text>}
+  </box>;
+}
 
 export interface TranscriptSettings {
   showThinking: boolean;
@@ -362,7 +372,7 @@ function WorkLog({ steps, detail, actors, live, syntax, width, controller, embed
   if (!sections.length) return null;
   return <box flexDirection="column" flexShrink={0} gap={1} marginTop={hasText ? 1 : 0}>{sections.map((section, index) => section.kind === 'worker' && controller
     ? <WorkerCard key={section.id} handoffs={section.handoffs} scheduled={section.scheduled} task={section.task} call={section.call} label={section.label} controller={controller} width={width - 6} defaultOpen={live || settings.toolDetails || settings.showThinking} needsApproval={detail.permissions.some(item => item.toolCallId === section.call.id)} renderTranscript={(child, childWidth) => <Transcript detail={child} width={childWidth} active={false} embedded />} />
-    : <DriverActivity key={section.id} entries={section.kind === 'driver' ? section.entries : [{ message: section.message, call: section.call }]} detail={detail} live={live && index === sections.length - 1} heading={!embedded && Boolean(detail.session.architecture) && (index ? sections[index - 1].kind : precedingActor) !== 'driver'} syntax={syntax} width={width} embedded={embedded} />)}</box>;
+    : <DriverActivity key={section.id} entries={section.kind === 'driver' ? section.entries : [{ message: section.message, call: section.call }]} detail={detail} live={live && index === sections.length - 1} heading={!embedded && Boolean(detail.session.architecture) && detail.session.architecture?.kind!=='litellm-specific' && (index ? sections[index - 1].kind : precedingActor) !== 'driver'} syntax={syntax} width={width} embedded={embedded} />)}</box>;
 }
 
 export const Transcript = memo(function Transcript({ detail, width, height, active = true, embedded = false, onInspect, onUsage, controller }: { detail: SessionDetail; width: number; height?: number; controller?: TerminalController; active?: boolean; embedded?: boolean; onInspect?: (steps: Message[]) => void; onUsage?: (message: Message, usage?: Usage) => void }) {
@@ -396,6 +406,8 @@ export const Transcript = memo(function Transcript({ detail, width, height, acti
       if (message.role === 'user') { previousActor = undefined; return embedded ? null : <UserRow key={message.id} message={message} first={index === 0} />; }
       if (message.role === 'system') {
         previousActor = undefined;
+        const title=litellmHarnessNoteTitle(message.content);
+        if(title)return <HarnessNoteRow key={message.id} title={title} content={message.content}/>;
         return <box key={message.id} marginTop={1} paddingLeft={ACTIVITY_TEXT} flexShrink={0}><text fg={toHex(theme.textMuted)} wrapMode="word">{terminalText(message.content, true)}</text></box>;
       }
       const usageMessage = steps.findLast(step => step.turnUsage) ?? steps.at(-1) ?? message;
@@ -405,7 +417,7 @@ export const Transcript = memo(function Transcript({ detail, width, height, acti
       const precedingActor = hasText ? 'driver' : previousActor;
       previousActor = activitySections(steps, actors).at(-1)?.kind ?? precedingActor;
       return <box key={message.id} marginTop={index === 0 && embedded ? 0 : 1} flexDirection="column" flexShrink={0}>
-        {showDriver && detail.session.architecture && controller && <text paddingLeft={ACTIVITY_TEXT} fg={toHex(theme.textMuted)}>{detail.session.architecture?.kind==='litefusion'?'Lead':'Driver'}</text>}
+        {showDriver && detail.session.architecture && detail.session.architecture.kind!=='litellm-specific' && controller && <text paddingLeft={ACTIVITY_TEXT} fg={toHex(theme.textMuted)}>{detail.session.architecture.kind==='litefusion'?'Lead':'Driver'}</text>}
         {message.reasoning && <ReasoningRow subtle={syntax.subtle} row={{ running: live && !message.content && !message.toolCalls?.length, ...reasoningSummary(message.reasoning) }} />}
         {/* Text is still arriving only while the run is live and no tool call has
             followed it in this message; a settled response renders its real source. */}

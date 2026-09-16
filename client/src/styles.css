@@ -367,6 +367,11 @@ summary::-webkit-details-marker { display: none; }
 @media (max-width: 480px) { .context-estimate > summary { min-height: 36px; }.context-estimate-body { padding: 11px; }.context-estimate-body dl > div { grid-template-columns: 100px minmax(0, 1fr); gap: 8px; } }
 .system-message { display: flex; align-items: flex-start; gap: 7px; font-size: 11px; color: var(--muted); background: var(--subtle); border: 1px solid var(--border); padding: 11px 13px; border-radius: 7px; line-height: 1.6; margin: 16px 0; }
 .system-message svg { margin-top: 3px; }
+.harness-note { margin: 16px 0; color: var(--muted); font-size: 11px; }
+.harness-note > summary { display: flex; align-items: center; gap: 7px; cursor: pointer; list-style: none; width: fit-content; }
+.harness-note > summary:hover { color: var(--text); }
+.harness-note[open] .disclosure-chevron { transform: rotate(90deg); }
+.harness-note > pre { max-height: 300px; overflow: auto; white-space: pre-wrap; overflow-wrap: anywhere; padding: 12px; border: 1px solid var(--border); border-radius: 7px; background: var(--subtle); font-size: 11px; line-height: 1.6; }
 .thinking { color: var(--muted); border-left: 1px solid var(--border); padding-left: 12px; margin: 2px 0 18px; }
 .thinking > summary { display: flex; align-items: center; gap: 7px; font-size: 11px; cursor: pointer; list-style: none; }
 .thinking > summary > span { width: 5px; height: 5px; border-radius: 50%; border: 1px solid var(--muted); }

@@ -1,0 +1,31 @@
+# Endpoint-aware streaming guide
+
+**Completed development experiment on one already inspected task; rejected for promotion.**
+
+The [real endpoint diagnosis](../feature-effort/legacy-inheritance/README.md#real-endpoint-check) separated simplified-adapter failures from actual Chat, Messages and Responses behavior. A generic manual assembler worked for two wire formats but skipped the real Responses hook. Another patch invoked that hook but lost its rewrite. Both also excluded inherited hooks; the task's word “own” makes that requirement ambiguous.
+
+The [candidate](candidate.patch) adds a matching-source-gated guide for legacy/post-call streaming guardrail tasks. It points to the existing endpoint translators, asks for real format checks and distinguishes resolved overrides from leaf-class declarations when the intended contract includes inheritance. It adds no tools, reviewer model or runtime bypass. The production harness remains unchanged pending results. Nineteen navigation tests and typechecking pass before freeze.
+
+The [plan](plan.json) fixes two new attempts per arm, Medium reasoning, 900 seconds, protocol 6 and the campaign's three global slots. The unchanged control and candidate both include production v34's history and test-navigation fixes. Runtime dependencies are physical copies inside each frozen worktree. Order is randomized before launch. The solver receives the existing curated task, not the withheld probe or reference patch.
+
+Success requires normal completion, original acceptance and all 24 qualified real-adapter checks. The report retains those dimensions separately. The probe fails 24/24 on the historical base and passes 24/24 on the merged reference. Its source and qualification are linked in the plan. This extra criterion was declared before these new attempts; it does not retrospectively change older scores. Two repetitions on one known task cannot estimate generalization or establish an Astra comparison.
+
+## First repetition (interim)
+
+The guide attempt `5933dea8` times out at 901.24 seconds: 8/16 original checks and 16/24 real-adapter checks. It passes all direct and inherited Chat/Messages cases but none of the eight Responses cases; those hooks are never invoked. The unmodified control `045a21e0` finishes normally at 881.94 seconds: 9/16 original and 8/24 real checks. It passes direct Chat/Messages cases, excludes inherited hooks, and passes the wrong native shape to direct Responses hooks. Token-priced costs are $0.5661 and $0.4939 respectively.
+
+Both therefore fail the declared success criterion. The guide was delivered, yet manual generic assembly remained in the candidate. Its improved inherited-hook behavior does not establish that the guidance caused the difference, or compensate for the missing Responses path. The completed second repetition also provides no promotion basis. The separately declared [Astra training diagnostic](../astra-legacy/README.md) uses the same withheld endpoint checks. It is distinct from the untouched chronological comparison.
+
+## Second guide attempt and deferred-state diagnostic
+
+Guide repetition 2 (`929c8cfe`) times out at 900.78 seconds, with 13/16 original checks and **24/24 real-adapter checks**. Two original failures use the simplified translator's rewrite representation. The third invokes the deferred audit directly with a fresh Logging object; the candidate instead records pipeline-managed names on the Logging object during streaming. That difference needs a lifecycle check before calling it duplicate execution.
+
+The [additional two-case probe](deferred_lifecycle_probe.py) calls the real streaming iterator hook, then the deferred audit, sharing a real Logging object. The managed hook must run once before delivery and never again; an unrelated native hook must still run during deferred auditing. Historical base passes 1/2, reference 2/2, candidate 2/2. Reference production source matches the recorded commit and all imported LiteLLM modules come from the selected checkout. [Results](deferred-lifecycle-results.json).
+
+This validates that sequenced path with shared logging state. It is not a full HTTP test or coverage of every caller. The original 13/16 score and timeout remain unchanged, as does the predeclared 24-case result. Different attempts can fail at different protocol boundaries; one repeated task does not justify promoting the guide.
+
+## Completed comparison and decision
+
+Both guide attempts and both controls fail the predeclared combined success criterion. Control repetition 2 (`db20a2dc`) times out at 901.45 seconds with 12/16 original checks and 12/24 real checks. Both guide attempts time out; only the first control finishes normally. The guide costs $0.7054 across its two attempts versus $0.6503 for the control and does not earn a default. One guide patch passes the real endpoint and subsequent lifecycle probes, but successful behavior at cancellation is not a delivered result. [Full results](results.json).
+
+All four attempts used protocol 6 and retain its [runtime-artifact reachability limitation](../runtime-artifact-isolation/README.md). No matching access was found in the recorded-command audit, which cannot prove nonaccess. This known-task diagnosis cannot establish future quality.

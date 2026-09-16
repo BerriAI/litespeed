@@ -1,0 +1,12 @@
+{
+  "createdAt": "2026-09-16T10:11:38.811463+00:00",
+  "solverRunsAllocated": 0,
+  "selection": "All 21 deterministic candidates retained; exclusions and prompts declared before qualification. No source/helper compatibility shims will be added to the historical base.",
+  "catalogCases": 21,
+  "knownCollectionRisks": [
+    "realtime-parallel-release",
+    "capability-backfill",
+    "access-log-path-filter",
+    "openinference-message-budget"
+  ]
+}

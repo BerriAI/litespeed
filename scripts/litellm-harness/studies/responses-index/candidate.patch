@@ -1,0 +1,899 @@
+diff --git a/litellm/llms/openai/responses/guardrail_translation/handler.py b/litellm/llms/openai/responses/guardrail_translation/handler.py
+index 280a867..b8f2010 100644
+--- a/litellm/llms/openai/responses/guardrail_translation/handler.py
++++ b/litellm/llms/openai/responses/guardrail_translation/handler.py
+@@ -106,6 +106,14 @@ class _ToolCallShape(NamedTuple):
+     arguments: str
+ 
+ 
++class _ToolCallRewrite(NamedTuple):
++    """A guardrail tool-call rewrite plus the output-item field it lands in."""
++
++    name: str | None
++    arguments: str
++    field: str
++
++
+ def _tool_call_shapes(tool_calls: Sequence[ChatCompletionToolCallChunk]) -> tuple[_ToolCallShape, ...]:
+     return tuple(
+         _ToolCallShape(name=tool_call["function"].get("name"), arguments=tool_call["function"].get("arguments", ""))
+@@ -113,6 +121,38 @@ def _tool_call_shapes(tool_calls: Sequence[ChatCompletionToolCallChunk]) -> tupl
+     )
+ 
+ 
++def _guardrail_tool_call_shapes(tool_calls: object) -> tuple[_ToolCallShape, ...]:
++    """Shapes for the tool calls a guardrail returned, dropping malformed entries.
++
++    A guardrail echoes the tool calls it was handed, so a missing "name" or
++    "arguments" key (as opposed to an explicit ``None`` name, which a custom
++    tool call without a name legitimately carries) means the entry cannot be
++    attributed back to a scanned call. Those entries are dropped so the caller
++    can compare the surviving count against what it scanned.
++    """
++    if not isinstance(tool_calls, Sequence) or isinstance(tool_calls, (str, bytes)):
++        return ()
++    shapes: list[_ToolCallShape] = []
++    for tool_call in tool_calls:
++        if not isinstance(tool_call, Mapping):
++            continue
++        function: Final = tool_call.get("function")
++        if not isinstance(function, Mapping) or "name" not in function or "arguments" not in function:
++            continue
++        name: Final = function.get("name")
++        arguments: Final = function.get("arguments")
++        if not isinstance(arguments, str) or (name is not None and not isinstance(name, str)):
++            continue
++        shapes.append(_ToolCallShape(name=name, arguments=arguments))
++    return tuple(shapes)
++
++
++def _tool_call_payload_field(item: object) -> str | None:
++    """The output-item payload field ("arguments" / "input") for a tool call item."""
++    item_type: Final = stream_item_field(item, "type")
++    return _TOOL_CALL_PAYLOAD_FIELD.get(item_type) if isinstance(item_type, str) else None
++
++
+ class ResponseOutputEnvelope(TypedDict, total=False):
+     """Dict form of a Responses API response, as far as guardrail write-back reads it."""
+ 
+@@ -143,6 +183,19 @@ _TERMINAL_ENVELOPE_EVENT_TYPES: Final = frozenset(
+ _FUNCTION_CALL_ARGUMENT_EVENT_TYPES: Final = frozenset(
+     {"response.function_call_arguments.delta", "response.function_call_arguments.done"}
+ )
++_CUSTOM_TOOL_CALL_INPUT_EVENT_TYPES: Final = frozenset(
++    {"response.custom_tool_call_input.delta", "response.custom_tool_call_input.done"}
++)
++# Every event that carries a tool call's payload as it streams in: function calls
++# use "response.function_call_arguments.*" and custom/freeform calls use
++# "response.custom_tool_call_input.*".
++_TOOL_CALL_PAYLOAD_EVENT_TYPES: Final = _FUNCTION_CALL_ARGUMENT_EVENT_TYPES | _CUSTOM_TOOL_CALL_INPUT_EVENT_TYPES
++_TOOL_CALL_ITEM_TYPES: Final = frozenset({"function_call", "custom_tool_call"})
++# The output-item field carrying the tool payload: function calls use
++# "arguments" (JSON string), custom/freeform calls use "input" (raw string).
++_TOOL_CALL_PAYLOAD_FIELD: Final[Mapping[str, str]] = MappingProxyType(
++    {"function_call": "arguments", "custom_tool_call": "input"}
++)
+ _OUTPUT_ITEM_EVENT_TYPES: Final = frozenset({"response.output_item.added", "response.output_item.done"})
+ _PATCHABLE_ITEM_FIELDS: Final[Mapping[str, str]] = MappingProxyType(
+     {"function_call_output": "output", "message": "content"}
+@@ -184,6 +237,17 @@ def _is_function_call_item(item: object) -> bool:
+     return isinstance(item, Mapping) and item.get("type") in ("function_call", "custom_tool_call")
+ 
+ 
++def _is_custom_tool_call_item(item: object) -> bool:
++    """True for a Responses API ``custom_tool_call`` item, dict or model form.
++
++    Covers litellm's ``CustomToolCallOutputItem`` and openai's
++    ``ResponseCustomToolCall`` alike, since both carry ``type == "custom_tool_call"``.
++    """
++    if isinstance(item, Mapping):
++        return item.get("type") == "custom_tool_call"
++    return isinstance(item, BaseModel) and getattr(item, "type", None) == "custom_tool_call"
++
++
+ def _last_message_role(messages: Sequence[object]) -> str | None:
+     if not messages:
+         return None
+@@ -683,6 +747,13 @@ class OpenAIResponsesHandler(BaseTranslation):
+                 responses=guardrailed_texts,
+                 task_mappings=task_mappings,
+             )
++            if tool_calls_to_check:
++                self._apply_guardrail_responses_to_output_tool_calls(
++                    response=response,
++                    tool_calls_to_check=tool_calls_to_check,
++                    returned_tool_calls=guardrailed_inputs.get("tool_calls"),
++                    guardrail_name=guardrail_to_apply.guardrail_name or "unknown",
++                )
+ 
+         verbose_proxy_logger.debug("OpenAI Responses API: Processed output response: %s", response)
+ 
+@@ -933,84 +1004,89 @@ class OpenAIResponsesHandler(BaseTranslation):
+         guardrail_name: str,
+     ) -> None:
+         """Write ended-stream guardrail tool-call rewrites into the completed
+-        envelope's ``function_call`` items and sync the earlier stream events,
+-        keyed by ``call_id``. The guardrail sees the envelope's function calls
+-        in output order, which is how a rewritten call finds its ``call_id``;
+-        the stream events find their call through the ``call_id`` on
+-        ``output_item`` events and the ``item_id`` on argument events, since an
+-        event's ``output_index`` need not match the envelope's (the chat bridge
+-        numbers tool calls from 1 while the envelope lists them after the
+-        message). A rewrite whose calls do not line up with the envelope, or
+-        whose events cannot be found, is reported as undeliverable, so the
+-        pipeline executor discards it and releases the original events."""
++        envelope's ``function_call`` / ``custom_tool_call`` items and sync the
++        earlier stream events, keyed by ``call_id``. The guardrail sees the
++        envelope's tool calls in output order, which is how a rewritten call
++        finds its ``call_id``; the stream events find their call through the
++        ``call_id`` on ``output_item`` events and the ``item_id`` on payload
++        events (``function_call_arguments.*`` / ``custom_tool_call_input.*``),
++        since an event's ``output_index`` need not match the envelope's (the
++        chat bridge numbers tool calls from 1 while the envelope lists them
++        after the message). A function call's payload is ``arguments``, a custom
++        tool call's is ``input``. A rewrite whose calls do not line up with the
++        envelope, or whose events cannot be found, is reported as undeliverable,
++        so the pipeline executor discards it and releases the original events."""
+         if post_guardrail_tool_calls == pre_guardrail_tool_calls:
+             return
+-        function_call_items: Final = tuple(
+-            output_item for output_item in outputs if stream_item_field(output_item, "type") == "function_call"
++        tool_call_items: Final = tuple(
++            output_item for output_item in outputs if _tool_call_payload_field(output_item) is not None
+         )
+-        call_ids: Final = tuple(
+-            call_id
+-            for output_item in function_call_items
+-            if isinstance(call_id := stream_item_field(output_item, "call_id"), str) and call_id
++        identified_items: Final = tuple(
++            (call_id, field)
++            for output_item in tool_call_items
++            if isinstance(call_id := stream_item_field(output_item, "call_id"), str)
++            and call_id
++            and (field := _tool_call_payload_field(output_item)) is not None
+         )
++        call_ids: Final = tuple(call_id for call_id, _ in identified_items)
++        payload_fields: Final = tuple(field for _, field in identified_items)
+         stream_events: Final = responses_so_far[:-1]
+-        call_id_by_item_id: Final = self._function_call_ids_by_item_id(stream_events)
++        call_id_by_item_id: Final = self._tool_call_ids_by_item_id(stream_events)
+         event_call_ids: Final = tuple(
+-            self._function_call_event_call_id(event, call_id_by_item_id) for event in stream_events
++            self._tool_call_event_call_id(event, call_id_by_item_id) for event in stream_events
+         )
+         rewrites_by_call_id: Final = MappingProxyType(
+             {
+-                call_id: after
+-                for call_id, before, after in zip(call_ids, pre_guardrail_tool_calls, post_guardrail_tool_calls)
++                call_id: _ToolCallRewrite(name=after.name, arguments=after.arguments, field=field)
++                for call_id, field, before, after in zip(
++                    call_ids, payload_fields, pre_guardrail_tool_calls, post_guardrail_tool_calls
++                )
+                 if after != before
+             }
+         )
+-        unresolved_argument_event: Final = any(
+-            call_id is None and stream_item_field(event, "type") in _FUNCTION_CALL_ARGUMENT_EVENT_TYPES
++        unresolved_payload_event: Final = any(
++            call_id is None and stream_item_field(event, "type") in _TOOL_CALL_PAYLOAD_EVENT_TYPES
+             for event, call_id in zip(stream_events, event_call_ids)
+         )
+         if (
+-            len(call_ids) != len(function_call_items)
++            len(call_ids) != len(tool_call_items)
+             or len(frozenset(call_ids)) != len(call_ids)
+             or len(call_ids) != len(post_guardrail_tool_calls)
+-            or unresolved_argument_event
++            or unresolved_payload_event
+             or not rewrites_by_call_id.keys() <= frozenset(event_call_ids)
+         ):
+             from litellm.proxy.policy_engine.pipeline_executor import UndeliverableStreamRewrite
+ 
+             raise UndeliverableStreamRewrite(guardrail_name)
+-        for output_item, rewrite in (
+-            (output_item, rewrites_by_call_id[call_id])
+-            for output_item, call_id in zip(function_call_items, call_ids)
+-            if call_id in rewrites_by_call_id
+-        ):
+-            self._write_function_call_item(output_item, rewrite.name, rewrite.arguments)
++        for output_item, call_id in zip(tool_call_items, call_ids):
++            rewrite: Final = rewrites_by_call_id.get(call_id)
++            if rewrite is not None:
++                self._write_tool_call_item(output_item, rewrite.field, rewrite.name, rewrite.arguments)
+         delta_replacements: Final = MappingProxyType(
+             {call_id: chain((rewrite.arguments,), repeat("")) for call_id, rewrite in rewrites_by_call_id.items()}
+         )
+         for event, call_id in zip(stream_events, event_call_ids):
+-            if call_id not in rewrites_by_call_id:
++            rewrite: Final = rewrites_by_call_id.get(call_id)
++            if rewrite is None:
+                 continue
+             match stream_item_field(event, "type"):
+-                case "response.function_call_arguments.delta":
++                case "response.function_call_arguments.delta" | "response.custom_tool_call_input.delta":
+                     self._write_event_field(event, "delta", next(delta_replacements[call_id]))
+                 case "response.function_call_arguments.done":
+-                    self._write_event_field(event, "arguments", rewrites_by_call_id[call_id].arguments)
++                    self._write_event_field(event, "arguments", rewrite.arguments)
++                case "response.custom_tool_call_input.done":
++                    self._write_event_field(event, "input", rewrite.arguments)
+                 case "response.output_item.added":
+-                    self._write_function_call_item(
+-                        stream_item_field(event, "item"), rewrites_by_call_id[call_id].name, None
+-                    )
++                    self._write_tool_call_item(stream_item_field(event, "item"), rewrite.field, rewrite.name, None)
+                 case "response.output_item.done":
+-                    self._write_function_call_item(
+-                        stream_item_field(event, "item"),
+-                        rewrites_by_call_id[call_id].name,
+-                        rewrites_by_call_id[call_id].arguments,
++                    self._write_tool_call_item(
++                        stream_item_field(event, "item"), rewrite.field, rewrite.name, rewrite.arguments
+                     )
+                 case _:
+                     pass
+ 
+     @staticmethod
+-    def _function_call_ids_by_item_id(stream_events: Sequence[object]) -> Mapping[str, str]:
++    def _tool_call_ids_by_item_id(stream_events: Sequence[object]) -> Mapping[str, str]:
+         items: Final = tuple(
+             stream_item_field(event, "item")
+             for event in stream_events
+@@ -1020,32 +1096,34 @@ class OpenAIResponsesHandler(BaseTranslation):
+             {
+                 item_id: call_id
+                 for item in items
+-                if stream_item_field(item, "type") == "function_call"
++                if stream_item_field(item, "type") in _TOOL_CALL_ITEM_TYPES
+                 and isinstance(item_id := stream_item_field(item, "id"), str)
+                 and isinstance(call_id := stream_item_field(item, "call_id"), str)
+             }
+         )
+ 
+     @staticmethod
+-    def _function_call_event_call_id(event: object, call_id_by_item_id: Mapping[str, str]) -> str | None:
++    def _tool_call_event_call_id(event: object, call_id_by_item_id: Mapping[str, str]) -> str | None:
+         event_type: Final = stream_item_field(event, "type")
+-        if event_type in _FUNCTION_CALL_ARGUMENT_EVENT_TYPES:
++        if event_type in _TOOL_CALL_PAYLOAD_EVENT_TYPES:
+             item_id: Final = stream_item_field(event, "item_id")
+             return call_id_by_item_id.get(item_id) if isinstance(item_id, str) else None
+         if event_type not in _OUTPUT_ITEM_EVENT_TYPES:
+             return None
+         item: Final = stream_item_field(event, "item")
+         call_id: Final = stream_item_field(item, "call_id")
+-        return call_id if stream_item_field(item, "type") == "function_call" and isinstance(call_id, str) else None
++        return (
++            call_id if stream_item_field(item, "type") in _TOOL_CALL_ITEM_TYPES and isinstance(call_id, str) else None
++        )
+ 
+     @staticmethod
+-    def _write_function_call_item(item: object, name: str | None, arguments: str | None) -> None:
+-        if item is None:
++    def _write_tool_call_item(item: object, field: str | None, name: str | None, payload: str | None) -> None:
++        if item is None or field is None:
+             return
+         if name is not None:
+             OpenAIResponsesHandler._write_event_field(item, "name", name)
+-        if arguments is not None:
+-            OpenAIResponsesHandler._write_event_field(item, "arguments", arguments)
++        if payload is not None:
++            OpenAIResponsesHandler._write_event_field(item, field, payload)
+ 
+     def _check_streaming_has_ended(self, responses_so_far: Sequence[object]) -> bool:
+         """
+@@ -1073,7 +1151,7 @@ class OpenAIResponsesHandler(BaseTranslation):
+     def _completed_response_scan_key(response: object) -> StreamingScanKey:
+         output_items: Final = stream_item_items(response, "output")
+         message_items: Final = tuple(
+-            item for item in output_items if stream_item_field(item, "type") != "function_call"
++            item for item in output_items if stream_item_field(item, "type") not in _TOOL_CALL_ITEM_TYPES
+         )
+         return StreamingScanKey(
+             texts=tuple(
+@@ -1085,7 +1163,7 @@ class OpenAIResponsesHandler(BaseTranslation):
+             tool_calls=tuple(
+                 stream_item_fingerprint(item)
+                 for item in output_items
+-                if stream_item_field(item, "type") == "function_call"
++                if stream_item_field(item, "type") in _TOOL_CALL_ITEM_TYPES
+             ),
+             stream_ended=True,
+         )
+@@ -1181,6 +1259,28 @@ class OpenAIResponsesHandler(BaseTranslation):
+                                 return True
+         return False
+ 
++    @staticmethod
++    def _custom_tool_call_chunk(item: object, output_idx: int) -> ChatCompletionToolCallChunk:
++        """Chat-shaped tool call for a freeform/grammar ``custom_tool_call`` item.
++
++        The custom payload lives in ``input``; it is surfaced to the guardrail as
++        the tool call's ``arguments`` so guardrails can scan/match it like any
++        function call.
++        """
++        input_value: Final = stream_item_field(item, "input")
++        return cast(
++            ChatCompletionToolCallChunk,
++            {
++                "id": stream_item_field(item, "call_id"),
++                "type": "function",
++                "function": {
++                    "name": stream_item_field(item, "name"),
++                    "arguments": input_value if isinstance(input_value, str) else "",
++                },
++                "index": output_idx,
++            },
++        )
++
+     def _extract_output_text_and_images(
+         self,
+         output_item: object,
+@@ -1226,6 +1326,14 @@ class OpenAIResponsesHandler(BaseTranslation):
+                     pass
+             return
+ 
++        # Freeform/grammar custom tool calls (e.g. apply_patch): the payload lives
++        # in `input` rather than `arguments`, but guardrails scan them like any
++        # other tool call.
++        if _is_custom_tool_call_item(output_item):
++            if tool_calls_to_check is not None:
++                tool_calls_to_check.append(self._custom_tool_call_chunk(output_item, output_idx))
++            return
++
+         # Handle both GenericResponseOutputItem and dict
+         content: list[OutputText] | list[dict] | None = None
+         if isinstance(output_item, BaseModel):
+@@ -1324,6 +1432,54 @@ class OpenAIResponsesHandler(BaseTranslation):
+                     elif hasattr(content[content_idx], "text"):
+                         content[content_idx].text = guardrail_response
+ 
++    def _apply_guardrail_responses_to_output_tool_calls(
++        self,
++        response: Union["ResponsesAPIResponse", ResponseOutputEnvelope],
++        tool_calls_to_check: Sequence[ChatCompletionToolCallChunk],
++        returned_tool_calls: object,
++        guardrail_name: str,
++    ) -> None:
++        """Write a guardrail's returned tool calls back onto the response output items.
++
++        The guardrail sees the scanned tool calls in order, so its returned calls
++        are matched positionally. Function calls get ``arguments`` and
++        custom/freeform calls get ``input``, and each item keeps its own
++        type/class. A tool call's ``name`` is only written when it changed, so a
++        custom tool call that had no name stays without one. A count mismatch --
++        including malformed entries that cannot be attributed -- leaves the
++        output unchanged and is logged, so a rewrite never lands on the wrong item.
++        """
++        # Handle both dict and Pydantic object responses
++        response_output: Final[Sequence[object]]
++        if isinstance(response, dict):
++            response_output = response.get("output", [])
++        elif hasattr(response, "output"):
++            response_output = response.output or []
++        else:
++            return
++
++        guardrailed_tool_calls: Final = _guardrail_tool_call_shapes(returned_tool_calls)
++        if len(guardrailed_tool_calls) != len(tool_calls_to_check):
++            verbose_proxy_logger.warning(
++                "OpenAI Responses API: guardrail %s returned %d tool calls for the %d scanned; leaving output unchanged",
++                guardrail_name,
++                len(guardrailed_tool_calls),
++                len(tool_calls_to_check),
++            )
++            return
++
++        for tool_call, guardrailed in zip(tool_calls_to_check, guardrailed_tool_calls):
++            output_idx: Final = tool_call.get("index")
++            if not isinstance(output_idx, int) or not (0 <= output_idx < len(response_output)):
++                continue
++            output_item: Final = response_output[output_idx]
++            field: Final = _tool_call_payload_field(output_item)
++            if field is None:
++                continue
++            if guardrailed.name is not None and guardrailed.name != tool_call["function"].get("name"):
++                self._write_event_field(output_item, "name", guardrailed.name)
++            self._write_event_field(output_item, field, guardrailed.arguments)
++
+     def build_block_sse_chunks(
+         self,
+         exc: "ModifyResponseException",
+diff --git a/tests/test_litellm/llms/openai/responses/test_openai_responses_guardrail_handler.py b/tests/test_litellm/llms/openai/responses/test_openai_responses_guardrail_handler.py
+index 6ed4ec6..3298d9d 100644
+--- a/tests/test_litellm/llms/openai/responses/test_openai_responses_guardrail_handler.py
++++ b/tests/test_litellm/llms/openai/responses/test_openai_responses_guardrail_handler.py
+@@ -2766,3 +2766,493 @@ class TestOpenAIResponsesHandlerStreamingScanKey:
+     def test_output_item_done_round_is_never_deduped(self):
+         done = {"type": "response.output_item.done", "sequence_number": 1, "item": {"type": "function_call"}}
+         assert OpenAIResponsesHandler().get_streaming_scan_key([self._delta(0, "hi"), done]) is None
++
++
++class MaskToolCallArgumentsGuardrail(CustomGuardrail):
++    """Rewrites every scanned tool call's arguments/input payload."""
++
++    async def apply_guardrail(
++        self,
++        inputs: GenericGuardrailAPIInputs,
++        request_data: dict,
++        input_type: Literal["request", "response"],
++        logging_obj: Optional[Any] = None,
++    ) -> GenericGuardrailAPIInputs:
++        tool_calls = [
++            {
++                **tool_call,
++                "function": {
++                    **tool_call["function"],
++                    "arguments": tool_call["function"]["arguments"].replace("Secret", "[MASKED]"),
++                },
++            }
++            for tool_call in inputs.get("tool_calls", [])
++        ]
++        return {**inputs, "tool_calls": tool_calls}
++
++
++def _custom_tool_call_item(payload: str, status: str = "completed") -> dict:
++    return {
++        "type": "custom_tool_call",
++        "id": "ctc_123",
++        "call_id": "call_123",
++        "name": "apply_patch",
++        "input": payload,
++        "status": status,
++    }
++
++
++class TestOpenAIResponsesHandlerCustomToolCallExtraction:
++    """freeform/grammar ``custom_tool_call`` items are scanned like function calls"""
++
++    @staticmethod
++    def _extract(output_item: object, output_idx: int = 0):
++        handler = OpenAIResponsesHandler()
++        texts_to_check: List[str] = []
++        images_to_check: List[str] = []
++        tool_calls_to_check: List[Any] = []
++        task_mappings: List[Tuple[int, int]] = []
++        handler._extract_output_text_and_images(
++            output_item=output_item,
++            output_idx=output_idx,
++            texts_to_check=texts_to_check,
++            images_to_check=images_to_check,
++            task_mappings=task_mappings,
++            tool_calls_to_check=tool_calls_to_check,
++        )
++        return texts_to_check, tool_calls_to_check, task_mappings
++
++    def test_extract_custom_tool_call_from_dict(self):
++        texts, tool_calls, mappings = self._extract(
++            {
++                "type": "custom_tool_call",
++                "call_id": "call_1",
++                "id": "ctc_1",
++                "name": "apply_patch",
++                "input": "*** Begin Patch",
++            }
++        )
++
++        assert texts == []
++        assert mappings == []
++        assert tool_calls == [
++            {
++                "id": "call_1",
++                "type": "function",
++                "function": {"name": "apply_patch", "arguments": "*** Begin Patch"},
++                "index": 0,
++            }
++        ]
++
++    def test_extract_custom_tool_call_from_litellm_model(self):
++        from litellm.types.responses.main import CustomToolCallOutputItem
++
++        item = CustomToolCallOutputItem(
++            type="custom_tool_call",
++            call_id="call_2",
++            id="ctc_2",
++            name="apply_patch",
++            input="patch body",
++        )
++        texts, tool_calls, _ = self._extract(item, output_idx=3)
++
++        assert texts == []
++        assert tool_calls == [
++            {
++                "id": "call_2",
++                "type": "function",
++                "function": {"name": "apply_patch", "arguments": "patch body"},
++                "index": 3,
++            }
++        ]
++
++    def test_extract_custom_tool_call_from_openai_model(self):
++        from openai.types.responses import ResponseCustomToolCall
++
++        item = ResponseCustomToolCall(
++            type="custom_tool_call",
++            call_id="call_3",
++            id="ctc_3",
++            name="apply_patch",
++            input="patch body",
++        )
++        texts, tool_calls, _ = self._extract(item, output_idx=1)
++
++        assert texts == []
++        assert tool_calls == [
++            {
++                "id": "call_3",
++                "type": "function",
++                "function": {"name": "apply_patch", "arguments": "patch body"},
++                "index": 1,
++            }
++        ]
++
++    def test_extract_custom_tool_call_without_name(self):
++        _, tool_calls, _ = self._extract(
++            {"type": "custom_tool_call", "call_id": "call_4", "id": "ctc_4", "input": "patch"}
++        )
++        assert tool_calls[0]["function"]["name"] is None
++        assert tool_calls[0]["function"]["arguments"] == "patch"
++
++
++class TestOpenAIResponsesHandlerCustomToolCallWriteBack:
++    """non-streaming guardrail rewrites land on ``custom_tool_call`` items"""
++
++    @pytest.mark.asyncio
++    async def test_custom_tool_call_input_rewritten_in_dict_response(self):
++        handler = OpenAIResponsesHandler()
++        response = {
++            "model": "gpt-4o",
++            "output": [
++                {
++                    "type": "custom_tool_call",
++                    "call_id": "call_1",
++                    "id": "ctc_1",
++                    "name": "apply_patch",
++                    "input": "patch Secret",
++                }
++            ],
++        }
++
++        await handler.process_output_response(
++            response, MaskToolCallArgumentsGuardrail(guardrail_name="mask")
++        )
++
++        assert response["output"][0]["input"] == "patch [MASKED]"
++        assert "arguments" not in response["output"][0]
++
++    @pytest.mark.asyncio
++    async def test_custom_tool_call_input_rewritten_in_typed_response(self):
++        from litellm.types.responses.main import CustomToolCallOutputItem
++
++        handler = OpenAIResponsesHandler()
++        response = ResponsesAPIResponse(
++            id="resp_1",
++            created_at=1,
++            model="gpt-4o",
++            object="response",
++            status="completed",
++            output=[
++                CustomToolCallOutputItem(
++                    type="custom_tool_call",
++                    call_id="call_1",
++                    id="ctc_1",
++                    name="apply_patch",
++                    input="patch Secret",
++                )
++            ],
++        )
++
++        await handler.process_output_response(
++            response, MaskToolCallArgumentsGuardrail(guardrail_name="mask")
++        )
++
++        output_item = response.output[0]
++        assert isinstance(output_item, CustomToolCallOutputItem)
++        assert output_item.input == "patch [MASKED]"
++        assert output_item.name == "apply_patch"
++
++    @pytest.mark.asyncio
++    async def test_function_call_arguments_rewritten(self):
++        handler = OpenAIResponsesHandler()
++        response = {
++            "model": "gpt-4o",
++            "output": [
++                {
++                    "type": "function_call",
++                    "call_id": "call_1",
++                    "id": "fc_1",
++                    "name": "lookup",
++                    "arguments": '{"value": "Secret"}',
++                }
++            ],
++        }
++
++        await handler.process_output_response(
++            response, MaskToolCallArgumentsGuardrail(guardrail_name="mask")
++        )
++
++        assert response["output"][0]["arguments"] == '{"value": "[MASKED]"}'
++        assert "input" not in response["output"][0]
++
++    @pytest.mark.asyncio
++    async def test_function_call_arguments_rewritten_in_typed_response(self):
++        from openai.types.responses import ResponseFunctionToolCall
++
++        handler = OpenAIResponsesHandler()
++        response = ResponsesAPIResponse(
++            id="resp_1",
++            created_at=1,
++            model="gpt-4o",
++            object="response",
++            status="completed",
++            output=[
++                ResponseFunctionToolCall(
++                    type="function_call",
++                    call_id="call_1",
++                    id="fc_1",
++                    name="lookup",
++                    arguments='{"value": "Secret"}',
++                    status="completed",
++                )
++            ],
++        )
++
++        await handler.process_output_response(
++            response, MaskToolCallArgumentsGuardrail(guardrail_name="mask")
++        )
++
++        output_item = response.output[0]
++        assert isinstance(output_item, ResponseFunctionToolCall)
++        assert output_item.arguments == '{"value": "[MASKED]"}'
++        assert output_item.name == "lookup"
++
++    @pytest.mark.asyncio
++    async def test_custom_tool_call_without_name_stays_without_name(self):
++        handler = OpenAIResponsesHandler()
++        response = {
++            "model": "gpt-4o",
++            "output": [
++                {"type": "custom_tool_call", "call_id": "call_1", "id": "ctc_1", "input": "patch Secret"}
++            ],
++        }
++
++        await handler.process_output_response(
++            response, MaskToolCallArgumentsGuardrail(guardrail_name="mask")
++        )
++
++        output_item = response["output"][0]
++        assert output_item["input"] == "patch [MASKED]"
++        assert "name" not in output_item
++        assert "arguments" not in output_item
++
++    @pytest.mark.asyncio
++    async def test_count_mismatch_leaves_output_and_warns(self, mocker):
++        warning = mocker.patch(
++            "litellm.llms.openai.responses.guardrail_translation.handler.verbose_proxy_logger.warning"
++        )
++
++        class DropToolCalls(CustomGuardrail):
++            async def apply_guardrail(
++                self,
++                inputs: GenericGuardrailAPIInputs,
++                request_data: dict,
++                input_type: Literal["request", "response"],
++                logging_obj: Optional[Any] = None,
++            ) -> GenericGuardrailAPIInputs:
++                return {**inputs, "tool_calls": []}
++
++        handler = OpenAIResponsesHandler()
++        response = {"model": "gpt-4o", "output": [_custom_tool_call_item("patch Secret")]}
++
++        await handler.process_output_response(response, DropToolCalls(guardrail_name="drop-tools"))
++
++        assert response["output"][0]["input"] == "patch Secret"
++        call_args = warning.call_args[0]
++        rendered = call_args[0] % call_args[1:]
++        assert "0 tool calls for the 1 scanned" in rendered
++        assert "drop-tools" in rendered
++
++    @pytest.mark.asyncio
++    async def test_malformed_returned_shapes_leave_output_and_warn(self, mocker):
++        warning = mocker.patch(
++            "litellm.llms.openai.responses.guardrail_translation.handler.verbose_proxy_logger.warning"
++        )
++
++        class MissingArguments(CustomGuardrail):
++            async def apply_guardrail(
++                self,
++                inputs: GenericGuardrailAPIInputs,
++                request_data: dict,
++                input_type: Literal["request", "response"],
++                logging_obj: Optional[Any] = None,
++            ) -> GenericGuardrailAPIInputs:
++                return {**inputs, "tool_calls": [{"function": {"name": "apply_patch"}}]}
++
++        handler = OpenAIResponsesHandler()
++        response = {"model": "gpt-4o", "output": [_custom_tool_call_item("patch Secret")]}
++
++        await handler.process_output_response(
++            response, MissingArguments(guardrail_name="malformed")
++        )
++
++        assert response["output"][0]["input"] == "patch Secret"
++        call_args = warning.call_args[0]
++        rendered = call_args[0] % call_args[1:]
++        assert "0 tool calls for the 1 scanned" in rendered
++        assert "malformed" in rendered
++
++
++class TestOpenAIResponsesHandlerCustomToolCallStreaming:
++    """ended-stream delivery syncs ``custom_tool_call_input.*`` events"""
++
++    @staticmethod
++    def _ended_custom_stream_events() -> List[dict]:
++        return [
++            {
++                "type": "response.output_item.added",
++                "sequence_number": 0,
++                "output_index": 0,
++                "item": _custom_tool_call_item("", "in_progress"),
++            },
++            {
++                "type": "response.custom_tool_call_input.delta",
++                "sequence_number": 1,
++                "item_id": "ctc_123",
++                "output_index": 0,
++                "delta": "patch ",
++            },
++            {
++                "type": "response.custom_tool_call_input.delta",
++                "sequence_number": 2,
++                "item_id": "ctc_123",
++                "output_index": 0,
++                "delta": "Secret",
++            },
++            {
++                "type": "response.custom_tool_call_input.done",
++                "sequence_number": 3,
++                "item_id": "ctc_123",
++                "output_index": 0,
++                "input": "patch Secret",
++            },
++            {
++                "type": "response.output_item.done",
++                "sequence_number": 4,
++                "output_index": 0,
++                "item": _custom_tool_call_item("patch Secret"),
++            },
++            {
++                "type": "response.completed",
++                "sequence_number": 5,
++                "response": {
++                    "id": "resp_123",
++                    "created_at": 1,
++                    "model": "gpt-4o",
++                    "output": [_custom_tool_call_item("patch Secret")],
++                    "status": "completed",
++                },
++            },
++        ]
++
++    @pytest.mark.asyncio
++    async def test_deliver_ended_stream_rewrites_syncs_custom_tool_call_events(self):
++        handler = OpenAIResponsesHandler()
++        events = self._ended_custom_stream_events()
++
++        result = await handler.process_output_streaming_response(
++            responses_so_far=events,
++            guardrail_to_apply=MaskToolCallArgumentsGuardrail(guardrail_name="mask"),
++            litellm_logging_obj=None,
++            deliver_ended_stream_rewrites=True,
++        )
++
++        assert result is events
++        assert events[0]["item"]["input"] == ""
++        assert events[1]["delta"] == "patch [MASKED]"
++        assert events[2]["delta"] == ""
++        assert events[3]["input"] == "patch [MASKED]"
++        assert events[4]["item"]["input"] == "patch [MASKED]"
++        assert events[5]["response"]["output"][0]["input"] == "patch [MASKED]"
++        assert events[5]["response"]["output"][0]["name"] == "apply_patch"
++
++    @pytest.mark.asyncio
++    async def test_deliver_ended_stream_rewrites_syncs_typed_custom_tool_call_events(self):
++        from openai.types.responses import (
++            ResponseCustomToolCallInputDeltaEvent,
++            ResponseCustomToolCallInputDoneEvent,
++        )
++
++        from litellm.types.llms.openai import (
++            OutputItemAddedEvent,
++            OutputItemDoneEvent,
++            ResponseCompletedEvent,
++        )
++
++        handler = OpenAIResponsesHandler()
++        typed_events: List[Any] = [
++            model.model_validate(event)
++            for model, event in zip(
++                (
++                    OutputItemAddedEvent,
++                    ResponseCustomToolCallInputDeltaEvent,
++                    ResponseCustomToolCallInputDeltaEvent,
++                    ResponseCustomToolCallInputDoneEvent,
++                    OutputItemDoneEvent,
++                    ResponseCompletedEvent,
++                ),
++                self._ended_custom_stream_events(),
++            )
++        ]
++
++        await handler.process_output_streaming_response(
++            responses_so_far=typed_events,
++            guardrail_to_apply=MaskToolCallArgumentsGuardrail(guardrail_name="mask"),
++            litellm_logging_obj=None,
++            deliver_ended_stream_rewrites=True,
++        )
++
++        assert typed_events[1].delta == "patch [MASKED]"
++        assert typed_events[2].delta == ""
++        assert typed_events[3].input == "patch [MASKED]"
++        assert typed_events[4].item.input == "patch [MASKED]"
++        assert typed_events[5].response.output[0].input == "patch [MASKED]"
++
++    @pytest.mark.asyncio
++    async def test_deliver_ended_stream_custom_rewrite_without_matching_events_fails_closed(self):
++        from litellm.proxy.policy_engine.pipeline_executor import UndeliverableStreamRewrite
++
++        handler = OpenAIResponsesHandler()
++        events = self._ended_custom_stream_events()
++        envelope_item = events[5]["response"]["output"][0]
++        events[5]["response"]["output"] = [{**envelope_item, "call_id": "call_999"}]
++
++        with pytest.raises(UndeliverableStreamRewrite):
++            await handler.process_output_streaming_response(
++                responses_so_far=events,
++                guardrail_to_apply=MaskToolCallArgumentsGuardrail(guardrail_name="mask"),
++                litellm_logging_obj=None,
++                deliver_ended_stream_rewrites=True,
++            )
++
++    @pytest.mark.asyncio
++    async def test_custom_tool_call_rewrite_left_untouched_by_default(self):
++        handler = OpenAIResponsesHandler()
++        events = self._ended_custom_stream_events()
++
++        await handler.process_output_streaming_response(
++            responses_so_far=events,
++            guardrail_to_apply=MaskToolCallArgumentsGuardrail(guardrail_name="mask"),
++            litellm_logging_obj=None,
++        )
++
++        assert events[1]["delta"] == "patch "
++        assert events[3]["input"] == "patch Secret"
++        assert events[5]["response"]["output"][0]["input"] == "patch Secret"
++
++
++class TestOpenAIResponsesHandlerCustomToolCallScanKey:
++    """``get_streaming_scan_key`` treats custom tool calls as tool calls"""
++
++    @staticmethod
++    def _completed(output: List[Any]) -> dict:
++        return {"type": "response.completed", "sequence_number": 1, "response": {"output": output}}
++
++    def test_completed_event_with_a_custom_tool_call_changes_the_key(self):
++        handler = OpenAIResponsesHandler()
++        before = _custom_tool_call_item("patch one")
++        after = _custom_tool_call_item("patch two")
++
++        key_before = handler.get_streaming_scan_key([self._completed([before])])
++        key_after = handler.get_streaming_scan_key([self._completed([after])])
++
++        assert key_before.texts == ()
++        assert len(key_before.tool_calls) == 1
++        assert key_before != key_after
++
++    def test_custom_tool_call_item_is_not_read_as_message_text(self):
++        handler = OpenAIResponsesHandler()
++        key = handler.get_streaming_scan_key([self._completed([_custom_tool_call_item("patch")])])
++        assert key.texts == ()
++

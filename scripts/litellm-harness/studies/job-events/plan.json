@@ -1,0 +1,101 @@
+{
+  "createdAt": "2026-09-16T04:00:39.801141+00:00",
+  "protocol": 6,
+  "repetitions": 2,
+  "control": "control",
+  "seed": 31160927,
+  "runs": [
+    {
+      "dataset": "training2",
+      "case": "bedrock-session-tags",
+      "name": "appended-jobs",
+      "label": "replication-v31-jobs-appended-jobs-r2",
+      "commit": "f1fed69e9130dce15f24458a4763040028b96dfb",
+      "effort": "medium"
+    },
+    {
+      "dataset": "training2",
+      "case": "mcp-auth-challenge",
+      "name": "control",
+      "label": "replication-v31-jobs-control-r2",
+      "commit": "e2646a171ea5cef0506f76d797740e5d11632419",
+      "effort": "medium"
+    },
+    {
+      "dataset": "training2",
+      "case": "mcp-auth-challenge",
+      "name": "appended-jobs",
+      "label": "replication-v31-jobs-appended-jobs-r2",
+      "commit": "f1fed69e9130dce15f24458a4763040028b96dfb",
+      "effort": "medium"
+    },
+    {
+      "dataset": "training2",
+      "case": "mcp-auth-challenge",
+      "name": "appended-jobs",
+      "label": "replication-v31-jobs-appended-jobs-r1",
+      "commit": "f1fed69e9130dce15f24458a4763040028b96dfb",
+      "effort": "medium"
+    },
+    {
+      "dataset": "training2",
+      "case": "bedrock-session-tags",
+      "name": "control",
+      "label": "replication-v31-jobs-control-r2-oom1",
+      "commit": "e2646a171ea5cef0506f76d797740e5d11632419",
+      "effort": "medium",
+      "replacesGatewayOutageRun": "replication-v31-jobs-control-r2-bedrock-session-tags-d8c2c980"
+    },
+    {
+      "dataset": "training2",
+      "case": "mcp-auth-challenge",
+      "name": "control",
+      "label": "replication-v31-jobs-control-r1-oom1",
+      "commit": "e2646a171ea5cef0506f76d797740e5d11632419",
+      "effort": "medium",
+      "replacesGatewayOutageRun": "replication-v31-jobs-control-r1-mcp-auth-challenge-dae42955"
+    },
+    {
+      "dataset": "training2",
+      "case": "bedrock-session-tags",
+      "name": "control",
+      "label": "replication-v31-jobs-control-r1-oom1",
+      "commit": "e2646a171ea5cef0506f76d797740e5d11632419",
+      "effort": "medium",
+      "replacesGatewayOutageRun": "replication-v31-jobs-control-r1-bedrock-session-tags-437db922"
+    },
+    {
+      "dataset": "training2",
+      "case": "bedrock-session-tags",
+      "name": "appended-jobs",
+      "label": "replication-v31-jobs-appended-jobs-r1-oom1",
+      "commit": "f1fed69e9130dce15f24458a4763040028b96dfb",
+      "effort": "medium",
+      "replacesGatewayOutageRun": "replication-v31-jobs-appended-jobs-r1-bedrock-session-tags-dc856ed7"
+    }
+  ],
+  "hypothesis": "Preserving the initial runtime envelope and appending later command completion notices avoids invalidating the entire tool-history cache prefix while keeping completions visible.",
+  "selectionDataOnly": true,
+  "successNote": "Normal completion and original acceptance, with mechanism activation and token/cost/timing reported separately. Bedrock acceptance includes known unstated error-wording coupling; retain raw scores and disclose it. No reference or reserved outcomes given to solvers.",
+  "execution": {
+    "timeoutSeconds": 900,
+    "sharedSolverConcurrency": 3
+  },
+  "activationNote": "Count persisted Background command completion notices and compare outgoing early-envelope hashes. Token priced cost is whole-task, not pure marginal notification cost. Affinity transport study is separate; this candidate does not alter provider parameters.",
+  "revision": 3,
+  "gatewayOutageAmendment": {
+    "at": "2026-09-16T06:34:41.187134+00:00",
+    "audit": "../gateway-memory/outage.json",
+    "reason": "Replace every allocation affected by the verified local gateway OOM, irrespective of candidate score. Original records, partial work and costs retained. Frozen source, task, effort, deadline and shared concurrency unchanged.",
+    "failedRuns": [
+      "replication-v31-jobs-appended-jobs-r1-bedrock-session-tags-dc856ed7",
+      "replication-v31-jobs-control-r1-bedrock-session-tags-437db922",
+      "replication-v31-jobs-control-r1-mcp-auth-challenge-dae42955",
+      "replication-v31-jobs-control-r2-bedrock-session-tags-d8c2c980"
+    ],
+    "correction": {
+      "at": "2026-09-16T06:44:29.670030+00:00",
+      "reason": "Completion-time audit also found the third active solver, which was between gateway requests at the crash. It had no pending ledger reservation, so the initial pending-request-based selection missed it. All provider-error completions in the outage window are now checked; sixteen affected allocations total."
+    }
+  }
+}

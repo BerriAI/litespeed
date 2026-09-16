@@ -1,0 +1,24 @@
+{
+  "at": "2026-09-16T20:13:47.747347+00:00",
+  "scope": "Complete file content for terminal edit approval, within existing per-path edit limits; no model-quality claim",
+  "fileBytes": 2400020,
+  "editLine": 300001,
+  "apiRegression": "failed before change; complete editable map and bounded ordinary browsing, oversized ordinary-file rejection and protected-file denial pass afterward",
+  "focusedTestsPassed": 145,
+  "typecheck": "passed",
+  "terminal": "Actual PTY opened diff, displayed replacement at line300001, approved edit and verified exact final bytes",
+  "fullSuite": {
+    "passed": 2146,
+    "skipped": 1,
+    "failed": 0,
+    "maxWorkers": 2
+  },
+  "earlierFullRuns": "Two full runs failed the unchanged MCP CPU-loop error-message assertion; isolated file12/12 passed. A host interrupt-reason correction subsequently preserves the CPU stop and retains actual guest TypeErrors. Final full suite passes, including that correction and its new regression.",
+  "evidenceHashes": {
+    "price-preview-full-tests.log": "a0bdf85cbca35a83c60e6c10ec794a0a4c245fc6632df6a548124e84c0b8504d",
+    "price-preview-mcp-rerun.log": "e91fcef70178424b331f913a9454c0046f9062b9639b730ded6f4f15ba5327cc",
+    "price-preview-full-rerun.log": "aa68e7a6022d4a3391b5260126fff8939497e4545b2b9897a388c6d818ea9e51",
+    "price-preview-full-fixed.log": "d22c4ed74e4680e31e84cace76450569f278c8e4a54c35437f2314246182183f",
+    "price-preview-pty.log": "22e43508a9b24faff242bbe21723a51c39e14005f52272b20f6f3190f554499b"
+  }
+}

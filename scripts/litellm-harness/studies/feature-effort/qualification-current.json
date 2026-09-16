@@ -1,0 +1,140 @@
+[
+  {
+    "id": "aws-signing-off-loop",
+    "valid": true,
+    "snapshotRevision": 2,
+    "testNodesHash": "8d028a7f9accdbf1b26081f21d804d93dc88fc7ebf587671d9fe94c1f65dac4f",
+    "results": {
+      "base": {
+        "exit": 1,
+        "tests": 5,
+        "failures": 4,
+        "errors": 0,
+        "skipped": 0
+      },
+      "reference": {
+        "exit": 0,
+        "tests": 5,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      }
+    },
+    "fixtureProfileHash": "643d5437104296e21d906ecb15b2c96ad278f20cfc4af53b12bb6069bd853726"
+  },
+  {
+    "id": "stream-tool-rewrite-membership",
+    "valid": true,
+    "snapshotRevision": 2,
+    "testNodesHash": "d5ea42ac5d0ba47ef2aae217eb061f0b994beb7d3dc2626449179ffd0c13426f",
+    "results": {
+      "base": {
+        "exit": 1,
+        "tests": 4,
+        "failures": 4,
+        "errors": 0,
+        "skipped": 0
+      },
+      "reference": {
+        "exit": 0,
+        "tests": 4,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      }
+    },
+    "fixtureProfileHash": "48cbe23f784dbc7962c6a86d6de79c008db26e4bb0ce56b8f0266d41f4bd4aa2"
+  },
+  {
+    "id": "background-responses-pipeline",
+    "valid": true,
+    "snapshotRevision": 2,
+    "testNodesHash": "bc029dbebdb62897ee1bbca02ac6334c472df7772813720d2732cddecb252c74",
+    "results": {
+      "base": {
+        "exit": 1,
+        "tests": 7,
+        "failures": 4,
+        "errors": 0,
+        "skipped": 0
+      },
+      "reference": {
+        "exit": 0,
+        "tests": 7,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      }
+    },
+    "fixtureProfileHash": "48cbe23f784dbc7962c6a86d6de79c008db26e4bb0ce56b8f0266d41f4bd4aa2"
+  },
+  {
+    "id": "legacy-stream-pipeline",
+    "valid": true,
+    "snapshotRevision": 2,
+    "testNodesHash": "5b4062fa6767d128a8771d862985b753db0f3bf2c36f3ffe8b5bbc380b96458f",
+    "results": {
+      "base": {
+        "exit": 1,
+        "tests": 16,
+        "failures": 15,
+        "errors": 0,
+        "skipped": 0
+      },
+      "reference": {
+        "exit": 0,
+        "tests": 16,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      }
+    },
+    "fixtureProfileHash": "48cbe23f784dbc7962c6a86d6de79c008db26e4bb0ce56b8f0266d41f4bd4aa2"
+  },
+  {
+    "id": "router-tier-output-ceiling",
+    "valid": false,
+    "snapshotRevision": 2,
+    "testNodesHash": "7de311064741b3ac281c5750554f22ed830bd0a774c290df10052b7585d2b997",
+    "results": {
+      "base": {
+        "exit": 4,
+        "tests": 1,
+        "failures": 0,
+        "errors": 1,
+        "skipped": 0
+      },
+      "reference": {
+        "exit": 0,
+        "tests": 43,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      }
+    },
+    "fixtureProfileHash": "643d5437104296e21d906ecb15b2c96ad278f20cfc4af53b12bb6069bd853726"
+  },
+  {
+    "id": "cost-map-background-retry",
+    "valid": false,
+    "snapshotRevision": 2,
+    "testNodesHash": "3560e928a8b6264dcbfcbc97ee60f27d0ef7dd173e4ea083e86753fe004f7004",
+    "results": {
+      "base": {
+        "exit": 4,
+        "tests": 1,
+        "failures": 0,
+        "errors": 1,
+        "skipped": 0
+      },
+      "reference": {
+        "exit": 0,
+        "tests": 16,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      }
+    },
+    "fixtureProfileHash": "643d5437104296e21d906ecb15b2c96ad278f20cfc4af53b12bb6069bd853726"
+  }
+]

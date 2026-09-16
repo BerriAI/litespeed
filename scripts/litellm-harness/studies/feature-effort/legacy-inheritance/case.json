@@ -1,0 +1,31 @@
+{
+  "id": "legacy-stream-pipeline",
+  "base": "08b60c409a0b556efb6bbe6470402a4530666870",
+  "reference": "c6f5763443504501e88113e783d2e1ec88b9264d",
+  "test_nodes": [
+    "tests/test_litellm/llms/anthropic/chat/guardrail_translation/test_anthropic_guardrail_handler.py::TestAnthropicMessagesHandlerPostCallHookResponse::test_openai_shaped_stream_assembly_reaches_the_hook_as_a_messages_response",
+    "tests/test_litellm/llms/anthropic/chat/guardrail_translation/test_anthropic_guardrail_handler.py::TestAnthropicMessagesHandlerPostCallHookResponse::test_anything_else_reaches_the_hook_untouched",
+    "tests/test_litellm/proxy/policy_engine/test_pipeline_executor.py::test_streaming_step_runs_legacy_hook_and_delivers_its_rewrite",
+    "tests/test_litellm/proxy/policy_engine/test_pipeline_executor.py::test_streaming_step_passes_untouched_when_legacy_hook_returns_none",
+    "tests/test_litellm/proxy/policy_engine/test_pipeline_executor.py::test_streaming_step_blocks_with_the_legacy_hook_exception",
+    "tests/test_litellm/proxy/policy_engine/test_pipeline_executor.py::test_streaming_step_takes_on_error_when_legacy_hook_crashes",
+    "tests/test_litellm/proxy/policy_engine/test_pipeline_executor.py::test_streaming_step_discards_legacy_rewrite_whose_texts_do_not_line_up",
+    "tests/test_litellm/proxy/test_proxy_logging_hook_detection.py::test_deferred_stream_guardrails_skip_pipeline_managed_native_hook",
+    "tests/test_litellm/proxy/utils/proxy_logging/test_guardrail_pipeline.py::test_streamable_post_call_pipelines_keeps_hook_guardrails_and_drops_iterator_only",
+    "tests/test_litellm/proxy/utils/proxy_logging/test_guardrail_pipeline.py::test_streaming_iterator_hook_runs_legacy_hook_and_delivers_its_rewrite",
+    "tests/test_litellm/proxy/utils/proxy_logging/test_guardrail_pipeline.py::test_streaming_iterator_hook_releases_stream_untouched_when_legacy_hook_returns_none",
+    "tests/test_litellm/proxy/utils/proxy_logging/test_guardrail_pipeline.py::test_streaming_iterator_hook_ends_stream_with_legacy_hook_exception",
+    "tests/test_litellm/proxy/utils/proxy_logging/test_guardrail_pipeline.py::test_streaming_iterator_hook_delivers_legacy_hook_rewrite_on_anthropic_sse",
+    "tests/test_litellm/proxy/utils/proxy_logging/test_guardrail_pipeline.py::test_streaming_iterator_hook_runs_iterator_hook_guardrail_whose_pipeline_cannot_stream"
+  ],
+  "reference_paths": [
+    "litellm",
+    "enterprise"
+  ],
+  "fixture_plugins": [
+    "tests.test_litellm.proxy.utils.proxy_logging.conftest"
+  ],
+  "fixture_hashes": {
+    "tests.test_litellm.proxy.utils.proxy_logging.conftest": "350c165a68a5d756af0e3b05e669b78b51867a74190f84fae0ac763331498487"
+  }
+}

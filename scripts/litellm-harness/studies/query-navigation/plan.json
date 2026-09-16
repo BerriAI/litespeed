@@ -1,0 +1,158 @@
+{
+  "createdAt": "2026-09-16T12:27:42.532864+00:00",
+  "protocol": 7,
+  "model": "fireworks_ai/deepseek-v4p1-flash",
+  "control": "control",
+  "repetitions": 2,
+  "globalConcurrency": 3,
+  "seed": 53160926,
+  "stopNewTrialsAtCommittedUsd": 80,
+  "purpose": "Test query navigation after the larger billing trace omitted cost_calculator.py from symbol scope and ranked generic rate matches ahead of an explicitly named function. Candidate uses the full bounded query for area selection, preserves underscore identifiers in the 24-token ranking budget, recognizes pricing/billing language, adds the core billing file, and prioritizes exact underscore/single-term symbol matches. Both arms use the production v52 runtime including price-map editing; neither includes the experimental grouped edits or chronological notices. This bundle is not a single-mechanism causal ablation.",
+  "selectionRule": "Require complete repeated pairs, normal delivery, unchanged reference acceptance, and the seven predeclared behavior checks on billing. Inspect navigation activation, first-edit latency and tool use alongside cost; this is development on two already known tasks and does not establish generalization. Preserve earlier four-check overconstrained billing scores in their original study. This new study prospectively uses the qualified seven-check behavioral probe for both arms. No reserved data is used.",
+  "versions": {
+    "control": {
+      "commit": "0fdc384563c46f5baede5818808c292a988004d6",
+      "files": {
+        "shared/source-file-limits.ts": "bdcc3cee8c7eefd493afaec60e3e4d1e18ec32f2ff11d872b2670ffb8bf0f42f",
+        "server/litellm-harness.ts": "b64d4cfb2eaf5861eec5c83c167bf070e3aba93f78c8ba33550265fa296b3bbd",
+        "server/runner.ts": "2cb8061f9a6a808d4478e3ee2acc495f5c2ad73d3892c3c1b2f046c37ca4e6d7",
+        "server/tools.ts": "9e9d47c7b7ee7896b88ca153d45e89b53d3853172e1c5a992814871708b09a47",
+        "server/history.ts": "217ee162eb15f6184e5363235234af8d1f65b438d9dcb118e8178f33bb016d9b",
+        "server/workspace-snapshot.ts": "a3a596c76376c61d65e5d1926e9be599ea6d287dd8f54e7247337fb357cabad9",
+        "scripts/litellm-harness/run.ts": "e6d86688ec0a321256ae8deb7290576450706c5b119195c0a00ed9a59b0eba5f",
+        "scripts/litellm-harness/solve.ts": "3d56881002d5b84233b895a9c2bb90094a33bef5c2d5ec6c3fdff927788e0a73",
+        "package-lock.json": "b0615d83c0d9f21a68abacb97c16777dc1eb4f42daa2b5496da51f787d394e88"
+      }
+    },
+    "query-navigation": {
+      "commit": "3bae1851ae107d9689054bb75869b07eff5a6ef0",
+      "files": {
+        "shared/source-file-limits.ts": "bdcc3cee8c7eefd493afaec60e3e4d1e18ec32f2ff11d872b2670ffb8bf0f42f",
+        "server/litellm-harness.ts": "2190d9d9f1630dccc154f090e432191e2f94e680da0017a4027e32f97a0f4436",
+        "server/runner.ts": "2cb8061f9a6a808d4478e3ee2acc495f5c2ad73d3892c3c1b2f046c37ca4e6d7",
+        "server/tools.ts": "9e9d47c7b7ee7896b88ca153d45e89b53d3853172e1c5a992814871708b09a47",
+        "server/history.ts": "217ee162eb15f6184e5363235234af8d1f65b438d9dcb118e8178f33bb016d9b",
+        "server/workspace-snapshot.ts": "a3a596c76376c61d65e5d1926e9be599ea6d287dd8f54e7247337fb357cabad9",
+        "scripts/litellm-harness/run.ts": "e6d86688ec0a321256ae8deb7290576450706c5b119195c0a00ed9a59b0eba5f",
+        "scripts/litellm-harness/solve.ts": "3d56881002d5b84233b895a9c2bb90094a33bef5c2d5ec6c3fdff927788e0a73",
+        "package-lock.json": "b0615d83c0d9f21a68abacb97c16777dc1eb4f42daa2b5496da51f787d394e88"
+      }
+    }
+  },
+  "patchSha256": "68b7291fb20781934664b53a85a1462245a7881b16b2c339a1e79a0231cbeaad",
+  "supplementalSource": {
+    "path": "scripts/litellm-harness/studies/multi-module-development/representation_probe.py",
+    "sha256": "43440ad587358382faab2e5fd12807b7daac86bb152c6ede0d1b5919ee719a48",
+    "qualification": "../multi-module-development/representation-observations.json (base0/7; reference7/7)"
+  },
+  "validation": {
+    "typecheck": "passed",
+    "focusedHarnessAndRunnerTests": 34,
+    "newNavigationRegressionsFailedBeforeFix": 3,
+    "actualBaseNavigationDiagnostic": "Same recorded queries on an answer-free historical base: cost calculator now appears, and _calculate_input_cost ranks first in its file. Not solver quality evidence."
+  },
+  "runs": [
+    {
+      "dataset": "training7",
+      "case": "realtime-cached-audio-cost",
+      "name": "control",
+      "kind": "litellm-specific",
+      "label": "replication-v53-query-control-r2",
+      "commit": "0fdc384563c46f5baede5818808c292a988004d6",
+      "effort": "medium",
+      "timeoutSeconds": 1800,
+      "supplemental": {
+        "artifact": "representation-probe.json",
+        "expectedChecks": 7
+      }
+    },
+    {
+      "dataset": "training7",
+      "case": "realtime-cached-audio-cost",
+      "name": "query-navigation",
+      "kind": "litellm-specific",
+      "label": "replication-v53-query-query-navigation-r1",
+      "commit": "3bae1851ae107d9689054bb75869b07eff5a6ef0",
+      "effort": "medium",
+      "timeoutSeconds": 1800,
+      "supplemental": {
+        "artifact": "representation-probe.json",
+        "expectedChecks": 7
+      }
+    },
+    {
+      "dataset": "training7",
+      "case": "realtime-cached-audio-cost",
+      "name": "control",
+      "kind": "litellm-specific",
+      "label": "replication-v53-query-control-r1",
+      "commit": "0fdc384563c46f5baede5818808c292a988004d6",
+      "effort": "medium",
+      "timeoutSeconds": 1800,
+      "supplemental": {
+        "artifact": "representation-probe.json",
+        "expectedChecks": 7
+      }
+    },
+    {
+      "dataset": "training2",
+      "case": "mock-input-tokens",
+      "name": "query-navigation",
+      "kind": "litellm-specific",
+      "label": "replication-v53-query-query-navigation-r1",
+      "commit": "3bae1851ae107d9689054bb75869b07eff5a6ef0",
+      "effort": "medium",
+      "timeoutSeconds": 900
+    },
+    {
+      "dataset": "training2",
+      "case": "mock-input-tokens",
+      "name": "control",
+      "kind": "litellm-specific",
+      "label": "replication-v53-query-control-r2",
+      "commit": "0fdc384563c46f5baede5818808c292a988004d6",
+      "effort": "medium",
+      "timeoutSeconds": 900
+    },
+    {
+      "dataset": "training2",
+      "case": "mock-input-tokens",
+      "name": "control",
+      "kind": "litellm-specific",
+      "label": "replication-v53-query-control-r1",
+      "commit": "0fdc384563c46f5baede5818808c292a988004d6",
+      "effort": "medium",
+      "timeoutSeconds": 900
+    },
+    {
+      "dataset": "training7",
+      "case": "realtime-cached-audio-cost",
+      "name": "query-navigation",
+      "kind": "litellm-specific",
+      "label": "replication-v53-query-query-navigation-r2",
+      "commit": "3bae1851ae107d9689054bb75869b07eff5a6ef0",
+      "effort": "medium",
+      "timeoutSeconds": 1800,
+      "supplemental": {
+        "artifact": "representation-probe.json",
+        "expectedChecks": 7
+      }
+    },
+    {
+      "dataset": "training2",
+      "case": "mock-input-tokens",
+      "name": "query-navigation",
+      "kind": "litellm-specific",
+      "label": "replication-v53-query-query-navigation-r2",
+      "commit": "3bae1851ae107d9689054bb75869b07eff5a6ef0",
+      "effort": "medium",
+      "timeoutSeconds": 900
+    }
+  ],
+  "preAllocationCorrection": {
+    "at": "2026-09-16T12:28:31.574250+00:00",
+    "reason": "The known mock-input-tokens case is in training2, not the original dataset. Correct its dataset locator before any allocation; task, source, settings and order unchanged. The initial preflight detected the missing path.",
+    "previousPublicPlan": "plan-v1.json",
+    "allocatedTrialsBeforeCorrection": 0
+  }
+}

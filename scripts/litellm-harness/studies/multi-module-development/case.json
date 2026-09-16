@@ -1,0 +1,69 @@
+{
+  "id": "realtime-cached-audio-cost",
+  "split": "dev",
+  "base": "9e1ed40db3376dc8e7b9392aa104653ca22d3fdb",
+  "reference": "6e9e08475ac37128f435ddc1d13347081637748a",
+  "prompt": "Realtime cached audio input is overbilled because the nested cached_tokens_details split is lost. Preserve optional text/audio/image cached-token details through realtime and Responses usage normalization and conversion back to Responses usage. Combine the nested split across response.done events, including when only some events supply it, without mutating input usage. Omit the optional nested key from serialized usage when no split was supplied; preserve existing cache-write fields and their absence.\n\nUse cache_read_input_audio_token_cost for cached audio, falling back to cache_read_input_token_cost when the audio rate is absent. Expose that audio rate through model-info lookups and the token-cost breakdown, and make the breakdown agree with input billing. Remove cached tokens from the corresponding full-rate text/audio/image buckets without going negative; cap the nested allocation at the aggregate cached count. Preserve existing billing when nested details are absent, along with existing tier/region/custom-price behavior.\n\nApply these historical cost-map corrections for this offline task (USD per token, not a request to look up current prices): set cache_read_input_audio_token_cost to 0.0000004 for gpt-realtime, gpt-realtime-1.5 and gpt-realtime-2025-08-28; set both audio and text cache-read rates to 0.0000004 for azure/gpt-realtime-2025-08-28 and azure/gpt-realtime-1.5-2026-02-23; set the audio cache-read rate to 0.0000003 for azure/gpt-realtime-mini and azure/gpt-realtime-mini-2025-10-06; add the text cache-read rate 0.00000006 for gpt-realtime-mini. Preserve other existing prices.\n\nFor example, 116 input text tokens and 167 input audio tokens, with 192 cached tokens split into 64 text and 128 audio, should charge 52 full-rate text, 39 full-rate audio, and the cached buckets once each. At text/audio rates 0.000004/0.000032 and both cached rates 0.0000004, the input cost is 0.0015328.",
+  "input_provenance": "Retrospective requirements curated from the public change and acceptance behavior, not an original pre-merge issue. The same requirements go to every solver; reference code and tests are withheld.",
+  "reference_paths": [
+    "litellm",
+    "enterprise",
+    "model_prices_and_context_window.json"
+  ],
+  "source_paths": [
+    "litellm/cost_calculator.py",
+    "litellm/litellm_core_utils/llm_cost_calc/utils.py",
+    "litellm/model_prices_and_context_window_backup.json",
+    "litellm/responses/litellm_completion_transformation/transformation.py",
+    "litellm/responses/utils.py",
+    "litellm/types/llms/base.py",
+    "litellm/types/llms/openai.py",
+    "litellm/types/utils.py",
+    "litellm/utils.py"
+  ],
+  "test_nodes": [
+    "tests/test_litellm/litellm_core_utils/llm_cost_calc/test_llm_cost_calc_utils.py::test_cache_writing_cost_with_zero_creation_tokens_and_ephemeral_details",
+    "tests/test_litellm/litellm_core_utils/llm_cost_calc/test_llm_cost_calc_utils.py::test_billed_token_rates_follow_the_token_tier_the_breakdown_bills_at",
+    "tests/test_litellm/litellm_core_utils/llm_cost_calc/test_llm_cost_calc_utils.py::test_cached_realtime_audio_tokens_billed_at_audio_cache_read_rate",
+    "tests/test_litellm/litellm_core_utils/llm_cost_calc/test_llm_cost_calc_utils.py::test_prompt_tokens_details_without_cached_tokens_details_unchanged",
+    "tests/test_litellm/litellm_core_utils/llm_cost_calc/test_llm_cost_calc_utils.py::test_cached_audio_tokens_fall_back_to_cache_read_input_token_cost",
+    "tests/test_litellm/litellm_core_utils/llm_cost_calc/test_llm_cost_calc_utils.py::test_cached_audio_tokens_capped_at_cached_tokens",
+    "tests/test_litellm/litellm_core_utils/llm_cost_calc/test_llm_cost_calc_utils.py::test_cached_audio_tokens_billed_at_audio_cache_rate_through_model_info_lookup",
+    "tests/test_litellm/litellm_core_utils/llm_cost_calc/test_llm_cost_calc_utils.py::test_cache_read_breakdown_splits_cached_audio_at_the_audio_cache_rate",
+    "tests/test_litellm/litellm_core_utils/llm_cost_calc/test_llm_cost_calc_utils.py::test_realtime_models_bill_cached_text_and_audio_at_their_cache_read_rates",
+    "tests/test_litellm/responses/litellm_completion_transformation/test_litellm_completion_responses.py::TestUsageTransformation::test_transform_usage_with_cached_tokens_anthropic",
+    "tests/test_litellm/responses/litellm_completion_transformation/test_litellm_completion_responses.py::TestUsageTransformation::test_transform_usage_preserves_cache_write_tokens",
+    "tests/test_litellm/responses/test_responses_utils.py::TestResponseAPILoggingUtils::test_transform_realtime_usage_dict_keeps_cached_tokens_details",
+    "tests/test_litellm/responses/test_responses_utils.py::TestResponseAPILoggingUtils::test_transform_response_api_usage_object_keeps_cached_tokens_details",
+    "tests/test_litellm/test_utils.py::test_get_model_info_carries_cache_read_input_audio_token_cost"
+  ],
+  "snapshot_revision": 2,
+  "prompt_revision": 3,
+  "reference_test_nodes": [
+    "tests/test_litellm/litellm_core_utils/llm_cost_calc/test_llm_cost_calc_utils.py::test_cache_writing_cost_with_zero_creation_tokens_and_ephemeral_details",
+    "tests/test_litellm/litellm_core_utils/llm_cost_calc/test_llm_cost_calc_utils.py::test_billed_token_rates_follow_the_token_tier_the_breakdown_bills_at",
+    "tests/test_litellm/litellm_core_utils/llm_cost_calc/test_llm_cost_calc_utils.py::test_cached_realtime_audio_tokens_billed_at_audio_cache_read_rate",
+    "tests/test_litellm/litellm_core_utils/llm_cost_calc/test_llm_cost_calc_utils.py::test_prompt_tokens_details_without_cached_tokens_details_unchanged",
+    "tests/test_litellm/litellm_core_utils/llm_cost_calc/test_llm_cost_calc_utils.py::test_cached_audio_tokens_fall_back_to_cache_read_input_token_cost",
+    "tests/test_litellm/litellm_core_utils/llm_cost_calc/test_llm_cost_calc_utils.py::test_cached_audio_tokens_capped_at_cached_tokens",
+    "tests/test_litellm/litellm_core_utils/llm_cost_calc/test_llm_cost_calc_utils.py::test_cached_audio_tokens_billed_at_audio_cache_rate_through_model_info_lookup",
+    "tests/test_litellm/litellm_core_utils/llm_cost_calc/test_llm_cost_calc_utils.py::test_cache_read_breakdown_splits_cached_audio_at_the_audio_cache_rate",
+    "tests/test_litellm/litellm_core_utils/llm_cost_calc/test_llm_cost_calc_utils.py::test_realtime_models_bill_cached_text_and_audio_at_their_cache_read_rates",
+    "tests/test_litellm/responses/litellm_completion_transformation/test_litellm_completion_responses.py::TestUsageTransformation::test_transform_usage_with_cached_tokens_anthropic",
+    "tests/test_litellm/responses/litellm_completion_transformation/test_litellm_completion_responses.py::TestUsageTransformation::test_transform_usage_preserves_cache_write_tokens",
+    "tests/test_litellm/responses/test_responses_utils.py::TestResponseAPILoggingUtils::test_transform_realtime_usage_dict_keeps_cached_tokens_details",
+    "tests/test_litellm/responses/test_responses_utils.py::TestResponseAPILoggingUtils::test_transform_response_api_usage_object_keeps_cached_tokens_details",
+    "tests/test_litellm/test_cost_calculator.py::test_realtime_combine_sums_nested_cached_tokens_details",
+    "tests/test_litellm/test_cost_calculator.py::test_realtime_combine_keeps_cached_split_when_only_one_usage_has_details",
+    "tests/test_litellm/test_cost_calculator.py::test_usage_without_cached_tokens_details_omits_key",
+    "tests/test_litellm/test_utils.py::test_get_model_info_carries_cache_read_input_audio_token_cost"
+  ],
+  "fixture_plugins": [],
+  "fixture_hashes": {},
+  "excluded_reference_nodes": [
+    "tests/test_litellm/test_cost_calculator.py::test_realtime_combine_sums_nested_cached_tokens_details",
+    "tests/test_litellm/test_cost_calculator.py::test_realtime_combine_keeps_cached_split_when_only_one_usage_has_details",
+    "tests/test_litellm/test_cost_calculator.py::test_usage_without_cached_tokens_details_omits_key"
+  ],
+  "oracle_note": "Curated before qualification/solvers. Three changed tests are excluded because their module imports newly introduced CachedTokensDetails; aggregation and optional-key behavior are covered by a separately predeclared probe using existing entrypoints without that type name. Remaining reference checks may still couple to rate representation; qualification is not proof of complete coverage."
+}

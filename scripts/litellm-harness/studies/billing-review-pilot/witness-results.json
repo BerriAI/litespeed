@@ -1,0 +1,82 @@
+{
+  "generatedAt": "2026-09-16T22:24:01.419642+00:00",
+  "sourceSha256": "8c546a8192f149e550af37e1d6d7164c35ad415a012a24aa792a38630960c970",
+  "scope": "Final-answer witness audit only; no change to coding acceptance or supplemental scores. Cap-order expectation describes candidate text-first allocation, not a normative priority requirement.",
+  "variants": [
+    {
+      "variant": "candidate-r2",
+      "rows": [
+        {
+          "name": "generic-cap-order-example",
+          "inputCost": 0.0058043999999999995,
+          "expectedInputCost": 0.0058044,
+          "cacheReadCost": 4e-07,
+          "expectedCacheReadCost": 4e-07,
+          "pass": true
+        },
+        {
+          "name": "generic-absent-audio-rate-example",
+          "inputCost": 3.9999999999999996e-05,
+          "expectedInputCost": 3.9999999999999996e-05,
+          "cacheReadCost": 3.9999999999999996e-05,
+          "expectedCacheReadCost": 3.9999999999999996e-05,
+          "pass": true
+        },
+        {
+          "name": "conservation-original-example",
+          "inputCost": 0.0015328,
+          "expectedInputCost": 0.0015328,
+          "cacheReadCost": 7.68e-05,
+          "expectedCacheReadCost": 7.68e-05,
+          "pass": true
+        }
+      ],
+      "passed": true,
+      "imports": {
+        "packageOrigin": "litellm/__init__.py",
+        "allLiteLLMModulesWithinWorkspace": true,
+        "moduleCount": 813
+      },
+      "bytecodePolicy": "fresh cache path; reads from adjacent caches and all writes disabled",
+      "costSourceSha256": "dcd7febccee07ca886c9c588389f1825b0d08d427ce869d4ffda2efd2d5670c5"
+    },
+    {
+      "variant": "merged-reference",
+      "rows": [
+        {
+          "name": "generic-cap-order-example",
+          "inputCost": 0.0057764,
+          "expectedInputCost": 0.0058044,
+          "cacheReadCost": 4e-07,
+          "expectedCacheReadCost": 4e-07,
+          "pass": false
+        },
+        {
+          "name": "generic-absent-audio-rate-example",
+          "inputCost": 3.9999999999999996e-05,
+          "expectedInputCost": 3.9999999999999996e-05,
+          "cacheReadCost": 3.9999999999999996e-05,
+          "expectedCacheReadCost": 3.9999999999999996e-05,
+          "pass": true
+        },
+        {
+          "name": "conservation-original-example",
+          "inputCost": 0.0015328,
+          "expectedInputCost": 0.0015328,
+          "cacheReadCost": 7.68e-05,
+          "expectedCacheReadCost": 7.68e-05,
+          "pass": true
+        }
+      ],
+      "passed": false,
+      "imports": {
+        "packageOrigin": "litellm/__init__.py",
+        "allLiteLLMModulesWithinWorkspace": true,
+        "moduleCount": 813
+      },
+      "bytecodePolicy": "fresh cache path; reads from adjacent caches and all writes disabled",
+      "costSourceSha256": "8a17c63632d282fe6a6a600b96f6ef54c6e03b3b15f5161aae24b2abaa73b207"
+    }
+  ],
+  "interpretation": "The cap-order row differs between candidate and reference on inconsistent counters; it is not a qualified pass/fail oracle. The fallback allegation is false for the supplied example. Original-example arithmetic agrees on both snapshots. All use network denial, fresh bytecode and snapshot-local import checks."
+}

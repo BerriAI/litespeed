@@ -56,6 +56,10 @@ describe('isolated TypeScript MCP execution', () => {
     expect(await run('return "still usable";')).toContain('still usable');
   });
 
+  it('preserves an ordinary guest TypeError when the CPU interrupt did not fire', async () => {
+    await expect(run('({}).missing();')).rejects.toThrow(/not a function/i);
+  });
+
   it('preserves the CPU-limit error and cancels a pending host call', async () => {
     let aborted = false;
     const invoke: McpCodeOptions['invoke'] = async (_name, _args, signal) => new Promise((_resolve, reject) => {

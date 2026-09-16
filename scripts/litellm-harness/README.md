@@ -1,0 +1,159 @@
+# Replaying the LiteLLM harness campaign
+
+These scripts are an evaluation and improvement workbench for the selectable architecture, not a service required to use it. They run real model calls and can incur charges. Set an explicit ceiling and retain the private ledger between runs.
+
+## Setup
+
+Requirements: Node matching this repository, installed Litespeed dependencies, Python with LiteLLM's test dependencies, a local LiteLLM Git checkout containing the task revisions, and a configured Codex CLI for Astra comparisons. Snapshots preserve tracked regular files, including .gitignore, Makefile, database schemas and repository guidance. Generated dashboard output and files above 15 MiB are omitted. Earlier exploratory snapshots filtered by extension and incorrectly omitted some of this metadata; those runs are kept separate. The current launcher requires macOS: it uses APFS `cp -cR` and `sandbox-exec`. Port both copying and filesystem isolation before using another platform; it fails closed elsewhere. Python dependencies are shared across historical snapshots, so this is not a reconstruction of every historical CI environment.
+
+Use a private directory outside either repository. Store your gateway key in a mode-0600 file there. Do not put it in scripts, task prompts or command arguments.
+
+```sh
+export LITELLM_CAMPAIGN_DIR=/absolute/private/campaign
+export LITELLM_CAMPAIGN_KEY_FILE=/absolute/private/campaign/gateway-key
+export LITELLM_CAMPAIGN_BASE_URL=https://your-gateway.example
+export LITELLM_CAMPAIGN_LIMIT_USD=100
+export LITELLM_SOURCE_REPO=/absolute/path/to/litellm
+export LITELLM_EVAL_PYTHON=/absolute/path/to/litellm/.venv/bin/python
+
+python3 scripts/litellm-harness/prepare.py
+python3 scripts/litellm-harness/validate.py
+npx tsx scripts/litellm-harness/gateway.ts
+```
+
+The gateway runs in its own terminal. It accepts only `fireworks_ai/deepseek-v4p1-flash`, reserves a conservative maximum request cost before dispatch and refuses calls beyond the saved ceiling. It prices cached input, ordinary input and generated tokens separately. The rates in `budget.ts` were verified against the campaign gateway; check your gateway's rates before starting another campaign. Account-level spend was unavailable on the original key. This ledger covers requests through this local process, not other uses of the account.
+
+Missing usage and interrupted requests retain their full reservation. **Committed dollars are an upper accounting bound, not measured spend.** Do not report unpriced reservations as actual charges. An exclusive lock prevents two gateway processes from separately admitting requests against the same ledger. After a crash, verify that the recorded process is gone before removing `gateway.lock`. Do not reset a ledger to obtain more budget.
+
+Missing raw gateway responses can sometimes be reconciled with independently persisted runner usage. `receipt_recovery.py` audits only explicit dataset directories, requiring a unique timing match, equal saved assistant usage and the exact preceding tool output; aggregate token differences are insufficient. Application requires a drained, stopped gateway and its exclusive lock, recomputes evidence hashes, preserves original reservations and backs up the ledger. The [campaign recovery](studies/runner-receipt-recovery/README.md) documents 58 matched requests and all unreleased uncertainty. These token-priced receipts are not an upstream invoice.
+
+Flash launches check the authenticated local gateway status before allocating a trial. Restore an unavailable gateway first; do not turn a failed connection into a model-quality result. This check does not prevent a later outage or replace per-request budget admission. The [gateway memory audit](studies/gateway-memory/README.md) retains one actual crash, its reproduced cause and recovery provenance.
+
+Streaming headers can be sent before the final cost is known; a zero cost header is not proof of a free request ([LiteLLM issue](https://github.com/BerriAI/litellm/issues/30816)). Without usable token usage, the gateway retains the reservation for streaming calls regardless of that header. A positive non-streaming cost header can settle a request; zero alone stays unknown. When both usage and a header are available, accounting uses the greater reported/token-priced amount.
+
+## Run and score
+
+In another terminal with the same environment:
+
+```sh
+npx tsx scripts/litellm-harness/run.ts converse-config single baseline
+npx tsx scripts/litellm-harness/run.ts converse-config litellm-specific candidate
+npx tsx scripts/litellm-harness/run.ts converse-config codex astra
+
+python3 scripts/litellm-harness/score.py /absolute/private/campaign/runs/RUN_DIRECTORY
+python3 scripts/litellm-harness/analyze.py
+```
+
+New runs use evaluation protocol 7. The launcher prepares a snapshot, then starts the solver under a macOS Seatbelt filesystem profile. The live source checkout, other campaign runs and reference artifacts are unreadable. Application code and required dependencies remain available; runtime reports, tests, benchmark scripts and the runtime Git pointer are blocked, with only the exact replay entrypoint imports allowed. Earlier frozen studies keep their recorded protocol and limitations. Writes to the live source and dependency environment are blocked. Codex gets a fresh private home with only its authentication copied. The profile and source hashes are retained for audit. This is a filesystem boundary, not complete adversarial isolation: model API networking remains available, and the runtime/dependencies must be trusted.
+
+Each run gets a fresh snapshot, a new Git repository with one starting commit, and its own Litespeed state. The original history and reference patch/tests are absent from the solver workspace. Raw traces and credentials are private artifacts, not files to commit in this repository. Scoring copies the candidate into `acceptance-workspace` before restoring reference tests; never use that directory as a solver input. Early exploratory runs were scored in place, so always start another run from a new snapshot.
+
+The optional fifth run argument selects the requested reasoning effort (`high` by default). Low and Max development trials are retained separately. The original historical comparison requested High reasoning for both routes. Later studies declare their own per-route effort, deadlines and source hashes; read their frozen plans rather than assuming those original settings. Litespeed uses the selected architecture, the gateway-advertised 1,048,576-token context window, memory disabled and no connected tools. Labels beginning with `comparison-` or `replication-` receive a 900-second timeout; other development runs receive 600 seconds. A new study can explicitly set `LITELLM_EVAL_TIMEOUT_SECONDS` to an integer from 60 to 3600 before allocation. Record that limit per trial or at plan level; the study exporter rejects a different recorded limit. Existing frozen studies keep their original deadlines. This setting affects only replay execution, not ordinary product turns. Earlier exploratory runs used an artificially low 131,072-token configuration and some triggered compaction; they must not stand in for the final candidate comparison. Compaction archives are retained for complete tool accounting. The recorded protocol-3 Codex runs used the installed CLI, exact model `gpt-6-astra`, the requested reasoning effort, ephemeral execution, workspace-write policy, disabled web search and a 900-second timeout. Protocol 4 keeps those model/settings but uses the outer Seatbelt filesystem policy; the CLI inner sandbox is disabled because nested macOS sandbox application fails. This does not remove the inherited outer boundary. Codex account usage is separate from the DeepSeek gateway ceiling; its dollar charge is unavailable and must not be reported as zero.
+
+The recorded v9/v11/v13 series used protocol 3, which only told solvers to work offline and within their checkout. The final audit found four v9 trials reading the live checkout, plus one plain-model development trial. Their raw results are retained and flagged in [the integrity review](integrity-review.json); they cannot support a fair superiority claim. The new protocol-4 launcher blocks those filesystem paths. The final pytest scorer also blocks network connections and ignores external pytest configuration. Do not reinterpret older runs as having the new boundary.
+
+## Task and oracle qualification
+
+The corpus contains retrospective requirements derived from public changes, not original pre-merge issues. `task-prompts.json` corrects omissions found during task auditing. Every solver receives the same task revision. Do not combine runs with different requirements into one comparative score.
+
+Before a paid run, the unpatched snapshot must fail the selected behavioral checks and the reference patch must pass them in the scoring environment. Import errors, missing fixtures, network setup and reference-patch failures are task-environment problems, not model failures. Two initial tasks failed this qualification and remain excluded unless their environment/oracle is repaired.
+
+Curated primary checks should target public behavior rather than newly introduced helper names. Some frozen early tasks nevertheless retain private-helper or query-shape assertions; the manifests and diagnostic audits identify these limitations without rewriting original scores. Alternate implementations can satisfy the public behavior without copying the merged patch. Passing the selected tests still does not prove the absence of regressions, security bugs or requirements those tests omit; inspect patches and relevant neighboring behavior as well.
+
+The train/dev/test labels separate improvement tasks from the final task comparison. They are not a chronological future-PR split, and the curator has inspected the reference changes while validating tasks. Do not describe these results as a blind study, a production deployment result, or a guarantee on arbitrary future LiteLLM work.
+
+The [original plan](comparison-plan.json) records v9, with three trials per route and task. The [follow-up plan](replication-plan.json) records v11, with one additional DeepSeek trial per task. Source hashes and commits distinguish them. The v13 follow-up added separately tested navigation corrections and a [final evaluation](final-evaluation-plan.json) on the same known tasks. This evaluation took place after inspecting previous outcomes; it is post-hoc and must remain separate from the earlier comparisons.
+
+### Access audit
+
+After completing runs, execute `python3 scripts/litellm-harness/audit.py` with the setup environment. Inspect the private `access-audit.json`, including outputs of flagged commands and any background polls. The script flags likely live-source, external-tool and history access; string matching is not proof of isolation. Preserve failed and compromised trials instead of quietly replacing them. The checked-in `integrity-review.json` documents the manual review of this campaign.
+
+### Diagnostic audits after scoring
+
+Base/reference qualification does not remove every implementation-specific assertion. In this campaign, MAI tests also prescribed an exception subclass and exact wording beyond the stated HTTP-400 contract; router tests sometimes prescribed new private names. Keep the original results. Diagnose these cases separately, and label any added probe as post-hoc.
+
+After the normal scorer creates each `acceptance-workspace`, the MAI diagnostic can be reproduced with:
+
+```sh
+python3 scripts/litellm-harness/audit-mai.py /absolute/private/campaign/runs/MAI_RUN_DIRECTORY
+```
+
+This runs the same 15 HTTP-status checks against the base, the validated merged reference and the supplied candidates. It writes `mai-audit.json` without modifying their frozen acceptance scores. It is not a replacement for regression checks or a new held-out benchmark.
+
+## Improve deliberately
+
+1. Run a fixed candidate on training/development tasks.
+2. Inspect failures, repeated tool calls, long reads, speculative edits and time spent in commands. Check the task wording and reference environment before blaming the model.
+3. Change one reusable mechanism or instruction, version it, and rerun affected development tasks.
+4. Freeze the candidate before comparing held-out tasks. Preserve failures and repeated trials; do not select only the best run.
+5. Publish task-level acceptance, elapsed time, request/token counts, priced spend, unknown reservations and limitations. Keep raw private transcripts out of the PR.
+
+
+## Additional datasets and bounded batches
+
+Set `LITELLM_CASE_CATALOG` to an explicit JSON array of `{id, split, revision, prompt}` records when running `prepare.py`. Optional `include_test_names`, `exclude_test_names`, and `oracle_note` preserve curation decisions. `reference_paths` can include required non-Python artifacts (such as the model-price JSON schema); its default is `litellm` and `enterprise`. Use a separate campaign directory for a new dataset, but point its `connection.json` at the same metered gateway. Do not create another ledger to bypass a campaign ceiling. Model-written task drafts require review: a curator can invert an error-handling contract or accidentally prescribe a new private helper.
+
+For shared fixtures, a catalog may declare `fixture_plugins`, for example `tests.test_litellm.proxy.utils.proxy_logging.conftest`. Only explicit repository test fixture modules unchanged by the reference PR are supported. Preparation hashes their starting-snapshot source and preserves it for scoring; qualification and acceptance load the same modules with `-p`, while retaining `--noconftest` to avoid unrelated root setup. The solver receives the same fixture flags. Changing a fixture or the declared list requires requalification before a paid call. Keep the original failed qualification when repairing an environment, and report the fixture profile with results. Missing fixtures are not model failures, and candidate edits to fixture files cannot change the restored acceptance setup.
+
+Keep reusable base snapshots free of generated Python bytecode. The launcher rejects cached bases before allocating a paid trial. Host pytest and supplemental probes use a fresh bytecode prefix, disable writes, and verify that LiteLLM imports originate inside the selected checkout. `python -B` alone does **not** prevent reading existing adjacent caches. The `reference` subdirectory contains captured tests; it is not a complete reference implementation. Use a fresh archive of the recorded reference commit, or a verified full base copy with the reference patch applied. For supplemental JSON probes, run `python -B scripts/litellm-harness/probe_runner.py /absolute/checkout /absolute/probe.py`; inspect the explicit `passed` field. The [snapshot audit](snapshot-hygiene-audit.json) retains the earlier process defects and independent reruns.
+
+Protocol 5 gives every solver its own temporary directory and pytest configuration. Its printed command explicitly enables the local cost map and the required pytest plugins. This avoids ancestor discovery outside the filesystem boundary and accidental remote cost-map reads. The production shell still filters credential-related environment variables; the replay's explicit test prefix does not weaken that filter.
+
+Use one shared `LITELLM_CAMPAIGN_LOCK_DIR` across all datasets with `batch.py`. `LITELLM_CAMPAIGN_CONCURRENCY` defaults to **3 total trials**, not three per batch. The lock directory pins that capacity and serializes grading. For example:
+
+```sh
+export LITELLM_CAMPAIGN_LOCK_DIR=/absolute/private/campaign/shared-slots
+python3 scripts/litellm-harness/batch.py /absolute/litespeed-checkout replication-v17 litellm-specific medium converse-config vertex-version-path
+```
+
+A batch never silently retries an allocated trial. New attempts use a new label. Freezing the runtime in a separate Git worktree keeps an ongoing batch reproducible while the next candidate changes. Excessive parallelism can produce host stalls and corrupt latency comparisons even when each individual batch has a reasonable worker count.
+
+Install or physically copy dependencies inside each frozen runtime. Do not link its `node_modules` to another checkout: the filesystem boundary blocks that target. The launcher checks this dependency root before allocating a trial; nested package links remain subject to the sandbox. Validate runner imports under the intended isolation profile before starting a new runtime. Two original startup failures and their separately labeled replacements are retained in the [native-inspection study](studies/native-inspection/README.md).
+
+Waiting trials acquire shared slots in ticket order, so a large controller cannot continually overtake an older queued experiment. Kernel file locks identify live tickets and release capacity after a process dies; stale tickets are removed without trusting a reused process ID. Queued time is outside the solver's recorded duration. Use the same scheduler version and capacity when comparing throughput.
+
+If a solver exits before writing its completion artifact, the launcher preserves a failed result and partial patch. For older dead runs, `recover.py RUN_DIRECTORY` extracts messages and receipts from the read-only state database after checking that the solver is gone. Recovered trials remain interrupted failures; their message-derived duration is incomplete and must be excluded from successful-run latency summaries. Never restore a recovered workspace into a new solver as though it were an untouched base.
+
+`analyze.py` reports provider-call time, the union of occupied tool intervals, per-tool summed latency, time to first edit and when final review began. Concurrent tool durations can overlap: do not add them to infer wall time. Use recorded timestamps rather than a critic model's estimates.
+
+`bottlenecks.py RESULTS_JSON OUTPUT_JSON OUTPUT_MARKDOWN` aggregates protocol-6 development requests from an already public export. It groups each entire assistant request by its chosen next action, preserving cost reconciliation and missing-measurement counts. Classification version 2 separately exposes recorded shell commands mentioning known check tools even when a wrapper prevents a conservative check receipt. This does not infer pass/fail, coverage or a tool's marginal cost. The first-edit metric is the first recorded edit attempt, which may fail; it is not proof of a successful write. The [current breakdown](../../docs/litellm-harness-bottlenecks.md) includes the filter and every selected run ID.
+
+An idle UI status is not sufficient evidence of task completion. The analyzer recognizes explicit host loop/no-progress guard messages and unresolved-work notices in saved final output. It preserves raw acceptance while reporting these as incomplete handoffs. Historical logs lack a structured stop-reason field; this classification uses the host's exact messages and must be extended if their format changes.
+
+`reflect.py RUN_DIRECTORY` sends a qualified train/dev trajectory, its private reference and acceptance output to the metered model for diagnosis. Held-out tasks are rejected. The response is untrusted advice; the script neither edits the harness nor promotes a suggestion. Empty output fails explicitly; an output-limit or other abnormal finish preserves text as `reflection.partial.md` and fails instead of presenting it as a complete review. Raw responses remain available. Keep any candidate-selection set separate from the next frozen comparison.
+
+`reflect_chunks.py RUN_DIRECTORY` is an optional windowed critic for long trajectories. It includes every archived/current non-tool step, explicitly excerpts long fields, reviews windows sequentially, and synthesizes those observations with the candidate, private reference, acceptance and a global index of all host-recorded command executions. Compound shell commands can lack a recognized check verdict while still recording execution. Version 2 keeps those entries and marks the verdict unknown; version 1 omitted them. That index helps distinguish a final answer without calls from genuinely missing execution evidence; it is not a coverage oracle. Medium reasoning uses up to 6,000 output tokens per window and 8,000 for synthesis. A two-trace pilot completed all ten window reviews and both syntheses, but one synthesis incorrectly alleged missing earlier tests. Critic prose still requires checking.
+
+`study.py CAMPAIGN_DIRECTORY PLAN_JSON OUTPUT_JSON` summarizes only declared trial identities and requires matching harness commits, effort and evaluation protocol. It compares complete task pairs, with `control` defaulting to the variant named `control`. A plan can require `supplemental: {"artifact": "probe.json", "expectedChecks": 6}`; each artifact must contain an `exit` and `rows` with Boolean `pass` values. Original acceptance stays visible, missing probes leave trials pending, and zero process exit cannot mask failed cases. See the public plans for [identity precedence](studies/identity-precedence/README.md), [reasoning effort](studies/reasoning-effort/README.md), [test activity](studies/test-activity/README.md), and [router precedence diagnostics](studies/router-precedence/README.md). These are training studies, not final model comparisons.
+
+Windowed reviews stay private under `windowed-reflection-v2/`. A saved request marker prevents silently resending a potentially billed interrupted call; incomplete output stops the synthesis and remains available. Re-running reuses only completed responses with matching request hashes. No mode automatically edits prompts or promotes candidates.
+
+Protocol 6 also isolates Git configuration and resolves the installed Git executable before applying Seatbelt. Ordinary `git diff` and `git status` work without reading the user's global configuration or writing xcrun's shared cache. Earlier protocol-5 trials can contain these infrastructure failures; keep their measurements separate from the final comparison.
+
+The solver receives only task identifiers and the public task prompt. Protocol 6 blocks reads of the host task manifest (reference revisions and acceptance node IDs), and blocks writes to captured source/launch metadata. The scorer reads that protected manifest, not solver-selected test nodes. This preserves the recorded oracle without claiming full adversarial isolation.
+
+To resynthesize an existing windowed review with linked background-job evidence, set `LITELLM_REFLECTION_PROTOCOL=3` and run `reflect_chunks.py` on the same qualified train/dev trial. Protocol 3 requires all saved v2 windows and verifies their exact input hashes; it adds only one new metered synthesis in `windowed-reflection-v3`. It attaches later `wait`/`bash_output` observations by exact session/job ID, keeps unmatched commands unknown, and distinguishes status from output. The original reviews, launch receipts and costs remain unchanged. See the [reproduced critic error](studies/critic-job-evidence/README.md). The default remains protocol 2 for already-running studies.
+
+For an explicitly labeled training refinement, set `LITELLM_REPAIR_FROM` to a completed trial directory and `LITELLM_REPAIR_FEEDBACK` to a bounded reviewer note inside it, then use a `replication-repair-` label. The launcher applies the parent candidate to a new base snapshot and records the relationship. This is a second attempt: report the parent, critic and repair costs/times together, never as a fresh first-attempt success. Reserved test tasks are rejected by this path.
+
+Export the original fixed study with `report.py OUTPUT_DIRECTORY` after its analysis/audit. For an interim report, run `analyze.py` for each explicitly included development dataset, then `progress.py OUTPUT_DIRECTORY DATASET_DIRECTORY ...`. The interim exporter checks accounting reconciliation and allowlists aggregate fields; it does not open datasets that were not supplied. Refresh the report after experiments, and keep reserved outcomes out until candidate selection is frozen.
+
+For a predeclared feature-removal plan, `study.py CAMPAIGN_DIRECTORY PLAN_JSON OUTPUT_JSON` matches only its named trials and verifies their frozen commits, protocol and effort. It compares complete repeated pairs by task; missing attempts do not become successes or zero-cost results. The task bootstrap is descriptive development evidence, not an automatic promotion rule. `analyze.py` also records whether initial maps, learned guides and final review appeared in the trace. It counts effective read limits, but cannot distinguish model-selected limits from host-injected defaults in historical traces. Preserve that uncertainty when attributing an outcome to a mechanism.
+
+The current [160-trial feature study](studies/feature-removal/README.md) includes its frozen order, task catalogs, qualification records and source patches for reconstructing the variants.
+
+### Per-response cost attribution
+
+`analyze.py` exports `actionUsage`: recorded assistant requests grouped by their chosen next action (navigation, structured edit, shell/check command, job polling/wait, mixed tools, other tool, or text). Mixed replies count once. Estimates use the campaign's fixed token prices, with missing cache counters explicitly counted; the gateway ledger remains the spending authority. These groups assign the **whole request**, including its existing input history, to the reply's action. They are not the marginal cost of executing a tool or an estimate of savings from removing it.
+
+The report reconciles attributed token/cost totals with the recorded request-usage breakdown. Missing or invalid receipts, and positive or negative differences, remain visible. Compaction or canceled requests are not silently allocated to a tool family. Raw arguments, source, commands and reasoning are excluded from the public export.
+
+The [background-retrieval oracle audit](studies/background-router-oracle/README.md) documents a reference test double coupled to one router lookup method. Original scores remain intact; a real-router diagnostic distinguishes the measured failure from an actual missing retrieval behavior.
+
+## Protocol 7: runtime artifact boundary
+
+Protocol 6 permitted the frozen runtime checkout to be read, including its published benchmark documents, study probes and test artifacts. Blocking the live LiteLLM checkout and private campaign references did not close that second route. Historical protocol-6 results retain that limitation; absence of a flagged access is not proof of isolation.
+
+Protocol 7 additionally denies reads of the runtime's `docs`, `tests`, `scripts` and Git pointer. Only the two workbench modules needed by the isolated solver (`solve.ts` and `budget.ts`) are allowed under `scripts`. Application source and dependencies remain readable; learned harness instructions are intentionally part of the architecture. Snapshot source/tests inside the run remain available. Real macOS checks cover direct reads, subprocesses, symlinks and attempted hardlinks, and preserve working Git status and permitted runtime imports. This remains an evaluation filesystem boundary with network access for inference, not a complete adversarial sandbox.
+
+The newly queued combined study had zero allocations when the gap was found. Its original plan is retained, and both arms received the same protocol-7 boundary before any paid attempt. Other frozen training studies retain protocol 6 for comparability and are labeled accordingly. The reserved chronological comparison must use protocol 7 or stronger.

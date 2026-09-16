@@ -1,0 +1,48 @@
+{
+  "createdAt": "2026-09-16T02:21:44.466969+00:00",
+  "protocol": 6,
+  "repetitions": 2,
+  "seed": 25160926,
+  "runs": [
+    {
+      "name": "decision-guide",
+      "commit": "3357bac238da7aca2fffd56c0b0a8708014937e2",
+      "dataset": "",
+      "case": "router-candidates",
+      "label": "replication-v25-decision-decision-guide-r1",
+      "effort": "medium"
+    },
+    {
+      "name": "control",
+      "commit": "a60c5d9556a69f8c795c514f81dfcda279fc3d7b",
+      "dataset": "",
+      "case": "router-candidates",
+      "label": "replication-v25-decision-control-r1",
+      "effort": "medium"
+    },
+    {
+      "name": "control",
+      "commit": "a60c5d9556a69f8c795c514f81dfcda279fc3d7b",
+      "dataset": "",
+      "case": "router-candidates",
+      "label": "replication-v25-decision-control-r2",
+      "effort": "medium"
+    },
+    {
+      "name": "decision-guide",
+      "commit": "3357bac238da7aca2fffd56c0b0a8708014937e2",
+      "dataset": "",
+      "case": "router-candidates",
+      "label": "replication-v25-decision-decision-guide-r2",
+      "effort": "medium"
+    }
+  ],
+  "hypothesis": "Use actual request selection rather than union-oriented listing/comments to validate candidate membership. Existing general precedence advice did not suffice in ten protocol-6 training attempts.",
+  "criterion": "Normal completion, original acceptance, and all five supplemental routing checks. Preserve original scores.",
+  "probe": "probe.py",
+  "supplemental": {
+    "artifact": "routing-probe.json",
+    "expectedChecks": 5
+  },
+  "selectionDataOnly": true
+}

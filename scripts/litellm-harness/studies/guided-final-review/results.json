@@ -1,0 +1,537 @@
+{
+  "status": "complete",
+  "note": "Development selection only. Interim observed-task means can change as slower trials finish. Bootstrap resamples tasks, not attempts; it does not correct adaptive candidate selection or establish future generalization. Token prices exclude requests without usage and do not replace the campaign ledger.",
+  "variants": [
+    {
+      "variant": "control",
+      "evaluated": 4,
+      "expected": 4,
+      "successes": 1,
+      "meanSeconds": 358.43025,
+      "tokenPricedUsd": 0.368698274,
+      "trialsWithoutTokenPrice": 0
+    },
+    {
+      "variant": "guided-review",
+      "evaluated": 4,
+      "expected": 4,
+      "successes": 1,
+      "meanSeconds": 391.2795,
+      "tokenPricedUsd": 0.6699970000000001,
+      "trialsWithoutTokenPrice": 0
+    }
+  ],
+  "comparisons": [
+    {
+      "variant": "guided-review",
+      "control": "control",
+      "pairedTasks": 2,
+      "expectedTasks": 2,
+      "complete": true,
+      "pairs": [
+        {
+          "dataset": "",
+          "case": "router-candidates",
+          "successDelta": 0,
+          "secondsDelta": 69.81450000000001
+        },
+        {
+          "dataset": "",
+          "case": "team-member-budget",
+          "successDelta": 0.0,
+          "secondsDelta": -4.1159999999999854
+        }
+      ],
+      "successDelta": 0.0,
+      "secondsDelta": 32.84925000000001,
+      "taskBootstrap95": [
+        0.0,
+        0.0
+      ]
+    }
+  ],
+  "trials": [
+    {
+      "dataset": "",
+      "case": "router-candidates",
+      "name": "guided-review",
+      "label": "replication-v27-review-guided-review-r2",
+      "commit": "39085680fcc0cb3807eeae69d888245c3adcab6c",
+      "effort": "medium",
+      "evaluated": true,
+      "success": false,
+      "completed": true,
+      "completionReason": "completed",
+      "seconds": 247.46,
+      "acceptance": {
+        "exit": 0,
+        "tests": 1,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0,
+        "passed": true
+      },
+      "computedUsd": 0.031596426000000004,
+      "activations": {
+        "initialMapNotices": 1,
+        "contextToolCalls": 1,
+        "guideIdsShown": [
+          "router-resolution-and-request-state"
+        ],
+        "unparsedContextPayloads": 1,
+        "finalReviewNotices": 1,
+        "guidedFinalReviewNotices": 1,
+        "finalReviewGuideIdsShown": [
+          "router-resolution-and-request-state"
+        ],
+        "batchedEditCalls": 0,
+        "completedBatchedEditCalls": 0,
+        "batchEditsRequested": 0,
+        "batchSizes": [],
+        "backgroundCommandNotices": 0,
+        "testFocusNotices": 1,
+        "explorationFocusNotices": 1,
+        "readCallsByEffectiveLimit": {
+          "130": 1,
+          "120": 2,
+          "110": 1,
+          "80": 1,
+          "160": 2,
+          "180": 2,
+          "70": 1,
+          "50": 1
+        },
+        "defaultWindowReadCalls": null,
+        "readLimitProvenance": "unknown: saved arguments include host-injected defaults"
+      },
+      "originalSuccess": true,
+      "supplemental": {
+        "artifact": "routing-probe-guarded.json",
+        "checks": 5,
+        "expectedChecks": 5,
+        "checksPassed": 3,
+        "exit": 0,
+        "passed": false
+      }
+    },
+    {
+      "dataset": "",
+      "case": "team-member-budget",
+      "name": "control",
+      "label": "replication-v27-review-control-r2",
+      "commit": "9e79372e3388e45b0dd85186238401f521425c96",
+      "effort": "medium",
+      "evaluated": true,
+      "success": false,
+      "completed": true,
+      "completionReason": "completed",
+      "seconds": 593.252,
+      "acceptance": {
+        "exit": 1,
+        "tests": 5,
+        "failures": 1,
+        "errors": 0,
+        "skipped": 0,
+        "passed": false
+      },
+      "computedUsd": 0.098213812,
+      "activations": {
+        "initialMapNotices": 1,
+        "contextToolCalls": 0,
+        "guideIdsShown": [
+          "budget-cache-reconciliation"
+        ],
+        "unparsedContextPayloads": 0,
+        "finalReviewNotices": 1,
+        "guidedFinalReviewNotices": 0,
+        "finalReviewGuideIdsShown": [],
+        "batchedEditCalls": 0,
+        "completedBatchedEditCalls": 0,
+        "batchEditsRequested": 0,
+        "batchSizes": [],
+        "backgroundCommandNotices": 0,
+        "testFocusNotices": 1,
+        "explorationFocusNotices": 1,
+        "readCallsByEffectiveLimit": {
+          "120": 7,
+          "160": 1,
+          "320": 1,
+          "360": 1,
+          "220": 3,
+          "400": 1,
+          "240": 2,
+          "300": 2,
+          "330": 1,
+          "102": 1,
+          "130": 1,
+          "140": 1,
+          "70": 2,
+          "145": 1,
+          "230": 1,
+          "60": 1,
+          "12": 1,
+          "16": 1,
+          "14": 1
+        },
+        "defaultWindowReadCalls": null,
+        "readLimitProvenance": "unknown: saved arguments include host-injected defaults"
+      }
+    },
+    {
+      "dataset": "",
+      "case": "router-candidates",
+      "name": "control",
+      "label": "replication-v27-review-control-r1",
+      "commit": "9e79372e3388e45b0dd85186238401f521425c96",
+      "effort": "medium",
+      "evaluated": true,
+      "success": false,
+      "completed": true,
+      "completionReason": "completed",
+      "seconds": 177.257,
+      "acceptance": {
+        "exit": 0,
+        "tests": 1,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0,
+        "passed": true
+      },
+      "computedUsd": 0.02196967,
+      "activations": {
+        "initialMapNotices": 1,
+        "contextToolCalls": 0,
+        "guideIdsShown": [
+          "router-resolution-and-request-state"
+        ],
+        "unparsedContextPayloads": 0,
+        "finalReviewNotices": 1,
+        "guidedFinalReviewNotices": 0,
+        "finalReviewGuideIdsShown": [],
+        "batchedEditCalls": 0,
+        "completedBatchedEditCalls": 0,
+        "batchEditsRequested": 0,
+        "batchSizes": [],
+        "backgroundCommandNotices": 0,
+        "testFocusNotices": 1,
+        "explorationFocusNotices": 0,
+        "readCallsByEffectiveLimit": {
+          "120": 3,
+          "160": 1,
+          "80": 2,
+          "150": 1,
+          "40": 1,
+          "90": 1,
+          "30": 1,
+          "45": 3,
+          "28": 1
+        },
+        "defaultWindowReadCalls": null,
+        "readLimitProvenance": "unknown: saved arguments include host-injected defaults"
+      },
+      "originalSuccess": true,
+      "supplemental": {
+        "artifact": "routing-probe-guarded.json",
+        "checks": 5,
+        "expectedChecks": 5,
+        "checksPassed": 3,
+        "exit": 0,
+        "passed": false
+      }
+    },
+    {
+      "dataset": "",
+      "case": "router-candidates",
+      "name": "guided-review",
+      "label": "replication-v27-review-guided-review-r1",
+      "commit": "39085680fcc0cb3807eeae69d888245c3adcab6c",
+      "effort": "medium",
+      "evaluated": true,
+      "success": false,
+      "completed": true,
+      "completionReason": "completed",
+      "seconds": 196.556,
+      "acceptance": {
+        "exit": 0,
+        "tests": 1,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0,
+        "passed": true
+      },
+      "computedUsd": 0.040660471999999996,
+      "activations": {
+        "initialMapNotices": 1,
+        "contextToolCalls": 0,
+        "guideIdsShown": [
+          "router-resolution-and-request-state"
+        ],
+        "unparsedContextPayloads": 0,
+        "finalReviewNotices": 1,
+        "guidedFinalReviewNotices": 0,
+        "finalReviewGuideIdsShown": [],
+        "batchedEditCalls": 0,
+        "completedBatchedEditCalls": 0,
+        "batchEditsRequested": 0,
+        "batchSizes": [],
+        "backgroundCommandNotices": 0,
+        "testFocusNotices": 1,
+        "explorationFocusNotices": 1,
+        "readCallsByEffectiveLimit": {
+          "160": 3,
+          "180": 3,
+          "80": 3,
+          "200": 1,
+          "60": 1,
+          "70": 1,
+          "130": 1
+        },
+        "defaultWindowReadCalls": null,
+        "readLimitProvenance": "unknown: saved arguments include host-injected defaults"
+      },
+      "originalSuccess": true,
+      "supplemental": {
+        "artifact": "routing-probe-guarded.json",
+        "checks": 5,
+        "expectedChecks": 5,
+        "checksPassed": 3,
+        "exit": 0,
+        "passed": false
+      }
+    },
+    {
+      "dataset": "",
+      "case": "team-member-budget",
+      "name": "guided-review",
+      "label": "replication-v27-review-guided-review-r2",
+      "commit": "39085680fcc0cb3807eeae69d888245c3adcab6c",
+      "effort": "medium",
+      "evaluated": true,
+      "success": true,
+      "completed": true,
+      "completionReason": "completed",
+      "seconds": 482.499,
+      "acceptance": {
+        "exit": 0,
+        "tests": 5,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0,
+        "passed": true
+      },
+      "computedUsd": 0.243683546,
+      "activations": {
+        "initialMapNotices": 1,
+        "contextToolCalls": 1,
+        "guideIdsShown": [
+          "budget-cache-reconciliation"
+        ],
+        "unparsedContextPayloads": 1,
+        "finalReviewNotices": 1,
+        "guidedFinalReviewNotices": 1,
+        "finalReviewGuideIdsShown": [
+          "budget-cache-reconciliation"
+        ],
+        "batchedEditCalls": 0,
+        "completedBatchedEditCalls": 0,
+        "batchEditsRequested": 0,
+        "batchSizes": [],
+        "backgroundCommandNotices": 0,
+        "testFocusNotices": 0,
+        "explorationFocusNotices": 1,
+        "readCallsByEffectiveLimit": {
+          "160": 5,
+          "90": 1,
+          "120": 5,
+          "40": 1,
+          "180": 1,
+          "80": 2,
+          "140": 2,
+          "60": 2,
+          "210": 1,
+          "55": 2,
+          "100": 2,
+          "30": 1,
+          "130": 2,
+          "62": 1,
+          "75": 1,
+          "45": 1
+        },
+        "defaultWindowReadCalls": null,
+        "readLimitProvenance": "unknown: saved arguments include host-injected defaults"
+      }
+    },
+    {
+      "dataset": "",
+      "case": "team-member-budget",
+      "name": "guided-review",
+      "label": "replication-v27-review-guided-review-r1",
+      "commit": "39085680fcc0cb3807eeae69d888245c3adcab6c",
+      "effort": "medium",
+      "evaluated": true,
+      "success": false,
+      "completed": true,
+      "completionReason": "completed",
+      "seconds": 638.603,
+      "acceptance": {
+        "exit": 1,
+        "tests": 5,
+        "failures": 1,
+        "errors": 0,
+        "skipped": 0,
+        "passed": false
+      },
+      "computedUsd": 0.354056556,
+      "activations": {
+        "initialMapNotices": 1,
+        "contextToolCalls": 0,
+        "guideIdsShown": [
+          "budget-cache-reconciliation"
+        ],
+        "unparsedContextPayloads": 0,
+        "finalReviewNotices": 1,
+        "guidedFinalReviewNotices": 0,
+        "finalReviewGuideIdsShown": [],
+        "batchedEditCalls": 0,
+        "completedBatchedEditCalls": 0,
+        "batchEditsRequested": 0,
+        "batchSizes": [],
+        "backgroundCommandNotices": 0,
+        "testFocusNotices": 0,
+        "explorationFocusNotices": 1,
+        "readCallsByEffectiveLimit": {
+          "140": 4,
+          "120": 3,
+          "160": 1,
+          "200": 1,
+          "130": 3,
+          "70": 4,
+          "80": 1,
+          "90": 2,
+          "36": 1,
+          "40": 1,
+          "180": 2,
+          "85": 1,
+          "60": 1,
+          "45": 3
+        },
+        "defaultWindowReadCalls": null,
+        "readLimitProvenance": "unknown: saved arguments include host-injected defaults"
+      }
+    },
+    {
+      "dataset": "",
+      "case": "router-candidates",
+      "name": "control",
+      "label": "replication-v27-review-control-r2",
+      "commit": "9e79372e3388e45b0dd85186238401f521425c96",
+      "effort": "medium",
+      "evaluated": true,
+      "success": false,
+      "completed": true,
+      "completionReason": "completed",
+      "seconds": 127.13,
+      "acceptance": {
+        "exit": 0,
+        "tests": 1,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0,
+        "passed": true
+      },
+      "computedUsd": 0.014549612,
+      "activations": {
+        "initialMapNotices": 1,
+        "contextToolCalls": 1,
+        "guideIdsShown": [
+          "router-resolution-and-request-state"
+        ],
+        "unparsedContextPayloads": 1,
+        "finalReviewNotices": 1,
+        "guidedFinalReviewNotices": 0,
+        "finalReviewGuideIdsShown": [],
+        "batchedEditCalls": 0,
+        "completedBatchedEditCalls": 0,
+        "batchEditsRequested": 0,
+        "batchSizes": [],
+        "backgroundCommandNotices": 0,
+        "testFocusNotices": 0,
+        "explorationFocusNotices": 1,
+        "readCallsByEffectiveLimit": {
+          "28": 1
+        },
+        "defaultWindowReadCalls": null,
+        "readLimitProvenance": "unknown: saved arguments include host-injected defaults"
+      },
+      "originalSuccess": true,
+      "supplemental": {
+        "artifact": "routing-probe-guarded.json",
+        "checks": 5,
+        "expectedChecks": 5,
+        "checksPassed": 3,
+        "exit": 0,
+        "passed": false
+      }
+    },
+    {
+      "dataset": "",
+      "case": "team-member-budget",
+      "name": "control",
+      "label": "replication-v27-review-control-r1",
+      "commit": "9e79372e3388e45b0dd85186238401f521425c96",
+      "effort": "medium",
+      "evaluated": true,
+      "success": true,
+      "completed": true,
+      "completionReason": "completed",
+      "seconds": 536.082,
+      "acceptance": {
+        "exit": 0,
+        "tests": 5,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0,
+        "passed": true
+      },
+      "computedUsd": 0.23396518,
+      "activations": {
+        "initialMapNotices": 1,
+        "contextToolCalls": 2,
+        "guideIdsShown": [
+          "budget-cache-reconciliation"
+        ],
+        "unparsedContextPayloads": 0,
+        "finalReviewNotices": 1,
+        "guidedFinalReviewNotices": 0,
+        "finalReviewGuideIdsShown": [],
+        "batchedEditCalls": 0,
+        "completedBatchedEditCalls": 0,
+        "batchEditsRequested": 0,
+        "batchSizes": [],
+        "backgroundCommandNotices": 0,
+        "testFocusNotices": 1,
+        "explorationFocusNotices": 1,
+        "readCallsByEffectiveLimit": {
+          "120": 5,
+          "160": 5,
+          "200": 2,
+          "130": 2,
+          "300": 1,
+          "220": 1,
+          "230": 1,
+          "245": 1,
+          "180": 5,
+          "90": 2,
+          "70": 3,
+          "140": 1,
+          "40": 1,
+          "110": 1,
+          "55": 1,
+          "50": 1
+        },
+        "defaultWindowReadCalls": null,
+        "readLimitProvenance": "unknown: saved arguments include host-injected defaults"
+      }
+    }
+  ]
+}

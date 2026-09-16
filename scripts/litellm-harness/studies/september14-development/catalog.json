@@ -1,0 +1,234 @@
+[
+  {
+    "id": "health-read-failure",
+    "split": "dev",
+    "revision": "d1fc231545d31566b8a2a2f11901ff335836c832",
+    "prompt": "A failed latest-health database read is currently treated as an empty table, so background health saving writes every model on every cycle. Skip all writes for that cycle and report the failure; later cycles may retry. Keep decorative latest-health reads tolerant of database failures. Preserve normal empty-table saves, changed-status saves, hourly refresh, and explicit manual health checks.",
+    "source_pr": "https://github.com/BerriAI/litellm/pull/41145",
+    "exclude_test_names": [
+      "test_query_all_raises_when_the_query_fails_instead_of_reading_as_an_empty_table",
+      "test_save_background_health_checks_to_db",
+      "test_save_background_health_checks_to_db_returns_false_when_a_write_fails",
+      "test_save_background_health_checks_to_db_exception_handling"
+    ],
+    "oracle_note": "Select the actual failed-read write regression, whose existing fixture binds real PrismaClient methods. Exclude the new query helper and three old tests whose modified MagicMock seams require the new query path."
+  },
+  {
+    "id": "prompt-security-queued",
+    "split": "dev",
+    "revision": "99245f93231649cbb30dc7abfb0b9ffac987baec",
+    "prompt": "Prompt Security file sanitization can return status created before in progress. Poll through both queued statuses until done or the existing timeout. Preserve fail-open timeout behavior, fail-closed HTTP 408, and blocking HTTP 400. Failed, missing, or unknown terminal statuses must still raise HTTP 500 even when fail-open is enabled.",
+    "source_pr": "https://github.com/BerriAI/litellm/pull/41131",
+    "exclude_test_names": [],
+    "oracle_note": "Existing entrypoint behavior selected before any solver allocation. Reference tests may still have implementation or diagnostic coupling; qualification is necessary, not proof of completeness."
+  },
+  {
+    "id": "proxy-call-id-header",
+    "split": "dev",
+    "revision": "9cbd2394884189c32ea88daebd1d9283fac50cb4",
+    "prompt": "Proxy responses such as moderations can omit x-litellm-call-id when their handler does not explicitly pass a call ID. Shared response-header assembly should resolve the ID in this order: explicit call_id, response hidden metadata litellm_call_id, request data litellm_call_id. Preserve existing filtering and explicit-ID precedence for all handlers using this assembly.",
+    "source_pr": "https://github.com/BerriAI/litellm/pull/41056",
+    "exclude_test_names": [],
+    "oracle_note": "Existing entrypoint behavior selected before any solver allocation. Reference tests may still have implementation or diagnostic coupling; qualification is necessary, not proof of completeness."
+  },
+  {
+    "id": "forwarded-http-headers",
+    "split": "dev",
+    "revision": "de55e22899eca90d2b5c0c5a5311fe8741030371",
+    "prompt": "With EXPERIMENTAL_OPENAI_BASE_LLM_HTTP_HANDLER enabled, forwarded request headers leak into the OpenAI JSON body as extra_headers and the provider rejects bridged Responses requests. Keep forwarded headers in the actual HTTP headers and out of JSON for both streaming and normal chat-backed Responses calls. Preserve ordinary SDK client header forwarding and existing provider parameters.",
+    "source_pr": "https://github.com/BerriAI/litellm/pull/41141",
+    "exclude_test_names": [],
+    "oracle_note": "Existing entrypoint behavior selected before any solver allocation. Reference tests may still have implementation or diagnostic coupling; qualification is necessary, not proof of completeness."
+  },
+  {
+    "id": "internal-param-filter",
+    "split": "dev",
+    "revision": "1f46e584947fb259dc7272c996c2bbe4d2e09305",
+    "prompt": "Internal LiteLLM parameters forwarded by bridges can leak into provider extra_body, including model_alias_map. Ensure keys produced by the internal get_litellm_params builder are recognized as LiteLLM options and excluded by get_non_default_completion_params. Preserve drop_params handling and real provider-specific parameters.",
+    "source_pr": "https://github.com/BerriAI/litellm/pull/41018",
+    "exclude_test_names": [],
+    "oracle_note": "Existing entrypoint behavior selected before any solver allocation. Reference tests may still have implementation or diagnostic coupling; qualification is necessary, not proof of completeness."
+  },
+  {
+    "id": "team-organization-models",
+    "split": "dev",
+    "revision": "7b6d2231052791eee316150e658805daa2198554",
+    "prompt": "Implement the backend portion only: /team/info should return team_info.organization_models with the parent organization model allowlist so team managers can configure team access without calling /organization/info. Proxy admins, admins of the team, and admins of that organization may see it. Ordinary members and team keys get null. No organization also gives null; preserve an empty list or all-proxy-models sentinel as configured. Keep membership authorization and other team details intact. No UI changes are requested.",
+    "source_pr": "https://github.com/BerriAI/litellm/pull/40196",
+    "exclude_test_names": [],
+    "oracle_note": "Backend-only subset of a larger UI/backend PR; no frontend quality claim. Calls team_info directly with database boundaries mocked."
+  },
+  {
+    "id": "team-cooldown-alternatives",
+    "split": "dev",
+    "revision": "e7662778462c5170caacb919263a61c09924eacf",
+    "prompt": "A team model may have several eligible deployments with different internal model_name values. A 429 should cool down the failing deployment when another routable deployment exists for the same team_id and team_public_model_name. Preserve the last-usable-deployment exemption: blocked siblings, other teams, other public names, and missing deployments do not count as alternatives. Keep ordinary model-group and routing-group behavior.",
+    "source_pr": "https://github.com/BerriAI/litellm/pull/40991",
+    "exclude_test_names": [
+      "test_team_model_has_alternatives"
+    ],
+    "oracle_note": "Exclude the newly named team_model_has_alternatives helper; retain existing cooldown entrypoint behavior."
+  },
+  {
+    "id": "realtime-parallel-release",
+    "split": "dev",
+    "revision": "3e417fa6e0b2ba8a4d2c028b90f5ef1bfb727bc9",
+    "prompt": "Realtime sessions leak max_parallel_requests slots when they disconnect, fail or are cancelled after acquisition but before LLM callbacks are enqueued. Release the held slot on those exits, including pre-call rejection and cancellation. Once a success or failure logging callback owns release, do not also release from the endpoint. Preserve cost reservation settlement. Bedrock realtime relay must finish when either direction finishes, even if the client disconnects normally while provider output remains open.",
+    "source_pr": "https://github.com/BerriAI/litellm/pull/41113",
+    "exclude_test_names": [
+      "test_refused_session_stamps_the_failure_ownership_marker",
+      "test_success_dispatch_stamps_the_ownership_marker_only_when_spend_was_logged"
+    ],
+    "oracle_note": "Exclude direct new ownership-marker assertions. Remaining files/helpers still import new constants; collection/attribute errors may disqualify this case. Do not silently add those constants to the base."
+  },
+  {
+    "id": "capability-backfill",
+    "split": "dev",
+    "revision": "c6e4c5582d11b7434c7d296604bc4f2ebb21da9e",
+    "prompt": "Allow fallback capability generalization rules to opt into filling missing fields on exact model-cost entries through fill_missing_for_providers, a list of allowed provider names. Existing exact values always win, provider/routing identity must not change, unflagged rules do not backfill, and backfill is limited to chat/responses modes. Enable appropriate OpenAI reasoning baseline backfill only for openai/azure/azure_ai and Claude thinking capabilities only for supported Anthropic hosts (anthropic, azure_ai, bedrock, bedrock_converse, vertex_ai-anthropic). Do not broadly backfill wandb or Claude numeric limits/always-on-thinking. Treat claude-opus-41 as an undelimited version rather than major 41.",
+    "source_pr": "https://github.com/BerriAI/litellm/pull/41093",
+    "exclude_test_names": [
+      "test_fill_missing_requires_per_rule_opt_in",
+      "test_shipped_wandb_rule_does_not_fill_missing_mapped_entries",
+      "test_shipped_openai_reasoning_rule_matches_only_openai",
+      "test_shipped_claude_thinking_rules_backfill_only_anthropic"
+    ],
+    "oracle_note": "Exclude direct new helper assertions. The test module still imports the added helper and may fail collection; retain that invalid reason. Include the root cost-map JSON in the reference patch.",
+    "reference_paths": [
+      "litellm",
+      "enterprise",
+      "model_prices_and_context_window.json"
+    ]
+  },
+  {
+    "id": "organization-own-memberships",
+    "split": "dev",
+    "revision": "4123b4bc2b203a2e0c3ef1610c80eab44a423739",
+    "prompt": "Organization admins listing their own teams must see memberships in other organizations. For /team/list with their own user_id, return all their member teams. For /v2/team/list with no user_id or their own user_id, return the union of teams in their administered organizations and all their own member teams. Resolve own memberships from the database rather than a stale user cache; preserve filtering, search and counts, and surface database failures. Queries for another user remain limited to administered organizations; the bare v1 admin listing remains organization scoped.",
+    "source_pr": "https://github.com/BerriAI/litellm/pull/41086",
+    "exclude_test_names": [
+      "test_list_team_v2_org_admin_sees_org_teams",
+      "test_list_team_v2_org_admin_own_user_id_sees_all_org_teams"
+    ],
+    "oracle_note": "Exclude exact database-query-shape assertions; retain behavior under a predicate-evaluating database fake and an existing authorization entrypoint. Remaining tests assert existing database lookup arguments."
+  },
+  {
+    "id": "session-read-and-statusline",
+    "split": "dev",
+    "revision": "2cad7a49af3c893e6cb57982ea4185da6f5de8c5",
+    "prompt": "A key restricted to llm_api_routes should be allowed to GET exactly /auto_router/session, while other methods, neighboring routes, benchmark routes, and unrelated scopes keep existing access restrictions. Do not classify the session endpoint as an LLM inference route. In the Claude status line, once an assistant response exists, prefer the session record last_model over transcript aliases for the routed-model label, honoring discovered display names. Keep transcript fallback when no session record exists, existing cost display, and Codex behavior.",
+    "source_pr": "https://github.com/BerriAI/litellm/pull/41116",
+    "exclude_test_names": [],
+    "oracle_note": "Existing entrypoint behavior selected before any solver allocation. Reference tests may still have implementation or diagnostic coupling; qualification is necessary, not proof of completeness."
+  },
+  {
+    "id": "login-credentials-hint",
+    "split": "dev",
+    "revision": "161ae2f3b4962b7b355716447c3f6e4412e9124e",
+    "prompt": "Hide the default-credentials hint on UI discovery, the legacy login page, and fallback login whenever UI_PASSWORD is a nonempty string. A username alone or an empty password should not hide the hint. Existing LITELLM_HIDE_DEFAULT_CREDENTIALS_HINT and general_settings.hide_default_credentials_hint settings continue to hide it. Preserve login form inputs and other UI configuration.",
+    "source_pr": "https://github.com/BerriAI/litellm/pull/41107",
+    "exclude_test_names": [],
+    "oracle_note": "Existing entrypoint behavior selected before any solver allocation. Reference tests may still have implementation or diagnostic coupling; qualification is necessary, not proof of completeness.",
+    "fixture_plugins": [
+      "tests.test_litellm.proxy.proxy_server.conftest"
+    ]
+  },
+  {
+    "id": "async-success-once",
+    "split": "dev",
+    "revision": "ab09abc3c887684328158a3e103928b38fe4cc07",
+    "prompt": "Normal acompletion can submit the synchronous success logging handler twice, duplicating CustomLogger.logging_hook calls and racing shared logging state. Make the synchronous success path run once per async completion while preserving asynchronous success callbacks, existing response metadata, streaming behavior, and legacy sync callbacks.",
+    "source_pr": "https://github.com/BerriAI/litellm/pull/41115",
+    "exclude_test_names": [],
+    "oracle_note": "Existing entrypoint behavior selected before any solver allocation. Reference tests may still have implementation or diagnostic coupling; qualification is necessary, not proof of completeness."
+  },
+  {
+    "id": "prometheus-rate-limit-provider",
+    "split": "dev",
+    "revision": "34fe9f71d561f3cd86238b5a2fe7cd8a32127ae8",
+    "prompt": "Pre-call rpm/tpm/budget failures for router aliases can report api_provider=None in Prometheus because no deployment is attached yet. Fall back to the provider resolved on a RateLimitError when request data has no usable provider. Explicit request/deployment provider wins. Ignore the proxy placeholder when no provider was resolved. Preserve metric names and label schemas.",
+    "source_pr": "https://github.com/BerriAI/litellm/pull/41059",
+    "exclude_test_names": [],
+    "oracle_note": "Existing entrypoint behavior selected before any solver allocation. Reference tests may still have implementation or diagnostic coupling; qualification is necessary, not proof of completeness."
+  },
+  {
+    "id": "access-log-path-filter",
+    "split": "dev",
+    "revision": "b94b8bca211e366328bcee3acd57d859fd35e52c",
+    "prompt": "Make LITELLM_DISABLE_ACCESS_LOG_PATHS work for uvicorn.access records. Parse comma-separated exact paths with surrounding whitespace ignored; compare the request path without its query string. Do not use substring or prefix matching. Unset/empty configuration preserves every line, nonstandard log records remain safe, runtime environment changes are honored, and the filtering survives JSON logger configuration while preserving existing redaction.",
+    "source_pr": "https://github.com/BerriAI/litellm/pull/41096",
+    "exclude_test_names": [
+      "test_access_log_path_filter_keeps_a_record_without_a_string_path_arg"
+    ],
+    "oracle_note": "Exclude direct new filter-class assertion; the file-level new class import may still disqualify collection. Do not repair after solver outcomes."
+  },
+  {
+    "id": "all-deployments-cooldown",
+    "split": "dev",
+    "revision": "f67cc62032609faa8ae714e38f884ec841c0a133",
+    "prompt": "Distinguish a router 429 caused by every candidate being cooled down from a partial-cooldown or otherwise-unavailable case. The all-cooled-down error should expose type all_deployments_in_cooldown, a true all_deployments_in_cooldown flag, and the message All deployments for selected model are in cooldown; partial cooldown retains rate_limit_error with a false flag. Preserve the existing no-deployments message prefix and retry-after information through proxy exception handling. Cover sync, async, and pass-through selection; pass-through considers only use_in_pass_through candidates.",
+    "source_pr": "https://github.com/BerriAI/litellm/pull/40995",
+    "exclude_test_names": [
+      "test_handle_llm_api_exception_names_cooldown_when_every_deployment_is_cooled_down",
+      "test_handle_llm_api_exception_keeps_rate_limit_type_when_cooldown_is_partial"
+    ],
+    "oracle_note": "Exclude proxy tests requiring a new constructor argument. The prompt explicitly states inspectable error flags/type/message required by remaining existing Router-entrypoint tests; enum member naming remains a noted coupling risk."
+  },
+  {
+    "id": "mapped-error-response-headers",
+    "split": "dev",
+    "revision": "7c55c4ba7d7beee93dfa2f0cc33c83cadc7da7a7",
+    "prompt": "Mapped provider exceptions may have a synthetic empty HTTP response while their real provider headers are stored on litellm_response_headers. Preserve those provider headers in proxy error responses when ordinary response headers are absent. Use the same existing prefix and safety filtering as other provider response headers, preserve real response-header precedence, and keep the original status, message, and retry information.",
+    "source_pr": "https://github.com/BerriAI/litellm/pull/40925",
+    "exclude_test_names": [],
+    "oracle_note": "Existing entrypoint behavior selected before any solver allocation. Reference tests may still have implementation or diagnostic coupling; qualification is necessary, not proof of completeness."
+  },
+  {
+    "id": "file-extension-allowlist",
+    "split": "dev",
+    "revision": "d541792b30b3b281bbc2ccdc1b1dc5ebb6983558",
+    "prompt": "Add general_settings.allowed_file_extensions to /v1/files uploads for every purpose. Unset means no allowlist; an empty list rejects all uploads. Compare filename suffixes and configured extensions case-insensitively, reject extensionless files when configured, and reject before forwarding. Enforce the allowlist before the existing blocklist, then still enforce the blocklist. Return the existing OpenAI-style HTTP 400 invalid_request_error with param file and a message naming the rejecting setting. Support database configuration, preserving YAML precedence and the distinction between unset and empty.",
+    "source_pr": "https://github.com/BerriAI/litellm/pull/41106",
+    "exclude_test_names": [
+      "test_allowed_extension_passes",
+      "test_extension_outside_allowlist_rejected",
+      "test_allowed_extension_match_is_case_insensitive_for_upload",
+      "test_allowed_extension_match_is_case_insensitive_for_configured_value",
+      "test_no_extension_rejected_when_allowlist_set",
+      "test_empty_allowlist_rejects_everything",
+      "test_unset_allowlist_skips_check",
+      "test_coerce_str_list_setting_keeps_unset_and_empty_distinct"
+    ],
+    "oracle_note": "Exclude new helper/value-object unit tests; retain actual upload endpoint behavior and existing configuration update behavior."
+  },
+  {
+    "id": "openinference-message-budget",
+    "split": "dev",
+    "revision": "cae4a655454a05750098c459a27a01f18f4c4a29",
+    "prompt": "Long conversations cause OpenInference per-message attributes to evict model, token, cost, and other core telemetry from spans under the default 128-attribute OTel limit. Bound indexed message attributes across prompt and response together (16 attributes / 8 role-and-content message pairs), reserving at least half the message slots for responses when needed. For prompts retain index 0 and the most recent turns under original indices. Keep short conversations fully indexed and full conversation JSON in input.value/output.value and gen_ai message fields, subject to the normal value-length limit. The core must fit alongside all enabled mapper vocabularies and existing tool attributes.",
+    "source_pr": "https://github.com/BerriAI/litellm/pull/40562",
+    "exclude_test_names": [],
+    "oracle_note": "Module imports new message-budget constant and checks exact allocation. Public prompt states numeric budget, but collection may still disqualify rather than test behavior."
+  },
+  {
+    "id": "correlation-logging-cost",
+    "split": "dev",
+    "revision": "08a78a39826759c26a8e08b853d52af75ecbfc1d",
+    "prompt": "When request_correlation_in_logs is disabled, creating a Logging object should skip trace/session context stamping and its sanitization/redaction cost. When enabled, preserve normal trace/session stamping and restoration across streaming completion, close, cancellation and task boundaries. Restore previously captured, already-sanitized context values without sanitizing them again; do not clobber a newer active call.",
+    "source_pr": "https://github.com/BerriAI/litellm/pull/41054",
+    "exclude_test_names": [],
+    "oracle_note": "Existing entrypoint behavior selected before any solver allocation. Reference tests may still have implementation or diagnostic coupling; qualification is necessary, not proof of completeness."
+  },
+  {
+    "id": "issuer-virtual-key-policy",
+    "split": "dev",
+    "revision": "9e1ed40db3376dc8e7b9392aa104653ca22d3fdb",
+    "prompt": "Allow each JWT issuer configuration to override virtual_key_claim_field and unregistered_jwt_client_behavior. Use the already-validated issuer claim to select overrides; missing overrides fall back to global settings. Enter virtual-key mapping even when only an issuer configures the claim field. A cached proxy-admin sentinel written under auto_register must not bypass a different current issuer reject policy. Preserve existing shared claim-name/value mapping keys, team-mapping fallback, and single-issuer behavior.",
+    "source_pr": "https://github.com/BerriAI/litellm/pull/40927",
+    "exclude_test_names": [
+      "test_a_jwt_issuer_can_override_the_virtual_key_claim_field_while_other_issuers_keep_the_global_one",
+      "test_virtual_key_mapping_counts_as_configured_when_any_issuer_sets_the_claim_field"
+    ],
+    "oracle_note": "Exclude newly named configuration helper tests. Existing auth resolution and builder behavior remain; tests inspect existing shared cache/database keys."
+  }
+]

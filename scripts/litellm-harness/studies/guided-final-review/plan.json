@@ -1,0 +1,97 @@
+{
+  "createdAt": "2026-09-16T03:11:12.658331+00:00",
+  "protocol": 6,
+  "repetitions": 2,
+  "control": "control",
+  "seed": 27160927,
+  "runs": [
+    {
+      "dataset": "",
+      "case": "router-candidates",
+      "name": "guided-review",
+      "label": "replication-v27-review-guided-review-r2",
+      "commit": "39085680fcc0cb3807eeae69d888245c3adcab6c",
+      "effort": "medium",
+      "supplemental": {
+        "artifact": "routing-probe-guarded.json",
+        "expectedChecks": 5
+      }
+    },
+    {
+      "dataset": "",
+      "case": "team-member-budget",
+      "name": "control",
+      "label": "replication-v27-review-control-r2",
+      "commit": "9e79372e3388e45b0dd85186238401f521425c96",
+      "effort": "medium"
+    },
+    {
+      "dataset": "",
+      "case": "router-candidates",
+      "name": "control",
+      "label": "replication-v27-review-control-r1",
+      "commit": "9e79372e3388e45b0dd85186238401f521425c96",
+      "effort": "medium",
+      "supplemental": {
+        "artifact": "routing-probe-guarded.json",
+        "expectedChecks": 5
+      }
+    },
+    {
+      "dataset": "",
+      "case": "router-candidates",
+      "name": "guided-review",
+      "label": "replication-v27-review-guided-review-r1",
+      "commit": "39085680fcc0cb3807eeae69d888245c3adcab6c",
+      "effort": "medium",
+      "supplemental": {
+        "artifact": "routing-probe-guarded.json",
+        "expectedChecks": 5
+      }
+    },
+    {
+      "dataset": "",
+      "case": "team-member-budget",
+      "name": "guided-review",
+      "label": "replication-v27-review-guided-review-r2",
+      "commit": "39085680fcc0cb3807eeae69d888245c3adcab6c",
+      "effort": "medium"
+    },
+    {
+      "dataset": "",
+      "case": "team-member-budget",
+      "name": "guided-review",
+      "label": "replication-v27-review-guided-review-r1",
+      "commit": "39085680fcc0cb3807eeae69d888245c3adcab6c",
+      "effort": "medium"
+    },
+    {
+      "dataset": "",
+      "case": "router-candidates",
+      "name": "control",
+      "label": "replication-v27-review-control-r2",
+      "commit": "9e79372e3388e45b0dd85186238401f521425c96",
+      "effort": "medium",
+      "supplemental": {
+        "artifact": "routing-probe-guarded.json",
+        "expectedChecks": 5
+      }
+    },
+    {
+      "dataset": "",
+      "case": "team-member-budget",
+      "name": "control",
+      "label": "replication-v27-review-control-r1",
+      "commit": "9e79372e3388e45b0dd85186238401f521425c96",
+      "effort": "medium"
+    }
+  ],
+  "hypothesis": "Repeating only task-matched lessons for changed source at final review addresses observed neglect of earlier guidance, and elicits discriminating checks rather than another broad test pass.",
+  "selectionDataOnly": true,
+  "successNote": "Normal completion plus original acceptance. Router also requires all five existing supplemental checks with asserted snapshot imports. Guidance comes from previously observed training failures; not held-out evidence.",
+  "execution": {
+    "timeoutSeconds": 900,
+    "sharedSolverConcurrency": 3
+  },
+  "activationNote": "Inspect guidedFinalReviewNotices and finalReviewGuideIdsShown. Production harness stays v26 until this study is assessed."
+}

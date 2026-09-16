@@ -1,0 +1,11 @@
+{
+  "createdAt": "2026-09-16T08:38:50.298981+00:00",
+  "priorProtocol": 6,
+  "protocol": 7,
+  "oldAllocatedTrials": 0,
+  "reason": "Runtime benchmark artifacts were readable under protocol 6. Preserve the original plan, freeze the same stronger isolation in both arms before any allocation, and require actual Flash and Astra smoke passes. Tasks, order, labels, effort, timeout and supplemental requirements unchanged.",
+  "commits": {
+    "control": "b06f9fd2c25f03382f26b6d8a5dbbe38a53ae8ea",
+    "combined": "3737757ecf1d2652cbf60a0abc49f4568e668adb"
+  }
+}

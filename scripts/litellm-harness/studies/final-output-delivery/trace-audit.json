@@ -1,0 +1,137 @@
+{
+  "at": "2026-09-16T08:50:20.533921+00:00",
+  "scope": "Completed protocol6/7 development attempts only. Latest recorded tool before the reminder must be a successful bash_output containing a final status. This observes at least one final output already delivered; it does not prove all pending jobs were read or assign causal dollars.",
+  "runsWithReminders": 11,
+  "completionReminders": 12,
+  "remindersImmediatelyAfterFinalOutputTool": 8,
+  "rows": [
+    {
+      "dataset": "original",
+      "run": "replication-repair-focused-v17-medium-r1-router-strategy-isolation-7b1adc51",
+      "protocol": 6,
+      "completionReminders": 1,
+      "remindersImmediatelyAfterFinalOutputTool": 0,
+      "reads": []
+    },
+    {
+      "dataset": "original",
+      "run": "replication-v27-review-guided-review-r2-team-member-budget-af1f9bac",
+      "protocol": 6,
+      "completionReminders": 1,
+      "remindersImmediatelyAfterFinalOutputTool": 1,
+      "reads": [
+        {
+          "job": "job-31",
+          "statusLine": "Status: exited (code 0) after 12s."
+        }
+      ]
+    },
+    {
+      "dataset": "original",
+      "run": "replication-p6-ablation-no-review-r1-vertex-version-path-97d8d33a",
+      "protocol": 6,
+      "completionReminders": 1,
+      "remindersImmediatelyAfterFinalOutputTool": 1,
+      "reads": [
+        {
+          "job": "job-13",
+          "statusLine": "Status: exited (code 0) after 3s."
+        }
+      ]
+    },
+    {
+      "dataset": "original",
+      "run": "replication-v24-test-activity-r2-router-strategy-isolation-63017a65",
+      "protocol": 6,
+      "completionReminders": 2,
+      "remindersImmediatelyAfterFinalOutputTool": 1,
+      "reads": [
+        {
+          "job": "job-17",
+          "statusLine": "Status: exited (code 0) after 3s."
+        }
+      ]
+    },
+    {
+      "dataset": "training2",
+      "run": "replication-v22-effort-medium-r1-mcp-auth-challenge-d31836db",
+      "protocol": 6,
+      "completionReminders": 1,
+      "remindersImmediatelyAfterFinalOutputTool": 1,
+      "reads": [
+        {
+          "job": "job-23",
+          "statusLine": "Status: exited (code 0) after 10s."
+        }
+      ]
+    },
+    {
+      "dataset": "training2",
+      "run": "replication-v24-test-activity-r2-mcp-auth-challenge-22185b8b",
+      "protocol": 6,
+      "completionReminders": 1,
+      "remindersImmediatelyAfterFinalOutputTool": 1,
+      "reads": [
+        {
+          "job": "job-21",
+          "statusLine": "Status: exited (code 0) after 10s."
+        }
+      ]
+    },
+    {
+      "dataset": "training2",
+      "run": "replication-v19-wait-r2-mcp-auth-challenge-93ccf1b6",
+      "protocol": 6,
+      "completionReminders": 1,
+      "remindersImmediatelyAfterFinalOutputTool": 0,
+      "reads": []
+    },
+    {
+      "dataset": "training2",
+      "run": "replication-p6-ablation-no-guides-r1-langfuse-session-traces-90c5eed2",
+      "protocol": 6,
+      "completionReminders": 1,
+      "remindersImmediatelyAfterFinalOutputTool": 0,
+      "reads": []
+    },
+    {
+      "dataset": "training2",
+      "run": "replication-p6-ablation-no-guides-r1-bedrock-session-tags-6586c24e",
+      "protocol": 6,
+      "completionReminders": 1,
+      "remindersImmediatelyAfterFinalOutputTool": 1,
+      "reads": [
+        {
+          "job": "job-55",
+          "statusLine": "Status: exited (code 0) after 2s."
+        }
+      ]
+    },
+    {
+      "dataset": "training5",
+      "run": "replication-v29-edits-batched-edits-r1-aws-signing-off-loop-93269ed1",
+      "protocol": 6,
+      "completionReminders": 1,
+      "remindersImmediatelyAfterFinalOutputTool": 1,
+      "reads": [
+        {
+          "job": "job-43",
+          "statusLine": "Status: exited (code 0) after 4s."
+        }
+      ]
+    },
+    {
+      "dataset": "training5",
+      "run": "replication-v29-edits-batched-edits-r2-oom1-background-responses-pipeline-d25104ed",
+      "protocol": 6,
+      "completionReminders": 1,
+      "remindersImmediatelyAfterFinalOutputTool": 1,
+      "reads": [
+        {
+          "job": "job-65",
+          "statusLine": "Status: exited (code 0) after 13s."
+        }
+      ]
+    }
+  ]
+}

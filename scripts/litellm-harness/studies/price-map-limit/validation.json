@@ -1,0 +1,49 @@
+{
+  "status": "passed",
+  "realPriceMaps": [
+    {
+      "path": "model_prices_and_context_window.json",
+      "bytes": 2395003,
+      "beforeSha256": "51282f775bc43cd0e1e116e335574eae7a022be31610724ed3d889161be22eb5",
+      "afterSha256": "bd3b6c3350d3183bb41877b01969862c1bc88fda98a4d3651039ec759cc99c9f"
+    },
+    {
+      "path": "litellm/model_prices_and_context_window_backup.json",
+      "bytes": 2395003,
+      "beforeSha256": "51282f775bc43cd0e1e116e335574eae7a022be31610724ed3d889161be22eb5",
+      "afterSha256": "bd3b6c3350d3183bb41877b01969862c1bc88fda98a4d3651039ec759cc99c9f"
+    }
+  ],
+  "structuredEditAndSealMilliseconds": 434,
+  "undoRedoMilliseconds": 1279,
+  "exactUndo": true,
+  "exactRedo": true,
+  "privateCopiesOnly": true,
+  "harnessVersion": "52",
+  "parentCommit": "25fed72",
+  "litellmBaseCommit": "9e1ed40db3376dc8e7b9392aa104653ca22d3fdb",
+  "triggerRun": "replication-v50-larger-flash-r1-realtime-cached-audio-cost-f4875007",
+  "triggerToolSequence": 65,
+  "beforeRegressionResults": {
+    "failures": 3,
+    "tests": [
+      "price-map edit/history round-trip",
+      "bounded exact-path allowance",
+      "large price-map snapshot capture"
+    ]
+  },
+  "validation": {
+    "focusedTestsPassed": 127,
+    "fullTestsPassed": 2140,
+    "fullTestsSkipped": 1,
+    "typecheck": "passed",
+    "build": "passed"
+  },
+  "sourceHashes": {
+    "shared/source-file-limits.ts": "bdcc3cee8c7eefd493afaec60e3e4d1e18ec32f2ff11d872b2670ffb8bf0f42f",
+    "server/tools.ts": "9e9d47c7b7ee7896b88ca153d45e89b53d3853172e1c5a992814871708b09a47",
+    "server/history.ts": "217ee162eb15f6184e5363235234af8d1f65b438d9dcb118e8178f33bb016d9b",
+    "server/workspace-snapshot.ts": "a3a596c76376c61d65e5d1926e9be599ea6d287dd8f54e7247337fb357cabad9"
+  },
+  "scope": "Deterministic host capability correction. No paid end-to-end quality improvement is inferred; frozen trials keep their original runtime and scores."
+}

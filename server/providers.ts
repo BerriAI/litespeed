@@ -213,6 +213,8 @@ function usage(value: any): Usage {
     inputTokens: value.prompt_tokens ?? value.input_tokens ?? 0,
     outputTokens: value.completion_tokens ?? value.output_tokens ?? 0,
     cachedTokens: value.prompt_tokens_details?.cached_tokens ?? value.input_tokens_details?.cached_tokens ?? value.cache_read_input_tokens,
+    // LiteLLM can report dollar cost in final usage; missing/invalid stays unknown.
+    ...(typeof value.cost === 'number' && Number.isFinite(value.cost) && value.cost >= 0 ? { cost: value.cost } : {}),
   };
 }
 async function* chatStream(response: Response, signal: AbortSignal, scope: { providerId: string; model: string }, requireCompleteText = false): AsyncGenerator<StreamChunk> {
@@ -317,6 +319,7 @@ async function* anthropicStream(response: Response, signal: AbortSignal, scope: 
     if (type === 'error') throw streamError(chunk);
     if (type === 'message_start' && chunk.message?.usage) {
       tokens = usage(chunk.message.usage);
+      delete tokens.cost; // Opening usage cannot report the completed response cost.
       // Anthropic's input_tokens excludes cache writes and hits; normalize total input.
       tokens.inputTokens += (chunk.message.usage.cache_read_input_tokens || 0) + (chunk.message.usage.cache_creation_input_tokens || 0);
     }
@@ -342,6 +345,10 @@ async function* anthropicStream(response: Response, signal: AbortSignal, scope: 
     if (type === 'message_delta') {
       if (chunk.delta?.stop_reason) stopReason = chunk.delta.stop_reason;
       if (chunk.usage?.output_tokens !== undefined) tokens.outputTokens = chunk.usage.output_tokens;
+      if (chunk.usage) {
+        const cost = usage(chunk.usage).cost;
+        if (cost === undefined) delete tokens.cost; else tokens.cost = cost;
+      }
       if (chunk.delta?.stop_reason === 'max_tokens') {
         yield { type: 'usage', usage: tokens };
         throw new ProviderError(`The model reached its output limit (max_tokens: ${maxOutputTokens}). No partial tool calls were executed. Increase LITESPEED_ANTHROPIC_MAX_TOKENS (or the explicit request output limit) within the model's supported range, or split large file writes into smaller calls.`, { code: 'output_limit_exceeded' });

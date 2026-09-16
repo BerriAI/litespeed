@@ -1,0 +1,32 @@
+{
+  "at": "2026-09-16T08:52:46.800599+00:00",
+  "version": "2026-09-16.45",
+  "base": "b83fc8f4b2ad963a912ca0ee22f680b85a9c648e",
+  "reproductionBefore": {
+    "failed": 2,
+    "observedRequests": 5,
+    "expectedRequests": 4,
+    "scope": "Read-only yielded command, explicit wait and final output read; Single model and LiteLLM architecture."
+  },
+  "focused": {
+    "passed": 65,
+    "covers": [
+      "actual process exit and final output delivery",
+      "running/partial output retains reminder",
+      "wait-only and direct registry read retain reminder",
+      "closing command history and whole-turn Undo",
+      "changed LiteLLM turns retain final review"
+    ]
+  },
+  "fullSuite": {
+    "passed": 2136,
+    "skipped": 1,
+    "failed": 0,
+    "maxWorkers": 2
+  },
+  "typecheck": "passed",
+  "build": "passed",
+  "qualityClaim": "None; no paid-trial improvement claimed.",
+  "browser": "Existing actual architecture/model persistence and Plan navigation pass",
+  "terminal": "Actual PTY picker, saved model, Plan and narrow layout pass"
+}

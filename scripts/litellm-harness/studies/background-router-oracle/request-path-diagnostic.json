@@ -1,0 +1,73 @@
+{
+  "scope": "Additional posthoc training diagnostic; raw acceptance and completion status unchanged.",
+  "changesFromOriginalTest": "Use a real Router and populate the Request test double with a concrete GET /v1/responses/{id} ASGI scope and URL. Original retrieval entrypoint and assertions retained.",
+  "probeSha256": "1defe615b39ee23fa7a1b0127083add853517781d1132eb542ac4efe75c2080a",
+  "results": [
+    {
+      "name": "base",
+      "exit": 1,
+      "tests": 1,
+      "failures": 1,
+      "errors": 0,
+      "skipped": 0,
+      "passed": false
+    },
+    {
+      "name": "reference",
+      "exit": 0,
+      "tests": 1,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "passed": true
+    },
+    {
+      "name": "replication-v29-edits-batched-edits-r1-background-responses-pipeline-3080a797",
+      "exit": 0,
+      "tests": 1,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "passed": true
+    },
+    {
+      "name": "replication-v24-features-high-r1-background-responses-pipeline-4c64c9b6",
+      "exit": 0,
+      "tests": 1,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "passed": true
+    },
+    {
+      "name": "replication-v24-features-medium-r1-background-responses-pipeline-17f57e85",
+      "exit": 0,
+      "tests": 1,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "passed": true
+    },
+    {
+      "name": "replication-v29-edits-control-r1-background-responses-pipeline-8c4360a4",
+      "exit": 0,
+      "tests": 1,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "passed": true,
+      "packageOriginsAsserted": true
+    },
+    {
+      "name": "replication-v29-edits-batched-edits-r2-oom1-background-responses-pipeline-d25104ed",
+      "scope": "Posthoc real Router plus concrete request-path diagnostic. Original 6/7 result retained.",
+      "exit": 1,
+      "tests": 1,
+      "failures": 1,
+      "errors": 0,
+      "skipped": 0,
+      "packageOriginsAsserted": true,
+      "passed": false
+    }
+  ]
+}

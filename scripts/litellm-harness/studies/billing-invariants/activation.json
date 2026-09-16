@@ -1,0 +1,27 @@
+{
+  "control": {
+    "query": "Realtime cached audio input is overbilled because the nested cached_tokens_details split is lost. Preserve optional text/audio/image cached-token details through realtime and Responses usage normalization and conversion back to Responses usage. Combine the nested split across response.done events, including when only some events supply it, without mutating input usage. Omit the optional nested key from serialized usage when no split was supplied; preserve existing cache-write fields and their absence.\n\nUse cache_read_input_audio_token_cost for cached audio, falling back to cache_read_input_token_cost when the audio rate is absent. Expose that audio rate through model-info lookups and the token-cost breakdown, and make the breakdown agree with input billing. Remove cached tokens from the corresponding full-rate text/audio/image buckets without going negative; cap the nested allocation at the aggregate cached count. Preserve existing billing when nested details are absent, along with exi",
+    "playbooks": [],
+    "bytes": 8842,
+    "withinInitialNoteBudget": true
+  },
+  "candidate": {
+    "query": "Realtime cached audio input is overbilled because the nested cached_tokens_details split is lost. Preserve optional text/audio/image cached-token details through realtime and Responses usage normalization and conversion back to Responses usage. Combine the nested split across response.done events, including when only some events supply it, without mutating input usage. Omit the optional nested key from serialized usage when no split was supplied; preserve existing cache-write fields and their absence.\n\nUse cache_read_input_audio_token_cost for cached audio, falling back to cache_read_input_token_cost when the audio rate is absent. Expose that audio rate through model-info lookups and the token-cost breakdown, and make the breakdown agree with input billing. Remove cached tokens from the corresponding full-rate text/audio/image buckets without going negative; cap the nested allocation at the aggregate cached count. Preserve existing billing when nested details are absent, along with exi",
+    "playbooks": [
+      {
+        "id": "billing-token-bucket-conservation",
+        "paths": [
+          "litellm/litellm_core_utils/llm_cost_calc/utils.py",
+          "litellm/cost_calculator.py"
+        ],
+        "lessons": [
+          "A nested modality split changes how cache reads are allocated; it must not bypass the existing budget for uncached input. Trace generic_cost_per_token through parsing and _calculate_input_cost, then the reported token-cost breakdown. After subtracting cache reads and cache writes from aggregate input, full-rate modality buckets must fit the remaining budget. Count every token once; cache-creation tokens must not also receive the ordinary input charge.",
+          "For a changed cache/modality path, check one mixed case with nonzero cache writes, not only the new example and isolated old cache-write tests. Use the current task\u2019s rates and existing public billing entrypoints. Distinguish an absent audio-cache rate from explicit zero, and compare total and breakdown amounts. Keep the no-nested-split path, tier/region/custom-price behavior and caller-owned input intact. This is a review hypothesis, not a requirement to add unrelated behavior or rerun a broad suite."
+        ],
+        "provenance": "Learned from training/development fixes. Verify against this checkout and the current user request; this is a debugging guide, not evidence that the bug is present."
+      }
+    ],
+    "bytes": 10231,
+    "withinInitialNoteBudget": true
+  }
+}

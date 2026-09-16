@@ -1,0 +1,23 @@
+{
+  "generatedAt": "2026-09-16T22:19:50.599891+00:00",
+  "phase": "medium",
+  "outcomes": [
+    {
+      "name": "generic",
+      "complete": false,
+      "finish": "length",
+      "completionTokens": 8192,
+      "characters": 0,
+      "costUsd": 0.0073262200000000005
+    },
+    {
+      "name": "conservation",
+      "complete": false,
+      "finish": "length",
+      "completionTokens": 8192,
+      "characters": 0,
+      "costUsd": 0.007340370000000001
+    }
+  ],
+  "interpretation": "Both responses finish at the8192-token limit with empty final content. No finding or correctness result can be credited; private reasoning is not published."
+}

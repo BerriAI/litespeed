@@ -1,0 +1,28 @@
+{
+  "createdAt": "2026-09-16T08:34:08.507776+00:00",
+  "protocol": 7,
+  "purpose": "Qualify the stricter runtime artifact boundary on one known small training task for both actual solver routes before the combined or chronological comparison. Not a quality comparison.",
+  "globalConcurrency": 3,
+  "repetitions": 1,
+  "control": "flash",
+  "runs": [
+    {
+      "dataset": "",
+      "case": "converse-config",
+      "name": "flash",
+      "kind": "litellm-specific",
+      "effort": "medium",
+      "label": "replication-protocol7-smoke-flash",
+      "commit": "b06f9fd2c25f03382f26b6d8a5dbbe38a53ae8ea"
+    },
+    {
+      "dataset": "",
+      "case": "converse-config",
+      "name": "astra",
+      "kind": "codex",
+      "effort": "high",
+      "label": "replication-protocol7-smoke-astra",
+      "commit": "b06f9fd2c25f03382f26b6d8a5dbbe38a53ae8ea"
+    }
+  ]
+}

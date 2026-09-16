@@ -1,0 +1,111 @@
+diff --git a/scripts/litellm-harness/studies/navigation-query/audit.mts b/scripts/litellm-harness/studies/navigation-query/audit.mts
+index 7a1b12d..a82041d 100644
+--- a/scripts/litellm-harness/studies/navigation-query/audit.mts
++++ b/scripts/litellm-harness/studies/navigation-query/audit.mts
+@@ -9,11 +9,11 @@ const inputs:Input[]=JSON.parse(await readFile(new URL('./inputs.json',import.me
+ const rows=[];
+ for(const input of inputs){
+  const start=performance.now();
+- const result:{matches?:Match[];symbols?:Match[];references?:Match[];playbooks?:{paths?:string[]}[];symbolScan?:unknown}=JSON.parse(await litellmContext(resolve(root,input.dataset,'cases',input.case,'base'),{query:input.query},new AbortController().signal));
+- const pathMatches=result.matches??[],symbols=result.symbols??[],references=result.references??[],playbooks=result.playbooks??[];
+- const evidencePaths=[...new Set([...pathMatches,...symbols,...references].map(x=>x.path))];
++ const result:{identifierDefinitions?:Match[];matches?:Match[];symbols?:Match[];references?:Match[];playbooks?:{paths?:string[]}[];symbolScan?:unknown}=JSON.parse(await litellmContext(resolve(root,input.dataset,'cases',input.case,'base'),{query:input.query},new AbortController().signal));
++ const identifiers=result.identifierDefinitions??[],pathMatches=result.matches??[],symbols=result.symbols??[],references=result.references??[],playbooks=result.playbooks??[];
++ const evidencePaths=[...new Set([...pathMatches,...symbols,...references,...identifiers].map(x=>x.path))];
+  const guidePaths=[...new Set(playbooks.flatMap(x=>x.paths??[]))];
+- const testPaths=[...new Set([...pathMatches,...symbols].flatMap(x=>x.tests??[]))];
++ const testPaths=[...new Set([...pathMatches,...symbols,...identifiers].flatMap(x=>x.tests??[]))];
+  const row={dataset:input.dataset,case:input.case,harnessVersion:LITELLM_HARNESS_VERSION,elapsedMs:performance.now()-start,expectedSourcePaths:input.expectedSourcePaths,sourcePathsShown:evidencePaths,sourceHits:input.expectedSourcePaths.filter(p=>evidencePaths.includes(p)),sourceHitsIncludingGuides:input.expectedSourcePaths.filter(p=>evidencePaths.includes(p)||guidePaths.includes(p)),expectedTestPaths:input.expectedTestPaths,testPathsShown:testPaths,testHits:input.expectedTestPaths.filter(p=>testPaths.includes(p)),symbolScan:result.symbolScan,outputCharacters:JSON.stringify(result).length};
+  rows.push(row);console.log(JSON.stringify({case:row.case,sourceHits:row.sourceHits.length,expectedSources:row.expectedSourcePaths.length,withGuides:row.sourceHitsIncludingGuides.length,testHits:row.testHits.length,expectedTests:row.expectedTestPaths.length,elapsedMs:row.elapsedMs}));
+  await writeFile(process.argv[3],JSON.stringify({createdAt:new Date().toISOString(),scope:'Read-only descriptive training retrieval audit against human-reference changed source and selected test paths. These are not exhaustive required files; alternative fixes can be correct. Task prompts and reference paths were already available during development. No solver quality conclusion.',rows},null,2));
+diff --git a/server/litellm-harness.ts b/server/litellm-harness.ts
+index d58e71d..31f3f0b 100644
+--- a/server/litellm-harness.ts
++++ b/server/litellm-harness.ts
+@@ -4,7 +4,7 @@ import path from 'node:path';
+ import fg from 'fast-glob';
+ import type { ToolDefinition } from '../shared/types.js';
+ 
+-export const LITELLM_HARNESS_VERSION='2026-09-15.34';
++export const LITELLM_HARNESS_VERSION='2026-09-16.40';
+ export const litellmContextTool:ToolDefinition={type:'function',function:{name:'litellm_context',description:'Navigate the current LiteLLM checkout. Give a task query to find relevant definitions, inline conditions and existing tests. Give a source path to see its symbol outline and test partners; add a symbol name to read that definition with numbered lines, or callers to find functions invoking a named helper in that file. Reads only this workspace, never Git history or remote answers.',parameters:{type:'object',properties:{query:{type:'string',maxLength:1000},path:{type:'string',maxLength:500},symbol:{type:'string',maxLength:200},callers:{type:'string',maxLength:200,description:'Python helper name whose call sites and enclosing functions to find; requires path.'}},additionalProperties:false}}};
+ 
+ const playbooks = [
+@@ -173,7 +173,7 @@ function routingReturnSites(text:string){
+   });
+ }
+ 
+-async function matchingSymbols(workspace:string,files:string[],tokens:string[],signal:AbortSignal){
++async function matchingSymbols(workspace:string,files:string[],tokens:string[],signal:AbortSignal,identifiers:string[]=[]){
+   const proxy=tokens.some(t=>/(?:^|_)(budget|auth|team|member|spend|redis|guardrail|proxy)/.test(t));
+   const router=tokens.some(t=>/(?:^|_)(router|deployment|retry|fallback|routing|tags?)/.test(t));
+   const providers=[...new Set(files.flatMap(p=>p.startsWith('litellm/llms/')?[p.split('/')[2]]:[]))].filter(provider=>tokens.some(t=>t===provider||provider.startsWith(t+'_')));
+@@ -192,13 +192,17 @@ async function matchingSymbols(workspace:string,files:string[],tokens:string[],s
+   // router or provider area gets a turn. Keep the overall limit, interleave roots.
+   for(let row=0;row<Math.max(...buckets.map(bucket=>bucket.length));row++)for(const bucket of buckets)if(bucket[row]&&!seen.has(bucket[row])){seen.add(bucket[row]);candidates.push(bucket[row]);}
+   const matches:{path:string;name:string;line:number;score:number}[]=[];
++  const identifierDefinitions:{path:string;name:string;line:number;rank:number}[]=[];
+   const references:{path:string;line:number;preview:string;score:number}[]=[];
+   let bytes=0,scanned=0;
+   for(let offset=0;offset<Math.min(candidates.length,800)&&bytes<64*1024*1024;offset+=8){
+     signal.throwIfAborted();
+     await Promise.all(candidates.slice(offset,Math.min(offset+8,800)).map(async file=>{
+       try{const text=await sourceFile(workspace,file);bytes+=Buffer.byteLength(text);scanned++;
+-        for(const symbol of outline(text)){const score=tokens.reduce((n,t)=>n+Number(symbol.name.toLowerCase().includes(t)),0);if(score)matches.push({path:file,name:symbol.name,line:symbol.line,score});}
++        for(const symbol of outline(text)){
++          const rank=identifiers.indexOf(symbol.name.toLowerCase());
++          if(rank>=0)identifierDefinitions.push({path:file,name:symbol.name,line:symbol.line,rank});
++          const score=tokens.reduce((n,t)=>n+Number(symbol.name.toLowerCase().includes(t)),0);if(score)matches.push({path:file,name:symbol.name,line:symbol.line,score});}
+         for(const [index,line] of text.split('\n').entries()){
+           const trimmed=line.trim(),lower=line.toLowerCase();
+           if(!trimmed||trimmed.startsWith('#')||/^(?:(?:async\s+)?def|class)\s/.test(trimmed))continue;
+@@ -212,7 +216,7 @@ async function matchingSymbols(workspace:string,files:string[],tokens:string[],s
+     }));
+   }
+   signal.throwIfAborted();
+-  return {matches:matches.sort((a,b)=>b.score-a.score||a.name.length-b.name.length||a.path.localeCompare(b.path)||a.line-b.line).slice(0,12),references:references.sort((a,b)=>b.score-a.score||a.path.localeCompare(b.path)||a.line-b.line).slice(0,12),roots,scanned,partial:scanned<candidates.length};
++  return {identifierDefinitions:identifierDefinitions.sort((a,b)=>a.rank-b.rank||a.path.localeCompare(b.path)||a.line-b.line).slice(0,8).map(({rank,...match})=>match),matches:matches.sort((a,b)=>b.score-a.score||a.name.length-b.name.length||a.path.localeCompare(b.path)||a.line-b.line).slice(0,12),references:references.sort((a,b)=>b.score-a.score||a.path.localeCompare(b.path)||a.line-b.line).slice(0,12),roots,scanned,partial:scanned<candidates.length};
+ }
+ export async function litellmContext(workspace:string,args:Record<string,unknown>,signal:AbortSignal):Promise<string>{
+   signal.throwIfAborted();
+@@ -250,7 +254,10 @@ export async function litellmContext(workspace:string,args:Record<string,unknown
+   const tokens=[...new Set(words(String(args.query??'')).flatMap(word=>[word,...(aliases[word]?[aliases[word]]:[])]))].slice(0,24);
+   const ui=/\b(ui|dashboard|frontend|react|component)\b/i.test(String(args.query??''));
+   const ranked=files.filter(p=>!p.startsWith('tests/')&&(ui||!p.startsWith('ui/'))).map(p=>({path:p,score:tokens.reduce((score,word)=>score+(p.toLowerCase().includes(word)?(p.split('/').includes(word)?5:2):0),0)})).filter(p=>p.score>0).sort((a,b)=>b.score-a.score||a.path.length-b.path.length||a.path.localeCompare(b.path)).slice(0,8);
+-  const symbols=tokens.length&&!ui?await matchingSymbols(workspace,files,tokens,signal):undefined;
++  // Preserve the ordinary scan and ranking. Explicit identifiers beyond the
++  // prose-token limit get a separate bounded lane within the same scanned files.
++  const identifiers=[...new Set((String(args.query??'').match(/\b[A-Za-z_][A-Za-z0-9_]*_[A-Za-z0-9_]+\b/g)??[]).map(name=>name.toLowerCase()))].slice(0,16);
++  const symbols=tokens.length&&!ui?await matchingSymbols(workspace,files,tokens,signal,identifiers):undefined;
+   let routingCallers:unknown,routingEntrypoints:unknown;
+   if(symbols?.roots.includes('litellm/router.py')&&files.includes('litellm/router.py')&&/(?:strateg|override|callback|account)/i.test(String(args.query??''))){
+     try{routingEntrypoints={path:'litellm/router.py',definitions:routingReturnSites(await sourceFile(workspace,'litellm/router.py')),note:'Syntactic return sites, including early returns. Check whether a proposed downstream wrapper is reached by every relevant entrypoint; routing methods can also be called directly. Nested definitions may be included.'};}catch{signal.throwIfAborted();}
+@@ -258,5 +265,5 @@ export async function litellmContext(workspace:string,args:Record<string,unknown
+   if(symbols?.roots.includes('litellm/router.py')&&files.includes('litellm/router.py')&&/(?:retr|fallback|tags?)/i.test(String(args.query??''))){
+     try{const routerText=await sourceFile(workspace,'litellm/router.py');routingCallers={path:'litellm/router.py',wrappers:['function_with_fallbacks','async_function_with_fallbacks'].map(name=>({name,...callSites(routerText,name)}))};}catch{signal.throwIfAborted();}
+   }
+-  return JSON.stringify({query:args.query??'',routingCallers,routingEntrypoints,playbooks:learnedContext(String(args.query??''),files),references:symbols?.references,symbols:symbols?.matches.map(s=>({...s,tests:partners(files,s.path).slice(0,2)})),symbolScan:symbols&&{roots:symbols.roots,files:symbols.scanned,partial:symbols.partial},matches:ranked.map(p=>({path:p.path,tests:partners(files,p.path).slice(0,3)})),hint:'Use path + symbol for a definition, path + query to filter a large outline, or grep within the relevant directory for an exact term. Ranked paths and symbols are navigation hints, not proof of the cause.'},null,2);
++  return JSON.stringify({query:args.query??'',identifierDefinitions:symbols?.identifierDefinitions.map(s=>({...s,tests:partners(files,s.path).slice(0,2)})),routingCallers,routingEntrypoints,playbooks:learnedContext(String(args.query??''),files),references:symbols?.references,symbols:symbols?.matches.map(s=>({...s,tests:partners(files,s.path).slice(0,2)})),symbolScan:symbols&&{roots:symbols.roots,files:symbols.scanned,partial:symbols.partial},matches:ranked.map(p=>({path:p.path,tests:partners(files,p.path).slice(0,3)})),hint:'Use path + symbol for a definition, path + query to filter a large outline, or grep within the relevant directory for an exact term. Ranked paths and symbols are navigation hints, not proof of the cause.'},null,2);
+ }
+diff --git a/tests/litellm-harness.test.ts b/tests/litellm-harness.test.ts
+index d7cfaaa..39937f8 100644
+--- a/tests/litellm-harness.test.ts
++++ b/tests/litellm-harness.test.ts
+@@ -90,6 +90,17 @@ describe('LiteLLM repository navigation',()=>{
+     expect(result.symbolScan.roots).toContain('litellm/llms/example/');
+     expect(result.symbolScan.roots).toContain('litellm/proxy/');
+   });
++  it('adds late exact definitions without displacing ordinary navigation',async()=>{
++    await put('litellm/proxy/late.py','def _late_definition(): pass\n');
++    await put('tests/test_litellm/proxy/test_late.py','def test_late(): pass\n');
++    const prefix='proxy '+Array.from({length:30},(_,i)=>'token'+i).join(' ');
++    const signal=new AbortController().signal;
++    const original=JSON.parse(await litellmContext(root,{query:prefix+' unavailable_definition'},signal));
++    const found=JSON.parse(await litellmContext(root,{query:prefix+' _late_definition'},signal));
++    expect(found.identifierDefinitions).toEqual([{path:'litellm/proxy/late.py',name:'_late_definition',line:1,tests:['tests/test_litellm/proxy/test_late.py']}]);
++    expect(original.identifierDefinitions).toEqual([]);
++    for(const field of ['matches','symbols','references','symbolScan','playbooks'])expect(found[field]).toEqual(original[field]);
++  });
+   it('recognizes area names inside Python symbols',async()=>{
+     await put('litellm/router.py','def get_available_deployment():\n    pass\n');
+     const result=JSON.parse(await litellmContext(root,{query:'get_available_deployment'},new AbortController().signal));

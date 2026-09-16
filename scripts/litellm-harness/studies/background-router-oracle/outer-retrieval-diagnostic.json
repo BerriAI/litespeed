@@ -1,0 +1,41 @@
+{
+  "scope": "Posthoc training diagnosis through the full request-processing entrypoint, stopped immediately before upstream dispatch. Original scores and completion unchanged. It verifies attachment timing after decoding and submission exclusion, not downstream policy execution or all untested conditions.",
+  "base": "08b60c409a0b556efb6bbe6470402a4530666870",
+  "reference": "3caa3b60d5a319efa78871198081783dd4c70ad1",
+  "referenceProductionPathsVerified": [
+    "litellm/proxy/common_request_processing.py",
+    "litellm/proxy/policy_engine/response_retrieval.py",
+    "litellm/proxy/utils.py"
+  ],
+  "probeSha256": "80dee9e868185bc2ce7ca0bde3b07bb4b2e3499c980941c8a775095935ed0cd6",
+  "results": [
+    {
+      "name": "base",
+      "exit": 1,
+      "tests": 2,
+      "failures": 1,
+      "errors": 0,
+      "skipped": 0,
+      "packageOriginsAsserted": true
+    },
+    {
+      "name": "reference",
+      "exit": 0,
+      "tests": 2,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "packageOriginsAsserted": true
+    },
+    {
+      "run": "replication-v29-edits-batched-edits-r2-oom1-background-responses-pipeline-d25104ed",
+      "scope": "Posthoc full processing entrypoint up to the provider boundary. Original acceptance unchanged.",
+      "exit": 0,
+      "tests": 2,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "packageOriginsAsserted": true
+    }
+  ]
+}

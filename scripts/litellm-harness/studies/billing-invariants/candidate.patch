@@ -1,0 +1,74 @@
+diff --git a/server/litellm-harness.ts b/server/litellm-harness.ts
+index 1db44d0..5c423b9 100644
+--- a/server/litellm-harness.ts
++++ b/server/litellm-harness.ts
+@@ -4,10 +4,19 @@ import path from 'node:path';
+ import fg from 'fast-glob';
+ import type { ToolDefinition } from '../shared/types.js';
+ 
+-export const LITELLM_HARNESS_VERSION='2026-09-16.52';
++export const LITELLM_HARNESS_VERSION='2026-09-16.55';
+ export const litellmContextTool:ToolDefinition={type:'function',function:{name:'litellm_context',description:'Navigate the current LiteLLM checkout. Give a task query to find relevant definitions, inline conditions and existing tests. Give a source path to see its symbol outline and test partners; add a symbol name to read that definition with numbered lines, or callers to find functions invoking a named helper in that file. Reads only this workspace, never Git history or remote answers.',parameters:{type:'object',properties:{query:{type:'string',maxLength:1000},path:{type:'string',maxLength:500},symbol:{type:'string',maxLength:200},callers:{type:'string',maxLength:200,description:'Python helper name whose call sites and enclosing functions to find; requires path.'}},additionalProperties:false}}};
+ 
+ const playbooks = [
++  {
++    id: 'billing-token-bucket-conservation',
++    matches: (query:string) => /(?:cost|pric|bill)/i.test(query) && /(?:token|audio|modality)/i.test(query) && /cach/i.test(query),
++    paths: ['litellm/litellm_core_utils/llm_cost_calc/utils.py', 'litellm/cost_calculator.py'],
++    lessons: [
++      'A nested modality split changes how cache reads are allocated; it must not bypass the existing budget for uncached input. Trace generic_cost_per_token through parsing and _calculate_input_cost, then the reported token-cost breakdown. After subtracting cache reads and cache writes from aggregate input, full-rate modality buckets must fit the remaining budget. Count every token once; cache-creation tokens must not also receive the ordinary input charge.',
++      'For a changed cache/modality path, check one mixed case with nonzero cache writes, not only the new example and isolated old cache-write tests. Use the current task’s rates and existing public billing entrypoints. Distinguish an absent audio-cache rate from explicit zero, and compare total and breakdown amounts. Keep the no-nested-split path, tier/region/custom-price behavior and caller-owned input intact. This is a review hypothesis, not a requirement to add unrelated behavior or rerun a broad suite.',
++    ],
++  },
+   {
+     id: 'langfuse-trace-session-precedence',
+     matches: (query:string) => /langfuse/i.test(query) && /(?:trace|session)/i.test(query),
+diff --git a/tests/litellm-harness-runner.test.ts b/tests/litellm-harness-runner.test.ts
+index ed364c7..3f35e1a 100644
+--- a/tests/litellm-harness-runner.test.ts
++++ b/tests/litellm-harness-runner.test.ts
+@@ -84,6 +84,21 @@ describe('LiteLLM-specific runner integration',()=>{
+     expect(reviews[0].content).toContain("Follow the user's scope and verification constraints");
+     expect(requests).toHaveLength(3);expect(store.session(session.id).status).toBe('idle');
+   });
++  it('delivers the billing lesson before the first specialized request and keeps Single model unchanged',async()=>{
++    const path='litellm/litellm_core_utils/llm_cost_calc/utils.py';
++    await mkdir(join(root,path,'..'),{recursive:true});await writeFile(join(root,path),'def generic_cost_per_token(): pass\n');
++    const prompt='Realtime cached audio input is overbilled; preserve existing cache-write behavior.';
++    const specialized=store.createSession({workspace:root,providerId:'test',model:'model',permissionMode:'auto',mode:'plan',architecture:{kind:'litellm-specific'}});
++    runner.start(specialized.id,prompt);await runner.whenIdle();
++    expect(requests).toHaveLength(1);
++    expect(JSON.stringify(requests[0].messages)).toContain('billing-token-bucket-conservation');
++    expect(JSON.stringify(requests[0].messages)).toContain('cache writes');
++    expect(store.messages(specialized.id).flatMap(message=>message.toolCalls??[])).toEqual([]);
++    requests=[];
++    const plain=store.createSession({workspace:root,providerId:'test',model:'model',permissionMode:'auto',mode:'plan'});
++    runner.start(plain.id,prompt);await runner.whenIdle();
++    expect(JSON.stringify(requests[0].messages)).not.toContain('billing-token-bucket-conservation');
++  });
+   it.each(['','LITELLM_LOCAL_MODEL_COST_MAP=True '])('reminds once after test activity with prefix %s without inventing a check verdict',async(prefix)=>{
+     await writeFile(join(root,'package.json'),JSON.stringify({scripts:{test:'node -e "process.exit(0)"'}}));
+     const session=store.createSession({workspace:root,providerId:'test',model:'model',permissionMode:'auto',architecture:{kind:'litellm-specific'}});
+diff --git a/tests/litellm-harness.test.ts b/tests/litellm-harness.test.ts
+index d7cfaaa..8deec92 100644
+--- a/tests/litellm-harness.test.ts
++++ b/tests/litellm-harness.test.ts
+@@ -70,6 +70,18 @@ describe('LiteLLM repository navigation',()=>{
+     expect(JSON.parse(await litellmContext(root,{query:'Langfuse trace session'},signal)).playbooks).toHaveLength(1);
+     expect(JSON.parse(await litellmContext(root,{query:'Langsmith trace session'},signal)).playbooks).toEqual([]);
+   });
++  it('scopes the token-bucket lesson to billing tasks and an existing billing implementation',async()=>{
++    const signal=new AbortController().signal, query='Realtime cached audio input is overbilled; preserve cache-write tokens.';
++    const cards=async(query:string)=>JSON.parse(await litellmContext(root,{query},signal)).playbooks;
++    expect(await cards(query)).toEqual([]);
++    await put('litellm/litellm_core_utils/llm_cost_calc/utils.py','def generic_cost_per_token(): pass\n');
++    const relevant=await cards(query);
++    expect(relevant.map((card:{id:string})=>card.id)).toContain('billing-token-bucket-conservation');
++    expect(relevant.find((card:{id:string})=>card.id==='billing-token-bucket-conservation').paths).toEqual(['litellm/litellm_core_utils/llm_cost_calc/utils.py']);
++    for(const unrelated of ['Cached responses have empty choices','Repair cached team budget reservations after Redis expires','Add a pricing column to the dashboard']){
++      expect((await cards(unrelated)).map((card:{id:string})=>card.id)).not.toContain('billing-token-bucket-conservation');
++    }
++  });
+   it('does not confuse credential identity selectors or empty guardrail text with routing and cached choices',async()=>{
+     await put('litellm/router.py','class Router: pass\n');
+     await put('litellm/litellm_core_utils/llm_response_utils/convert_dict_to_response.py','def convert(): pass\n');

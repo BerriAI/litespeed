@@ -1,0 +1,32 @@
+{
+  "createdAt": "2026-09-16T11:14:56.518660+00:00",
+  "purpose": "Explore a coverage gap: larger, multi-module development changes before the existing September15 reserved boundary. Metadata selected before reading new PR bodies, source patches, tests or model outcomes. No solver study declared yet.",
+  "rule": "First-parent origin/main changes dated September11 through September14 UTC, 5\u201312 production Python files under litellm/ or enterprise/, 1\u20136 Python test files, and450\u20132000 total changed lines across the commit. Select the six most recent qualifying commits by Git log order; preserve any qualification failures.",
+  "candidates": [
+    {
+      "sha": "6e9e08475ac37128f435ddc1d13347081637748a",
+      "date": "2026-09-14T10:50:00-07:00",
+      "title": "Merge pull request #40627 from BerriAI/litellm_fix_realtime_cached_audio_cost",
+      "lines": 545,
+      "hasBinaryDiff": false,
+      "production": [
+        "litellm/cost_calculator.py",
+        "litellm/litellm_core_utils/llm_cost_calc/utils.py",
+        "litellm/responses/litellm_completion_transformation/transformation.py",
+        "litellm/responses/utils.py",
+        "litellm/types/llms/base.py",
+        "litellm/types/llms/openai.py",
+        "litellm/types/utils.py",
+        "litellm/utils.py"
+      ],
+      "tests": [
+        "tests/test_litellm/litellm_core_utils/llm_cost_calc/test_llm_cost_calc_utils.py",
+        "tests/test_litellm/responses/litellm_completion_transformation/test_litellm_completion_responses.py",
+        "tests/test_litellm/responses/test_responses_utils.py",
+        "tests/test_litellm/test_cost_calculator.py",
+        "tests/test_litellm/test_utils.py"
+      ]
+    }
+  ],
+  "selectedAt": "2026-09-16T11:14:57.568568+00:00"
+}

@@ -1,0 +1,180 @@
+{
+  "base": {
+    "exit": 0,
+    "rows": [
+      {
+        "case": "unprefixed-global",
+        "expected": [
+          "global-wild"
+        ],
+        "candidates": [],
+        "selected": "global-wild",
+        "pass": false
+      },
+      {
+        "case": "direct-group",
+        "expected": [
+          "direct"
+        ],
+        "candidates": [
+          "direct"
+        ],
+        "selected": "direct",
+        "pass": true
+      },
+      {
+        "case": "global-before-team-wildcard",
+        "expected": [
+          "global-wild"
+        ],
+        "candidates": [],
+        "selected": "global-wild",
+        "pass": false
+      },
+      {
+        "case": "named-team-before-global",
+        "expected": [
+          "team-named"
+        ],
+        "candidates": [
+          "team-named"
+        ],
+        "selected": "team-named",
+        "pass": true
+      },
+      {
+        "case": "default",
+        "expected": [
+          "default"
+        ],
+        "candidates": [
+          "default"
+        ],
+        "selected": "default",
+        "pass": true
+      }
+    ]
+  },
+  "reference": {
+    "exit": 0,
+    "rows": [
+      {
+        "case": "unprefixed-global",
+        "expected": [
+          "global-wild"
+        ],
+        "candidates": [
+          "global-wild"
+        ],
+        "selected": "global-wild",
+        "pass": true
+      },
+      {
+        "case": "direct-group",
+        "expected": [
+          "direct"
+        ],
+        "candidates": [
+          "direct"
+        ],
+        "selected": "direct",
+        "pass": true
+      },
+      {
+        "case": "global-before-team-wildcard",
+        "expected": [
+          "global-wild"
+        ],
+        "candidates": [
+          "global-wild"
+        ],
+        "selected": "global-wild",
+        "pass": true
+      },
+      {
+        "case": "named-team-before-global",
+        "expected": [
+          "team-named"
+        ],
+        "candidates": [
+          "team-named"
+        ],
+        "selected": "team-named",
+        "pass": true
+      },
+      {
+        "case": "default",
+        "expected": [
+          "default"
+        ],
+        "candidates": [
+          "default"
+        ],
+        "selected": "default",
+        "pass": true
+      }
+    ]
+  },
+  "candidate": {
+    "exit": 0,
+    "rows": [
+      {
+        "case": "unprefixed-global",
+        "expected": [
+          "global-wild"
+        ],
+        "candidates": [
+          "global-wild"
+        ],
+        "selected": "global-wild",
+        "pass": true
+      },
+      {
+        "case": "direct-group",
+        "expected": [
+          "direct"
+        ],
+        "candidates": [
+          "direct"
+        ],
+        "selected": "direct",
+        "pass": true
+      },
+      {
+        "case": "global-before-team-wildcard",
+        "expected": [
+          "global-wild"
+        ],
+        "candidates": [
+          "global-wild",
+          "team-wild"
+        ],
+        "selected": "global-wild",
+        "pass": false
+      },
+      {
+        "case": "named-team-before-global",
+        "expected": [
+          "team-named"
+        ],
+        "candidates": [
+          "global-wild",
+          "team-named"
+        ],
+        "selected": "team-named",
+        "pass": false
+      },
+      {
+        "case": "default",
+        "expected": [
+          "default"
+        ],
+        "candidates": [
+          "default"
+        ],
+        "selected": "default",
+        "pass": true
+      }
+    ]
+  }
+}

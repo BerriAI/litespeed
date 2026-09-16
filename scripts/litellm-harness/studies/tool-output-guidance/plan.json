@@ -1,0 +1,145 @@
+{
+  "createdAt": "2026-09-16T11:51:00.105941+00:00",
+  "protocol": 7,
+  "model": "fireworks_ai/deepseek-v4p1-flash",
+  "control": "control",
+  "repetitions": 2,
+  "globalConcurrency": 3,
+  "timeoutSeconds": 900,
+  "seed": 51160926,
+  "stopNewTrialsAtCommittedUsd": 80,
+  "purpose": "Known-task development follow-up after the completed global output-retention instruction did not improve strict success. Test a shorter instruction on the actual bash tool description: run focused pytest --tb=short -q without output filters; use a log for large checks. No new tool, command rewrite, permission or execution behavior. Both arms share the v46 integration plus replay timeout configuration.",
+  "selectionRule": "Require complete repeated task pairs and normal correctness; separately audit actual outbound tool descriptions and literal pytest calls for filters/logging. Fewer filters is mechanism evidence, not causal quality or savings. Preserve known router-helper and legacy-inheritance wording limitations. Compared with v47, wording, location and runtime differ; this is not a location-only causal comparison. No reserved data is used.",
+  "versions": {
+    "control": {
+      "commit": "8e0a6d40d66f13f73f6174073836ff43919c4282",
+      "files": {
+        "server/litellm-harness.ts": "8b7ae14594798801f6003f6bc239c263b64efe087d11373ae7a069e5fad24a31",
+        "server/runner.ts": "c3a6cec38b247f0862f9fc05133eadf04ab03f42b8e01958d55dbe6d6ad119ae",
+        "server/tools.ts": "af76b826867e6607e952e900a14c6602910d1bb3d7adc0873ef859469d5a30e2",
+        "scripts/litellm-harness/run.ts": "356848d2cf168e45af67f53698f8012524b3794d57a88f6536ce7e8b81ba693f",
+        "scripts/litellm-harness/solve.ts": "3d56881002d5b84233b895a9c2bb90094a33bef5c2d5ec6c3fdff927788e0a73",
+        "package-lock.json": "b0615d83c0d9f21a68abacb97c16777dc1eb4f42daa2b5496da51f787d394e88"
+      }
+    },
+    "tool-guidance": {
+      "commit": "1a28eddc9bf49351adce778de140122f383ac028",
+      "files": {
+        "server/litellm-harness.ts": "cfdb6c5bedb6ae766bc1ba69b2cc5c10e6ab2335700ad3f1859d0827210778a0",
+        "server/runner.ts": "cf744cb3ef5ea5d1b8d09322a57e7f1f0646bc799140178d637462433142227a",
+        "server/tools.ts": "af76b826867e6607e952e900a14c6602910d1bb3d7adc0873ef859469d5a30e2",
+        "scripts/litellm-harness/run.ts": "356848d2cf168e45af67f53698f8012524b3794d57a88f6536ce7e8b81ba693f",
+        "scripts/litellm-harness/solve.ts": "3d56881002d5b84233b895a9c2bb90094a33bef5c2d5ec6c3fdff927788e0a73",
+        "package-lock.json": "b0615d83c0d9f21a68abacb97c16777dc1eb4f42daa2b5496da51f787d394e88"
+      }
+    }
+  },
+  "patchSha256": "1dc87653c6ddfd3cada83dbcaa7c0007b001990b575b7b7efcd8facce3a39776",
+  "supplementalSource": {
+    "path": "scripts/litellm-harness/studies/feature-effort/legacy-inheritance/real_stream_probe.py",
+    "sha256": "cefbc0b3d63bc05414f20b3357dc06a26e4b6eb30808f8636a820f46d3a86f7b"
+  },
+  "validation": {
+    "typecheck": "passed",
+    "focusedRunnerAndHarnessTests": 37,
+    "outboundToolSchemaTest": "passed for specialized and ordinary sessions; no mutation of ordinary tool definition"
+  },
+  "runs": [
+    {
+      "dataset": "",
+      "case": "router-strategy-isolation",
+      "name": "control",
+      "kind": "litellm-specific",
+      "label": "replication-v51-tool-output-control-r2",
+      "commit": "8e0a6d40d66f13f73f6174073836ff43919c4282",
+      "effort": "medium",
+      "timeoutSeconds": 900
+    },
+    {
+      "dataset": "",
+      "case": "router-strategy-isolation",
+      "name": "tool-guidance",
+      "kind": "litellm-specific",
+      "label": "replication-v51-tool-output-tool-guidance-r2",
+      "commit": "1a28eddc9bf49351adce778de140122f383ac028",
+      "effort": "medium",
+      "timeoutSeconds": 900
+    },
+    {
+      "dataset": "training5",
+      "case": "legacy-stream-pipeline",
+      "name": "tool-guidance",
+      "kind": "litellm-specific",
+      "label": "replication-v51-tool-output-tool-guidance-r1",
+      "commit": "1a28eddc9bf49351adce778de140122f383ac028",
+      "effort": "medium",
+      "timeoutSeconds": 900,
+      "supplemental": {
+        "artifact": "real-stream-probe.json",
+        "expectedChecks": 24
+      }
+    },
+    {
+      "dataset": "training5",
+      "case": "legacy-stream-pipeline",
+      "name": "control",
+      "kind": "litellm-specific",
+      "label": "replication-v51-tool-output-control-r2",
+      "commit": "8e0a6d40d66f13f73f6174073836ff43919c4282",
+      "effort": "medium",
+      "timeoutSeconds": 900,
+      "supplemental": {
+        "artifact": "real-stream-probe.json",
+        "expectedChecks": 24
+      }
+    },
+    {
+      "dataset": "training5",
+      "case": "legacy-stream-pipeline",
+      "name": "control",
+      "kind": "litellm-specific",
+      "label": "replication-v51-tool-output-control-r1",
+      "commit": "8e0a6d40d66f13f73f6174073836ff43919c4282",
+      "effort": "medium",
+      "timeoutSeconds": 900,
+      "supplemental": {
+        "artifact": "real-stream-probe.json",
+        "expectedChecks": 24
+      }
+    },
+    {
+      "dataset": "",
+      "case": "router-strategy-isolation",
+      "name": "control",
+      "kind": "litellm-specific",
+      "label": "replication-v51-tool-output-control-r1",
+      "commit": "8e0a6d40d66f13f73f6174073836ff43919c4282",
+      "effort": "medium",
+      "timeoutSeconds": 900
+    },
+    {
+      "dataset": "training5",
+      "case": "legacy-stream-pipeline",
+      "name": "tool-guidance",
+      "kind": "litellm-specific",
+      "label": "replication-v51-tool-output-tool-guidance-r2",
+      "commit": "1a28eddc9bf49351adce778de140122f383ac028",
+      "effort": "medium",
+      "timeoutSeconds": 900,
+      "supplemental": {
+        "artifact": "real-stream-probe.json",
+        "expectedChecks": 24
+      }
+    },
+    {
+      "dataset": "",
+      "case": "router-strategy-isolation",
+      "name": "tool-guidance",
+      "kind": "litellm-specific",
+      "label": "replication-v51-tool-output-tool-guidance-r1",
+      "commit": "1a28eddc9bf49351adce778de140122f383ac028",
+      "effort": "medium",
+      "timeoutSeconds": 900
+    }
+  ]
+}

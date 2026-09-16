@@ -1,0 +1,742 @@
+[
+  {
+    "run": "replication-p6-ablation-control-r1-router-candidates-976dd133",
+    "label": "replication-p6-ablation-control-r1",
+    "original": {
+      "exit": 0,
+      "tests": 1,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "passed": true
+    },
+    "seconds": 175.281,
+    "exit": 0,
+    "rows": [
+      {
+        "case": "unprefixed-global",
+        "expected": [
+          "global-wild"
+        ],
+        "candidates": [
+          "global-wild"
+        ],
+        "selected": "global-wild",
+        "pass": true
+      },
+      {
+        "case": "direct-group",
+        "expected": [
+          "direct"
+        ],
+        "candidates": [
+          "direct"
+        ],
+        "selected": "direct",
+        "pass": true
+      },
+      {
+        "case": "global-before-team-wildcard",
+        "expected": [
+          "global-wild"
+        ],
+        "candidates": [
+          "global-wild",
+          "team-wild"
+        ],
+        "selected": "global-wild",
+        "pass": false
+      },
+      {
+        "case": "named-team-before-global",
+        "expected": [
+          "team-named"
+        ],
+        "candidates": [
+          "global-wild",
+          "team-named"
+        ],
+        "selected": "team-named",
+        "pass": false
+      },
+      {
+        "case": "default",
+        "expected": [
+          "default"
+        ],
+        "candidates": [
+          "default"
+        ],
+        "selected": "default",
+        "pass": true
+      }
+    ],
+    "supplementalPassed": false
+  },
+  {
+    "run": "replication-p6-ablation-no-guides-r1-router-candidates-360f3ddd",
+    "label": "replication-p6-ablation-no-guides-r1",
+    "original": {
+      "exit": 0,
+      "tests": 1,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "passed": true
+    },
+    "seconds": 208.796,
+    "exit": 0,
+    "rows": [
+      {
+        "case": "unprefixed-global",
+        "expected": [
+          "global-wild"
+        ],
+        "candidates": [
+          "global-wild"
+        ],
+        "selected": "global-wild",
+        "pass": true
+      },
+      {
+        "case": "direct-group",
+        "expected": [
+          "direct"
+        ],
+        "candidates": [
+          "direct"
+        ],
+        "selected": "direct",
+        "pass": true
+      },
+      {
+        "case": "global-before-team-wildcard",
+        "expected": [
+          "global-wild"
+        ],
+        "candidates": [
+          "global-wild",
+          "team-wild"
+        ],
+        "selected": "global-wild",
+        "pass": false
+      },
+      {
+        "case": "named-team-before-global",
+        "expected": [
+          "team-named"
+        ],
+        "candidates": [
+          "global-wild",
+          "team-named"
+        ],
+        "selected": "team-named",
+        "pass": false
+      },
+      {
+        "case": "default",
+        "expected": [
+          "default"
+        ],
+        "candidates": [
+          "default"
+        ],
+        "selected": "default",
+        "pass": true
+      }
+    ],
+    "supplementalPassed": false
+  },
+  {
+    "run": "replication-p6-ablation-no-preload-r1-router-candidates-cd7e66d3",
+    "label": "replication-p6-ablation-no-preload-r1",
+    "original": {
+      "exit": 0,
+      "tests": 1,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "passed": true
+    },
+    "seconds": 99.167,
+    "exit": 0,
+    "rows": [
+      {
+        "case": "unprefixed-global",
+        "expected": [
+          "global-wild"
+        ],
+        "candidates": [
+          "global-wild"
+        ],
+        "selected": "global-wild",
+        "pass": true
+      },
+      {
+        "case": "direct-group",
+        "expected": [
+          "direct"
+        ],
+        "candidates": [
+          "direct"
+        ],
+        "selected": "direct",
+        "pass": true
+      },
+      {
+        "case": "global-before-team-wildcard",
+        "expected": [
+          "global-wild"
+        ],
+        "candidates": [
+          "global-wild",
+          "team-wild"
+        ],
+        "selected": "global-wild",
+        "pass": false
+      },
+      {
+        "case": "named-team-before-global",
+        "expected": [
+          "team-named"
+        ],
+        "candidates": [
+          "global-wild",
+          "team-named"
+        ],
+        "selected": "team-named",
+        "pass": false
+      },
+      {
+        "case": "default",
+        "expected": [
+          "default"
+        ],
+        "candidates": [
+          "default"
+        ],
+        "selected": "default",
+        "pass": true
+      }
+    ],
+    "supplementalPassed": false
+  },
+  {
+    "run": "replication-v18-owner-r1-router-candidates-da3bd147",
+    "label": "replication-v18-owner-r1",
+    "original": {
+      "exit": 0,
+      "tests": 1,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "passed": true
+    },
+    "seconds": 247.421,
+    "exit": 0,
+    "rows": [
+      {
+        "case": "unprefixed-global",
+        "expected": [
+          "global-wild"
+        ],
+        "candidates": [
+          "global-wild"
+        ],
+        "selected": "global-wild",
+        "pass": true
+      },
+      {
+        "case": "direct-group",
+        "expected": [
+          "direct"
+        ],
+        "candidates": [
+          "direct"
+        ],
+        "selected": "direct",
+        "pass": true
+      },
+      {
+        "case": "global-before-team-wildcard",
+        "expected": [
+          "global-wild"
+        ],
+        "candidates": [
+          "global-wild",
+          "team-wild"
+        ],
+        "selected": "global-wild",
+        "pass": false
+      },
+      {
+        "case": "named-team-before-global",
+        "expected": [
+          "team-named"
+        ],
+        "candidates": [
+          "global-wild",
+          "team-named"
+        ],
+        "selected": "team-named",
+        "pass": false
+      },
+      {
+        "case": "default",
+        "expected": [
+          "default"
+        ],
+        "candidates": [
+          "default"
+        ],
+        "selected": "default",
+        "pass": true
+      }
+    ],
+    "supplementalPassed": false
+  },
+  {
+    "run": "replication-v18-owner-r2-router-candidates-41399d0b",
+    "label": "replication-v18-owner-r2",
+    "original": {
+      "exit": 0,
+      "tests": 1,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "passed": true
+    },
+    "seconds": 148.539,
+    "exit": 0,
+    "rows": [
+      {
+        "case": "unprefixed-global",
+        "expected": [
+          "global-wild"
+        ],
+        "candidates": [
+          "global-wild"
+        ],
+        "selected": "global-wild",
+        "pass": true
+      },
+      {
+        "case": "direct-group",
+        "expected": [
+          "direct"
+        ],
+        "candidates": [
+          "direct"
+        ],
+        "selected": "direct",
+        "pass": true
+      },
+      {
+        "case": "global-before-team-wildcard",
+        "expected": [
+          "global-wild"
+        ],
+        "candidates": [
+          "global-wild",
+          "team-wild"
+        ],
+        "selected": "global-wild",
+        "pass": false
+      },
+      {
+        "case": "named-team-before-global",
+        "expected": [
+          "team-named"
+        ],
+        "candidates": [
+          "global-wild",
+          "team-named"
+        ],
+        "selected": "team-named",
+        "pass": false
+      },
+      {
+        "case": "default",
+        "expected": [
+          "default"
+        ],
+        "candidates": [
+          "default"
+        ],
+        "selected": "default",
+        "pass": true
+      }
+    ],
+    "supplementalPassed": false
+  },
+  {
+    "run": "replication-v18-owner-r3-router-candidates-07aace63",
+    "label": "replication-v18-owner-r3",
+    "original": {
+      "exit": 0,
+      "tests": 1,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "passed": true
+    },
+    "seconds": 119.285,
+    "exit": 0,
+    "rows": [
+      {
+        "case": "unprefixed-global",
+        "expected": [
+          "global-wild"
+        ],
+        "candidates": [
+          "global-wild"
+        ],
+        "selected": "global-wild",
+        "pass": true
+      },
+      {
+        "case": "direct-group",
+        "expected": [
+          "direct"
+        ],
+        "candidates": [
+          "direct"
+        ],
+        "selected": "direct",
+        "pass": true
+      },
+      {
+        "case": "global-before-team-wildcard",
+        "expected": [
+          "global-wild"
+        ],
+        "candidates": [
+          "global-wild",
+          "team-wild"
+        ],
+        "selected": "global-wild",
+        "pass": false
+      },
+      {
+        "case": "named-team-before-global",
+        "expected": [
+          "team-named"
+        ],
+        "candidates": [
+          "global-wild",
+          "team-named"
+        ],
+        "selected": "team-named",
+        "pass": false
+      },
+      {
+        "case": "default",
+        "expected": [
+          "default"
+        ],
+        "candidates": [
+          "default"
+        ],
+        "selected": "default",
+        "pass": true
+      }
+    ],
+    "supplementalPassed": false
+  },
+  {
+    "run": "replication-v20-boundary-review-r1-router-candidates-9c905956",
+    "label": "replication-v20-boundary-review-r1",
+    "original": {
+      "exit": 0,
+      "tests": 1,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "passed": true
+    },
+    "seconds": 146.727,
+    "exit": 0,
+    "rows": [
+      {
+        "case": "unprefixed-global",
+        "expected": [
+          "global-wild"
+        ],
+        "candidates": [
+          "global-wild"
+        ],
+        "selected": "global-wild",
+        "pass": true
+      },
+      {
+        "case": "direct-group",
+        "expected": [
+          "direct"
+        ],
+        "candidates": [
+          "direct"
+        ],
+        "selected": "direct",
+        "pass": true
+      },
+      {
+        "case": "global-before-team-wildcard",
+        "expected": [
+          "global-wild"
+        ],
+        "candidates": [
+          "global-wild",
+          "team-wild"
+        ],
+        "selected": "global-wild",
+        "pass": false
+      },
+      {
+        "case": "named-team-before-global",
+        "expected": [
+          "team-named"
+        ],
+        "candidates": [
+          "global-wild",
+          "team-named"
+        ],
+        "selected": "team-named",
+        "pass": false
+      },
+      {
+        "case": "default",
+        "expected": [
+          "default"
+        ],
+        "candidates": [
+          "default"
+        ],
+        "selected": "default",
+        "pass": true
+      }
+    ],
+    "supplementalPassed": false
+  },
+  {
+    "run": "replication-v20-boundary-review-r2-router-candidates-07d9da18",
+    "label": "replication-v20-boundary-review-r2",
+    "original": {
+      "exit": 0,
+      "tests": 1,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "passed": true
+    },
+    "seconds": 240.172,
+    "exit": 0,
+    "rows": [
+      {
+        "case": "unprefixed-global",
+        "expected": [
+          "global-wild"
+        ],
+        "candidates": [
+          "global-wild"
+        ],
+        "selected": "global-wild",
+        "pass": true
+      },
+      {
+        "case": "direct-group",
+        "expected": [
+          "direct"
+        ],
+        "candidates": [
+          "direct"
+        ],
+        "selected": "direct",
+        "pass": true
+      },
+      {
+        "case": "global-before-team-wildcard",
+        "expected": [
+          "global-wild"
+        ],
+        "candidates": [
+          "global-wild",
+          "team-wild"
+        ],
+        "selected": "global-wild",
+        "pass": false
+      },
+      {
+        "case": "named-team-before-global",
+        "expected": [
+          "team-named"
+        ],
+        "candidates": [
+          "global-wild",
+          "team-named"
+        ],
+        "selected": "team-named",
+        "pass": false
+      },
+      {
+        "case": "default",
+        "expected": [
+          "default"
+        ],
+        "candidates": [
+          "default"
+        ],
+        "selected": "default",
+        "pass": true
+      }
+    ],
+    "supplementalPassed": false
+  },
+  {
+    "run": "replication-v20-boundary-review-r3-router-candidates-68175e2a",
+    "label": "replication-v20-boundary-review-r3",
+    "original": {
+      "exit": 0,
+      "tests": 1,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "passed": true
+    },
+    "seconds": 226.207,
+    "exit": 0,
+    "rows": [
+      {
+        "case": "unprefixed-global",
+        "expected": [
+          "global-wild"
+        ],
+        "candidates": [
+          "global-wild"
+        ],
+        "selected": "global-wild",
+        "pass": true
+      },
+      {
+        "case": "direct-group",
+        "expected": [
+          "direct"
+        ],
+        "candidates": [
+          "direct"
+        ],
+        "selected": "direct",
+        "pass": true
+      },
+      {
+        "case": "global-before-team-wildcard",
+        "expected": [
+          "global-wild"
+        ],
+        "candidates": [
+          "global-wild",
+          "team-wild"
+        ],
+        "selected": "global-wild",
+        "pass": false
+      },
+      {
+        "case": "named-team-before-global",
+        "expected": [
+          "team-named"
+        ],
+        "candidates": [
+          "global-wild",
+          "team-named"
+        ],
+        "selected": "team-named",
+        "pass": false
+      },
+      {
+        "case": "default",
+        "expected": [
+          "default"
+        ],
+        "candidates": [
+          "default"
+        ],
+        "selected": "default",
+        "pass": true
+      }
+    ],
+    "supplementalPassed": false
+  },
+  {
+    "run": "replication-v21-route-identities-r1-router-candidates-84768071",
+    "label": "replication-v21-route-identities-r1",
+    "original": {
+      "exit": 0,
+      "tests": 1,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "passed": true
+    },
+    "seconds": 222.042,
+    "exit": 0,
+    "rows": [
+      {
+        "case": "unprefixed-global",
+        "expected": [
+          "global-wild"
+        ],
+        "candidates": [
+          "global-wild"
+        ],
+        "selected": "global-wild",
+        "pass": true
+      },
+      {
+        "case": "direct-group",
+        "expected": [
+          "direct"
+        ],
+        "candidates": [
+          "direct"
+        ],
+        "selected": "direct",
+        "pass": true
+      },
+      {
+        "case": "global-before-team-wildcard",
+        "expected": [
+          "global-wild"
+        ],
+        "candidates": [
+          "global-wild",
+          "team-wild"
+        ],
+        "selected": "global-wild",
+        "pass": false
+      },
+      {
+        "case": "named-team-before-global",
+        "expected": [
+          "team-named"
+        ],
+        "candidates": [
+          "global-wild",
+          "team-named"
+        ],
+        "selected": "team-named",
+        "pass": false
+      },
+      {
+        "case": "default",
+        "expected": [
+          "default"
+        ],
+        "candidates": [
+          "default"
+        ],
+        "selected": "default",
+        "pass": true
+      }
+    ],
+    "supplementalPassed": false
+  }
+]

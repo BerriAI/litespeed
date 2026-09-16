@@ -1,0 +1,82 @@
+{
+  "createdAt": "2026-09-16T08:21:57.615280+00:00",
+  "scope": "Posthoc diagnostic of guide-r2 original deferred-hook failure. Calls the production streaming iterator hook and then the deferred audit with one shared real Logging object, as the request path supplies. Tests managed exactly-once execution before delivery and preservation of an unrelated deferred hook. Not a full HTTP/provider test or a replacement for the original16 or declared24.",
+  "sourceRun": "replication-v39-streams-stream-guide-r2-legacy-stream-pipeline-929c8cfe",
+  "probeSha256": "d4fb302e054cb1ed050d45a8018a3d616771ef3dad3def1c2a3db84d90aa1f01",
+  "reference": "c6f5763443504501e88113e783d2e1ec88b9264d",
+  "referenceProductionFilesVerified": 5,
+  "outcomes": {
+    "base": {
+      "rows": [
+        {
+          "name": "pipeline-hook-executes-once-before-delivery",
+          "pass": false,
+          "during": 0,
+          "after": 1,
+          "deliveredChunks": 2
+        },
+        {
+          "name": "unmanaged-hook-still-runs-deferred",
+          "pass": true,
+          "during": 0,
+          "after": 1
+        }
+      ],
+      "passed": false,
+      "imports": {
+        "packageOrigin": "litellm/__init__.py",
+        "allLiteLLMModulesWithinWorkspace": true,
+        "moduleCount": 1219
+      },
+      "bytecodePolicy": "fresh cache path; reads from adjacent caches and all writes disabled"
+    },
+    "reference": {
+      "rows": [
+        {
+          "name": "pipeline-hook-executes-once-before-delivery",
+          "pass": true,
+          "during": 1,
+          "after": 1,
+          "deliveredChunks": 2
+        },
+        {
+          "name": "unmanaged-hook-still-runs-deferred",
+          "pass": true,
+          "during": 0,
+          "after": 1
+        }
+      ],
+      "passed": true,
+      "imports": {
+        "packageOrigin": "litellm/__init__.py",
+        "allLiteLLMModulesWithinWorkspace": true,
+        "moduleCount": 1221
+      },
+      "bytecodePolicy": "fresh cache path; reads from adjacent caches and all writes disabled"
+    },
+    "guide-r2": {
+      "rows": [
+        {
+          "name": "pipeline-hook-executes-once-before-delivery",
+          "pass": true,
+          "during": 1,
+          "after": 1,
+          "deliveredChunks": 2
+        },
+        {
+          "name": "unmanaged-hook-still-runs-deferred",
+          "pass": true,
+          "during": 0,
+          "after": 1
+        }
+      ],
+      "passed": true,
+      "imports": {
+        "packageOrigin": "litellm/__init__.py",
+        "allLiteLLMModulesWithinWorkspace": true,
+        "moduleCount": 1221
+      },
+      "bytecodePolicy": "fresh cache path; reads from adjacent caches and all writes disabled"
+    }
+  }
+}

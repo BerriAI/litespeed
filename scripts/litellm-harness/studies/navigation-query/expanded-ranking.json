@@ -1,0 +1,1484 @@
+{
+  "createdAt": "2026-09-16T05:32:22.132Z",
+  "scope": "Read-only descriptive training retrieval audit against human-reference changed source and selected test paths. These are not exhaustive required files; alternative fixes can be correct. Task prompts and reference paths were already available during development. No solver quality conclusion.",
+  "rows": [
+    {
+      "dataset": "",
+      "case": "anthropic-image-guardrail",
+      "harnessVersion": "2026-09-15.36",
+      "elapsedMs": 455.199,
+      "expectedSourcePaths": [
+        "litellm/llms/anthropic/chat/guardrail_translation/handler.py"
+      ],
+      "sourcePathsShown": [
+        "litellm/types/images/main.py",
+        "litellm/types/proxy/guardrails/guardrail_hooks/deepkeep.py",
+        "litellm/images/main.py",
+        "litellm/images/utils.py",
+        "litellm/images/__init__.py",
+        "litellm/llms/anthropic/files/handler.py",
+        "litellm/llms/anthropic/files/__init__.py",
+        "litellm/proxy/guardrails/anthropic_sse.py",
+        "litellm/llms/anthropic/experimental_pass_through/responses_adapters/transformation.py",
+        "litellm/llms/anthropic/chat/guardrail_translation/handler.py",
+        "litellm/proxy/guardrails/guardrail_hooks/deepkeep/deepkeep.py",
+        "litellm/proxy/guardrails/guardrail_hooks/model_armor/file_scanning.py",
+        "litellm/proxy/common_utils/static_asset_utils.py",
+        "litellm/proxy/common_utils/callback_utils.py",
+        "enterprise/litellm_enterprise/proxy/hooks/managed_files.py",
+        "litellm/router.py",
+        "litellm/proxy/_experimental/mcp_server/oauth_utils.py",
+        "litellm/llms/anthropic/common_utils.py",
+        "litellm/proxy/_experimental/mcp_server/sampling_handler.py",
+        "litellm/llms/anthropic/experimental_pass_through/adapters/transformation.py"
+      ],
+      "sourceHits": [
+        "litellm/llms/anthropic/chat/guardrail_translation/handler.py"
+      ],
+      "sourceHitsIncludingGuides": [
+        "litellm/llms/anthropic/chat/guardrail_translation/handler.py"
+      ],
+      "expectedTestPaths": [
+        "tests/test_litellm/llms/anthropic/chat/guardrail_translation/test_anthropic_guardrail_handler.py"
+      ],
+      "testPathsShown": [
+        "tests/test_litellm/images/test_image_edit_extra_params.py",
+        "tests/test_litellm/images/test_image_edit_utils.py",
+        "tests/test_litellm/images/test_image_generation_extra_headers.py",
+        "tests/test_litellm/llms/anthropic/files/test_anthropic_files_transformation.py",
+        "tests/test_litellm/proxy/guardrails/test_content_filter_path_traversal.py",
+        "tests/test_litellm/proxy/guardrails/test_content_utils.py",
+        "tests/test_litellm/proxy/guardrails/test_custom_code_security.py",
+        "tests/test_litellm/llms/anthropic/experimental_pass_through/responses_adapters/test_responses_adapters_transformation.py",
+        "tests/test_litellm/llms/anthropic/chat/guardrail_translation/test_anthropic_guardrail_handler.py",
+        "tests/test_litellm/proxy/common_utils/test_static_asset_utils.py",
+        "tests/test_litellm/proxy/common_utils/test_callback_utils.py",
+        "tests/enterprise/litellm_enterprise/proxy/hooks/test_managed_files.py",
+        "tests/test_litellm/test_router.py",
+        "tests/test_litellm/types/test_router.py",
+        "tests/test_litellm/proxy/_experimental/mcp_server/test_byok_oauth_endpoints.py",
+        "tests/test_litellm/proxy/_experimental/mcp_server/test_callback_oauth_error_responses.py",
+        "tests/test_litellm/llms/anthropic/test_anthropic_common_utils.py"
+      ],
+      "testHits": [
+        "tests/test_litellm/llms/anthropic/chat/guardrail_translation/test_anthropic_guardrail_handler.py"
+      ],
+      "symbolScan": {
+        "roots": [
+          "litellm/llms/anthropic/",
+          "litellm/proxy/",
+          "enterprise/",
+          "litellm/router.py",
+          "litellm/router_utils/",
+          "litellm/router_strategy/"
+        ],
+        "files": 800,
+        "partial": true
+      },
+      "outputCharacters": 10030
+    },
+    {
+      "dataset": "",
+      "case": "anthropic-tool-document",
+      "harnessVersion": "2026-09-15.36",
+      "elapsedMs": 91.44712500000003,
+      "expectedSourcePaths": [
+        "litellm/llms/anthropic/experimental_pass_through/adapters/transformation.py"
+      ],
+      "sourcePathsShown": [
+        "litellm/llms/anthropic/experimental_pass_through/messages/utils.py",
+        "litellm/llms/anthropic/experimental_pass_through/messages/handler.py",
+        "litellm/llms/anthropic/experimental_pass_through/messages/mcp_handler.py",
+        "litellm/llms/anthropic/experimental_pass_through/messages/response_cache.py",
+        "litellm/llms/anthropic/experimental_pass_through/messages/transformation.py",
+        "litellm/llms/anthropic/experimental_pass_through/messages/interceptors/base.py",
+        "litellm/llms/anthropic/experimental_pass_through/messages/streaming_iterator.py",
+        "litellm/llms/anthropic/experimental_pass_through/messages/fake_stream_iterator.py",
+        "litellm/llms/anthropic/common_utils.py",
+        "litellm/llms/anthropic/experimental_pass_through/adapters/transformation.py",
+        "litellm/llms/anthropic/completion/transformation.py",
+        "litellm/llms/anthropic/chat/guardrail_translation/handler.py",
+        "litellm/llms/anthropic/chat/transformation.py"
+      ],
+      "sourceHits": [
+        "litellm/llms/anthropic/experimental_pass_through/adapters/transformation.py"
+      ],
+      "sourceHitsIncludingGuides": [
+        "litellm/llms/anthropic/experimental_pass_through/adapters/transformation.py"
+      ],
+      "expectedTestPaths": [
+        "tests/test_litellm/llms/anthropic/experimental_pass_through/adapters/test_anthropic_experimental_pass_through_adapters_transformation.py"
+      ],
+      "testPathsShown": [
+        "tests/test_litellm/llms/anthropic/experimental_pass_through/messages/test_request_optional_param_utils.py",
+        "tests/test_litellm/llms/anthropic/experimental_pass_through/messages/test_anthropic_experimental_pass_through_messages_handler.py",
+        "tests/test_litellm/llms/anthropic/experimental_pass_through/messages/test_mcp_handler.py",
+        "tests/test_litellm/llms/anthropic/experimental_pass_through/messages/test_response_cache.py",
+        "tests/test_litellm/llms/anthropic/experimental_pass_through/messages/test_advisor_integration.py",
+        "tests/test_litellm/llms/anthropic/experimental_pass_through/messages/test_agentic_streaming_iterator.py",
+        "tests/test_litellm/llms/anthropic/experimental_pass_through/messages/test_streaming_iterator.py",
+        "tests/test_litellm/llms/anthropic/test_anthropic_common_utils.py",
+        "tests/test_litellm/llms/anthropic/experimental_pass_through/adapters/test_anthropic_experimental_pass_through_adapters_transformation.py",
+        "tests/test_litellm/llms/anthropic/chat/guardrail_translation/test_anthropic_guardrail_handler.py"
+      ],
+      "testHits": [
+        "tests/test_litellm/llms/anthropic/experimental_pass_through/adapters/test_anthropic_experimental_pass_through_adapters_transformation.py"
+      ],
+      "symbolScan": {
+        "roots": [
+          "litellm/llms/anthropic/",
+          "litellm/responses/",
+          "litellm/main.py"
+        ],
+        "files": 67,
+        "partial": false
+      },
+      "outputCharacters": 7780
+    },
+    {
+      "dataset": "",
+      "case": "converse-config",
+      "harnessVersion": "2026-09-15.36",
+      "elapsedMs": 341.112667,
+      "expectedSourcePaths": [
+        "litellm/llms/bedrock/chat/converse_transformation.py"
+      ],
+      "sourcePathsShown": [
+        "litellm/llms/bedrock/chat/converse_handler.py",
+        "litellm/llms/bedrock/chat/converse_like/handler.py",
+        "litellm/llms/bedrock/chat/converse_transformation.py",
+        "litellm/llms/bedrock/chat/converse_like/transformation.py",
+        "litellm/llms/bedrock/base_aws_llm.py",
+        "litellm/llms/bedrock/common_utils.py",
+        "litellm/llms/bedrock/chat/__init__.py",
+        "litellm/llms/bedrock/files/handler.py",
+        "litellm/proxy/auth/auth_utils.py",
+        "litellm/llms/bedrock/files/transformation.py",
+        "litellm/llms/bedrock/rerank/transformation.py",
+        "litellm/utils.py",
+        "litellm/llms/bedrock/batches/transformation.py",
+        "litellm/proxy/_experimental/mcp_server/discoverable_endpoints.py",
+        "litellm/llms/bedrock/realtime/transformation.py",
+        "litellm/llms/bedrock_mantle/chat/transformation.py",
+        "litellm/litellm_core_utils/get_litellm_params.py",
+        "litellm/llms/bedrock/chat/invoke_transformations/base_invoke_transformation.py",
+        "litellm/llms/bedrock/count_tokens/handler.py",
+        "litellm/proxy/_types.py",
+        "litellm/proxy/guardrails/guardrail_hooks/custom_code/__init__.py"
+      ],
+      "sourceHits": [
+        "litellm/llms/bedrock/chat/converse_transformation.py"
+      ],
+      "sourceHitsIncludingGuides": [
+        "litellm/llms/bedrock/chat/converse_transformation.py"
+      ],
+      "expectedTestPaths": [
+        "tests/test_litellm/llms/bedrock/chat/test_converse_transformation.py"
+      ],
+      "testPathsShown": [
+        "tests/test_litellm/llms/bedrock/chat/test_bedrock_converse_handler.py",
+        "tests/test_litellm/llms/bedrock/chat/test_converse_transformation.py",
+        "tests/test_litellm/llms/bedrock/chat/test_converse_transformation_nova_2.py",
+        "tests/test_litellm/llms/bedrock/test_base_aws_llm.py",
+        "tests/test_litellm/llms/bedrock/test_bedrock_common_utils.py",
+        "tests/test_litellm/llms/bedrock/files/test_bedrock_files_handler.py",
+        "tests/test_litellm/proxy/auth/test_auth_utils.py",
+        "tests/test_litellm/llms/bedrock/files/test_bedrock_files_transformation.py",
+        "tests/test_litellm/llms/bedrock/rerank/test_bedrock_rerank_header_forwarding.py",
+        "tests/test_litellm/test_utils.py",
+        "tests/test_litellm/a2a_protocol/test_utils.py",
+        "tests/test_litellm/llms/bedrock/batches/test_transformation.py",
+        "tests/test_litellm/proxy/_experimental/mcp_server/test_discoverable_endpoints.py",
+        "tests/test_litellm/llms/bedrock/realtime/test_bedrock_realtime_transformation.py"
+      ],
+      "testHits": [
+        "tests/test_litellm/llms/bedrock/chat/test_converse_transformation.py"
+      ],
+      "symbolScan": {
+        "roots": [
+          "litellm/llms/bedrock/",
+          "litellm/llms/bedrock_mantle/",
+          "litellm/proxy/",
+          "enterprise/",
+          "litellm/litellm_core_utils/",
+          "litellm/utils.py"
+        ],
+        "files": 800,
+        "partial": true
+      },
+      "outputCharacters": 6382
+    },
+    {
+      "dataset": "",
+      "case": "dashscope-rerank",
+      "harnessVersion": "2026-09-15.36",
+      "elapsedMs": 70.68779100000006,
+      "expectedSourcePaths": [
+        "litellm/llms/dashscope/common_utils.py",
+        "litellm/llms/dashscope/qwen_ai_platform.py",
+        "litellm/llms/dashscope/qwencloud.py",
+        "litellm/llms/dashscope/rerank/transformation.py"
+      ],
+      "sourcePathsShown": [
+        "litellm/llms/dashscope/rerank/__init__.py",
+        "litellm/llms/openai/chat/o_series_handler.py",
+        "litellm/llms/dashscope/chat/transformation.py",
+        "litellm/llms/openai/chat/gpt_transformation.py",
+        "litellm/llms/dashscope/rerank/transformation.py",
+        "litellm/llms/openai/chat/gpt_5_transformation.py",
+        "litellm/llms/openai/chat/o_series_transformation.py",
+        "litellm/llms/openai/chat/gpt_audio_transformation.py",
+        "litellm/llms/openai_like/chat/handler.py",
+        "litellm/llms/openai/openai.py",
+        "litellm/llms/dashscope/qwencloud.py",
+        "litellm/llms/openai/fine_tuning/handler.py",
+        "litellm/llms/openai/workload_identity.py",
+        "litellm/llms/openai_like/chat/transformation.py",
+        "litellm/llms/openai/completion/handler.py",
+        "litellm/llms/dashscope/qwen_ai_platform.py",
+        "litellm/llms/dashscope/image_generation/transformation.py"
+      ],
+      "sourceHits": [
+        "litellm/llms/dashscope/qwen_ai_platform.py",
+        "litellm/llms/dashscope/qwencloud.py",
+        "litellm/llms/dashscope/rerank/transformation.py"
+      ],
+      "sourceHitsIncludingGuides": [
+        "litellm/llms/dashscope/common_utils.py",
+        "litellm/llms/dashscope/qwen_ai_platform.py",
+        "litellm/llms/dashscope/qwencloud.py",
+        "litellm/llms/dashscope/rerank/transformation.py"
+      ],
+      "expectedTestPaths": [
+        "tests/test_litellm/llms/dashscope/test_dashscope_rerank_transformation.py",
+        "tests/test_litellm/llms/dashscope/test_qwen_brand_aliases.py",
+        "tests/test_litellm/rerank_api/test_main.py"
+      ],
+      "testPathsShown": [
+        "tests/test_litellm/llms/openai/chat/test_openai_gpt_transformation.py",
+        "tests/test_litellm/llms/openai/chat/guardrail_translation/test_openai_guardrail_handler.py",
+        "tests/test_litellm/llms/openai_like/chat/test_openai_like_chat_transformation.py",
+        "tests/test_litellm/llms/openai/test_openai.py",
+        "tests/test_litellm/llms/openai/test_openai_common_utils.py",
+        "tests/test_litellm/llms/dashscope/test_dashscope_chat_transformation.py",
+        "tests/test_litellm/llms/dashscope/test_dashscope_cost_calculator.py",
+        "tests/test_litellm/llms/openai/test_openai_workload_identity.py",
+        "tests/test_litellm/llms/openai/completion/test_completion_handler.py",
+        "tests/test_litellm/llms/openai/completion/test_text_completion_guardrail_handler.py"
+      ],
+      "testHits": [],
+      "symbolScan": {
+        "roots": [
+          "litellm/llms/dashscope/",
+          "litellm/llms/openai/",
+          "litellm/llms/openai_like/"
+        ],
+        "files": 77,
+        "partial": false
+      },
+      "outputCharacters": 7901
+    },
+    {
+      "dataset": "",
+      "case": "databricks-reasoning",
+      "harnessVersion": "2026-09-15.36",
+      "elapsedMs": 204.7506249999999,
+      "expectedSourcePaths": [
+        "litellm/llms/databricks/chat/transformation.py",
+        "litellm/types/llms/databricks.py"
+      ],
+      "sourcePathsShown": [
+        "litellm/llms/databricks/responses/__init__.py",
+        "litellm/llms/databricks/chat/transformation.py",
+        "litellm/llms/databricks/responses/transformation.py",
+        "litellm/llms/gigachat/chat/streaming.py",
+        "litellm/responses/streaming_iterator.py",
+        "litellm/llms/databricks/streaming_utils.py",
+        "litellm/llms/a2a/chat/streaming_iterator.py",
+        "litellm/llms/chatgpt/chat/streaming_utils.py",
+        "litellm/litellm_core_utils/prompt_templates/common_utils.py",
+        "litellm/litellm_core_utils/prompt_templates/factory.py",
+        "litellm/utils.py",
+        "litellm/responses/litellm_completion_transformation/transformation.py"
+      ],
+      "sourceHits": [
+        "litellm/llms/databricks/chat/transformation.py"
+      ],
+      "sourceHitsIncludingGuides": [
+        "litellm/llms/databricks/chat/transformation.py"
+      ],
+      "expectedTestPaths": [
+        "tests/test_litellm/llms/databricks/chat/test_databricks_chat_transformation.py"
+      ],
+      "testPathsShown": [
+        "tests/test_litellm/llms/databricks/responses/test_databricks_responses_transformation.py",
+        "tests/test_litellm/llms/databricks/chat/test_databricks_chat_transformation.py",
+        "tests/test_litellm/llms/gigachat/chat/test_gigachat_chat_streaming.py",
+        "tests/test_litellm/responses/test_streaming_iterator.py",
+        "tests/test_litellm/responses/test_responses_streaming_iterator.py",
+        "tests/test_litellm/responses/test_streaming_iterator_error_events.py",
+        "tests/test_litellm/llms/databricks/test_databricks_streaming_utils.py",
+        "tests/test_litellm/llms/a2a/chat/test_a2a_chat_transformation.py",
+        "tests/test_litellm/llms/a2a/chat/guardrail_translation/test_a2a_guardrail_handler.py",
+        "tests/test_litellm/llms/chatgpt/chat/test_streaming_utils.py",
+        "tests/test_litellm/litellm_core_utils/prompt_templates/test_litellm_core_utils_prompt_templates_common_utils.py",
+        "tests/test_litellm/litellm_core_utils/prompt_templates/test_litellm_core_utils_prompt_templates_factory.py",
+        "tests/test_litellm/test_utils.py",
+        "tests/test_litellm/a2a_protocol/test_utils.py",
+        "tests/test_litellm/responses/litellm_completion_transformation/test_streaming_iterator_transformation.py"
+      ],
+      "testHits": [
+        "tests/test_litellm/llms/databricks/chat/test_databricks_chat_transformation.py"
+      ],
+      "symbolScan": {
+        "roots": [
+          "litellm/llms/databricks/",
+          "litellm/router.py",
+          "litellm/router_utils/",
+          "litellm/router_strategy/",
+          "litellm/responses/",
+          "litellm/main.py",
+          "litellm/litellm_core_utils/",
+          "litellm/utils.py"
+        ],
+        "files": 165,
+        "partial": false
+      },
+      "outputCharacters": 11098
+    },
+    {
+      "dataset": "",
+      "case": "empty-choices",
+      "harnessVersion": "2026-09-15.36",
+      "elapsedMs": 214.59299999999985,
+      "expectedSourcePaths": [
+        "litellm/litellm_core_utils/llm_response_utils/convert_dict_to_response.py",
+        "litellm/litellm_core_utils/streaming_handler.py",
+        "litellm/llms/anthropic/experimental_pass_through/adapters/transformation.py"
+      ],
+      "sourcePathsShown": [
+        "litellm/llms/anthropic/experimental_pass_through/responses_adapters/streaming_iterator.py",
+        "litellm/types/responses/streaming_websocket.py",
+        "litellm/llms/anthropic/experimental_pass_through/adapters/streaming_iterator.py",
+        "litellm/responses/streaming_iterator.py",
+        "litellm/responses/mcp/mcp_streaming_iterator.py",
+        "litellm/responses/litellm_completion_transformation/streaming_iterator.py",
+        "litellm/llms/anthropic/experimental_pass_through/responses_adapters/handler.py",
+        "litellm/llms/anthropic/experimental_pass_through/messages/streaming_iterator.py",
+        "litellm/litellm_core_utils/llm_response_utils/convert_dict_to_response.py",
+        "litellm/main.py",
+        "litellm/litellm_core_utils/streaming_handler.py",
+        "litellm/utils.py",
+        "litellm/llms/anthropic/experimental_pass_through/messages/transformation.py",
+        "litellm/litellm_core_utils/prompt_templates/image_handling.py",
+        "litellm/litellm_core_utils/model_response_utils.py",
+        "litellm/litellm_core_utils/prompt_templates/factory.py",
+        "litellm/llms/anthropic/experimental_pass_through/adapters/transformation.py",
+        "litellm/litellm_core_utils/llm_request_utils.py",
+        "litellm/litellm_core_utils/service_tier_utils.py",
+        "litellm/litellm_core_utils/streaming_chunk_builder_utils.py",
+        "litellm/llms/anthropic/chat/handler.py",
+        "litellm/llms/anthropic/common_utils.py"
+      ],
+      "sourceHits": [
+        "litellm/litellm_core_utils/llm_response_utils/convert_dict_to_response.py",
+        "litellm/litellm_core_utils/streaming_handler.py",
+        "litellm/llms/anthropic/experimental_pass_through/adapters/transformation.py"
+      ],
+      "sourceHitsIncludingGuides": [
+        "litellm/litellm_core_utils/llm_response_utils/convert_dict_to_response.py",
+        "litellm/litellm_core_utils/streaming_handler.py",
+        "litellm/llms/anthropic/experimental_pass_through/adapters/transformation.py"
+      ],
+      "expectedTestPaths": [
+        "tests/llm_translation/test_llm_response_utils/test_convert_dict_to_chat_completion.py",
+        "tests/test_litellm/litellm_core_utils/llm_response_utils/test_convert_dict_to_response.py",
+        "tests/test_litellm/litellm_core_utils/test_streaming_handler.py",
+        "tests/test_litellm/llms/anthropic/experimental_pass_through/adapters/test_anthropic_experimental_pass_through_adapters_transformation.py",
+        "tests/test_litellm/test_main.py"
+      ],
+      "testPathsShown": [
+        "tests/test_litellm/llms/anthropic/experimental_pass_through/responses_adapters/test_responses_adapters_streaming_iterator.py",
+        "tests/test_litellm/llms/anthropic/experimental_pass_through/adapters/test_streaming_iterator_combined_chunk.py",
+        "tests/test_litellm/llms/anthropic/experimental_pass_through/adapters/test_streaming_iterator_compaction.py",
+        "tests/test_litellm/llms/anthropic/experimental_pass_through/adapters/test_streaming_iterator_empty_choices.py",
+        "tests/test_litellm/responses/test_streaming_iterator.py",
+        "tests/test_litellm/responses/test_responses_streaming_iterator.py",
+        "tests/test_litellm/responses/test_streaming_iterator_error_events.py",
+        "tests/test_litellm/responses/mcp/test_mcp_streaming_iterator.py",
+        "tests/test_litellm/responses/litellm_completion_transformation/test_streaming_iterator_transformation.py",
+        "tests/test_litellm/llms/anthropic/experimental_pass_through/responses_adapters/test_responses_adapters_handler.py",
+        "tests/test_litellm/llms/anthropic/experimental_pass_through/messages/test_streaming_iterator.py",
+        "tests/test_litellm/llms/anthropic/experimental_pass_through/messages/test_agentic_streaming_iterator.py",
+        "tests/test_litellm/litellm_core_utils/llm_response_utils/test_convert_dict_to_response.py",
+        "tests/test_litellm/test_main.py",
+        "tests/test_litellm/a2a_protocol/test_main.py",
+        "tests/test_litellm/litellm_core_utils/test_streaming_handler.py",
+        "tests/test_litellm/test_utils.py",
+        "tests/test_litellm/a2a_protocol/test_utils.py",
+        "tests/test_litellm/llms/anthropic/experimental_pass_through/messages/test_advisor_integration.py",
+        "tests/test_litellm/litellm_core_utils/prompt_templates/test_bedrock_converse_strict_tools_opus_47_48.py",
+        "tests/test_litellm/litellm_core_utils/prompt_templates/test_litellm_core_utils_prompt_templates_common_utils.py"
+      ],
+      "testHits": [
+        "tests/test_litellm/litellm_core_utils/llm_response_utils/test_convert_dict_to_response.py",
+        "tests/test_litellm/litellm_core_utils/test_streaming_handler.py",
+        "tests/test_litellm/test_main.py"
+      ],
+      "symbolScan": {
+        "roots": [
+          "litellm/llms/anthropic/",
+          "litellm/responses/",
+          "litellm/main.py",
+          "litellm/litellm_core_utils/",
+          "litellm/utils.py"
+        ],
+        "files": 149,
+        "partial": false
+      },
+      "outputCharacters": 9893
+    },
+    {
+      "dataset": "",
+      "case": "router-candidates",
+      "harnessVersion": "2026-09-15.36",
+      "elapsedMs": 379.166166,
+      "expectedSourcePaths": [
+        "litellm/router.py"
+      ],
+      "sourcePathsShown": [
+        "litellm/router_utils/pattern_match_deployments.py",
+        "litellm/integrations/otel/model/spans.py",
+        "litellm/integrations/otel/model/utils.py",
+        "litellm/integrations/otel/model/config.py",
+        "litellm/integrations/otel/model/baggage.py",
+        "litellm/integrations/otel/model/semconv.py",
+        "litellm/integrations/otel/model/__init__.py",
+        "litellm/integrations/otel/model/metadata.py",
+        "litellm/router.py",
+        "litellm/proxy/_experimental/mcp_server/auth/user_api_key_auth_mcp.py",
+        "litellm/proxy/proxy_server.py",
+        "litellm/router_utils/pre_call_checks/encrypted_content_affinity_check.py",
+        "litellm/proxy/health_check.py",
+        "litellm/proxy/auth/model_checks.py",
+        "litellm/proxy/guardrails/guardrail_endpoints.py",
+        "litellm/router_strategy/complexity_router/complexity_router.py",
+        "litellm/proxy/management_endpoints/internal_user_endpoints.py",
+        "litellm/proxy/litellm_pre_call_utils.py",
+        "enterprise/litellm_enterprise/proxy/common_utils/check_batch_cost.py",
+        "litellm/proxy/common_request_processing.py",
+        "litellm/proxy/db/db_spend_update_writer.py"
+      ],
+      "sourceHits": [
+        "litellm/router.py"
+      ],
+      "sourceHitsIncludingGuides": [
+        "litellm/router.py"
+      ],
+      "expectedTestPaths": [
+        "tests/test_litellm/test_router.py"
+      ],
+      "testPathsShown": [
+        "tests/test_litellm/router_utils/test_pattern_match_deployments.py",
+        "tests/test_litellm/test_router.py",
+        "tests/test_litellm/types/test_router.py",
+        "tests/test_litellm/proxy/_experimental/mcp_server/auth/test_user_api_key_auth_mcp.py",
+        "tests/test_litellm/proxy/test_proxy_server.py",
+        "tests/test_litellm/router_utils/pre_call_checks/test_encrypted_content_affinity_check.py",
+        "tests/test_litellm/proxy/test_health_check_functions.py",
+        "tests/test_litellm/proxy/test_health_check_max_tokens.py",
+        "tests/test_litellm/proxy/auth/test_model_checks.py",
+        "tests/test_litellm/proxy/auth/test_model_checks_fallbacks.py",
+        "tests/test_litellm/proxy/guardrails/test_guardrail_endpoints.py",
+        "tests/test_litellm/proxy/management_endpoints/test_internal_user_endpoints.py"
+      ],
+      "testHits": [
+        "tests/test_litellm/test_router.py"
+      ],
+      "symbolScan": {
+        "roots": [
+          "litellm/proxy/",
+          "enterprise/",
+          "litellm/router.py",
+          "litellm/router_utils/",
+          "litellm/router_strategy/"
+        ],
+        "files": 800,
+        "partial": true
+      },
+      "outputCharacters": 7496
+    },
+    {
+      "dataset": "",
+      "case": "router-strategy-isolation",
+      "harnessVersion": "2026-09-15.36",
+      "elapsedMs": 162.25766599999997,
+      "expectedSourcePaths": [
+        "litellm/router.py"
+      ],
+      "sourcePathsShown": [
+        "litellm/router_strategy/base_routing_strategy.py",
+        "litellm/llms/anthropic/experimental_pass_through/utils.py",
+        "litellm/router_utils/pre_call_checks/model_rate_limit_check.py",
+        "litellm/router_utils/pre_call_checks/io_token_rate_limit_check.py",
+        "litellm/llms/anthropic/experimental_pass_through/messages/utils.py",
+        "litellm/llms/anthropic/experimental_pass_through/adapters/handler.py",
+        "litellm/llms/anthropic/experimental_pass_through/messages/handler.py",
+        "litellm/llms/anthropic/experimental_pass_through/adapters/__init__.py",
+        "litellm/router.py",
+        "litellm/integrations/custom_guardrail.py",
+        "litellm/integrations/custom_logger.py",
+        "litellm/integrations/otel/logger.py",
+        "litellm/router_strategy/lowest_tpm_rpm_v2.py"
+      ],
+      "sourceHits": [
+        "litellm/router.py"
+      ],
+      "sourceHitsIncludingGuides": [
+        "litellm/router.py"
+      ],
+      "expectedTestPaths": [
+        "tests/test_litellm/router_strategy/test_router_routing_groups.py"
+      ],
+      "testPathsShown": [
+        "tests/test_litellm/router_strategy/test_base_routing_strategy.py",
+        "tests/test_litellm/llms/anthropic/experimental_pass_through/messages/test_request_optional_param_utils.py",
+        "tests/test_litellm/router_utils/pre_call_checks/test_deployment_affinity_check.py",
+        "tests/test_litellm/router_utils/pre_call_checks/test_encrypted_content_affinity_check.py",
+        "tests/test_litellm/router_utils/pre_call_checks/test_prompt_caching_deployment_check.py",
+        "tests/test_litellm/llms/anthropic/experimental_pass_through/adapters/test_handler_output_config_passthrough.py",
+        "tests/test_litellm/llms/anthropic/experimental_pass_through/adapters/test_handler_prompt_cache_key.py",
+        "tests/test_litellm/llms/anthropic/experimental_pass_through/adapters/test_handler_reasoning_effort_normalization.py",
+        "tests/test_litellm/llms/anthropic/experimental_pass_through/messages/test_anthropic_experimental_pass_through_messages_handler.py",
+        "tests/test_litellm/llms/anthropic/experimental_pass_through/messages/test_mcp_handler.py",
+        "tests/test_litellm/llms/anthropic/experimental_pass_through/adapters/test_anthropic_experimental_pass_through_adapters_transformation.py",
+        "tests/test_litellm/test_router.py",
+        "tests/test_litellm/types/test_router.py",
+        "tests/test_litellm/integrations/test_custom_guardrail.py",
+        "tests/test_litellm/integrations/test_custom_guardrail_recursion.py",
+        "tests/test_litellm/integrations/test_agentops.py",
+        "tests/test_litellm/integrations/test_anthropic_cache_control_hook.py",
+        "tests/test_litellm/integrations/otel/test_langfuse_logger.py",
+        "tests/test_litellm/integrations/otel/test_otel_v2_logger.py",
+        "tests/test_litellm/router_strategy/test_auto_router.py"
+      ],
+      "testHits": [],
+      "symbolScan": {
+        "roots": [
+          "litellm/llms/pass_through/",
+          "litellm/router.py",
+          "litellm/router_utils/",
+          "litellm/router_strategy/",
+          "litellm/integrations/"
+        ],
+        "files": 268,
+        "partial": false
+      },
+      "outputCharacters": 9986
+    },
+    {
+      "dataset": "",
+      "case": "team-member-budget",
+      "harnessVersion": "2026-09-15.36",
+      "elapsedMs": 425.70220800000016,
+      "expectedSourcePaths": [
+        "litellm/proxy/auth/user_api_key_auth.py",
+        "litellm/proxy/proxy_server.py",
+        "litellm/proxy/spend_tracking/budget_reservation.py"
+      ],
+      "sourcePathsShown": [
+        "litellm/models/team_membership.py",
+        "litellm/proxy/db/budget_window_spend_writer.py",
+        "litellm/proxy/spend_tracking/budget_reservation.py",
+        "litellm/integrations/SlackAlerting/user_spend_alerts.py",
+        "litellm/proxy/management_helpers/team_member_permission_checks.py",
+        "litellm/proxy/common_utils/expired_ui_session_key_cleanup_manager.py",
+        "litellm/_redis.py",
+        "litellm/models/team.py",
+        "litellm/proxy/proxy_server.py",
+        "litellm/proxy/management_endpoints/team_endpoints.py",
+        "litellm/proxy/spend_tracking/spend_management_endpoints.py",
+        "litellm/proxy/auth/auth_checks.py",
+        "litellm/proxy/management_endpoints/common_utils.py",
+        "litellm/proxy/common_utils/reset_budget_job.py",
+        "litellm/proxy/management_endpoints/model_management_endpoints.py",
+        "litellm/proxy/db/spend_counter_reseed.py",
+        "litellm/proxy/hooks/parallel_request_limiter_v3.py",
+        "litellm/proxy/auth/user_api_key_auth.py"
+      ],
+      "sourceHits": [
+        "litellm/proxy/auth/user_api_key_auth.py",
+        "litellm/proxy/proxy_server.py",
+        "litellm/proxy/spend_tracking/budget_reservation.py"
+      ],
+      "sourceHitsIncludingGuides": [
+        "litellm/proxy/auth/user_api_key_auth.py",
+        "litellm/proxy/proxy_server.py",
+        "litellm/proxy/spend_tracking/budget_reservation.py"
+      ],
+      "expectedTestPaths": [
+        "tests/test_litellm/proxy/auth/test_user_api_key_auth.py",
+        "tests/test_litellm/proxy/test_budget_reservation.py",
+        "tests/test_litellm/proxy/test_proxy_server.py"
+      ],
+      "testPathsShown": [
+        "tests/test_litellm/models/test_models.py",
+        "tests/test_litellm/proxy/db/test_budget_window_spend_writer.py",
+        "tests/test_litellm/proxy/spend_tracking/test_budget_reservation.py",
+        "tests/test_litellm/proxy/spend_tracking/test_budget_reservation_redis_failure.py",
+        "tests/test_litellm/integrations/SlackAlerting/test_user_spend_alerts.py",
+        "tests/test_litellm/proxy/management_helpers/test_team_member_permission_checks.py",
+        "tests/test_litellm/proxy/common_utils/test_expired_ui_session_key_cleanup_manager.py",
+        "tests/test_litellm/test_a2a_registry_lookup.py",
+        "tests/test_litellm/test_acompletion_session_reuse_e2e.py",
+        "tests/test_litellm/test_add_deployment_no_master_key.py",
+        "tests/test_litellm/proxy/test_proxy_server.py",
+        "tests/test_litellm/proxy/management_endpoints/test_team_endpoints.py",
+        "tests/test_litellm/proxy/spend_tracking/test_spend_management_endpoints.py",
+        "tests/test_litellm/proxy/auth/test_auth_checks.py",
+        "tests/test_litellm/proxy/management_endpoints/test_common_utils.py",
+        "tests/test_litellm/proxy/common_utils/test_reset_budget_job.py",
+        "tests/test_litellm/proxy/management_endpoints/test_model_management_endpoints.py"
+      ],
+      "testHits": [
+        "tests/test_litellm/proxy/test_proxy_server.py"
+      ],
+      "symbolScan": {
+        "roots": [
+          "litellm/proxy/",
+          "enterprise/",
+          "litellm/caching/"
+        ],
+        "files": 783,
+        "partial": false
+      },
+      "outputCharacters": 8329
+    },
+    {
+      "dataset": "",
+      "case": "vertex-version-path",
+      "harnessVersion": "2026-09-15.36",
+      "elapsedMs": 143.52195800000027,
+      "expectedSourcePaths": [
+        "litellm/llms/vertex_ai/vertex_llm_base.py"
+      ],
+      "sourcePathsShown": [
+        "litellm/llms/vertex_ai/gemini/transformation.py",
+        "litellm/llms/vertex_ai/gemini/cost_calculator.py",
+        "litellm/llms/vertex_ai/gemini/grounding_requests.py",
+        "litellm/llms/vertex_ai/gemini/vertex_and_google_ai_studio_gemini.py",
+        "litellm/llms/vertex_ai/vertex_ai_non_gemini.py",
+        "litellm/llms/gemini/common_utils.py",
+        "litellm/llms/gemini/agents/__init__.py",
+        "litellm/llms/gemini/cost_calculator.py",
+        "litellm/llms/vertex_ai/common_utils.py",
+        "litellm/llms/vertex_ai/vertex_ai_partner_models/llama3/transformation.py",
+        "litellm/litellm_core_utils/redact_messages.py",
+        "litellm/litellm_core_utils/litellm_logging.py",
+        "litellm/llms/vertex_ai/vertex_llm_base.py",
+        "litellm/litellm_core_utils/llm_response_utils/get_api_base.py",
+        "litellm/llms/vertex_ai/vertex_model_garden/main.py"
+      ],
+      "sourceHits": [
+        "litellm/llms/vertex_ai/vertex_llm_base.py"
+      ],
+      "sourceHitsIncludingGuides": [
+        "litellm/llms/vertex_ai/vertex_llm_base.py"
+      ],
+      "expectedTestPaths": [
+        "tests/test_litellm/llms/vertex_ai/test_vertex_llm_base.py"
+      ],
+      "testPathsShown": [
+        "tests/test_litellm/llms/vertex_ai/gemini/test_transformation.py",
+        "tests/test_litellm/llms/vertex_ai/gemini/test_vertex_ai_gemini_transformation.py",
+        "tests/test_litellm/llms/vertex_ai/gemini/test_context_circulation.py",
+        "tests/test_litellm/llms/vertex_ai/gemini/test_function_call_args_serialization.py",
+        "tests/test_litellm/llms/vertex_ai/gemini/test_gemini_image_url_missing_field.py",
+        "tests/test_litellm/llms/vertex_ai/gemini/test_grounding_requests.py",
+        "tests/test_litellm/llms/vertex_ai/gemini/test_vertex_and_google_ai_studio_gemini.py",
+        "tests/test_litellm/llms/vertex_ai/test_bge_embedding.py",
+        "tests/test_litellm/llms/vertex_ai/test_bge_response_transformation.py",
+        "tests/test_litellm/llms/vertex_ai/test_gemini_batch_embeddings.py",
+        "tests/test_litellm/llms/gemini/test_gemini_common_utils.py",
+        "tests/test_litellm/llms/gemini/test_cost_calculator.py",
+        "tests/test_litellm/llms/vertex_ai/test_vertex_ai_common_utils.py",
+        "tests/test_litellm/llms/vertex_ai/vertex_ai_partner_models/llama3/test_vertex_ai_partner_models_llama3_transformation.py",
+        "tests/test_litellm/litellm_core_utils/test_redact_messages.py",
+        "tests/test_litellm/litellm_core_utils/test_litellm_logging.py"
+      ],
+      "testHits": [],
+      "symbolScan": {
+        "roots": [
+          "litellm/llms/custom_httpx/",
+          "litellm/llms/gemini/",
+          "litellm/llms/vertex_ai/",
+          "litellm/litellm_core_utils/",
+          "litellm/utils.py"
+        ],
+        "files": 189,
+        "partial": false
+      },
+      "outputCharacters": 8386
+    },
+    {
+      "dataset": "training2",
+      "case": "bedrock-session-tags",
+      "harnessVersion": "2026-09-15.36",
+      "elapsedMs": 814.8216660000003,
+      "expectedSourcePaths": [
+        "litellm/litellm_core_utils/get_litellm_params.py",
+        "litellm/llms/bedrock/base_aws_llm.py",
+        "litellm/llms/bedrock/batches/handler.py",
+        "litellm/llms/bedrock/chat/converse_handler.py",
+        "litellm/llms/bedrock/common_utils.py",
+        "litellm/llms/bedrock/embed/embedding.py",
+        "litellm/llms/sagemaker/chat/handler.py",
+        "litellm/llms/sagemaker/completion/handler.py",
+        "litellm/proxy/auth/auth_utils.py",
+        "litellm/proxy/management_endpoints/model_management_endpoints.py",
+        "litellm/types/llms/bedrock.py",
+        "litellm/types/router.py"
+      ],
+      "sourcePathsShown": [
+        "litellm/proxy/auth/roles.py",
+        "litellm/proxy/auth/ip_address_utils.py",
+        "litellm/proxy/auth/user_api_key_auth.py",
+        "enterprise/litellm_enterprise/proxy/auth/user_api_key_auth.py",
+        "litellm/proxy/_experimental/mcp_server/auth/user_api_key_auth_mcp.py",
+        "litellm/proxy/_experimental/mcp_server/outbound_credentials/httpx_auth.py",
+        "litellm/proxy/_experimental/mcp_server/outbound_credentials/session_token.py",
+        "litellm/proxy/_experimental/mcp_server/outbound_credentials/oauth_token_store.py",
+        "litellm/litellm_core_utils/get_litellm_params.py",
+        "litellm/llms/bedrock/common_utils.py",
+        "litellm/llms/bedrock/base_aws_llm.py",
+        "litellm/proxy/guardrails/guardrail_hooks/cisco_ai_defense/cisco_ai_defense.py",
+        "litellm/proxy/_experimental/mcp_server/db.py",
+        "litellm/proxy/_experimental/mcp_server/outbound_credentials/session_credentials.py",
+        "litellm/litellm_core_utils/prompt_templates/common_utils.py",
+        "litellm/litellm_core_utils/prompt_templates/factory.py",
+        "litellm/proxy/health_endpoints/_health_endpoints.py",
+        "litellm/router.py",
+        "litellm/litellm_core_utils/exception_mapping_utils.py",
+        "litellm/llms/bedrock/batches/transformation.py",
+        "litellm/proxy/_types.py",
+        "litellm/router_strategy/tag_based_routing.py",
+        "litellm/router_utils/pre_call_checks/encrypted_content_affinity_check.py"
+      ],
+      "sourceHits": [
+        "litellm/litellm_core_utils/get_litellm_params.py",
+        "litellm/llms/bedrock/base_aws_llm.py",
+        "litellm/llms/bedrock/common_utils.py"
+      ],
+      "sourceHitsIncludingGuides": [
+        "litellm/litellm_core_utils/get_litellm_params.py",
+        "litellm/llms/bedrock/base_aws_llm.py",
+        "litellm/llms/bedrock/common_utils.py"
+      ],
+      "expectedTestPaths": [
+        "tests/test_litellm/llms/bedrock/batches/test_handler.py",
+        "tests/test_litellm/llms/bedrock/chat/invoke_transformations/test_bedrock_chat_invoke_transformations_anthropic_claude3_transformation.py",
+        "tests/test_litellm/llms/bedrock/chat/test_bedrock_converse_handler.py",
+        "tests/test_litellm/llms/bedrock/embed/test_bedrock_embedding.py",
+        "tests/test_litellm/llms/bedrock/test_base_aws_llm.py",
+        "tests/test_litellm/llms/bedrock/test_bedrock_common_utils.py",
+        "tests/test_litellm/llms/sagemaker/test_sagemaker_chat_handler.py",
+        "tests/test_litellm/llms/sagemaker/test_sagemaker_completion_handler.py",
+        "tests/test_litellm/proxy/management_endpoints/test_model_management_endpoints.py",
+        "tests/test_litellm/types/test_router.py"
+      ],
+      "testPathsShown": [
+        "tests/test_litellm/proxy/auth/test_admin_viewer_handler_access.py",
+        "tests/test_litellm/proxy/auth/test_auth_checks.py",
+        "tests/test_litellm/proxy/auth/test_auth_exception_handler.py",
+        "tests/test_litellm/proxy/auth/test_user_api_key_auth.py",
+        "tests/enterprise/litellm_enterprise/proxy/auth/test_user_api_key_auth.py",
+        "tests/test_litellm/proxy/_experimental/mcp_server/auth/test_user_api_key_auth_mcp.py",
+        "tests/test_litellm/proxy/_experimental/mcp_server/outbound_credentials/test_httpx_auth.py",
+        "tests/test_litellm/proxy/_experimental/mcp_server/outbound_credentials/test_session_token.py",
+        "tests/test_litellm/proxy/_experimental/mcp_server/outbound_credentials/test_oauth_token_store.py",
+        "tests/test_litellm/litellm_core_utils/test_get_litellm_params.py",
+        "tests/test_litellm/llms/bedrock/test_bedrock_common_utils.py",
+        "tests/test_litellm/llms/bedrock/test_base_aws_llm.py",
+        "tests/test_litellm/proxy/_experimental/mcp_server/test_db_credentials.py",
+        "tests/test_litellm/proxy/_experimental/mcp_server/outbound_credentials/test_session_credentials.py",
+        "tests/test_litellm/litellm_core_utils/prompt_templates/test_litellm_core_utils_prompt_templates_common_utils.py"
+      ],
+      "testHits": [
+        "tests/test_litellm/llms/bedrock/test_base_aws_llm.py",
+        "tests/test_litellm/llms/bedrock/test_bedrock_common_utils.py"
+      ],
+      "symbolScan": {
+        "roots": [
+          "litellm/llms/aws_polly/",
+          "litellm/llms/bedrock/",
+          "litellm/llms/bedrock_mantle/",
+          "litellm/proxy/",
+          "enterprise/",
+          "litellm/router.py",
+          "litellm/router_utils/",
+          "litellm/router_strategy/",
+          "litellm/litellm_core_utils/",
+          "litellm/utils.py"
+        ],
+        "files": 800,
+        "partial": true
+      },
+      "outputCharacters": 12809
+    },
+    {
+      "dataset": "training2",
+      "case": "langfuse-session-traces",
+      "harnessVersion": "2026-09-15.36",
+      "elapsedMs": 651.76325,
+      "expectedSourcePaths": [
+        "litellm/integrations/langfuse/langfuse.py"
+      ],
+      "sourcePathsShown": [
+        "litellm/integrations/langfuse/langfuse.py",
+        "litellm/integrations/langfuse/langfuse_otel.py",
+        "litellm/integrations/langfuse/langfuse_handler.py",
+        "litellm/integrations/langfuse/langfuse_mock_client.py",
+        "litellm/integrations/langfuse/langfuse_otel_attributes.py",
+        "litellm/integrations/langfuse/langfuse_prompt_management.py",
+        "litellm/integrations/otel/mappers/langfuse.py",
+        "litellm/types/integrations/langfuse.py",
+        "litellm/integrations/otel/presets/langfuse.py",
+        "litellm/proxy/_experimental/mcp_server/server.py",
+        "litellm/integrations/SlackAlerting/utils.py",
+        "litellm/proxy/_experimental/mcp_server/mcp_server_manager.py",
+        "litellm/proxy/guardrails/guardrail_hooks/akto/akto.py",
+        "litellm/proxy/guardrails/guardrail_hooks/grayswan/grayswan.py",
+        "litellm/proxy/guardrails/guardrail_hooks/lasso/lasso.py",
+        "litellm/litellm_core_utils/url_utils.py",
+        "litellm/litellm_core_utils/prompt_templates/common_utils.py",
+        "litellm/proxy/auth/team_grants.py",
+        "litellm/proxy/_types.py",
+        "litellm/litellm_core_utils/prompt_templates/factory.py",
+        "litellm/proxy/_experimental/mcp_server/auth/user_api_key_auth_mcp.py",
+        "litellm/integrations/otel/model/destination.py",
+        "litellm/integrations/otel/mount.py",
+        "litellm/litellm_core_utils/litellm_logging.py",
+        "litellm/litellm_core_utils/specialty_caches/dynamic_logging_cache.py",
+        "litellm/proxy/_experimental/mcp_server/openapi_to_mcp_generator.py",
+        "litellm/proxy/_experimental/mcp_server/outbound_credentials/bridge_credentials.py",
+        "litellm/proxy/_experimental/mcp_server/outbound_credentials/oauth_token_store.py",
+        "litellm/proxy/common_request_processing.py"
+      ],
+      "sourceHits": [
+        "litellm/integrations/langfuse/langfuse.py"
+      ],
+      "sourceHitsIncludingGuides": [
+        "litellm/integrations/langfuse/langfuse.py"
+      ],
+      "expectedTestPaths": [
+        "tests/test_litellm/integrations/test_langfuse.py"
+      ],
+      "testPathsShown": [
+        "tests/test_litellm/integrations/langfuse/test_langfuse_prompt_management.py",
+        "tests/test_litellm/integrations/langfuse/test_gemini_cached_tokens.py",
+        "tests/test_litellm/proxy/_experimental/mcp_server/test_mcp_server_identity_env.py",
+        "tests/test_litellm/proxy/_experimental/mcp_server/test_mcp_server_manager.py",
+        "tests/test_litellm/integrations/SlackAlerting/test_slack_alerting_utils.py",
+        "tests/test_litellm/litellm_core_utils/test_url_utils.py",
+        "tests/test_litellm/litellm_core_utils/prompt_templates/test_litellm_core_utils_prompt_templates_common_utils.py",
+        "tests/test_litellm/proxy/auth/test_team_grants.py"
+      ],
+      "testHits": [],
+      "symbolScan": {
+        "roots": [
+          "litellm/proxy/",
+          "enterprise/",
+          "litellm/integrations/",
+          "litellm/litellm_core_utils/",
+          "litellm/utils.py"
+        ],
+        "files": 800,
+        "partial": true
+      },
+      "outputCharacters": 8498
+    },
+    {
+      "dataset": "training2",
+      "case": "mcp-auth-challenge",
+      "harnessVersion": "2026-09-15.36",
+      "elapsedMs": 855.9347079999998,
+      "expectedSourcePaths": [
+        "litellm/proxy/_experimental/mcp_server/auth/user_api_key_auth_mcp.py",
+        "litellm/proxy/_experimental/mcp_server/discoverable_endpoints.py",
+        "litellm/proxy/_experimental/mcp_server/gateway_dcr_flow.py",
+        "litellm/types/mcp_server/mcp_server_manager.py"
+      ],
+      "sourcePathsShown": [
+        "litellm/proxy/_experimental/mcp_server/auth/user_api_key_auth_mcp.py",
+        "litellm/proxy/_experimental/mcp_server/oauth2_token_cache.py",
+        "litellm/proxy/_experimental/mcp_server/auth/token_endpoint_auth.py",
+        "litellm/proxy/_experimental/mcp_server/oauth2_flow_backfill.py",
+        "litellm/proxy/_experimental/mcp_server/outbound_credentials/oauth_token_store.py",
+        "litellm/proxy/_experimental/mcp_server/outbound_credentials/per_user_oauth_store.py",
+        "litellm/proxy/auth/user_api_key_auth.py",
+        "enterprise/litellm_enterprise/proxy/auth/user_api_key_auth.py",
+        "litellm/proxy/management_endpoints/mcp_management_endpoints.py",
+        "litellm/proxy/litellm_pre_call_utils.py",
+        "litellm/proxy/_types.py",
+        "litellm/proxy/custom_auth_auto.py",
+        "litellm/proxy/example_config_yaml/custom_auth_basic.py",
+        "litellm/proxy/example_config_yaml/custom_auth.py",
+        "litellm/proxy/_experimental/mcp_server/auth/litellm_auth_handler.py",
+        "litellm/proxy/_experimental/mcp_server/mcp_server_manager.py",
+        "litellm/proxy/_experimental/mcp_server/server.py",
+        "litellm/proxy/_experimental/mcp_server/discoverable_endpoints.py",
+        "litellm/proxy/_experimental/mcp_server/outbound_credentials/sso_assertion_store.py",
+        "litellm/proxy/_experimental/mcp_server/rest_endpoints.py"
+      ],
+      "sourceHits": [
+        "litellm/proxy/_experimental/mcp_server/auth/user_api_key_auth_mcp.py",
+        "litellm/proxy/_experimental/mcp_server/discoverable_endpoints.py"
+      ],
+      "sourceHitsIncludingGuides": [
+        "litellm/proxy/_experimental/mcp_server/auth/user_api_key_auth_mcp.py",
+        "litellm/proxy/_experimental/mcp_server/discoverable_endpoints.py"
+      ],
+      "expectedTestPaths": [
+        "tests/test_litellm/proxy/_experimental/mcp_server/auth/test_user_api_key_auth_mcp.py",
+        "tests/test_litellm/proxy/_experimental/mcp_server/test_discoverable_endpoints.py",
+        "tests/test_litellm/proxy/_experimental/mcp_server/test_gateway_dcr_flow.py"
+      ],
+      "testPathsShown": [
+        "tests/test_litellm/proxy/_experimental/mcp_server/auth/test_user_api_key_auth_mcp.py",
+        "tests/test_litellm/proxy/_experimental/mcp_server/test_oauth2_token_cache.py",
+        "tests/test_litellm/proxy/_experimental/mcp_server/auth/test_token_endpoint_auth.py",
+        "tests/test_litellm/proxy/_experimental/mcp_server/test_oauth2_flow_backfill.py",
+        "tests/test_litellm/proxy/_experimental/mcp_server/outbound_credentials/test_oauth_token_store.py",
+        "tests/test_litellm/proxy/_experimental/mcp_server/outbound_credentials/test_per_user_oauth_store.py",
+        "tests/test_litellm/proxy/auth/test_user_api_key_auth.py",
+        "tests/enterprise/litellm_enterprise/proxy/auth/test_user_api_key_auth.py",
+        "tests/test_litellm/proxy/management_endpoints/test_mcp_management_endpoints.py",
+        "tests/test_litellm/proxy/test_litellm_pre_call_utils.py",
+        "tests/test_litellm/proxy/test__types.py",
+        "tests/test_litellm/proxy/test_aiohttp_cleanup_closed.py"
+      ],
+      "testHits": [
+        "tests/test_litellm/proxy/_experimental/mcp_server/auth/test_user_api_key_auth_mcp.py"
+      ],
+      "symbolScan": {
+        "roots": [
+          "litellm/proxy/",
+          "enterprise/",
+          "litellm/experimental_mcp_client/",
+          "litellm/proxy/_experimental/mcp_server/"
+        ],
+        "files": 769,
+        "partial": false
+      },
+      "outputCharacters": 7662
+    },
+    {
+      "dataset": "training2",
+      "case": "mcp-optional-discovery",
+      "harnessVersion": "2026-09-15.36",
+      "elapsedMs": 155.92670799999996,
+      "expectedSourcePaths": [
+        "litellm/experimental_mcp_client/client.py"
+      ],
+      "sourcePathsShown": [
+        "litellm/experimental_mcp_client/tools.py",
+        "litellm/experimental_mcp_client/client.py",
+        "litellm/experimental_mcp_client/__init__.py",
+        "litellm/proxy/prompts/__init__.py",
+        "litellm/proxy/prompts/init_prompts.py",
+        "litellm/types/prompts/init_prompts.py",
+        "litellm/proxy/prompts/prompt_registry.py",
+        "litellm/proxy/prompts/prompt_endpoints.py",
+        "litellm/proxy/_experimental/mcp_server/server.py",
+        "litellm/proxy/_experimental/mcp_server/exceptions.py",
+        "litellm/proxy/_experimental/mcp_server/mcp_server_manager.py"
+      ],
+      "sourceHits": [
+        "litellm/experimental_mcp_client/client.py"
+      ],
+      "sourceHitsIncludingGuides": [
+        "litellm/experimental_mcp_client/client.py"
+      ],
+      "expectedTestPaths": [
+        "tests/test_litellm/experimental_mcp_client/test_mcp_client.py"
+      ],
+      "testPathsShown": [
+        "tests/test_litellm/experimental_mcp_client/test_tools.py",
+        "tests/test_litellm/experimental_mcp_client/test_mcp_client.py",
+        "tests/test_litellm/proxy/prompts/test_prompt_endpoints_crud.py",
+        "tests/test_litellm/proxy/prompts/test_prompt_endpoints.py",
+        "tests/test_litellm/proxy/prompts/test_prompt_environment.py",
+        "tests/test_litellm/proxy/prompts/test_prompt_registry.py",
+        "tests/test_litellm/proxy/_experimental/mcp_server/test_mcp_server_identity_env.py",
+        "tests/test_litellm/proxy/_experimental/mcp_server/test_mcp_server_manager.py",
+        "tests/test_litellm/proxy/_experimental/mcp_server/test_byok_oauth_endpoints.py",
+        "tests/test_litellm/proxy/_experimental/mcp_server/test_callback_oauth_error_responses.py"
+      ],
+      "testHits": [
+        "tests/test_litellm/experimental_mcp_client/test_mcp_client.py"
+      ],
+      "symbolScan": {
+        "roots": [
+          "litellm/experimental_mcp_client/",
+          "litellm/proxy/_experimental/mcp_server/"
+        ],
+        "files": 67,
+        "partial": false
+      },
+      "outputCharacters": 7897
+    },
+    {
+      "dataset": "training2",
+      "case": "mock-input-tokens",
+      "harnessVersion": "2026-09-15.36",
+      "elapsedMs": 762.4509159999998,
+      "expectedSourcePaths": [
+        "litellm/main.py",
+        "litellm/proxy/spend_tracking/budget_reservation.py"
+      ],
+      "sourcePathsShown": [
+        "litellm/proxy/spend_tracking/budget_reservation.py",
+        "litellm/proxy/spend_tracking/compression_savings.py",
+        "litellm/proxy/spend_tracking/key_metadata_recovery.py",
+        "litellm/proxy/spend_tracking/savings.py",
+        "litellm/proxy/spend_tracking/ptu_feature_flag.py",
+        "litellm/proxy/spend_tracking/vantage_endpoints.py",
+        "litellm/proxy/spend_tracking/cloudzero_endpoints.py",
+        "litellm/proxy/spend_tracking/cold_storage_handler.py",
+        "litellm/proxy/hooks/parallel_request_limiter_v3.py",
+        "litellm/proxy/management_endpoints/common_daily_activity.py",
+        "litellm/litellm_core_utils/llm_cost_calc/utils.py",
+        "litellm/litellm_core_utils/token_counter.py",
+        "litellm/proxy/pass_through_endpoints/llm_provider_handlers/openai_passthrough_logging_handler.py",
+        "litellm/proxy/hooks/proxy_track_cost_callback.py",
+        "litellm/proxy/management_endpoints/key_management_endpoints.py",
+        "litellm/litellm_core_utils/streaming_chunk_builder_utils.py",
+        "litellm/litellm_core_utils/litellm_logging.py",
+        "litellm/litellm_core_utils/llm_cost_calc/usage_object_transformation.py",
+        "litellm/litellm_core_utils/prompt_templates/factory.py"
+      ],
+      "sourceHits": [
+        "litellm/proxy/spend_tracking/budget_reservation.py"
+      ],
+      "sourceHitsIncludingGuides": [
+        "litellm/proxy/spend_tracking/budget_reservation.py"
+      ],
+      "expectedTestPaths": [
+        "tests/test_litellm/proxy/spend_tracking/test_budget_reservation.py",
+        "tests/test_litellm/test_main.py"
+      ],
+      "testPathsShown": [
+        "tests/test_litellm/proxy/spend_tracking/test_budget_reservation.py",
+        "tests/test_litellm/proxy/spend_tracking/test_budget_reservation_redis_failure.py",
+        "tests/test_litellm/proxy/spend_tracking/test_compression_savings.py",
+        "tests/test_litellm/proxy/spend_tracking/test_key_metadata_recovery.py",
+        "tests/test_litellm/proxy/spend_tracking/test_savings.py",
+        "tests/test_litellm/proxy/spend_tracking/test_ptu_feature_flag.py",
+        "tests/test_litellm/proxy/spend_tracking/test_cloudzero_endpoints.py",
+        "tests/test_litellm/proxy/hooks/test_parallel_request_limiter_v3.py",
+        "tests/test_litellm/proxy/management_endpoints/test_common_daily_activity.py",
+        "tests/test_litellm/litellm_core_utils/llm_cost_calc/test_llm_cost_calc_utils.py",
+        "tests/test_litellm/litellm_core_utils/test_token_counter.py",
+        "tests/test_litellm/litellm_core_utils/test_token_counter_tool_data.py",
+        "tests/test_litellm/proxy/pass_through_endpoints/llm_provider_handlers/test_openai_passthrough_logging_handler.py",
+        "tests/test_litellm/proxy/hooks/test_proxy_track_cost_callback.py"
+      ],
+      "testHits": [
+        "tests/test_litellm/proxy/spend_tracking/test_budget_reservation.py"
+      ],
+      "symbolScan": {
+        "roots": [
+          "litellm/proxy/",
+          "enterprise/",
+          "litellm/litellm_core_utils/",
+          "litellm/utils.py"
+        ],
+        "files": 800,
+        "partial": true
+      },
+      "outputCharacters": 10256
+    },
+    {
+      "dataset": "training2",
+      "case": "responses-custom-guardrail",
+      "harnessVersion": "2026-09-15.36",
+      "elapsedMs": 793.5134579999994,
+      "expectedSourcePaths": [
+        "litellm/completion_extras/litellm_responses_transformation/transformation.py",
+        "litellm/llms/openai/responses/guardrail_translation/handler.py"
+      ],
+      "sourcePathsShown": [
+        "litellm/llms/openai/responses/guardrail_translation/handler.py",
+        "litellm/llms/openai/responses/guardrail_translation/tool_merge.py",
+        "litellm/llms/openai/responses/count_tokens/handler.py",
+        "litellm/llms/openai/responses/guardrail_translation/__init__.py",
+        "litellm/types/responses/streaming_websocket.py",
+        "litellm/llms/openai/responses/transformation.py",
+        "litellm/llms/openai/responses/count_tokens/__init__.py",
+        "litellm/llms/openai/responses/count_tokens/token_counter.py",
+        "litellm/llms/openai/chat/guardrail_translation/handler.py",
+        "litellm/litellm_core_utils/prompt_templates/factory.py",
+        "litellm/litellm_core_utils/redact_messages.py",
+        "litellm/litellm_core_utils/core_helpers.py",
+        "litellm/proxy/guardrails/guardrail_hooks/compresr/compresr.py",
+        "litellm/responses/litellm_completion_transformation/transformation.py",
+        "litellm/proxy/guardrails/guardrail_hooks/panw_prisma_airs/panw_prisma_airs.py",
+        "litellm/responses/litellm_completion_transformation/streaming_iterator.py",
+        "litellm/llms/openai_like/chat/transformation.py",
+        "litellm/proxy/guardrails/_content_utils.py",
+        "litellm/proxy/guardrails/guardrail_hooks/microsoft_purview/base.py",
+        "litellm/responses/litellm_completion_transformation/custom_tools.py",
+        "litellm/responses/streaming_iterator.py"
+      ],
+      "sourceHits": [
+        "litellm/llms/openai/responses/guardrail_translation/handler.py"
+      ],
+      "sourceHitsIncludingGuides": [
+        "litellm/llms/openai/responses/guardrail_translation/handler.py"
+      ],
+      "expectedTestPaths": [
+        "tests/test_litellm/llms/openai/responses/test_openai_responses_guardrail_handler.py"
+      ],
+      "testPathsShown": [
+        "tests/test_litellm/llms/openai/responses/test_openai_count_tokens_transformation.py",
+        "tests/test_litellm/llms/openai/responses/test_openai_responses_transformation.py",
+        "tests/test_litellm/llms/openai/chat/guardrail_translation/test_openai_guardrail_handler.py",
+        "tests/test_litellm/litellm_core_utils/prompt_templates/test_litellm_core_utils_prompt_templates_factory.py",
+        "tests/test_litellm/litellm_core_utils/test_redact_messages.py",
+        "tests/test_litellm/litellm_core_utils/test_core_helpers.py",
+        "tests/test_litellm/responses/litellm_completion_transformation/test_streaming_iterator_transformation.py"
+      ],
+      "testHits": [],
+      "symbolScan": {
+        "roots": [
+          "litellm/llms/custom_httpx/",
+          "litellm/llms/openai/",
+          "litellm/llms/openai_like/",
+          "litellm/proxy/",
+          "enterprise/",
+          "litellm/responses/",
+          "litellm/main.py",
+          "litellm/litellm_core_utils/",
+          "litellm/utils.py"
+        ],
+        "files": 800,
+        "partial": true
+      },
+      "outputCharacters": 7435
+    },
+    {
+      "dataset": "training5",
+      "case": "aws-signing-off-loop",
+      "harnessVersion": "2026-09-15.36",
+      "elapsedMs": 846.2296670000005,
+      "expectedSourcePaths": [
+        "litellm/llms/bedrock/base_aws_llm.py",
+        "litellm/llms/bedrock/embed/embedding.py",
+        "litellm/llms/bedrock_mantle/common_utils.py",
+        "litellm/proxy/guardrails/guardrail_hooks/bedrock_guardrails.py"
+      ],
+      "sourcePathsShown": [
+        "litellm/llms/bedrock/chat/mantle/__init__.py",
+        "litellm/llms/bedrock/chat/mantle/transformation.py",
+        "litellm/proxy/_experimental/mcp_server/outbound_credentials/oauth_token_store.py",
+        "litellm/proxy/_experimental/mcp_server/outbound_credentials/authz_code_refresher.py",
+        "litellm/proxy/_experimental/mcp_server/outbound_credentials/per_user_oauth_store.py",
+        "litellm/proxy/_experimental/mcp_server/outbound_credentials/runtime_refresh_coordinator.py",
+        "litellm/llms/bedrock/image_generation/amazon_nova_canvas_transformation.py",
+        "litellm/llms/bedrock/chat/invoke_transformations/amazon_nova_transformation.py",
+        "litellm/proxy/_types.py",
+        "litellm/proxy/_experimental/mcp_server/db.py",
+        "litellm/proxy/_experimental/mcp_server/outbound_credentials/client_credentials.py",
+        "litellm/llms/bedrock/chat/invoke_transformations/base_invoke_transformation.py",
+        "litellm/proxy/management_endpoints/mcp_management_endpoints.py",
+        "litellm/proxy/hooks/parallel_request_limiter_v3.py",
+        "litellm/proxy/management_endpoints/usage_endpoints/ai_usage_chat.py",
+        "litellm/llms/bedrock/vector_stores/transformation.py",
+        "litellm/proxy/_experimental/mcp_server/mcp_server_manager.py",
+        "litellm/llms/bedrock_mantle/passthrough/transformation.py",
+        "litellm/llms/bedrock_mantle/common_utils.py",
+        "litellm/proxy/db/token_auth.py",
+        "litellm/llms/bedrock/base_aws_llm.py",
+        "litellm/llms/bedrock/chat/converse_handler.py",
+        "litellm/llms/bedrock/chat/invoke_transformations/amazon_openai_transformation.py",
+        "litellm/llms/bedrock/embed/embedding.py"
+      ],
+      "sourceHits": [
+        "litellm/llms/bedrock/base_aws_llm.py",
+        "litellm/llms/bedrock/embed/embedding.py",
+        "litellm/llms/bedrock_mantle/common_utils.py"
+      ],
+      "sourceHitsIncludingGuides": [
+        "litellm/llms/bedrock/base_aws_llm.py",
+        "litellm/llms/bedrock/embed/embedding.py",
+        "litellm/llms/bedrock_mantle/common_utils.py"
+      ],
+      "expectedTestPaths": [
+        "tests/test_litellm/llms/bedrock/embed/test_bedrock_async_invoke_embedding.py",
+        "tests/test_litellm/llms/bedrock/embed/test_bedrock_embedding.py",
+        "tests/test_litellm/llms/bedrock_mantle/test_bedrock_mantle_transformation.py",
+        "tests/test_litellm/proxy/guardrails/guardrail_hooks/test_bedrock_guardrails.py",
+        "tests/test_litellm/proxy/guardrails/guardrail_hooks/test_bedrock_invoke_guardrail_checks.py"
+      ],
+      "testPathsShown": [
+        "tests/test_litellm/llms/bedrock/chat/mantle/test_bedrock_chat_mantle_transformation.py",
+        "tests/test_litellm/proxy/_experimental/mcp_server/outbound_credentials/test_oauth_token_store.py",
+        "tests/test_litellm/proxy/_experimental/mcp_server/outbound_credentials/test_authz_code_refresher.py",
+        "tests/test_litellm/proxy/_experimental/mcp_server/outbound_credentials/test_per_user_oauth_store.py",
+        "tests/test_litellm/proxy/_experimental/mcp_server/outbound_credentials/test_adapter.py",
+        "tests/test_litellm/proxy/_experimental/mcp_server/outbound_credentials/test_bridge_credentials.py",
+        "tests/test_litellm/llms/bedrock/chat/invoke_transformations/test_amazon_moonshot_transformation.py",
+        "tests/test_litellm/llms/bedrock/chat/invoke_transformations/test_amazon_qwen2_transformation.py",
+        "tests/test_litellm/llms/bedrock/chat/invoke_transformations/test_amazon_qwen3_transformation.py",
+        "tests/test_litellm/proxy/test__types.py",
+        "tests/test_litellm/proxy/_experimental/mcp_server/test_db_credentials.py",
+        "tests/test_litellm/proxy/_experimental/mcp_server/outbound_credentials/test_client_credentials.py",
+        "tests/test_litellm/llms/bedrock/chat/invoke_transformations/test_base_invoke_transformation.py",
+        "tests/test_litellm/proxy/management_endpoints/test_mcp_management_endpoints.py",
+        "tests/test_litellm/proxy/hooks/test_parallel_request_limiter_v3.py",
+        "tests/test_litellm/proxy/management_endpoints/usage_endpoints/test_ai_usage_chat.py",
+        "tests/test_litellm/llms/bedrock/vector_stores/test_bedrock_vector_store_transformation.py",
+        "tests/test_litellm/proxy/_experimental/mcp_server/test_mcp_server_manager.py"
+      ],
+      "testHits": [],
+      "symbolScan": {
+        "roots": [
+          "litellm/llms/aws_polly/",
+          "litellm/llms/bedrock/",
+          "litellm/llms/bedrock_mantle/",
+          "litellm/proxy/",
+          "enterprise/"
+        ],
+        "files": 800,
+        "partial": true
+      },
+      "outputCharacters": 7918
+    },
+    {
+      "dataset": "training5",
+      "case": "background-responses-pipeline",
+      "harnessVersion": "2026-09-15.36",
+      "elapsedMs": 836.6917919999996,
+      "expectedSourcePaths": [
+        "litellm/proxy/common_request_processing.py",
+        "litellm/proxy/policy_engine/response_retrieval.py",
+        "litellm/proxy/utils.py"
+      ],
+      "sourcePathsShown": [
+        "litellm/types/proxy/guardrails/guardrail_hooks/qohash.py",
+        "litellm/proxy/guardrails/guardrail_hooks/qohash/qohash.py",
+        "litellm/proxy/guardrails/guardrail_hooks/qohash/__init__.py",
+        "litellm/types/proxy/guardrails/guardrail_hooks/model_armor.py",
+        "litellm/proxy/guardrails/guardrail_hooks/model_armor/__init__.py",
+        "litellm/proxy/guardrails/guardrail_hooks/tool_policy/__init__.py",
+        "litellm/proxy/guardrails/guardrail_hooks/model_armor/model_armor.py",
+        "litellm/proxy/guardrails/guardrail_hooks/model_armor/file_scanning.py",
+        "litellm/proxy/pass_through_endpoints/passthrough_endpoint_router.py",
+        "litellm/router_utils/common_utils.py",
+        "litellm/proxy/_types.py",
+        "litellm/proxy/guardrails/guardrail_hooks/deepkeep/deepkeep.py",
+        "litellm/proxy/guardrails/guardrail_hooks/generic_guardrail_api/generic_guardrail_api.py",
+        "litellm/proxy/_experimental/mcp_server/ui_session_utils.py",
+        "litellm/responses/utils.py",
+        "litellm/proxy/management_endpoints/model_access_group_management_endpoints.py",
+        "litellm/proxy/management_endpoints/team_endpoints.py",
+        "litellm/proxy/common_request_processing.py",
+        "litellm/proxy/auth/auth_checks.py",
+        "litellm/proxy/litellm_pre_call_utils.py",
+        "litellm/router.py",
+        "litellm/proxy/hooks/proxy_track_cost_callback.py",
+        "litellm/proxy/_experimental/mcp_server/auth/user_api_key_auth_mcp.py",
+        "litellm/proxy/pass_through_endpoints/llm_passthrough_endpoints.py",
+        "litellm/proxy/policy_engine/__init__.py",
+        "litellm/proxy/policy_engine/init_policies.py"
+      ],
+      "sourceHits": [
+        "litellm/proxy/common_request_processing.py"
+      ],
+      "sourceHitsIncludingGuides": [
+        "litellm/proxy/common_request_processing.py"
+      ],
+      "expectedTestPaths": [
+        "tests/test_litellm/proxy/test_common_request_processing.py",
+        "tests/test_litellm/proxy/utils/proxy_logging/test_guardrail_pipeline.py"
+      ],
+      "testPathsShown": [
+        "tests/test_litellm/proxy/pass_through_endpoints/test_passthrough_endpoint_router.py",
+        "tests/test_litellm/router_utils/test_router_utils_common_utils.py",
+        "tests/test_litellm/proxy/test__types.py",
+        "tests/test_litellm/proxy/_experimental/mcp_server/test_ui_session_utils.py",
+        "tests/test_litellm/responses/test_responses_utils.py",
+        "tests/test_litellm/proxy/management_endpoints/test_access_group_endpoints.py",
+        "tests/test_litellm/proxy/management_endpoints/test_access_group_management.py",
+        "tests/test_litellm/proxy/management_endpoints/test_team_endpoints.py",
+        "tests/test_litellm/proxy/test_common_request_processing.py",
+        "tests/test_litellm/proxy/auth/test_auth_checks.py"
+      ],
+      "testHits": [
+        "tests/test_litellm/proxy/test_common_request_processing.py"
+      ],
+      "symbolScan": {
+        "roots": [
+          "litellm/llms/together_ai/",
+          "litellm/proxy/",
+          "enterprise/",
+          "litellm/router.py",
+          "litellm/router_utils/",
+          "litellm/router_strategy/",
+          "litellm/responses/",
+          "litellm/main.py"
+        ],
+        "files": 800,
+        "partial": true
+      },
+      "outputCharacters": 11659
+    },
+    {
+      "dataset": "training5",
+      "case": "legacy-stream-pipeline",
+      "harnessVersion": "2026-09-15.36",
+      "elapsedMs": 901.8907090000012,
+      "expectedSourcePaths": [
+        "litellm/llms/anthropic/chat/guardrail_translation/handler.py",
+        "litellm/llms/base_llm/guardrail_translation/base_translation.py",
+        "litellm/proxy/common_request_processing.py",
+        "litellm/proxy/policy_engine/pipeline_executor.py",
+        "litellm/proxy/utils.py"
+      ],
+      "sourcePathsShown": [
+        "litellm/types/proxy/guardrails/guardrail_hooks/openai/openai_moderation.py",
+        "litellm/llms/anthropic/experimental_pass_through/messages/streaming_iterator.py",
+        "litellm/llms/anthropic/experimental_pass_through/messages/agentic_streaming_iterator.py",
+        "litellm/proxy/guardrails/guardrail_hooks/openai/base.py",
+        "litellm/proxy/guardrails/guardrail_hooks/openai/__init__.py",
+        "litellm/proxy/guardrails/guardrail_hooks/openai/moderations.py",
+        "litellm/llms/anthropic/experimental_pass_through/messages/transformation.py",
+        "litellm/llms/anthropic/experimental_pass_through/messages/fake_stream_iterator.py",
+        "litellm/proxy/_experimental/mcp_server/server.py",
+        "enterprise/enterprise_hooks/banned_keywords.py",
+        "enterprise/litellm_enterprise/enterprise_callbacks/llm_guard.py",
+        "litellm/proxy/example_config_yaml/custom_callbacks1.py",
+        "litellm/proxy/guardrails/guardrail_hooks/azure/text_moderation.py",
+        "litellm/litellm_core_utils/streaming_handler.py",
+        "litellm/llms/anthropic/experimental_pass_through/messages/utils.py",
+        "litellm/proxy/guardrails/guardrail_hooks/aim/aim.py",
+        "litellm/proxy/guardrails/guardrail_hooks/bedrock_guardrails.py",
+        "litellm/proxy/guardrails/guardrail_hooks/cato_networks/cato_networks.py",
+        "litellm/litellm_core_utils/prompt_templates/factory.py",
+        "litellm/litellm_core_utils/token_counter.py",
+        "litellm/proxy/common_request_processing.py",
+        "litellm/proxy/guardrails/guardrail_hooks/noma/noma.py",
+        "litellm/proxy/guardrails/guardrail_hooks/unified_guardrail/unified_guardrail.py",
+        "litellm/proxy/guardrails/guardrail_hooks/cisco_ai_defense/cisco_ai_defense.py",
+        "litellm/proxy/guardrails/guardrail_hooks/dynamoai/dynamoai.py",
+        "litellm/proxy/guardrails/guardrail_hooks/enkryptai/enkryptai.py"
+      ],
+      "sourceHits": [
+        "litellm/proxy/common_request_processing.py"
+      ],
+      "sourceHitsIncludingGuides": [
+        "litellm/proxy/common_request_processing.py"
+      ],
+      "expectedTestPaths": [
+        "tests/test_litellm/llms/anthropic/chat/guardrail_translation/test_anthropic_guardrail_handler.py",
+        "tests/test_litellm/proxy/policy_engine/test_pipeline_executor.py",
+        "tests/test_litellm/proxy/test_proxy_logging_hook_detection.py",
+        "tests/test_litellm/proxy/utils/proxy_logging/test_guardrail_pipeline.py"
+      ],
+      "testPathsShown": [
+        "tests/test_litellm/llms/anthropic/experimental_pass_through/messages/test_streaming_iterator.py",
+        "tests/test_litellm/llms/anthropic/experimental_pass_through/messages/test_agentic_streaming_iterator.py",
+        "tests/test_litellm/proxy/guardrails/guardrail_hooks/openai/test_moderations.py",
+        "tests/test_litellm/proxy/guardrails/guardrail_hooks/openai/test_openai_moderation_streaming.py",
+        "tests/test_litellm/llms/anthropic/experimental_pass_through/messages/test_advisor_integration.py",
+        "tests/test_litellm/llms/anthropic/experimental_pass_through/messages/test_anthropic_experimental_pass_through_messages_handler.py",
+        "tests/test_litellm/proxy/_experimental/mcp_server/test_mcp_server_identity_env.py",
+        "tests/test_litellm/proxy/_experimental/mcp_server/test_mcp_server_manager.py",
+        "tests/enterprise/litellm_enterprise/enterprise_callbacks/test_prometheus_logging_callbacks.py",
+        "tests/test_litellm/proxy/guardrails/guardrail_hooks/azure/test_azure_text_moderation.py",
+        "tests/test_litellm/litellm_core_utils/test_streaming_handler.py",
+        "tests/test_litellm/llms/anthropic/experimental_pass_through/messages/test_request_optional_param_utils.py",
+        "tests/test_litellm/proxy/guardrails/guardrail_hooks/test_bedrock_guardrails.py"
+      ],
+      "testHits": [],
+      "symbolScan": {
+        "roots": [
+          "litellm/llms/anthropic/",
+          "litellm/llms/openai/",
+          "litellm/llms/openai_like/",
+          "litellm/proxy/",
+          "enterprise/",
+          "litellm/litellm_core_utils/",
+          "litellm/utils.py"
+        ],
+        "files": 800,
+        "partial": true
+      },
+      "outputCharacters": 9150
+    },
+    {
+      "dataset": "training5",
+      "case": "stream-tool-rewrite-membership",
+      "harnessVersion": "2026-09-15.36",
+      "elapsedMs": 890.1183329999985,
+      "expectedSourcePaths": [
+        "litellm/proxy/policy_engine/pipeline_executor.py"
+      ],
+      "sourcePathsShown": [
+        "litellm/llms/anthropic/chat/guardrail_translation/handler.py",
+        "litellm/llms/anthropic/chat/guardrail_translation/__init__.py",
+        "litellm/responses/litellm_completion_transformation/streaming_iterator.py",
+        "litellm/llms/anthropic/experimental_pass_through/responses_adapters/streaming_iterator.py",
+        "litellm/llms/anthropic/experimental_pass_through/context_management/editors/clear_tool_uses.py",
+        "litellm/llms/anthropic/chat/transformation.py",
+        "litellm/llms/anthropic/completion/transformation.py",
+        "litellm/proxy/guardrails/anthropic_sse.py",
+        "litellm/responses/litellm_completion_transformation/transformation.py",
+        "litellm/proxy/guardrails/guardrail_hooks/panw_prisma_airs/panw_prisma_airs.py",
+        "litellm/litellm_core_utils/prompt_templates/factory.py",
+        "litellm/proxy/common_request_processing.py",
+        "litellm/litellm_core_utils/redact_messages.py",
+        "litellm/utils.py",
+        "enterprise/litellm_enterprise/enterprise_callbacks/callback_controls.py",
+        "litellm/main.py",
+        "litellm/proxy/_experimental/mcp_server/guardrail_translation/handler.py",
+        "litellm/proxy/guardrails/guardrail_hooks/model_armor/model_armor.py"
+      ],
+      "sourceHits": [],
+      "sourceHitsIncludingGuides": [],
+      "expectedTestPaths": [
+        "tests/test_litellm/proxy/policy_engine/test_pipeline_executor.py",
+        "tests/test_litellm/proxy/utils/proxy_logging/test_guardrail_pipeline.py"
+      ],
+      "testPathsShown": [
+        "tests/test_litellm/llms/anthropic/chat/guardrail_translation/test_anthropic_guardrail_handler.py",
+        "tests/test_litellm/responses/litellm_completion_transformation/test_streaming_iterator_transformation.py",
+        "tests/test_litellm/llms/anthropic/experimental_pass_through/responses_adapters/test_responses_adapters_streaming_iterator.py",
+        "tests/test_litellm/llms/anthropic/chat/test_anthropic_chat_transformation.py",
+        "tests/test_litellm/proxy/guardrails/test_auto_router_compression.py",
+        "tests/test_litellm/proxy/guardrails/test_content_filter_path_traversal.py",
+        "tests/test_litellm/proxy/guardrails/test_content_utils.py",
+        "tests/test_litellm/litellm_core_utils/prompt_templates/test_litellm_core_utils_prompt_templates_factory.py",
+        "tests/test_litellm/proxy/test_common_request_processing.py",
+        "tests/test_litellm/litellm_core_utils/test_redact_messages.py",
+        "tests/test_litellm/test_utils.py",
+        "tests/test_litellm/a2a_protocol/test_utils.py"
+      ],
+      "testHits": [],
+      "symbolScan": {
+        "roots": [
+          "litellm/llms/anthropic/",
+          "litellm/proxy/",
+          "enterprise/",
+          "litellm/responses/",
+          "litellm/main.py",
+          "litellm/litellm_core_utils/",
+          "litellm/utils.py"
+        ],
+        "files": 800,
+        "partial": true
+      },
+      "outputCharacters": 8376
+    }
+  ]
+}

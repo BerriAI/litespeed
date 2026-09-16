@@ -1,0 +1,86 @@
+{
+  "createdAt": "2026-09-16T11:23:49.895576+00:00",
+  "protocol": 7,
+  "control": "astra",
+  "modelByArm": {
+    "flash": "fireworks_ai/deepseek-v4p1-flash",
+    "astra": "gpt-6-astra"
+  },
+  "repetitions": 2,
+  "globalConcurrency": 3,
+  "timeoutSeconds": 1800,
+  "seed": 50160926,
+  "stopNewTrialsAtCommittedUsd": 80,
+  "purpose": "Larger multi-module development diagnosis on the only metadata-eligible September11\u201314 change. Compare actual Codex/Astra High against integrated LiteLLM-specific Flash Medium with identical source/task/fixtures and a30-minute ceiling. This is not the untouched final comparison, nor a fair attribution to model or harness alone.",
+  "selectionRule": "All four declared attempts count. Require normal completion, all17 original selected reference checks and all4 independently qualified aggregation/serialization probes. Keep latency, incomplete tasks, and raw check counts. One task cannot estimate between-task generalization; two attempts give limited within-task evidence.",
+  "effortRationale": "Flash Medium retained after prior development effort comparisons; Astra High is the established baseline setting. Equal wall deadlines do not imply equal internal reasoning budgets.",
+  "budgetAccounting": "Only Flash requests count against the authorized gateway campaign. Astra subscription dollar cost is unavailable and must remain null.",
+  "reconstruction": "Use deadline/reconstruction-validation.json: public7faf688base plus v46 integration and replay deadline patches. Record a fresh commit/plan for reproduction.",
+  "supplementalSource": {
+    "path": "scripts/litellm-harness/studies/multi-module-development/aggregation_probe.py",
+    "sha256": "cbe0e291995cdaa42a0fd4eccee4f4e6a6b795a45207032efcf9cf55f6393735"
+  },
+  "qualificationInputHashes": {
+    "preparation-plan.json": "997e77a16bef3803ec4fe6dec832a65f991682a4d72aad73512755cdabe366d0",
+    "catalog.json": "402c6d73afe01e3c9114614a32afeeb4bebd04f5f4beff41a69d2db3e0cc27de",
+    "curation-record.json": "199703877d719c76aad5492d5d7c5ea45eb5bba539538ace7f7cb50c94949ea8"
+  },
+  "runs": [
+    {
+      "dataset": "training7",
+      "case": "realtime-cached-audio-cost",
+      "name": "astra",
+      "kind": "codex",
+      "label": "replication-v50-larger-astra-r1",
+      "commit": "8e0a6d40d66f13f73f6174073836ff43919c4282",
+      "effort": "high",
+      "timeoutSeconds": 1800,
+      "supplemental": {
+        "artifact": "aggregation-probe.json",
+        "expectedChecks": 4
+      }
+    },
+    {
+      "dataset": "training7",
+      "case": "realtime-cached-audio-cost",
+      "name": "flash",
+      "kind": "litellm-specific",
+      "label": "replication-v50-larger-flash-r1",
+      "commit": "8e0a6d40d66f13f73f6174073836ff43919c4282",
+      "effort": "medium",
+      "timeoutSeconds": 1800,
+      "supplemental": {
+        "artifact": "aggregation-probe.json",
+        "expectedChecks": 4
+      }
+    },
+    {
+      "dataset": "training7",
+      "case": "realtime-cached-audio-cost",
+      "name": "flash",
+      "kind": "litellm-specific",
+      "label": "replication-v50-larger-flash-r2",
+      "commit": "8e0a6d40d66f13f73f6174073836ff43919c4282",
+      "effort": "medium",
+      "timeoutSeconds": 1800,
+      "supplemental": {
+        "artifact": "aggregation-probe.json",
+        "expectedChecks": 4
+      }
+    },
+    {
+      "dataset": "training7",
+      "case": "realtime-cached-audio-cost",
+      "name": "astra",
+      "kind": "codex",
+      "label": "replication-v50-larger-astra-r2",
+      "commit": "8e0a6d40d66f13f73f6174073836ff43919c4282",
+      "effort": "high",
+      "timeoutSeconds": 1800,
+      "supplemental": {
+        "artifact": "aggregation-probe.json",
+        "expectedChecks": 4
+      }
+    }
+  ]
+}
