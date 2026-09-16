@@ -1,0 +1,22 @@
+{
+  "createdAt": "2026-09-16T10:27:49.815353+00:00",
+  "purpose": "Correct the critic evidence index, then resynthesize one known training review. No new solver patch or acceptance change; not a coding-quality experiment.",
+  "case": "mcp-auth-challenge",
+  "run": "replication-p6-ablation-control-r1-mcp-auth-challenge-aad2d3c9",
+  "reflectionProtocol": 3,
+  "priorReflectionProtocol": 2,
+  "frozenWindows": 8,
+  "windowInputHashesVerifiedUnchanged": true,
+  "sourceSha256": "6ca97b915482dafa6a4c1c2f1aaa30f74f49425ed675cb0c8d9417172232a388",
+  "observedCorrection": {
+    "commandStep": 123,
+    "waitStep": 125,
+    "outputStep": 127,
+    "jobId": "job-11",
+    "recordedOutputSummary": "981 passed, 78 warnings in 10.60s",
+    "priorCriticClaim": "The final 981 passed claim is not evidenced in the global index.",
+    "scope": "Later output existed in a trace window, but the global command entry retained only launch output. Its structured execution status already said exited. The critic overlooked available evidence; the index also failed to associate it with the command."
+  },
+  "metering": "One new metered synthesis under the shared three-slot queue. Reuse the eight prior window reviews only after exact input-hash verification. Preserve v2 outputs and charge the extra synthesis. No automatic retry if interrupted.",
+  "limits": "Output is a recorded tool observation, not independent proof of behavioral coverage. Wait status alone is not test output; compound-shell exit can mask an earlier failed command. Exact session/job matches only; unknown observations stay unassigned."
+}

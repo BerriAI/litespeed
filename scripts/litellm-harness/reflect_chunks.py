@@ -35,6 +35,14 @@ Propose only information obtainable from their task and pre-change checkout.
 Do not copy new private reference helper names into proposed solver prompts.
 Cite step numbers, report uncertainty, and claim no unmeasured improvement.
 Finish within the output allowance.'''
+SYNTHESIS_SYSTEM_V3 = SYNTHESIS_SYSTEM + '''
+The command index links background launches to later wait/output observations
+using exact session and job IDs. Read those observations before alleging that a
+started job was never completed or its reported test summary was absent. Wait
+reports status, not command output. Output excerpts are tool observations, not
+independent acceptance verdicts. Unmatched observations have no inferred command.
+Do not prescribe reverting the working fix: use a separate copy if baseline
+evidence is needed, and respect the existing solver's verification constraints.'''
 
 
 def excerpt(value, limit):
@@ -45,7 +53,7 @@ def excerpt(value, limit):
     return text[:head] + f'\n[omitted {len(text)-limit} characters]\n' + text[-(limit-head):]
 
 
-def trace_evidence(directory):
+def trace_evidence(directory, include_job_outputs=False):
     archives = json.loads((directory / 'archives.json').read_text()) if (directory / 'archives.json').exists() else []
     raw = [m for archive in archives for m in archive['messages']] + json.loads((directory / 'messages.json').read_text())
     unique = {}
@@ -54,7 +62,7 @@ def trace_evidence(directory):
                tuple(call['id'] for call in message.get('toolCalls', [])))
         unique[key] = message
     messages = sorted(unique.values(), key=lambda m: m['createdAt'])
-    steps, checks = [], []
+    steps, checks, jobs, observations = [], [], {}, []
     for index, message in enumerate(messages, 1):
         if message['role'] == 'tool':
             continue  # The runner retains its result on the assistant call.
@@ -62,16 +70,41 @@ def trace_evidence(directory):
         for call in message.get('toolCalls', []):
             calls.append({'name': call['name'], 'args': excerpt(call.get('args'), 6000),
                           'status': call.get('status'), 'output': excerpt(call.get('output') or '', 12000)})
-            execution = call.get('execution', {})
+            execution = call.get('execution') or {}
             if execution.get('command'):
-                checks.append({'step': index, 'tool': call['name'],
+                check = {'step': index, 'tool': call['name'],
                                'command': excerpt(execution['command'], 2500),
                                'status': execution.get('status'), 'exitCode': execution.get('exitCode'),
                                'checkVerdictRecognized': bool(execution.get('checkKey')),
-                               'output': excerpt(call.get('output') or '', 1200)})
+                               'output': excerpt(call.get('output') or '', 1200)}
+                checks.append(check)
+                if include_job_outputs and isinstance(execution.get('jobId'), str):
+                    check.update(jobId=execution['jobId'], jobObservations=[])
+                    jobs.setdefault((message.get('sessionId'), execution['jobId']), []).append(check)
+            if include_job_outputs and call['name'] in ('bash_output', 'wait', 'kill_shell'):
+                args = call.get('args') or {}
+                if isinstance(args, dict):
+                    ids = args.get('job_ids', []) if call['name'] == 'wait' else [args.get('job_id')]
+                    if isinstance(ids, list):
+                        for job_id in dict.fromkeys(value for value in ids if isinstance(value, str)):
+                            observations.append((message.get('sessionId'), job_id, {
+                                'step': index, 'tool': call['name'], 'callId': call['id'],
+                                'status': call.get('status'),
+                                'containsCommandOutput': call['name'] == 'bash_output',
+                                'output': excerpt(call.get('output') or '', 2400)}))
         steps.append({'step': index, 'role': message['role'],
                       'content': excerpt(message.get('content') or '', 4000),
                       'reasoning': excerpt(message.get('reasoning') or '', 6000), 'calls': calls})
+    unmatched = 0
+    for session_id, job_id, observation in observations:
+        matches = jobs.get((session_id, job_id), [])
+        if len(matches) == 1 and matches[0]['step'] <= observation['step']:
+            matches[0]['jobObservations'].append(observation)
+        else:
+            unmatched += 1
+            checks.append({'step': observation['step'], 'tool': observation['tool'],
+                           'command': None, 'jobId': job_id, 'jobObservations': [observation],
+                           'note': 'No unique preceding command with this session/job ID; command not inferred.'})
     chunks, current, size = [], [], 0
     for step in steps:
         encoded_size = len(json.dumps(step, ensure_ascii=False))
@@ -80,9 +113,13 @@ def trace_evidence(directory):
         current.append(step); size += encoded_size
     if current:
         chunks.append(current)
-    return chunks, checks, {'messages': len(messages), 'nonToolSteps': len(steps),
+    coverage = {'messages': len(messages), 'nonToolSteps': len(steps),
                             'archives': len(archives), 'windows': len(chunks),
                             'excerpted': True, 'note': 'Every non-tool step is included; long fields are explicitly excerpted. One large tool batch can exceed the target window size.'}
+    if include_job_outputs:
+        coverage.update(commandIndexVersion=3, jobObservations=len(observations),
+                        unmatchedJobObservations=unmatched)
+    return chunks, checks, coverage
 
 
 def request(root, target, label, system, payload, max_tokens):
@@ -133,7 +170,9 @@ def candidate_context(directory):
         return 'Context unavailable; do not infer that unchanged surrounding code is absent.'
 
 
-def reflect(root, raw):
+def reflect(root, raw, protocol=2):
+    if protocol not in (2, 3):
+        raise ValueError('Use reflection protocol 2 or 3.')
     root = root.resolve()
     directory = Path(raw).resolve()
     if directory.parent != root / 'runs':
@@ -143,23 +182,28 @@ def reflect(root, raw):
         raise ValueError('Reserved evaluation tasks cannot be used for training critiques.')
     if not json.loads((root / 'cases' / task['id'] / 'validation.json').read_text()).get('valid'):
         raise ValueError('Qualify the task before using its reference.')
-    chunks, checks, coverage = trace_evidence(directory)
+    chunks, checks, coverage = trace_evidence(directory, include_job_outputs=protocol == 3)
     if not chunks:
         raise ValueError('No recorded trajectory to review.')
-    out = directory / 'windowed-reflection-v2'; out.mkdir(mode=0o700, exist_ok=True)
+    window_out = directory / 'windowed-reflection-v2'
+    if protocol == 3 and any(not (window_out / f'window-{index:03d}.json').exists()
+                             for index in range(1, len(chunks) + 1)):
+        raise ValueError('Protocol 3 resynthesis requires all preserved v2 windows; it never reruns them.')
+    out = directory / f'windowed-reflection-v{protocol}'; out.mkdir(mode=0o700, exist_ok=True)
     (out / 'coverage.json').write_text(json.dumps(coverage, indent=2))
     reviews = []
     for index, chunk in enumerate(chunks, 1):
-        answer = request(root, out / f'window-{index:03d}.json', f'window-review-v2-{directory.name}-{index}',
+        answer = request(root, window_out / f'window-{index:03d}.json', f'window-review-v2-{directory.name}-{index}',
                          WINDOW_SYSTEM, {'task': task['prompt'], 'window': index,
                                          'totalWindows': len(chunks), 'steps': chunk}, 6000)
         reviews.append({'window': index, 'steps': [s['step'] for s in chunk], 'observations': answer})
         print(json.dumps({'run': directory.name, 'window': index, 'totalWindows': len(chunks), 'complete': True}), flush=True)
     result = json.loads((directory / 'result.json').read_text())
-    answer = request(root, out / 'synthesis.json', 'window-synthesis-v2-' + directory.name, SYNTHESIS_SYSTEM,
+    answer = request(root, out / 'synthesis.json', f'window-synthesis-v{protocol}-' + directory.name,
+        SYNTHESIS_SYSTEM_V3 if protocol == 3 else SYNTHESIS_SYSTEM,
         {'task': task['prompt'], 'coverage': coverage, 'windows': reviews,
          'executedCommandIndex': checks,
-         'commandIndexNote': 'Includes all host-recorded executions, including compound shell commands without a recognized check verdict. Exit zero for a compound command does not prove every subcommand passed.',
+         'commandIndexNote': ('Includes all host-recorded executions and exact session/job-ID links to later status/output observations. Unmatched observations retain an unknown command. Wait status and a compound-shell exit are not proof of test coverage.' if protocol == 3 else 'Includes all host-recorded executions, including compound shell commands without a recognized check verdict. Exit zero for a compound command does not prove every subcommand passed.'),
          'result': {key: result.get(key) for key in ['seconds', 'status', 'timedOut', 'acceptance', 'final']},
          'candidate': excerpt((directory / 'candidate.patch').read_text(), 100000),
          'candidateSourceContext': candidate_context(directory),
@@ -173,4 +217,4 @@ if __name__ == '__main__':
     os.umask(0o077)
     campaign = Path(os.environ['LITELLM_CAMPAIGN_DIR']).resolve()
     for argument in sys.argv[1:]:
-        reflect(campaign, argument)
+        reflect(campaign, argument, protocol=int(os.environ.get('LITELLM_REFLECTION_PROTOCOL', '2')))
