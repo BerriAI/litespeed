@@ -18,5 +18,20 @@
     "allocatedBeforeFix": 0,
     "paidRequestsBeforeFix": 0,
     "issue": "Two later datasets held stale copied connection files. Converted them to links to the current root connection after preserving the copies privately."
+  },
+  "billingAccessRecheck": {
+    "at": "2026-09-16T20:43:55.581007+00:00",
+    "routes": [
+      {
+        "path": "/key/info",
+        "status": 403
+      },
+      {
+        "path": "/key/spend/report",
+        "status": 403
+      }
+    ],
+    "reason": "Virtual key allows llm_api_routes only. No alternate billing endpoint can be assumed available.",
+    "accountingChange": null
   }
 }
