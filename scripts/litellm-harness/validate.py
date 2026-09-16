@@ -7,6 +7,7 @@ from pathlib import Path
 import shutil
 import subprocess
 import xml.etree.ElementTree as ET
+from fixtures import fixture_arguments, fixture_profile_hash, verify_fixtures
 
 ROOT=Path(os.environ['LITELLM_CAMPAIGN_DIR'])
 PYTHON=os.environ['LITELLM_EVAL_PYTHON']
@@ -17,12 +18,13 @@ def run_case(case):
     if dest.exists():shutil.rmtree(dest)
     subprocess.run(['cp','-cR',str(directory/'base'),str(dest)],check=True)
     shutil.copytree(directory/'reference',dest,dirs_exist_ok=True)
+    verify_fixtures(case, dest)
     results={}
     for label in ['base','reference']:
         if label=='reference':
             subprocess.run(['git','apply',str(directory/'reference.patch')],cwd=dest,check=True)
         output=directory/(label+'.xml')
-        command=[PYTHON,str(RUNNER),str(dest),'--junitxml='+str(output),*case['test_nodes']]
+        command=[PYTHON,str(RUNNER),str(dest),'--junitxml='+str(output),*fixture_arguments(case),*case['test_nodes']]
         try:
             result=subprocess.run(command,capture_output=True,text=True,timeout=150,env={'PATH':os.environ['PATH']})
             (directory/(label+'.log')).write_text(result.stdout+result.stderr)
@@ -34,6 +36,7 @@ def run_case(case):
     b,g=results['base'],results['reference']
     valid=b.get('exit')==1 and b.get('failures',0)>0 and b.get('errors')==0 and g.get('exit')==0 and g.get('tests',0)>g.get('skipped',0) and g.get('errors')==0
     record={'id':case['id'],'valid':valid,'snapshotRevision':case.get('snapshot_revision',1),'testNodesHash':hashlib.sha256(json.dumps(case['test_nodes'],separators=(',',':'),ensure_ascii=False).encode()).hexdigest(),'results':results}
+    record['fixtureProfileHash'] = fixture_profile_hash(case)
     (directory/'validation.json').write_text(json.dumps(record,indent=2))
     print(json.dumps(record),flush=True)
     return record

@@ -6,6 +6,7 @@ import re
 from pathlib import Path
 from trace_metrics import activations
 from completion import completion_reason
+from fixtures import fixture_profile_hash
 
 ROOT=Path(os.environ['LITELLM_CAMPAIGN_DIR'])
 records=[]
@@ -14,6 +15,8 @@ for p in sorted((ROOT/'runs').glob('*/result.json')):
     record={k:result.get(k) for k in ['id','kind','label','seconds','status','exit','acceptance','timedOut','contextWindow','evaluationProtocol','effort','timeoutSeconds','isolation','interrupted','recovered','durationIncomplete','repairParent']}
     record['run']=directory.name
     task=json.loads((directory/'task.json').read_text()) if (directory/'task.json').exists() else {}
+    record['fixturePlugins'] = task.get('fixture_plugins', [])
+    record['fixtureProfileHash'] = fixture_profile_hash(task)
     record['promptRevision']=result.get('promptRevision',task.get('prompt_revision',1))
     record['snapshotRevision']=result.get('snapshotRevision',task.get('snapshot_revision',1))
     record['completionReason']=completion_reason(result)

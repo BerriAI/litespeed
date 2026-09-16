@@ -6,6 +6,7 @@ import shutil
 import subprocess
 import sys
 import xml.etree.ElementTree as ET
+from fixtures import fixture_arguments, verify_fixtures
 
 ROOT=Path(os.environ['LITELLM_CAMPAIGN_DIR'])
 PYTHON=os.environ['LITELLM_EVAL_PYTHON']
@@ -19,9 +20,10 @@ for raw in sys.argv[1:]:
     if workspace.exists():shutil.rmtree(workspace)
     subprocess.run(['cp','-cR',str(directory/'workspace'),str(workspace)],check=True)
     shutil.copytree(ROOT/'cases'/result['id']/'reference',workspace,dirs_exist_ok=True)
+    verify_fixtures(case, workspace)
     xml=directory/'acceptance.xml'
     xml.unlink(missing_ok=True)
-    command=[PYTHON,str(RUNNER),str(workspace),'--junitxml='+str(xml),*case['test_nodes']]
+    command=[PYTHON,str(RUNNER),str(workspace),'--junitxml='+str(xml),*fixture_arguments(case),*case['test_nodes']]
     try:
         ran=subprocess.run(command,capture_output=True,text=True,timeout=180,env={'PATH':os.environ['PATH']})
         (directory/'acceptance.log').write_text(ran.stdout+ran.stderr)

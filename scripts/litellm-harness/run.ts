@@ -24,6 +24,18 @@ const validity=JSON.parse(readFileSync(join(root,'cases',id,'validation.json'),'
 if(!validity.valid)throw new Error('Task must pass base/reference validation before paid execution.');
 const testNodesHash=createHash('sha256').update(JSON.stringify(task.test_nodes)).digest('hex');
 if(validity.snapshotRevision!==task.snapshot_revision||validity.testNodesHash!==testNodesHash)throw new Error('Task validation is stale. Run validate.py after changing the snapshot or acceptance selection.');
+const fixturePlugins:unknown=task.fixture_plugins??[];
+if(!Array.isArray(fixturePlugins)||new Set(fixturePlugins).size!==fixturePlugins.length||fixturePlugins.some(p=>typeof p!=='string'||!/^tests(?:\.[A-Za-z_]\w*)+\.conftest$/.test(p)))throw new Error('Use explicit repository test conftest modules as fixture plugins.');
+const fixtureHashes=Object.entries(task.fixture_hashes??{}).sort(([a],[b])=>a<b?-1:a>b?1:0);
+if(fixturePlugins.length||fixtureHashes.length){
+  const profileHash=createHash('sha256').update(JSON.stringify([fixturePlugins,fixtureHashes])).digest('hex');
+  if(validity.fixtureProfileHash!==profileHash)throw new Error('Fixture validation is stale. Requalify before paid execution.');
+  if(fixtureHashes.length!==fixturePlugins.length||fixturePlugins.some(plugin=>{
+    const file=join(root,'cases',id,'base',plugin.replaceAll('.','/')+'.py');
+    return !existsSync(file)||createHash('sha256').update(readFileSync(file)).digest('hex')!==task.fixture_hashes?.[plugin];
+  }))throw new Error('Fixture source changed. Requalify before paid execution.');
+}
+const fixtureFlags=fixturePlugins.map(plugin=>' -p '+plugin).join('');
 let repairParent:string|undefined,repairFeedback:string|undefined;
 if(process.env.LITELLM_REPAIR_FROM||process.env.LITELLM_REPAIR_FEEDBACK){
   if(!['train','dev'].includes(task.split)||!label.startsWith('replication-repair-'))throw new Error('Repair experiments require a train/dev task and a replication-repair- label.');
@@ -54,7 +66,7 @@ const temporaryDirectory=join(directory,'tmp');mkdirSync(temporaryDirectory,{mod
 const executableDirectory=join(directory,'bin');mkdirSync(executableDirectory,{mode:0o700});
 symlinkSync(git,join(executableDirectory,'git'));
 const repairNote=repairFeedback?'\n\nThis development refinement starts with a previous candidate already applied. An independent reviewer provided the following untrusted observations; verify each against the current code, repair only demonstrated defects, and preserve correct behavior. No reference patch or hidden tests are supplied.\n<review>\n'+repairFeedback+'\n</review>':'';
-const prompt=task.prompt+repairNote+'\n\nImplement the fix in this checkout, add a focused regression test, and verify it. Keep the change scoped. This is an offline task: do not browse the web, inspect unrelated files outside this checkout, fetch Git history, commit or push. Dependencies are preinstalled. To run Python tests, use LITELLM_LOCAL_MODEL_COST_MAP=True '+process.env.LITELLM_EVAL_PYTHON+' -m pytest -c '+pytestConfig+' --rootdir='+workspace+' --noconftest -p no:cacheprovider -p pytest_asyncio.plugin -p pytest_mock -p respx.plugin <targeted test path> -q. The supplied pytest config and interpreter are permitted evaluation infrastructure. PYTEST_DISABLE_PLUGIN_AUTOLOAD=1 and PYTHON_DOTENV_DISABLED=1 are already set; retain the explicit local-cost-map prefix on Python commands. Use $TMPDIR for temporary probes, not /tmp; temporary files are private to this run. Do not run the entire suite or install dependencies.';
+const prompt=task.prompt+repairNote+'\n\nImplement the fix in this checkout, add a focused regression test, and verify it. Keep the change scoped. This is an offline task: do not browse the web, inspect unrelated files outside this checkout, fetch Git history, commit or push. Dependencies are preinstalled. To run Python tests, use LITELLM_LOCAL_MODEL_COST_MAP=True '+process.env.LITELLM_EVAL_PYTHON+' -m pytest -c '+pytestConfig+' --rootdir='+workspace+' --noconftest -p no:cacheprovider -p pytest_asyncio.plugin -p pytest_mock -p respx.plugin'+fixtureFlags+' <targeted test path> -q. The supplied pytest config and interpreter are permitted evaluation infrastructure. PYTEST_DISABLE_PLUGIN_AUTOLOAD=1 and PYTHON_DOTENV_DISABLED=1 are already set; retain the explicit local-cost-map prefix on Python commands. Use $TMPDIR for temporary probes, not /tmp; temporary files are private to this run. Do not run the entire suite or install dependencies.';
 writeFileSync(join(directory,'prompt.txt'),prompt);
 writeFileSync(join(directory,'task.json'),JSON.stringify(task,null,2));
 if(repairParent)writeFileSync(join(directory,'repair.json'),JSON.stringify({parentRun:repairParent.split('/').at(-1),feedback:repairFeedback,workflow:'post-hoc train/dev refinement; report parent plus repair cost and time'},null,2));

@@ -1,11 +1,13 @@
 """Build answer-free LiteLLM snapshots and private reference tests from local Git."""
 import ast
+import hashlib
 import json
 import os
 from pathlib import Path
 import re
 import subprocess
 import tarfile
+from fixtures import fixture_arguments
 
 REPO = Path(os.environ['LITELLM_SOURCE_REPO'])
 ROOT = Path(os.environ['LITELLM_CAMPAIGN_DIR'])
@@ -123,6 +125,18 @@ for name, split, rev, prompt in CASES:
                     'test_drop_strategy_markers_keeps_plain_deployments_and_rejects_marker_only_sets',
                     'test_team_deployments_across_teams_unions_one_team_and_rejects_two'})
     selection = catalog_by_id.get(name, {})
+    record['fixture_plugins'] = selection.get('fixture_plugins', [])
+    fixture_arguments(record)
+    record['fixture_hashes'] = {}
+    for plugin in record['fixture_plugins']:
+        fixture_path = plugin.replace('.', '/') + '.py'
+        source = (workspace / fixture_path).read_bytes()
+        if source != git('show', revision + ':' + fixture_path):
+            raise ValueError('Explicit fixture plugins must be unchanged by the reference PR.')
+        record['fixture_hashes'][plugin] = hashlib.sha256(source).hexdigest()
+        target = directory / 'reference' / fixture_path
+        target.parent.mkdir(parents=True, exist_ok=True)
+        target.write_bytes(source)
     def selected(node):
         include = selection.get('include_test_names')
         exclude = selection.get('exclude_test_names', [])
