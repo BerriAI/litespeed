@@ -384,10 +384,10 @@ describe('runner and turn history integration', () => {
       child.once('error', reject); child.once('close', (code, signal) => resolve({ code, signal }));
     });
     try {
+      // Cold TypeScript/server startup competes with the full suite on Intel CI.
       await until(() => {
         if (child.exitCode !== null || child.signalCode !== null) throw new Error(`Fixture exited before startup: ${stderr}`);
         return stdout.includes(`http://localhost:${port}`);
-      // Cold TypeScript/server startup competes with the full suite on Intel CI.
       }, 30000).catch(error => { throw new Error(`${error.message}\nFixture stdout: ${stdout}\nFixture stderr: ${stderr}`); });
       const response = await fetch(`http://127.0.0.1:${port}/api/sessions/${s.id}/messages`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ content: 'Write before stopping' }) });
       expect(response.status).toBe(202); await response.json();

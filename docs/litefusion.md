@@ -1,6 +1,6 @@
 # LiteFusion
 
-LiteFusion keeps one user-facing lead and routes coherent assignments to task-specific models and reasoning levels. It is recommended for new setup; existing sessions and explicit saved arrangements are unchanged. This is an **initial research policy**, not evidence that a mixture beats a frontier model on quality or cost.
+LiteFusion keeps one user-facing lead and routes coherent assignments to task-specific models and reasoning levels. It is experimental; Sidekick Fusion is recommended for new setup. Existing sessions and explicit saved arrangements are unchanged. This is an **initial research policy**, not evidence that a mixture beats a frontier model on quality or cost.
 
 The [63-task catalog](litefusion-tasks.md) retains the proposed default/escalation routes, confidence, source URLs and task guides. Only 11 roles have a direct equation-profile link; the other routes are judgment/transfer proposals. The operational overrides are explicit: the selected lead handles controller, classification, conversation, progress and requirements; unavailable Mercury Edit 2 becomes an explicit version-checked edit suggestion; unavailable Voyage Code 4 becomes search and repository investigation. There is no continuous autocomplete or vector index.
 
