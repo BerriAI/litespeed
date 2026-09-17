@@ -129,7 +129,11 @@ try{
   await waitFor(()=>!screen().includes('API connections and ChatGPT sign-in'),'settings closed');
   const configured=await api(`/sessions/${session.id}`);await api(`/sessions/${session.id}`,{architecture:null,expectedConfigRevision:configured.session.configRevision},'PATCH');
   terminal.write('create fixture\r');await waitFor(()=>screen().includes('1 Allow once'),'prompt');await save('04-permissions');terminal.write('4');
-  await waitFor(async()=>{const d=await api(`/sessions/${session.id}`);return d.session.status==='idle'&&d.session.permissionMode==='auto';},'allow all while waiting');
+  await waitFor(async()=>{const d=await api(`/sessions/${session.id}`);return d.session.status==='idle'&&d.permissions.length===0;},'remember project approval while waiting');
+  assert.equal((await api(`/sessions/${session.id}`)).session.permissionMode,configured.session.permissionMode,'remembering a project grant does not enable Full access');
+  const access=await api('/workspaces/permissions?workspace='+encodeURIComponent(settings.workspace));
+  assert(access.grants.some(grant=>grant.tool==='write_file'),'the reviewed file-tool scope is remembered for the project');
+  await api('/workspaces/tool-grants',{workspace:settings.workspace},'DELETE');
   const live=await api('/sessions',{workspace:settings.workspace,providerId:'fixture',model:'test-model',architecture:null,permissionMode:'auto'});await launch(live,100,32);
   terminal.write('LIVE_STEPS_BROWSER\r');
   await waitFor(()=>screen().split('\n').filter(line=>line.includes('Read README.md')||line.includes('Read src/hello.ts')).length>=5,'consecutive tools visible without Inspect');
@@ -147,11 +151,11 @@ try{
     const next=await api('/sessions',{workspace:settings.workspace,providerId:'fixture',model:'test-model',architecture,permissionMode:label==='Sidekick'?'ask':'auto'});await launch(next,100,38);
     terminal.write((label==='Sidekick'?'SIDEKICK_BROWSER HOLD_CHILD':'WORKERS_BROWSER')+'\r');
     if(label==='Sidekick'){
-      await waitFor(()=>screen().includes('Driver wants to ask Sidekick'),'sidekick permission');terminal.write('1');
       await waitFor(()=>screen().includes('wants to write a file'),'sidekick action');
+      assert(!screen().includes('Driver wants to ask Sidekick'),'the internal Sidekick handoff runs without a redundant approval');
       await waitFor(()=>screen().split('\n').some(line=>line.trim()==='Sidekick'),'sidekick identity visible');
       await waitFor(()=>screen().includes('Write sidekick-note.txt'),'sidekick card opens its bound invocation by default');await save('07-sidekick');clickLine('▾',screen().split('\n').findIndex(line=>line.trim()==='Sidekick')+1);
-      await waitFor(()=>!screen().includes('Write sidekick-note.txt'),'sidekick card collapses without resolving its permission');terminal.write('4');
+      await waitFor(()=>!screen().includes('Write sidekick-note.txt'),'sidekick card collapses without resolving its permission');terminal.write('1');
     }else{
       await waitFor(()=>screen().includes(label+' 1 ·')&&screen().includes(label+' 2 ·'),'both compact worker cards');
       assert(!screen().includes('beta is inspecting its assignment.'));
@@ -227,5 +231,5 @@ try{
   assert.equal(freshSettings.defaultModel,'test-model');assert.equal((await api('/workspace-preferences?workspace='+encodeURIComponent(settings.workspace))).architecture.kind,'litefusion');
   const next=await api('/sessions',{workspace:settings.workspace+'/src'});await launch(next,80,24);await waitFor(()=>screen().includes('A fresh start.'),'next folder opens chat');assert(!screen().includes('Gateway base URL'));assert.equal(next.model,'test-model');assert.equal(next.architecture.kind,'litefusion');await save('10-next-folder-ready');
   console.log('Fresh TUI gateway setup passed: blank URL, masked key, failed authentication, model discovery, and saved setup.');
-  console.log('TUI interactions passed: first-run setup, saved models, live Allow all, two workers, two experts, Sidekick handoff, and narrow/wide rendering.');
+  console.log('TUI interactions passed: first-run setup, saved models, scoped project grants, two workers, two experts, automatic Sidekick handoff, and narrow/wide rendering.');
 }finally{await stopTerminal();await browser?.close();server.kill('SIGTERM');await rm(config,{recursive:true,force:true});}

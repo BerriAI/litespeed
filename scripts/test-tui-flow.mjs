@@ -65,14 +65,14 @@ try{
    await delay(400);await save('approval-'+p.tool);
    if(!baseline){
     assert(screen().includes(' wants to '),'approval explains the action');
-    assert(screen().split('\n').some(line=>line.includes('1 Allow once')&&line.includes('4 Allow all tools')),'approval choices share one row');
+    assert(screen().split('\n').some(line=>line.includes('1 Allow once')&&line.includes('4 Remember for project')),'scoped approval choices share one row');
     assert(!screen().includes('"content":')&&!screen().includes('"todos":'),'approval does not expose raw arguments');
    }
    if(p.tool==='write_file'){
     childRequest=true;await save('sidekick-writing');
     if(!baseline){assert(screen().includes('Project inspection complete.'));assert(screen().includes('Sidekick · 1/3 done'));}
 
-    terminal.resize(80,24);emulator.resize(80,24);await delay(250);await save('sidekick-narrow');if(!baseline){assert(screen().split('\n').slice(0,4).join('\n').includes('Update the project note'),'current task stays pinned on narrow terminals');assert(screen().split('\n').some(line=>line.includes('1 Allow once')&&line.includes('4 Allow all tools')),'approval choices fit on one row at 80 columns');}
+    terminal.resize(80,24);emulator.resize(80,24);await delay(250);await save('sidekick-narrow');if(!baseline){assert(screen().split('\n').slice(0,4).join('\n').includes('Update the project note'),'current task stays pinned on narrow terminals');assert(screen().split('\n').some(line=>line.includes('1 Allow once')&&line.includes('4 Remember for project')),'scoped approval choices fit on one row at 80 columns');}
     if(!baseline)assert(screen().split('\n')[0].includes('+ sidekick'),'companion remains visible on narrow terminals');
     terminal.resize(120,38);emulator.resize(120,38);await delay(250);
    }
