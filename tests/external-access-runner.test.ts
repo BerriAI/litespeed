@@ -138,7 +138,6 @@ describe('external paths use normal tool permissions', () => {
       else reply(res,name,{description:'Inspect sibling',prompt:'CHILD request'});
     };
     start(s.id);
-    if(name==='sidekick'){await until(()=>runner.permissions(s.id).length===1);runner.decide(s.id,runner.permissions(s.id)[0].id,'allow');}
     const prompt=await approve(s.id);expect(prompt.tool).toBe('read_file');expect(prompt.sessionId).toBe(s.id);
     const delegation=runner.delegations.list(s.id)[0];const result=runner.delegations.transcript(s.id,delegation.id).messages.find(message=>message.role==='tool');expect(result?.content).toContain('external evidence');
   });

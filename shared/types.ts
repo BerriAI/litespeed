@@ -28,7 +28,7 @@ export type ReasoningEffort = typeof REASONING_EFFORTS[number];
 /** Session preferences keyed by JSON.stringify([providerId, model]). */
 export type ModelReasoning = Record<string, ReasoningEffort>;
 export type Mode = 'build' | 'plan';
-export type PermissionMode = 'ask' | 'auto';
+export type PermissionMode = 'ask' | 'edit' | 'auto';
 export type RunStatus = 'idle' | 'running' | 'waiting' | 'error';
 export type ProviderKind = 'openai' | 'anthropic' | 'codex';
 export interface Provider { id: string; name: string; kind: ProviderKind; baseUrl: string; apiKey?: string; configured?: boolean; models?: string[]; anthropicCacheModels?: string[]; contextWindows?: Record<string, number>; }
@@ -39,6 +39,8 @@ export interface Settings { mcpConfigRevision?: string; providers: Provider[]; d
   /** Canonical (realpath) workspace paths the user marked trusted. Project
    * .litespeed/hooks.json only runs for a workspace listed here. */
   trustedWorkspaces?: string[];
+  /** Reviewed project permission content hashes, keyed by canonical workspace. */
+  trustedPermissionRules?: Record<string, string>;
   /** Installed plugin registry (design note 4.4): per-plugin provenance so
    * uninstall removes exactly the items an install recorded. */
   plugins?: Record<string, PluginRegistryEntry>;
@@ -56,7 +58,7 @@ export interface Settings { mcpConfigRevision?: string; providers: Provider[]; d
  * refresh/disconnect never reshapes the advertised tool array
  * (docs/design-capability-proxy.md, Option 3). */
 export interface McpServerConfig { command?: string; args?: string[]; env?: Record<string,string>; url?: string; enabled?: boolean; advertise?: boolean; }
-export interface Session { modelReasoning?: ModelReasoning; profile?: ActiveProfile; configRevision?: number; historyRevision?: number; id: string; title: string; workspace: string; model: string; providerId: string; mode: Mode; permissionMode: PermissionMode; createdAt: number; updatedAt: number; status: RunStatus; archived: boolean; parentId?: string;
+export interface Session { modelReasoning?: ModelReasoning; profile?: ActiveProfile; configRevision?: number; historyRevision?: number; id: string; title: string; workspace: string; model: string; providerId: string; mode: Mode; permissionMode: PermissionMode; commandSandbox?: 'off' | 'workspace'; createdAt: number; updatedAt: number; status: RunStatus; archived: boolean; parentId?: string;
   architectureConfigurations?: import('./architecture-config.js').ArchitectureConfigurations;
   pendingArchitecture?: import('./architecture-config.js').PendingArchitectureConfiguration;
   shunt?: import('./shunt.js').ShuntSelection;
@@ -94,7 +96,7 @@ export interface Message { internal?:'worker_result'; clientSurface?: ClientSurf
   receipts?: TurnReceipts; }
 export interface Usage { inputTokens: number; outputTokens: number; cachedTokens?: number; cost?: number; durationMs?: number; }
 export interface Todo { id: string; content: string; status: 'pending' | 'in_progress' | 'completed'; }
-export interface PermissionRequest { invocationId?: string; ruleMatch?: RuleMatch; scopePath?: string; id: string; sessionId: string; toolCallId: string; tool: string; args: Record<string,unknown>; description: string; }
+export interface PermissionRequest { invocationId?: string; ruleMatch?: RuleMatch; scopePath?: string; scopeDescription?: string; workspace?: string; id: string; sessionId: string; toolCallId: string; tool: string; args: Record<string,unknown>; description: string; }
 export interface FileEntry { name: string; path: string; type: 'file' | 'directory'; size?: number; }
 export interface FileChange { path: string; before: string | null; after: string | null; actorSessionId?: string; invocationId?: string; }
 export interface QueuedMessage { clientSurface?: ClientSurface; id: string; sessionId: string; content: string; attachments: Attachment[]; createdAt: number; }

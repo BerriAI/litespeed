@@ -1,3 +1,4 @@
+import { sandboxCommand, sandboxBackend } from './command-sandbox.js';
 import { LiteFusionDiscovery } from './litefusion-discovery.js';
 import { liteFusionReadiness, type LiteFusionReadiness } from '../shared/litefusion-readiness.js';
 import { unavailableRoute } from './litefusion-availability.js';
@@ -8,6 +9,7 @@ import type { LiteFusionTask } from '../shared/litefusion-tasks.js';
 import type { Outcome } from './parallel-workers.js';
 import { commandCheckKey } from './checks.js';
 import { WorkspacePreferences } from './workspace-preferences.js';
+import { permissionReview } from './workspace-trust.js';
 import { shellInspection } from './shell-inspection.js';
 import { SHUNT_LIMITS, shuntConfigured, shuntInstructions, shuntTools } from '../shared/shunt.js';
 import { bulkReadSchema, codeWriteSchema, completeShunt } from './shunt.js';
@@ -302,13 +304,14 @@ export class Runner {
     }
     this.notifyIdle();
   }
-  decide(id: string, requestId: string, decision: 'allow' | 'always' | 'deny') {
+  decide(id: string, requestId: string, decision: import('../shared/permissions.js').ApprovalDecision) {
     this.assertRoot(id);const run = this.runs.get(id), pending = run?.approvals.get(requestId);
     if (!run || !pending) throw conflict('This permission request is no longer pending.');
-    if (decision === 'always' && pending.request.ruleMatch?.decision === 'ask') throw conflict('An explicit permission rule requires approval each time. Allow once or edit that rule.');
+    if ((decision === 'always' || decision === 'project') && pending.request.ruleMatch?.decision === 'ask') throw conflict('An explicit permission rule requires approval each time. Allow once or edit that rule.');
     if (decision === 'always') this.store.grantTool(id,pending.request.tool,pending.scope);
+    if (decision === 'project') this.store.grantProjectTool(this.store.session(id).workspace,pending.request.tool,pending.scope,pending.request.scopeDescription ?? pending.request.description);
     for (const [key, approval] of [...run.approvals]) {
-      if (key !== requestId && !(decision === 'always' && approval.request.ruleMatch?.decision !== 'ask' && approval.request.tool === pending.request.tool && approval.scope === pending.scope)) continue;
+      if (key !== requestId && !((decision === 'always' || decision === 'project') && approval.request.ruleMatch?.decision !== 'ask' && approval.request.tool === pending.request.tool && approval.scope === pending.scope)) continue;
       this.bus.emit(id, 'permission_resolved', { id: key, decision });
       run.approvals.delete(key); approval.resolve(decision !== 'deny');
     }
@@ -323,9 +326,10 @@ export class Runner {
     for (const active of this.runs.values()) if ((active === owner || (owner && active.child?.parent === owner)) && active.policy) active.policy.session.permissionMode = permissionMode;
     this.bus.emit(id, 'session', session);
     this.bus.emit(id, 'queue', this.store.queue(id));
-    if (permissionMode === 'auto' && owner && !owner.controller.signal.aborted) {
+    if (permissionMode !== 'ask' && owner && !owner.controller.signal.aborted) {
       for (const [key, pending] of [...owner.approvals]) {
         if (pending.request.ruleMatch?.decision === 'ask') continue;
+        if(permissionMode==='edit' && (pending.request.scopePath || (!['write_file','edit_file'].includes(pending.request.tool) && !(pending.request.tool==='bash'&&session.commandSandbox==='workspace'&&pending.request.args.sandbox!=='off'))))continue;
         this.bus.emit(id, 'permission_resolved', { id: key, decision: 'allow' });
         owner.approvals.delete(key); pending.resolve(true);
       }
@@ -504,6 +508,11 @@ export class Runner {
     if (source.text !== null) {
       try { project = validateRuleSet(JSON.parse(source.text.replace(/^﻿/, ''))).rules; }
       catch { advisory = 'Project permission rules in .litespeed/permissions.json are invalid and were ignored for this turn.'; }
+    }
+    const review=permissionReview(workspace);
+    if (project.some(rule=>rule.decision==='allow') && this.store.settings().trustedPermissionRules?.[workspace] !== review.sourceHash) {
+      project=project.filter(rule=>rule.decision!=='allow');
+      advisory=[advisory,'Project allow rules need review in Settings → Permissions. Deny and ask rules remain active.'].filter(Boolean).join(' ');
     }
     // A pattern-free deny covers every invocation of its tool, so the tool is
     // not advertised for this turn. Pattern-scoped denies keep the tool listed.
@@ -899,7 +908,7 @@ export class Runner {
   // The exact posture sentences previously embedded in the system prompt, now
   // delivered through the per-turn envelope instead.
   private posture(session: Session): string {
-    return `Mode: ${session.mode}. ${session.mode === 'plan' ? 'You are in read-only planning mode. Inspect and explain; do not write files, run shell commands, or delegate mutable work. Provide a concrete plan, then ask the user to switch to Build when ready.' : 'Use the todo tools for multi-step tasks; complete the work rather than only describing changes.'}\nPermission mode: ${session.permissionMode === 'ask' ? 'File changes, shell commands, and reads outside the workspace require user approval. Denied requests are final; do not work around them.' : 'The user opted into automatic tool approval for this session. This is not a sandbox; remain careful.'}`;
+    return `Mode: ${session.mode}. ${session.mode === 'plan' ? 'You are in read-only planning mode. Inspect and explain; do not write files, run shell commands, or delegate mutable work. Provide a concrete plan, then ask the user to switch to Build when ready.' : 'Use the todo tools for multi-step tasks; complete the work rather than only describing changes.'}\nPermission mode: ${session.permissionMode === 'auto' ? 'The user opted into full access for this session.' : session.permissionMode === 'edit' ? 'Workspace file edits are authorized. Shell commands, connected tools, and external paths follow scoped approvals.' : 'File changes, shell commands, and external paths follow scoped approvals.'} Command confinement: ${session.commandSandbox==='workspace'?'workspace writes and private temporary files, no network; request sandbox:"off" only when broader access is necessary':'off; approved shell commands run with user access'}. Internal delegation is already authorized within the selected architecture. Submit tool calls directly; do not ask conversational permission for routine work. Use ask_user only for a missing decision that materially changes the result. Denied requests and explicit rules remain final.`;
   }
   /** Injects the per-turn envelope into the OUTBOUND request copy only; persisted
    * rows are never touched, so the transcript, undo, export and import stay
@@ -1049,7 +1058,9 @@ export class Runner {
       catch (error) { run.failure = this.safeError(error, run); run.blocked = true; }
     };
     run.controller.signal.throwIfAborted();
-    const job = this.jobs.start(id, command, cwd, { hidden: call.args.run_in_background !== true, onSettled: record, onProgress: () => {
+    const confined=call.args.sandbox==='workspace' || (run.policy?.session.commandSandbox==='workspace' && call.args.sandbox!=='off');
+    const launch=confined ? await sandboxCommand(command,cwd,run.policy!.session.workspace,this.store.directory) : undefined;
+    const job = this.jobs.start(id, command, cwd, { launch, hidden: call.args.run_in_background !== true, onSettled: record, onProgress: () => {
       run.commandProgress?.();
     } });
     record(job);
@@ -1128,7 +1139,7 @@ export class Runner {
     const publish = () => { this.persist(message); this.bus.emit(id, 'tool', { messageId: message.id, tool: call }); };
     return executeMcpCode({
       code: call.args.code as string, names: lease.definitions.map(tool => tool.function.name), signal: run.controller.signal,
-      invoke: async (name, args, signal) => {
+      invoke: async (name, args, signal, approvalWait) => {
         const inner = this.capabilityCall(run, { operation: 'call', name, arguments: args })!;
         const innerCall: ToolCall = { id: randomUUID(), name: inner.name, args: inner.args, status: 'pending' };
         const audit: McpCodeInvocation = { id: innerCall.id, name: inner.name, status: 'pending', argumentBytes: Buffer.byteLength(JSON.stringify(inner.args)), startedAt: Date.now() };
@@ -1136,7 +1147,7 @@ export class Runner {
         let dispatched = false, observed = false;
         try {
           signal.throwIfAborted(); lease.assertCurrent(inner.name);
-          if (!(await this.approve(session, innerCall, run, signal))) throw new McpCodeDenied('The user denied or cancelled an MCP call. The script stopped; do not retry or bypass this decision.');
+          if (!(await this.approve(session, innerCall, run, signal, approvalWait))) throw new McpCodeDenied('The user denied or cancelled an MCP call. The script stopped; do not retry or bypass this decision.');
           signal.throwIfAborted(); lease.assertCurrent(inner.name);
           const veto = await this.fireHooks(id, run, 'PreToolUse', { tool: inner.name, args: inner.args }, inner.name, notice);
           if (veto) throw new McpCodeDenied('An MCP call was blocked by a PreToolUse hook. The script stopped.');
@@ -1259,7 +1270,7 @@ export class Runner {
     if (inner === null || typeof inner !== 'object' || Array.isArray(inner)) throw new Error('arguments must be a JSON object matching the tool\'s schema (see {"operation":"inspect"}).');
     return { name, args: inner as Record<string, unknown> };
   }
-  private async approve(session: Session, call: ToolCall, run: ActiveRun, approvalSignal = run.controller.signal): Promise<boolean> {
+  private async approve(session: Session, call: ToolCall, run: ActiveRun, approvalSignal = run.controller.signal, approvalWait?: (waiting:boolean)=>void): Promise<boolean> {
     // update_goal writes only session-local goal state (like todo_write's
     // plan writes): no workspace, shell, or network effect, so it auto-runs
     // without a prompt in every mode — but it is NOT read-only (it mutates
@@ -1299,12 +1310,11 @@ export class Runner {
     // auto | grant | rule-allow) -> prompt. Deny outranks every fast path,
     // including the local read-only shortcut and remembered grants. An ask rule
     // prompts every time, even under Auto and even with an "Always" grant — the
-    // grant remains valid for calls the rule does not match. Rules never target
-    // mcp_* or capability (schema-enforced), so an allow can never auto-approve
-    // connected tools on either path.
+    // grant remains valid for calls the rule does not match. Connected rules
+    // target exact underlying names, never the capability wrapper.
     const captured=run.policy?.rules;
     const sources = captured ? [{source:'project' as const,rules:captured.project},{source:'app' as const,rules:captured.app}] : [];
-    let match = !subject.startsWith('mcp_') ? decide(sources,subject,subjectArgs) : undefined;
+    let match = decide(sources,subject,subjectArgs);
     if (match?.decision === 'deny') { call.ruleMatch = match; return false; }
     const access = await inspectToolPath(session.workspace,subject,subjectArgs);
     // A lexical alias must not bypass a deny/ask rule on the resolved target.
@@ -1316,9 +1326,22 @@ export class Runner {
     if (access) this.approvedPaths.set(call,access); else this.approvedPaths.delete(call);
     if(match)call.ruleMatch=match;
     if(match?.decision==='deny')return false;
-    const scope = createHash('sha256').update(canonical({workspace:ownerSession.workspace,...(access?.external?{externalPath:access.resolvedPath}:{}),mcp:subject.startsWith('mcp_') ? run.external!.scope(subject) : undefined})).digest('hex');
+    // Versioned scopes deliberately retire legacy tool-wide shell/MCP grants.
+    const confined=subject==='bash' && (subjectArgs.sandbox==='workspace' || (session.commandSandbox==='workspace' && subjectArgs.sandbox!=='off'));
+    if(subject==='bash' && subjectArgs.sandbox!==undefined && !['workspace','off'].includes(String(subjectArgs.sandbox)))throw new Error('sandbox must be workspace or off.');
+    if(confined && (!sandboxBackend() || access?.external))throw new Error('Workspace command confinement is unavailable for this command. It was not run. Request sandbox:"off" for explicit approval.');
+    const connected = subject.startsWith('mcp_');
+    const readTool = connected && Boolean(run.external!.readOnlyTools?.().has(subject));
+    const target = access?.external || subject === 'bash' ? access?.resolvedPath : undefined;
+    const scopeDescription = subject === 'bash' ? `This exact command in ${target ?? session.workspace} (${confined?'workspace confinement, no network':'unrestricted shell access'})`
+      : connected ? readTool ? 'This read tool on the reviewed connection' : 'This connected tool with these exact arguments'
+      : target ? `This tool at ${target}` : 'This tool in this workspace';
+    const scope = createHash('sha256').update(canonical({version:2,workspace:ownerSession.workspace,
+      path:target, command:subject === 'bash' ? subjectArgs.command : undefined, sandbox:subject==='bash' ? confined : undefined,
+      mcp:connected ? run.external!.scope(subject) : undefined,
+      arguments:connected && !readTool ? subjectArgs : undefined})).digest('hex');
     if (match?.decision!=='ask') {
-      if (subject === 'todo_write' || (run.policy?.memory && !run.child && ['memory_remember','memory_forget'].includes(subject)) || (localReadOnly && !access?.external) || session.permissionMode === 'auto' || this.store.toolGrants(ownerSession.id).some(g => g.tool === subject && g.scope === scope) || match?.decision==='allow') return true;
+      if (['task','sidekick','delegate','takeover','kill_shell','todo_write'].includes(subject) || (session.permissionMode === 'edit' && !access?.external && ['write_file','edit_file'].includes(subject)) || (session.permissionMode==='edit' && session.commandSandbox==='workspace' && confined) || (run.policy?.memory && !run.child && ['memory_remember','memory_forget'].includes(subject)) || (localReadOnly && !access?.external) || session.permissionMode === 'auto' || [...this.store.toolGrants(ownerSession.id),...this.store.projectToolGrants(ownerSession.workspace)].some(g => g.tool === subject && g.scope === scope) || match?.decision==='allow') return true;
     }
     if (approvalSignal.aborted) return false;
     const base = access?.external ? `${subject === 'bash' ? 'Run this command with an external working directory' : localReadOnly ? 'Read outside this session’s workspace' : 'Modify a file outside this session’s workspace'}: ${access.resolvedPath}${run.child ? ` (requested by the ${run.child.role ?? 'researcher'})` : ''}.${!localReadOnly ? ' External changes are not covered by workspace Undo.' : ''}` : subject === 'task' ? 'Launch one bounded read-only researcher. It cannot modify files or delegate.' : subject === 'sidekick' ? 'Hand this task to the persistent sidekick. It can modify files and run commands, each behind your normal approval.' : subject === 'delegate' ? 'Start a fresh worker for this assignment. Its file edits and commands use this session’s permissions.' : subject === 'bash' ? `Run this command in your workspace${run.child?.role ? ` (requested by the ${run.child.role})` : ''}` : subject.startsWith('mcp_') ? 'Call this connected tool' : run.child?.role ? `Allow this ${run.child.role} action in your workspace` : 'Allow this action in your workspace';
@@ -1326,7 +1349,7 @@ export class Runner {
     // request.tool/args carry the SUBJECT: the user reviews the real connected
     // tool and its real arguments, and an "always" grant is stored under that
     // identity (decide() grants pending.request.tool), never under 'capability'.
-    const request: PermissionRequest = { id:randomUUID(),sessionId:ownerSession.id,toolCallId:call.id,tool:subject,args:subjectArgs,description:base+notes,...(run.child?{invocationId:run.child.delegation.id}:{}),...(match?{ruleMatch:match}:{}),...(access?.external?{scopePath:access.resolvedPath}:{}) };
+    const request: PermissionRequest = { id:randomUUID(),sessionId:ownerSession.id,toolCallId:call.id,tool:subject,args:subjectArgs,workspace:session.workspace,scopeDescription,description:base+notes,...(run.child?{invocationId:run.child.delegation.id}:{}),...(match?{ruleMatch:match}:{}),...(access?.external?{scopePath:access.resolvedPath}:{}) };
     this.setSession(ownerSession.id,{status:'waiting'});
     this.workerActivity(run,'Waiting for approval');
     run.approvalWaitStarted=Date.now();
@@ -1334,6 +1357,7 @@ export class Runner {
     // below, so the microtask-deferred check sees it (or sees the request
     // already resolved and stays silent).
     this.notifyWaiting(ownerSession.id);
+    approvalWait?.(true);
     const approved = await new Promise<boolean>(resolve => {
       const abort = () => {
         // A script can expire or be denied while the enclosing turn remains
@@ -1349,6 +1373,7 @@ export class Runner {
       approvalSignal.addEventListener('abort',abort,{once:true});
       this.bus.emit(ownerSession.id,'permission',request);
     });
+    approvalWait?.(false);
     owner.approvals.delete(request.id);
     run.approvalWaitMs=(run.approvalWaitMs??0)+Date.now()-(run.approvalWaitStarted??Date.now());run.approvalWaitStarted=undefined;
     // The owner is mid-turn in both shapes: itself (normal) or the parent
@@ -1378,7 +1403,7 @@ export class Runner {
       check();
       const blocked=await this.interceptToolCall(id,run,action,notice);
       if(blocked!==null)throw new ShuntDenied(blocked);
-      if(action.intercepted&&!await this.approve(session,action,run))throw new ShuntDenied('The modified action was denied. Do not execute the original or modified action.');
+      if(action.intercepted&&canonical(action.args)!==canonical(action.intercepted.originalArgs)&&!await this.approve(session,action,run))throw new ShuntDenied('The modified action was denied. Do not execute the original or modified action.');
       await validateToolPath(session.workspace,action.name,action.args,this.approvedPaths.get(action));
       check();
     };
@@ -1892,7 +1917,7 @@ export class Runner {
             // normal execution path below (bad args throw an ordinary error).
             const sidecarBlock = await this.interceptToolCall(id, run, call, content => hookNotices.push(content));
             if (sidecarBlock !== null) { call.status = 'denied'; output = sidecarBlock; }
-            else if (call.intercepted && !(await this.approve(session,call,run))) { call.status='denied';output='The modified action was denied. Do not execute the original or modified action.'; }
+            else if (call.intercepted && canonical(call.args)!==canonical(call.intercepted.originalArgs) && !(await this.approve(session,call,run))) { call.status='denied';output='The modified action was denied. Do not execute the original or modified action.'; }
             else {
             await validateToolPath(session.workspace,call.name==='verify'?'bash':call.name,call.name==='verify'?verificationCommand(call.args):call.args,this.approvedPaths.get(call));
             if (policy.shuntProvider && call.name==='read_file' && await shuntReadGate(session.workspace,call.args,this.approvedPaths.get(call),signal,session.shunt?.minLines??SHUNT_LIMITS.minLines)) {
@@ -2070,7 +2095,7 @@ export class Runner {
     if([...this.runs.values()].filter(run=>run.child&&!run.child.role).length>=DELEGATION_LIMITS.active)throw conflict('Four researchers are already running.');
     if(budget.launches>=DELEGATION_LIMITS.launches)throw conflict('This turn reached its research budget.');
     budget.launches++;
-    const policy=parent.policy!,created=this.delegations.create({parentSessionId:id,parentTurnId:parent.turnId!,parentMessageId:message.id,toolCallId:call.id,...input,childSession:{workspace:policy.session.workspace,providerId:policy.session.providerId,model:policy.session.model,mode:policy.session.mode,permissionMode:policy.session.permissionMode},profile:parent.profile??null});
+    const policy=parent.policy!,created=this.delegations.create({parentSessionId:id,parentTurnId:parent.turnId!,parentMessageId:message.id,toolCallId:call.id,...input,childSession:{workspace:policy.session.workspace,providerId:policy.session.providerId,model:policy.session.model,mode:policy.session.mode,permissionMode:policy.session.permissionMode,commandSandbox:policy.session.commandSandbox},profile:parent.profile??null});
     accepted();
     // Write-capable children inherit the captured action policy and hooks.
     // Their model route is pinned independently of persisted context settings.
@@ -2222,7 +2247,7 @@ export class Runner {
     budget.launches++;
     const created=record
       ?this.delegations.reuse({delegationId:record.id,parentSessionId:id,parentTurnId:parent.turnId!,parentMessageId:message.id,toolCallId:call.id,...input,contextKey,litefusion:metadata,asyncTaskId:scheduled?.taskId})
-      :this.delegations.create({parentSessionId:id,parentTurnId:parent.turnId!,parentMessageId:message.id,toolCallId:call.id,...input,contextKey,role,isolated:Boolean(isolated),litefusion:metadata,asyncTaskId:scheduled?.taskId,reasoningEffort:effort??policy.session.modelReasoning?.[JSON.stringify([route.providerId,route.model])],childSession:{workspace,providerId:route.providerId,model:route.model,mode:policy.session.mode,permissionMode:policy.session.permissionMode},profile:parent.profile??null});
+      :this.delegations.create({parentSessionId:id,parentTurnId:parent.turnId!,parentMessageId:message.id,toolCallId:call.id,...input,contextKey,role,isolated:Boolean(isolated),litefusion:metadata,asyncTaskId:scheduled?.taskId,reasoningEffort:effort??policy.session.modelReasoning?.[JSON.stringify([route.providerId,route.model])],childSession:{workspace,providerId:route.providerId,model:route.model,mode:policy.session.mode,permissionMode:policy.session.permissionMode,commandSandbox:policy.session.commandSandbox},profile:parent.profile??null});
     accepted();
     const child:ActiveRun={controller:new AbortController(),approvals:new Map(),profile:parent.profile,turnId:created.user.id,invocationEffort:effort,litefusionRole:roleCard,policy:{...policy,provider,session:{...policy.session,workspace,id:created.child.id,parentId:id,providerId:route.providerId,model:route.model},tools:policy.tools.filter(name=>!['task','sidekick','delegate','takeover','verify'].includes(name))},child:{delegation:created.delegation,parent,timedOut:false,role,isolated}};
     if(externalNames.length)child.external=scopeExternalLease(parent.external!,externalNames,child.controller.signal);

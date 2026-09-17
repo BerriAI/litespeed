@@ -116,7 +116,7 @@ export class TerminalController {
       this.setDraft(merge(recalled));
     });
   }
-  decide(request: PermissionRequest, decision: 'allow' | 'always' | 'deny') {
+  decide(request: PermissionRequest, decision: 'allow' | 'always' | 'project' | 'deny') {
     return this.action('Recording decision', () => this.client.api(this.path(`/permissions/${encodeURIComponent(request.id)}`), { decision }));
   }
   permissionMode(permissionMode: Session['permissionMode']) {

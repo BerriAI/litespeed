@@ -23,6 +23,7 @@ describe('capability gateway: stable connected-tool surface',()=>{
   // Two connected servers: 'browser' is gateway-routed (advertise unset), 'trusted'
   // opted into direct advertisement. generation simulates refresh/reconnect.
   let generation:number,gatewayDefs:ToolDefinition[],directDefs:ToolDefinition[],gatewayServer:(name:string)=>string,scopes:Record<string,string>;
+  let readTools:Set<string>;
   let executions:{name:string,args:Record<string,unknown>}[];
   let external:ExternalTools & {capture:ReturnType<typeof vi.fn>};
   let codeResult: (name: string, args: Record<string, unknown>, signal: AbortSignal) => Promise<McpCodeResult>;
@@ -34,7 +35,7 @@ describe('capability gateway: stable connected-tool surface',()=>{
   const toolResult=(id:string)=>store.messages(id).filter(m=>m.role==='tool').at(-1)?.content??'';
   const lastCache=(id:string)=>store.messages(id).filter(m=>m.role==='assistant').at(-1)?.context?.cache;
   beforeEach(async()=>{
-    directory=await realpath(await mkdtemp(join(tmpdir(),'litespeed-capability-')));store=new Store(join(directory,'state'));calls=[];executions=[];generation=1;
+    directory=await realpath(await mkdtemp(join(tmpdir(),'litespeed-capability-')));store=new Store(join(directory,'state'));calls=[];executions=[];generation=1;readTools=new Set([gw1,gw2,direct]);
     gatewayDefs=[definition(gw1,'Click an element on the page'),definition(gw2,'Scrape page text\nSecond line never shown in list')];
     directDefs=[definition(direct,'Echo text back')];
     gatewayServer=(name:string)=>name===gw2?'other':'browser';
@@ -54,7 +55,7 @@ describe('capability gateway: stable connected-tool surface',()=>{
         const gateway=new Map(gatewayDefs.map(t=>[t.function.name,gatewayServer(t.function.name)]));
         const frozenScopes={...scopes};
         const assertCurrent=(name:string)=>{if(signal.aborted||version!==generation||!definitions.some(t=>t.function.name===name))throw fail('The accepted MCP tool catalog is stale. Review MCP settings and explicitly refresh before a new turn.');};
-        return{definitions,gatewayTools:()=>gateway,scope:(name:string)=>{assertCurrent(name);return frozenScopes[name];},assertCurrent,execute:async(name,args,callSignal)=>{assertCurrent(name);callSignal.throwIfAborted();executions.push({name,args});return `Executed ${name}`;},executeForCode:async(name,args,callSignal)=>{assertCurrent(name);callSignal.throwIfAborted();executions.push({name,args});return codeResult(name,args,callSignal);},release:()=>{}};
+        return{definitions,readOnlyTools:()=>readTools,gatewayTools:()=>gateway,scope:(name:string)=>{assertCurrent(name);return frozenScopes[name];},assertCurrent,execute:async(name,args,callSignal)=>{assertCurrent(name);callSignal.throwIfAborted();executions.push({name,args});return `Executed ${name}`;},executeForCode:async(name,args,callSignal)=>{assertCurrent(name);callSignal.throwIfAborted();executions.push({name,args});return codeResult(name,args,callSignal);},release:()=>{}};
       }),
     };
     const app=createApp({store,external});runner=app.runner;server=createServer(app.app);url=await listen(server);
@@ -120,6 +121,15 @@ describe('capability gateway: stable connected-tool surface',()=>{
     runner.decide(s.id,request.id,'allow');await runner.whenIdle();
     expect(executions).toEqual([{name:gw1,args:{text:'hello'}}]);
     expect(toolResult(s.id)).toBe(`Executed ${gw1}`);
+  });
+
+  it('requires a new approval when a mutable or unknown connected action changes arguments',async()=>{
+    readTools.clear();let argument='first';
+    respond=(body,res)=>body.messages.at(-1)?.role==='tool'?text(res):tool(res,'capability',{operation:'call',name:gw1,arguments:{text:argument}});
+    const s=await create({permissionMode:'ask'});runner.start(s.id,'First action');await until(()=>runner.permissions(s.id).length===1);
+    runner.decide(s.id,runner.permissions(s.id)[0].id,'always');await runner.whenIdle();await run(s.id,'Same action');
+    expect(executions).toHaveLength(2);argument='different';runner.start(s.id,'New action');await until(()=>runner.permissions(s.id).length===1);
+    runner.decide(s.id,runner.permissions(s.id)[0].id,'deny');await runner.whenIdle();expect(executions).toHaveLength(2);
   });
 
   it('a remembered grant binds the underlying tool: same tool skips the prompt, a different server tool still prompts',async()=>{

@@ -1,4 +1,5 @@
 /** @jsxImportSource @opentui/react */
+import { permissionModeLabels } from '../shared/permissions.js';
 import { liteFusionReadinessLabel } from '../shared/litefusion-readiness.js';
 import { pendingArchitectureLabel } from '../shared/architecture-config.js';
 import { Footer, shortcutLabel } from './footer.js';
@@ -38,7 +39,7 @@ import { WorkerInspectionContext } from './workerCard.js';
 import { workerLabels } from '../shared/worker-presentation.js';
 import { architectureInfo } from '../shared/architectures.js';
 import { ModelSettings } from './models.js';
-import { GoalPanel, PlanPanel, HistoryPanel } from './sessionPanels.js';
+import { HistoryConfirmation, GoalPanel, PlanPanel, HistoryPanel } from './sessionPanels.js';
 import { SettingsPanel } from './settings.js';
 import { expandProjectCommand, type ProjectCommand } from './projectCommands.js';
 import { Providers } from './providers.js';
@@ -158,7 +159,8 @@ function SessionApp({ controller, router, onQuit, chooseTheme, themeName, themeM
   };
   const permissions = () => menu('Permissions', [
     { id: 'ask', label: `${controller.detail?.session.permissionMode === 'ask' ? '●' : '○'} Ask first`, description: 'Review actions; remember tools you trust for this session.', action: () => { close(); run(() => controller.permissionMode('ask')); } },
-    { id: 'auto', label: `${controller.detail?.session.permissionMode === 'auto' ? '●' : '○'} Allow all tools`, description: 'This session and its workers. Explicit ask/deny rules still apply.', action: () => { close(); run(() => controller.permissionMode('auto')); } },
+    { id: 'edit', label: `${controller.detail?.session.permissionMode === 'edit' ? '●' : '○'} Allow project edits`, description: 'Ask for commands and new external access.', action: () => { close(); run(() => controller.permissionMode('edit')); } },
+    { id: 'auto', label: `${controller.detail?.session.permissionMode === 'auto' ? '●' : '○'} Full access`, description: 'This session and its workers. Explicit ask/deny rules still apply.', action: () => { close(); run(() => controller.permissionMode('auto')); } },
     { id: 'settings', label: 'Rules and defaults', action: () => openSettings() },
   ]);
   const openSettings = () => setPanel(<SettingsPanel controller={controller} onClose={close} />);
@@ -223,9 +225,9 @@ function SessionApp({ controller, router, onQuit, chooseTheme, themeName, themeM
     { id: 'queue', label: 'Queued messages', description: 'Pause, resume, or remove follow-ups', action: queue },
     { id: 'steer', label: 'Send draft as steering', description: 'Guide the current response without starting another turn', disabled: !busy, action: () => { close(); run(() => send('steer')); } },
     { id: 'stop', label: 'Stop response', disabled: !busy, action: () => { close(); run(() => controller.cancel()); } },
-    { id: 'undo', label: 'Undo last turn', disabled: busy || !detail?.history?.canUndo, description: detail?.history?.unavailableReason, action: () => { close(); run(() => controller.history('undo')); } },
-    { id: 'redo', label: 'Redo turn', disabled: busy || !detail?.history?.canRedo, action: () => { close(); run(() => controller.history('redo')); } },
-    { id: 'recover', label: 'Recover interrupted history', disabled: !detail?.history?.pendingRecovery, action: () => { close(); run(() => controller.history('recover')); } },
+    { id: 'undo', label: 'Undo last turn', disabled: busy || !detail?.history?.canUndo, description: detail?.history?.unavailableReason, action: () => setPanel(<HistoryConfirmation controller={controller} direction="undo" onClose={close}/>) },
+    { id: 'redo', label: 'Redo turn', disabled: busy || !detail?.history?.canRedo, action: () => setPanel(<HistoryConfirmation controller={controller} direction="redo" onClose={close}/>) },
+    { id: 'recover', label: 'Recover interrupted history', disabled: !detail?.history?.pendingRecovery, action: () => setPanel(<HistoryConfirmation controller={controller} direction="recover" onClose={close}/>) },
     { id: 'thinking', label: 'Toggle thinking', action: () => { toggle('showThinking'); close(); } },
     { id: 'actions', label: 'Toggle tool details', action: () => { toggle('toolDetails'); close(); } },
     { id: 'refresh', label: 'Reconnect', description: 'Refresh the session without resending anything', action: () => { close(); run(() => controller.open(controller.sessionId)); } },
@@ -300,7 +302,7 @@ function SessionApp({ controller, router, onQuit, chooseTheme, themeName, themeM
         <Transcript controller={controller} detail={detail} width={width - taskWidth} active={!panel} onInspect={inspect} onUsage={showUsage} />
         {taskWidth > 0 && <scrollbox width={taskWidth} flexShrink={0} border={['left']} borderColor={toHex(theme.border)}><TaskProgress detail={detail} controller={controller} /></scrollbox>}
       </box>
-      {detail.history?.pendingRecovery && <box border borderColor={toHex(theme.warning)}><text fg={toHex(theme.warning)}>History needs recovery. Your draft is saved. </text><Button onPress={() => run(() => controller.history('recover'))}>Recover history</Button></box>}
+      {detail.history?.pendingRecovery && <box border borderColor={toHex(theme.warning)}><text fg={toHex(theme.warning)}>History needs recovery. Your draft is saved. </text><Button onPress={() => setPanel(<HistoryConfirmation controller={controller} direction="recover" onClose={close}/>)}>Recover history</Button></box>}
       {detail.litefusion&&<box height={1}><Button tone="muted" onPress={()=>run(openModels)}>{liteFusionReadinessLabel(detail.litefusion)}</Button></box>}
       {detail.session.pendingArchitecture&&<box height={1}><Button onPress={()=>run(openModels)}>{pendingArchitectureLabel(detail.session)}</Button></box>}
       {detail.session.goal && ['active', 'blocked'].includes(detail.session.goal.status) && <box height={1} flexShrink={0}><Button onPress={() => setPanel(<GoalPanel controller={controller} onClose={close} />)}>{`Goal ${detail.session.goal.status} · ${goalTurnLabel(detail.session.goal.turns, detail.session.goal.maxTurns)} · ${terminalText(detail.session.goal.text).slice(0, Math.max(10, width - 36))}`}</Button></box>}

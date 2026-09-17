@@ -1,6 +1,6 @@
 /** Opt-in, copy-only MCP config import. Fixed sources are resolved server-side;
- * previews contain metadata, never executable configuration or credential values.
- * Applying re-reads the selected sources and saves disabled configurations only.
+ * discovery contains metadata; explicit plans show commands/endpoints without environment values.
+ * Applying re-reads the selected sources; connecting requires the explicit reviewed option.
  */
 import * as fs from 'node:fs/promises';
 import { constants } from 'node:fs';
@@ -254,6 +254,7 @@ export async function mcpImportPlan(workspace: string, existing: Record<string, 
   const choices = select(await scan(workspace, existing), ids, existing);
   const candidates = choices.map(value => value.candidate);
   return {
+    connections:choices.filter(value=>value.config&&value.candidate.compatible&&!value.candidate.conflict).map(value=>({name:value.candidate.name,command:value.config!.command,args:value.config!.args,url:value.config!.url,envKeys:Object.keys(value.config!.env??{})})),
     candidates, sourceHash: sha(choices.map(value => value.identity)), destination: 'global-settings',
     warnings: [
       'Imported servers are saved globally, disabled, and disconnected. Static environment values may include API keys and are copied only on confirmation.',
@@ -265,7 +266,7 @@ export async function mcpImportPlan(workspace: string, existing: Record<string, 
 
 export async function mcpImportApply(
   workspace: string, store: Store, ids: string[], sourceHash: string,
-  expectedRevision: string, revision: () => string,
+  expectedRevision: string, revision: () => string, connect=false,
 ): Promise<McpImportResult> {
   const guardRevision = () => {
     if (revision() !== expectedRevision) throw fail('Saved MCP configuration changed. Review and retry.', 409);
@@ -283,7 +284,7 @@ export async function mcpImportApply(
       skipped.push(value.candidate.name);
       continue;
     }
-    servers[value.candidate.name] = value.config;
+    servers[value.candidate.name] = {...value.config,enabled:connect};
     imported.push(value.candidate.name);
   }
   if (imported.length) store.saveSettings({ mcpServers: servers });

@@ -29,11 +29,22 @@ export function PlanPanel({ controller, onClose }: { controller: TerminalControl
 
 export function HistoryPanel({ controller, onClose }: { controller: TerminalController; onClose: () => void }) {
   const state = useSyncExternalStore(controller.subscribe, controller.getState), history = state.sync.detail?.history;
-  const [details, setDetails] = useState(false);
+  const [details, setDetails] = useState(false),[confirm,setConfirm]=useState<'undo'|'redo'|'recover'>();
   const disabled = Boolean(state.pending) || isRunning(state.sync.detail);
+  if(confirm)return <HistoryConfirmation key={confirm} controller={controller} direction={confirm} onClose={()=>setConfirm(undefined)}/>;
   if (details) return <TextViewer title="History details" onClose={() => setDetails(false)} text={[state.notice, history?.pendingRecovery?.reason, ...(history?.pendingRecovery?.paths ?? []), history?.unavailableReason, history?.effectsNotice].filter(Boolean).join('\n\n') || 'Recorded changes can be undone without replaying commands. External changes are protected.'} />;
   return <Menu title="File history" search={false} onClose={onClose} footer={state.notice || history?.effectsNotice || 'Restores recorded files and conversation; commands are never replayed.'} items={[
     { id: 'details', label: 'History and recovery details', description: history?.pendingRecovery?.reason || history?.unavailableReason, action: () => setDetails(true) },
-    ...(['undo', 'redo', 'recover'] as const).map(action => ({ id: action, label: action === 'recover' ? 'Recover interrupted operation' : action === 'undo' ? 'Undo last turn' : 'Redo turn', disabled: disabled || (action === 'recover' ? !history?.pendingRecovery : Boolean(history?.pendingRecovery) || !(action === 'undo' ? history?.canUndo : history?.canRedo)), action: () => { void controller.history(action); } })),
+    ...(['undo', 'redo', 'recover'] as const).map(action => ({ id: action, label: action === 'recover' ? 'Recover interrupted operation' : action === 'undo' ? 'Undo last turn' : 'Redo turn', disabled: disabled || (action === 'recover' ? !history?.pendingRecovery : Boolean(history?.pendingRecovery) || !(action === 'undo' ? history?.canUndo : history?.canRedo)), action: () => setConfirm(action) })),
   ]} />;
+}
+
+export function HistoryConfirmation({controller,direction,onClose}:{controller:TerminalController;direction:'undo'|'redo'|'recover';onClose:()=>void}) {
+  const [review]=useState(()=>({session:controller.detail!.session.id,checkpoint:direction==='undo'?controller.detail?.history?.undoId:direction==='redo'?controller.detail?.history?.redoId:undefined,paths:controller.detail?.history?.pendingRecovery?.paths??[]}));
+  const label=direction==='undo'?'Undo last turn':direction==='redo'?'Redo turn':'Recover history';
+  return <Menu title={`${label}?`} search={false} onClose={onClose} footer="Restores recorded files and conversation. Shell, terminal, and remote effects are not reversed. Queued messages remain paused." items={[
+    ...review.paths.map(path=>({id:path,label:path,disabled:true,action(){}})),
+    {id:'cancel',label:'Cancel',action:onClose},
+    {id:'confirm',label,action:()=>{const current=direction==='undo'?controller.detail?.history?.undoId:direction==='redo'?controller.detail?.history?.redoId:undefined;if(controller.detail?.session.id!==review.session||current!==review.checkpoint){controller.notice('History changed. Review it again.');onClose();return;}onClose();void controller.history(direction);}},
+  ]}/>;
 }

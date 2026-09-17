@@ -395,8 +395,7 @@ describe('Sidekick Fusion persistent delegated executor',()=>{
   it('routes sidekick mutations through the parent permission flow under Ask',async()=>{
     const s=await create({permissionMode:'ask'});runner.start(s.id,'ROOT guarded');
     await until(()=>runner.permissions(s.id).length===1);
-    const launch=runner.permissions(s.id)[0];expect(launch.sessionId).toBe(s.id);runner.decide(s.id,launch.id,'allow');
-    await until(()=>runner.permissions(s.id).length===1&&runner.permissions(s.id)[0].id!==launch.id);
+    expect(runner.permissions(s.id)[0].tool).toBe('write_file');
     const write=runner.permissions(s.id)[0];expect(write.sessionId).toBe(s.id);expect(write.description).toContain('sidekick');
     const childId=runner.delegations.list(s.id)[0].childSessionId;expect(runner.permissions(childId)).toEqual([]);
     runner.decide(s.id,write.id,'allow');await runner.whenIdle();
@@ -406,13 +405,11 @@ describe('Sidekick Fusion persistent delegated executor',()=>{
 
   it('a denied mutation remains visible as needing review and the sidekick keeps its context',async()=>{
     const s=await create({permissionMode:'ask'});runner.start(s.id,'ROOT guarded');
-    await until(()=>runner.permissions(s.id).length===1);runner.decide(s.id,runner.permissions(s.id)[0].id,'allow');
     await until(()=>runner.permissions(s.id).length===1);const write=runner.permissions(s.id)[0];runner.decide(s.id,write.id,'deny');await runner.whenIdle();
     await expect(readFile(join(directory,'note.txt'),'utf8')).rejects.toThrow();
     const first=runner.delegations.list(s.id)[0];expect(first.status).toBe('completed');expect(first.verificationNote).toContain('denied');
     const before=first.childSessionId;
     runner.start(s.id,'ROOT retry');
-    await until(()=>runner.permissions(s.id).length===1);runner.decide(s.id,runner.permissions(s.id)[0].id,'allow');
     await until(()=>runner.permissions(s.id).length===1);runner.decide(s.id,runner.permissions(s.id)[0].id,'allow');await runner.whenIdle();
     const after=runner.delegations.list(s.id);expect(after).toHaveLength(2);expect(after[0]).toEqual(first);expect(after[1].childSessionId).toBe(before);
   });
@@ -436,8 +433,6 @@ describe('Sidekick Fusion persistent delegated executor',()=>{
     const next=join(directory,'next');await mkdir(next);
     store.updateSession(s.id,{workspace:next,permissionMode:'ask'});
     runner.start(s.id,'ROOT new workspace');
-    await until(()=>runner.permissions(s.id).length===1);
-    runner.decide(s.id,runner.permissions(s.id)[0].id,'allow');
     await until(()=>runner.permissions(s.id).length===1);
     expect(runner.permissions(s.id)[0].tool).toBe('write_file');
     await expect(readFile(join(next,'note.txt'),'utf8')).rejects.toThrow();

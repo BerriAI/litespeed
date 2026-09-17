@@ -7,7 +7,7 @@
 // per-item provenance (kind + exact target + sha256 of installed content) under
 // Settings.plugins so uninstall is exact. Trust posture: MCP servers land
 // DISABLED (connecting stays the explicit act it is today) and hooks land in
-// Settings.hooks behind the existing workspace-trust gate at capture time.
+// Settings.hooks disabled until explicitly reviewed and enabled in Settings.
 import { constants } from 'node:fs';
 import * as fs from 'node:fs/promises';
 import path from 'node:path';
@@ -161,7 +161,7 @@ function registryEntry(settings: Settings, name: string): PluginRegistryEntry | 
 /** Hash of an MCP settings entry EXCLUDING `enabled`: the user connecting a
  * plugin server later must not strand the entry at uninstall time. */
 const mcpHash = (config: McpServerConfig) => { const { enabled: _enabled, ...rest } = config; return hash(canonical(rest)); };
-const hookHash = (hook: HookConfig) => hash(canonical(hook));
+const hookHash = ({enabled:_enabled,...hook}: HookConfig) => hash(canonical(hook));
 
 /** Existence probe for a plan target under the workspace. Any unsafe state
  * (symlink on the path, non-file) reports "exists" so the plan CONFLICTS
@@ -245,7 +245,7 @@ export async function planInstall(source: string, workspace: string, store: Stor
   const seenHookHashes = new Set<string>();
   let plannedNewHooks = 0;
   for (const hookConfig of manifest.hooks ?? []) {
-    const content = canonical(hookConfig), identity = hookHash(hookConfig);
+    const content = canonical({...hookConfig,enabled:false}), identity = hookHash(hookConfig);
     if (seenHookHashes.has(identity)) { warnings.push('Duplicate hook in the manifest was skipped.'); continue; }
     seenHookHashes.add(identity);
     const target = `hooks#${identity.slice(0, 16)}`;
@@ -333,13 +333,13 @@ export async function applyInstall(plan: PluginPlan, workspace: string, store: S
     const presentHashes = new Set(hooks.map(hookHash));
     for (const action of hookActions) {
       const hookConfig = JSON.parse(action.content) as HookConfig;
-      if (!presentHashes.has(hookHash(hookConfig))) { hooks.push(hookConfig); presentHashes.add(hookHash(hookConfig)); }
+      if (!presentHashes.has(hookHash(hookConfig))) { hooks.push({...hookConfig,enabled:false}); presentHashes.add(hookHash(hookConfig)); }
     }
     patch.hooks = hooks;
   }
-  // MCP provenance hashes exclude `enabled` (see mcpHash): connecting the
-  // server later must still uninstall cleanly. Files and hooks hash verbatim.
-  const items: PluginItem[] = apply.map(action => ({ kind: action.kind, target: action.target, hash: action.kind === 'mcp' ? mcpHash(JSON.parse(action.content) as McpServerConfig) : hash(action.content) }));
+  // MCP and hook provenance exclude `enabled`: enabling reviewed executables
+  // must not break exact uninstall. File contents retain their full hashes.
+  const items: PluginItem[] = apply.map(action => ({ kind: action.kind, target: action.target, hash: action.kind === 'mcp' ? mcpHash(JSON.parse(action.content) as McpServerConfig) : action.kind==='hook' ? hookHash(JSON.parse(action.content) as HookConfig) : hash(action.content) }));
   const previous = settings.plugins?.[plan.plugin.name];
   const previousParsed = previous ? registryEntrySchema.safeParse(previous) : undefined;
   // A version that stops shipping an item never silently orphans it: the old

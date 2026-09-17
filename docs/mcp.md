@@ -102,3 +102,7 @@ A disconnected lifecycle HTTP request or app shutdown cancels its preparation. A
 ## Current scope
 
 Supported workflows are explicit stdio/Streamable HTTP/legacy SSE tool connection, discovery, tool search, TypeScript execution, approval, dispatch, cancellation, status, refresh, and reconnect. MCP OAuth login, resources, prompts, and automatic reconnection are not part of this version. Provider API keys are not forwarded to local MCP subprocesses by the app; configure only the environment entries the tool needs and never place secrets in prompts or share unreviewed configuration exports.
+
+## Approval improvements in 0.1.20
+
+Import can connect selected servers in the same reviewed action. Read-tool grants are explicit and connection-scoped; mutable/unknown tool grants bind exact arguments. Rules can target exact connected tool names. Script execution time excludes approval review. See [permissions](permissions.md).

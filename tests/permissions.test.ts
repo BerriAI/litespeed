@@ -13,7 +13,7 @@ describe('permission rule validation', () => {
     expect(set.rules).toHaveLength(1);
   });
   it('rejects unknown tools, decisions, extra keys, and unbounded patterns', () => {
-    expect(() => validateRuleSet({ version: 1, rules: [{ tool: 'mcp_evil_tool', decision: 'allow' }] })).toThrow(/Invalid permission rules/);
+    expect(() => validateRuleSet({ version: 1, rules: [{ tool: 'invented_tool', decision: 'allow' }] })).toThrow(/Invalid permission rules/);
     expect(() => validateRuleSet({ version: 1, rules: [{ tool: 'bash', decision: 'always' }] })).toThrow(/Invalid permission rules/);
     expect(() => validateRuleSet({ version: 1, rules: [{ tool: 'bash', decision: 'allow', extra: true }] })).toThrow(/Invalid permission rules/);
     expect(() => validateRuleSet({ version: 2, rules: [] })).toThrow(/Invalid permission rules/);

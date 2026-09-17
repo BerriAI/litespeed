@@ -22,7 +22,7 @@ export interface CreateDelegation {
   toolCallId: string;
   description: string;
   prompt: string;
-  childSession: Pick<Session, 'workspace' | 'providerId' | 'model' | 'mode' | 'permissionMode'>;
+  childSession: Pick<Session, 'workspace' | 'providerId' | 'model' | 'mode' | 'permissionMode' | 'commandSandbox'>;
   profile: ProfileSnapshot | null;
   role?: DelegationSummary['role'];
   isolated?: boolean;
@@ -243,10 +243,10 @@ export class Delegations {
         if (running.length && !(input.role !== 'sidekick' && input.isolated && running.every(row => this.data(row).summary.isolated))) throw conflict('The worker is already running.');
       } else if (existing.length >= DELEGATION_LIMITS.perTurn || running.length) throw conflict('The parent researcher limit has been reached.');
       const selected = input.childSession;
-      if (!selected || ['workspace', 'providerId', 'model'].some(key => typeof selected[key as keyof typeof selected] !== 'string' || !selected[key as keyof typeof selected]) || !['plan', 'build'].includes(selected.mode) || !['ask', 'auto'].includes(selected.permissionMode)) throw invalid('Researcher configuration is incomplete.');
+      if (!selected || ['workspace', 'providerId', 'model'].some(key => typeof selected[key as keyof typeof selected] !== 'string' || !selected[key as keyof typeof selected]) || !['plan', 'build'].includes(selected.mode) || !['ask', 'edit', 'auto'].includes(selected.permissionMode)) throw invalid('Researcher configuration is incomplete.');
       // Explicitly select persisted fields; never spread provider credentials or
       // runtime/system authority into the child session's durable JSON.
-      child = this.store.createSession({ id: childId, title: input.description, workspace: selected.workspace, providerId: selected.providerId, model: selected.model, mode: selected.mode, permissionMode: selected.permissionMode, parentId: parent.id }, profile ? { workspace: selected.workspace, catalogRevision: profile.active.revision, snapshot: profile } : undefined);
+      child = this.store.createSession({ id: childId, title: input.description, workspace: selected.workspace, providerId: selected.providerId, model: selected.model, mode: selected.mode, permissionMode: selected.permissionMode, commandSandbox:selected.commandSandbox, parentId: parent.id }, profile ? { workspace: selected.workspace, catalogRevision: profile.active.revision, snapshot: profile } : undefined);
       const data: RecordData = { summary, userId: user.id, profileRevision: profile?.active.revision ?? null, contextKey: input.contextKey };
       this.store.db.prepare('INSERT INTO delegations(id,parent_session_id,parent_turn_id,parent_message_id,tool_call_id,child_session_id,status,data) VALUES(?,?,?,?,?,?,?,?)').run(id, parent.id, input.parentTurnId, input.parentMessageId, input.toolCallId, childId, 'running', JSON.stringify(data));
       call.delegationId = id;if(!input.asyncTaskId){call.status = 'running'; call.startedAt ??= now;}

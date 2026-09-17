@@ -8,7 +8,7 @@ export const delegateTool = definition('delegate',
   { repairOf: {type:'string',description:'Finished invocation ID from this turn that this assignment repairs, including completed work with issues found during review. Omit for a new assignment.'}, description: { type: 'string', description: 'Short activity label.' }, prompt: { type: 'string', description: 'Self-contained assignment, relevant paths, constraints, and acceptance criteria.' } }, ['description', 'prompt']);
 export const verifyTool = definition('verify',
   'Run one foreground test, typecheck, lint, or build command in the workspace. This is the driver verification phase. Shell operators, environment assignments, background jobs, and arbitrary scripts are unavailable. Use a supported runner such as npm test, npm run check, npx vitest run, pytest, cargo test, or go test.',
-  { command: { type: 'string' }, timeout_ms: { type: 'number' } }, ['command']);
+  { command: { type: 'string' }, sandbox: {type:'string',enum:['workspace','off']}, timeout_ms: { type: 'number' } }, ['command']);
 export const takeoverTool = definition('takeover',
   'Request an explicit bounded fallback after a worker failed or its budget was exhausted. Explain the blocker and list the exact files you need to repair. If approved, up to three write_file/edit_file calls are allowed this turn for those files. Verification remains separate.',
   { invocationId: {type:'string',description:'The failed invocation being taken over. Required when more than one assignment failed.'}, reason: { type: 'string' }, files: { type: 'array', items: { type: 'string' }, minItems: 1, maxItems: 10 } }, ['reason', 'files']);
@@ -21,7 +21,7 @@ export function verificationCommand(args: Record<string, unknown>): Record<strin
     throw new Error('Use one supported verification command without shell operators. Delegate other commands to a worker.');
   }
   if (command.split(/\s+/).some(arg => arg === '--config' || arg === '-c' || arg === '--eval' || arg === '-e')) throw new Error('Inline code and configuration overrides are unavailable in driver verification.');
-  return { command, timeout_ms: args.timeout_ms, run_in_background: false };
+  return { command, sandbox:args.sandbox, timeout_ms: args.timeout_ms, run_in_background: false };
 }
 
 export function fusionInstructions(architecture: ArchitectureSelection, child: boolean): string {

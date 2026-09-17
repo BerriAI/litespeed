@@ -27,6 +27,7 @@ export class Store {
       CREATE TABLE IF NOT EXISTS changes (session_id TEXT NOT NULL REFERENCES sessions(id) ON DELETE CASCADE, path TEXT NOT NULL, data TEXT NOT NULL, PRIMARY KEY(session_id,path));
       CREATE TABLE IF NOT EXISTS queues (session_id TEXT PRIMARY KEY REFERENCES sessions(id) ON DELETE CASCADE, data TEXT NOT NULL);
       CREATE TABLE IF NOT EXISTS tool_grants (session_id TEXT NOT NULL REFERENCES sessions(id) ON DELETE CASCADE, tool TEXT NOT NULL, scope TEXT NOT NULL, PRIMARY KEY(session_id,tool,scope));
+      CREATE TABLE IF NOT EXISTS project_tool_grants (workspace TEXT NOT NULL, tool TEXT NOT NULL, scope TEXT NOT NULL, description TEXT NOT NULL, PRIMARY KEY(workspace,tool,scope));
       CREATE TABLE IF NOT EXISTS events (id INTEGER PRIMARY KEY AUTOINCREMENT, session_id TEXT NOT NULL REFERENCES sessions(id) ON DELETE CASCADE, data TEXT NOT NULL);
       CREATE INDEX IF NOT EXISTS events_session ON events(session_id,id);
       CREATE TABLE IF NOT EXISTS session_profiles (session_id TEXT PRIMARY KEY REFERENCES sessions(id) ON DELETE CASCADE, data TEXT NOT NULL);
@@ -48,7 +49,7 @@ export class Store {
       -- riding the cascade) must never erase its usage record.
       CREATE TABLE IF NOT EXISTS usage_log (id INTEGER PRIMARY KEY AUTOINCREMENT, session_id TEXT NOT NULL, provider_id TEXT NOT NULL, model TEXT NOT NULL, day TEXT NOT NULL, input_tokens INTEGER NOT NULL, output_tokens INTEGER NOT NULL, cached_tokens INTEGER, created_at INTEGER NOT NULL);
       CREATE INDEX IF NOT EXISTS usage_log_day ON usage_log(day);`);
-    try { this.migrateDelegations(); this.migrateTaskAttempts(); this.migrateToolGrants(); } catch (error) { this.db.close(); throw error; }
+    try { this.migrateDelegations(); this.migrateTaskAttempts(); this.migrateToolGrants(); this.migrateApprovalScopes(); } catch (error) { this.db.close(); throw error; }
     // An interrupted process must never leave a session stuck running.
     for (const session of this.sessions('', true).concat(this.sessions())) {
       if (session.status === 'running' || session.status === 'waiting') this.updateSession(session.id, { status: 'idle' });
@@ -109,6 +110,10 @@ export class Store {
     `));
   }
   /** Keep each approved target; a later path must not replace an earlier grant. */
+  private migrateApprovalScopes(): void {
+    if(this.db.prepare('SELECT 1 FROM schema_migrations WHERE version=3').get())return;
+    this.atomic(()=>this.db.exec('DELETE FROM tool_grants; INSERT INTO schema_migrations(version) VALUES(3);'));
+  }
   private migrateToolGrants(): void {
     const columns = this.db.prepare('PRAGMA table_info(tool_grants)').all() as { name: string; pk: number }[];
     if (columns.some(column => column.name === 'scope' && column.pk)) return;
@@ -229,7 +234,7 @@ export class Store {
       // same class of decision as `model`: revision bump + queue hold.
       const architectureChanged = architecture !== undefined && JSON.stringify(architecture ?? undefined) !== JSON.stringify(previous.architecture);
       const reasoningChanged = safe.modelReasoning !== undefined && JSON.stringify(safe.modelReasoning) !== JSON.stringify(previous.modelReasoning);
-      const changed = (shunt !== undefined && JSON.stringify(shunt ?? undefined) !== JSON.stringify(previous.shunt)) || reasoningChanged || plannerChanged || styleChanged || architectureChanged || (['workspace', 'providerId', 'model', 'mode', 'permissionMode'] as const).some(key => safe[key] !== undefined && safe[key] !== previous[key]);
+      const changed = (shunt !== undefined && JSON.stringify(shunt ?? undefined) !== JSON.stringify(previous.shunt)) || reasoningChanged || plannerChanged || styleChanged || architectureChanged || (['workspace', 'providerId', 'model', 'mode', 'permissionMode', 'commandSandbox'] as const).some(key => safe[key] !== undefined && safe[key] !== previous[key]);
       if (safe.workspace !== undefined && safe.workspace !== previous.workspace && (previous.profile || this.db.prepare('SELECT 1 FROM session_profiles WHERE session_id=?').get(id))) throw Object.assign(new Error('Clear the profile before changing the workspace.'), { status: 409 });
       const session = { ...previous, ...safe, id, updatedAt: Date.now(), configRevision: previous.configRevision! + (changed ? 1 : 0) };
       if (shunt !== undefined) { if (shunt === null) delete session.shunt; else session.shunt = shunt; }
@@ -375,6 +380,13 @@ export class Store {
     this.db.prepare('INSERT INTO tool_grants(session_id,tool,scope) VALUES(?,?,?) ON CONFLICT(session_id,tool,scope) DO NOTHING').run(id,tool,scope);
   }
   clearToolGrants(id: string) { this.session(id); this.db.prepare('DELETE FROM tool_grants WHERE session_id=?').run(id); }
+  projectToolGrants(workspace: string) {
+    return this.db.prepare('SELECT tool,scope,description FROM project_tool_grants WHERE workspace=? ORDER BY tool').all(workspace) as {tool:string;scope:string;description:string}[];
+  }
+  grantProjectTool(workspace: string, tool: string, scope: string, description: string) {
+    this.db.prepare('INSERT INTO project_tool_grants(workspace,tool,scope,description) VALUES(?,?,?,?) ON CONFLICT(workspace,tool,scope) DO NOTHING').run(workspace,tool,scope,description);
+  }
+  clearProjectToolGrants(workspace: string) { this.db.prepare('DELETE FROM project_tool_grants WHERE workspace=?').run(workspace); }
   event(event: RunEvent): RunEvent {
     const result = this.db.prepare('INSERT INTO events(session_id,data) VALUES(?,?)').run(event.sessionId, JSON.stringify(event));
     return { ...event, id: Number(result.lastInsertRowid) };

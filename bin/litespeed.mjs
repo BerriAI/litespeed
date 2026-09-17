@@ -19,13 +19,13 @@ const options = new Map();
 const positional = [];
 let base;
 const valueOptions = new Set(['--url', '--port', '--workspace', '--model', '--provider', '--session', '--profile', '--skills', '--days']);
-const booleanOptions = new Set(['--plan', '--build', '--auto', '--json', '--reindex']);
+const booleanOptions = new Set(['--plan', '--build', '--auto', '--allow-edits', '--ask', '--json', '--reindex']);
 const supported = {
   migrate: new Set([]),
   update: new Set(['--url', '--json']),
   serve: new Set(['--port', '--workspace']),
-  run: new Set(['--url', '--model', '--provider', '--session', '--profile', '--skills', '--plan', '--build', '--auto', '--json']),
-  tui: new Set(['--url', '--workspace', '--model', '--provider', '--session', '--plan', '--build', '--auto']),
+  run: new Set(['--url', '--model', '--provider', '--session', '--profile', '--skills', '--plan', '--build', '--auto', '--allow-edits', '--ask', '--json']),
+  tui: new Set(['--url', '--workspace', '--model', '--provider', '--session', '--plan', '--build', '--auto', '--allow-edits', '--ask']),
   profiles: new Set(['--url', '--workspace', '--json']),
   sessions: new Set(['--url']), models: new Set(['--url', '--provider']), export: new Set(['--url']),
   plugin: new Set(['--url', '--workspace', '--json']),
@@ -68,6 +68,7 @@ function parse() {
     const override = ['--model', '--provider', '--profile', '--skills', '--plan', '--build', '--auto'].find(name => options.has(name));
     if (override) throw new Error(`${override} cannot be combined with --session. Change the existing session settings in Litespeed, or start a new session.`);
   }
+  if (['--auto','--allow-edits','--ask'].filter(flag=>options.has(flag)).length>1) throw new Error('Choose one permission mode: --ask, --allow-edits, or --auto.');
   if (options.has('--plan') && options.has('--build')) throw new Error('--plan and --build cannot be combined.');
   if (options.has('--profile') && !validProfileId(option('--profile'))) throw new Error('--profile requires a lowercase ID of 1–64 letters, digits, or hyphens, starting with a letter or digit.');
   const skills = selectedSkills();
@@ -162,7 +163,7 @@ async function newRunSession() {
   const activeChoice = profileId !== null || skillIds.length > 0;
   const input = { workspace: process.cwd(), model: option('--model'), providerId: option('--provider'),
     ...(options.has('--plan') ? { mode: 'plan' } : options.has('--build') || !activeChoice ? { mode: 'build' } : {}),
-    permissionMode: options.has('--auto') ? 'auto' : 'ask' };
+    permissionMode: options.has('--auto') ? 'auto' : options.has('--allow-edits') ? 'edit' : 'ask' };
   if (explicitChoice) {
     const catalog = await profileCatalog(input.workspace);
     if (profileId !== null && !catalog.profiles.some(profile => profile.id === profileId)) throw new Error(`Unknown project profile: ${profileId}. Use litespeed profiles to inspect this workspace.`);
@@ -255,10 +256,11 @@ async function runPrompt(prompt) {
           const permission = event.data; seenPermissions.add(permission.id);
           if (!process.stdin.isTTY) {
             await api(`${path}/permissions/${encodeURIComponent(permission.id)}`, { decision: 'deny' }, controller.signal);
-            process.stderr.write(`\nDenied ${terminalText(permission.tool)}: interactive approval required (or explicitly use --auto).\n`);
+            process.stderr.write(`\nDenied ${terminalText(permission.tool)}: interactive approval required; approve a project scope interactively before running unattended.\n`);
           } else promptInput('permission', permission.id, async (rl, signal) => {
-            const answer = await rl.question(`\nAllow ${terminalText(permission.tool)} ${terminalText(JSON.stringify(permission.args))}? [y/N] `, { signal });
-            if (!signal.aborted) await api(`${path}/permissions/${encodeURIComponent(permission.id)}`, { decision: /^y(es)?$/i.test(answer.trim()) ? 'allow' : 'deny' }, signal);
+            const forced = permission.ruleMatch?.decision === 'ask';
+            const answer = await rl.question(`\n${terminalText(permission.description)}\n${terminalText(JSON.stringify(permission.args, null, 2))}\n${terminalText(permission.scopeDescription || '')}\nAllow? ${forced ? '[y/N]' : '[y] once, [s] session, [p] project, [N] deny'} `, { signal });
+            if (!signal.aborted) await api(`${path}/permissions/${encodeURIComponent(permission.id)}`, { decision: /^y(es)?$/i.test(answer.trim()) ? 'allow' : !forced && /^s$/i.test(answer.trim()) ? 'always' : !forced && /^p$/i.test(answer.trim()) ? 'project' : 'deny' }, signal);
           });
         }
         if (event.type === 'permission_resolved') dismissInput('permission', event.data.id);
@@ -332,7 +334,7 @@ async function pluginCommand(subcommand, argument) {
       const landed = data.plan.actions.filter(action => action.conflict !== 'exists');
       console.log(`Installed ${terminalText(data.plugin.name)}@${terminalText(data.plugin.version)}: ${landed.length} item${landed.length === 1 ? '' : 's'} landed.`);
       if (landed.some(action => action.kind === 'mcp')) console.log('MCP servers were installed DISABLED; connect them explicitly in Settings.');
-      if (landed.some(action => action.kind === 'hook')) console.log('Hooks were added to Settings; project workspaces still require explicit trust.');
+      if (landed.some(action => action.kind === 'hook')) console.log('App hooks were installed DISABLED. Review and enable them in Settings → Permissions → Project access.');
     } else console.log('Dry run only. Use litespeed plugin install to apply.');
   } else if (subcommand === 'list') {
     const data = await api('/plugins');
@@ -432,7 +434,7 @@ Usage:   --days N (1-90, default 30), --json. Token counts are provider-
 Doctor:  --json, --reindex (rebuild the search index; the only repair in v1)
 Plugin:  --workspace PATH (default current directory), --json
          Local directories only; clone git packages first. MCP servers install
-         DISABLED; hooks stay behind workspace trust; conflicts are skipped.
+         DISABLED; app hooks install disabled until reviewed; conflicts are skipped.
 
 --session continues existing settings; model, provider, profile, skills,
 mode, and permission flags cannot override it. --json emits newline-delimited
@@ -442,7 +444,8 @@ model with BOTH --provider and --model; --build overrides a Plan default.
 --plan and --build conflict. Unprofiled runs keep the existing Build default.
 Skills default to NONE. Recommendations never activate automatically.
 Profile selection uses the server's canonical catalog for the current directory.
-Tools ask for approval by default. --auto explicitly allows shell
+Internal delegation runs automatically. --allow-edits allows workspace edits;
+commands still ask. --auto explicitly allows shell
 commands and edits; it is not a sandbox. Keys stay server-side.
 Questions require your answer in an interactive terminal or the Litespeed app.
 Non-interactive runs cancel unanswered questions, including with --auto.
@@ -480,7 +483,7 @@ Non-interactive runs cancel unanswered questions, including with --auto.
     if (!process.stdin.isTTY || !process.stdout.isTTY) throw new Error('litespeed needs an interactive terminal. Use litespeed run for scripted work.');
     const forwarded = ['--url', base, '--workspace', option('--workspace', process.cwd())];
     for (const name of ['--session', '--model', '--provider']) if (options.has(name)) forwarded.push(name, option(name));
-    for (const name of ['--plan', '--build', '--auto']) if (options.has(name)) forwarded.push(name);
+    for (const name of ['--plan', '--build', '--auto', '--allow-edits', '--ask']) if (options.has(name)) forwarded.push(name);
     if (options.has('--session') && ['--model', '--provider', '--plan', '--build', '--auto'].some(name => options.has(name))) throw new Error('An existing session keeps its configuration. Use the TUI Models or Settings menu to change it.');
     const runtime = resolve(root, 'node_modules', '.bin', process.platform === 'win32' ? 'bun.exe' : 'bun');
     if (!existsSync(runtime)) throw new Error('The TUI needs the bundled Bun runtime. Run npm install in the Litespeed directory.');

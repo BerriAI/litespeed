@@ -1,4 +1,6 @@
 /** @jsxImportSource @opentui/react */
+import { WorkspacePermissions } from './workspacePermissions.js';
+import { RULE_TOOLS, permissionModeLabels } from '../shared/permissions.js';
 import { useEffect, useState, useSyncExternalStore } from 'react';
 import type { PermissionRule, PermissionRuleSet } from '../shared/permissions.js';
 import type { McpServerStatus } from '../shared/mcp.js';
@@ -12,10 +14,11 @@ import { McpImporter } from './mcpImport.js';
 
 function Rules({ initial, onSave, onClose, feedback }: { initial: PermissionRuleSet | undefined; onSave: (rules: PermissionRuleSet) => void; onClose: () => void; feedback: string }) {
   const [rules, setRules] = useState(initial?.rules ?? []), [index, setIndex] = useState<number | null>(null), [view, setView] = useState('main');
-  const tools = ['read_file', 'write_file', 'edit_file', 'glob', 'grep', 'bash', 'web_fetch', 'todo_read', 'todo_write', 'task', 'memory_remember', 'memory_forget', 'memory_recall'];
+  const tools = RULE_TOOLS;
   const rule = index === null ? null : rules[index];
   const update = (patch: Partial<PermissionRule>) => setRules(rules.map((rule, offset) => offset === index ? { ...rule, ...patch } : rule));
-  if (view === 'tool') return <Menu title="Tool" onClose={() => setView('main')} items={tools.map(tool => ({ id: tool, label: tool, action: () => { if (index === null) { setRules([...rules, { tool, decision: 'ask' }]); setIndex(rules.length); } else update({ tool }); setView('main'); } }))} />;
+  if (view === 'tool') return <Menu title="Tool" onClose={() => setView('main')} items={[...tools.map(tool => ({ id: tool, label: tool, action: () => { if (index === null) { setRules([...rules, { tool, decision: 'ask' }]); setIndex(rules.length); } else update({ tool }); setView('main'); } })),{id:'connected',label:'Connected tool by exact name…',action:()=>setView('connected')}]}/>;
+  if(view==='connected')return <TextPrompt title="Exact connected tool name" value={rule?.tool.startsWith('mcp_')?rule.tool:'mcp_'} onClose={()=>setView('main')} onSave={tool=>{if(!/^mcp_[a-zA-Z0-9_-]{1,200}$/.test(tool))return;if(index===null){setRules([...rules,{tool,decision:'ask'}]);setIndex(rules.length);}else update({tool});setView('main');}}/>;
   if (view === 'patterns' && rule) return <TextPrompt title="Patterns (one per line)" multiline value={rule.patterns?.join('\n') ?? ''} placeholder="Leave empty to match every call of this tool" onClose={() => setView('main')} onSave={value => { update({ patterns: value.split('\n').map(item => item.trim()).filter(Boolean) }); setView('main'); }} />;
   if (view === 'decision') return <Menu title="Decision" search={false} onClose={() => setView('main')} items={(['ask', 'allow', 'deny'] as const).map(decision => ({ id: decision, label: decision, action: () => { update({ decision }); setView('main'); } }))} />;
   if (rule) return <Menu title="Edit permission rule" search={false} onClose={() => setIndex(null)} items={[
@@ -51,7 +54,7 @@ export function SettingsPanel({ controller, onClose }: { controller: TerminalCon
     if (view === 'integrations') controller.client.api<McpSnapshot>('/mcp').then(value => { if (live) setMcp(value); }).catch(error => { if (live) setFeedback(error.message); });
     if (view === 'memory') void run(refreshMemory);
     if (view === 'usage') { setUsage(null); controller.client.api<UsageReport>(`/usage?days=${days}`).then(value => { if (live) setUsage(value); }).catch(error => { if (live) setFeedback(error.message); }); }
-    if (view === 'permissions') controller.client.api<{ tools: string[] }>(controller.path('/tool-grants')).then(value => { if (live) setGrants(value.tools); }).catch(error => { if (live) setFeedback(error.message); });
+  if (view === 'permissions') controller.client.api<{ tools: string[] }>(controller.path('/tool-grants')).then(value => { if (live) setGrants(value.tools); }).catch(error => { if (live) setFeedback(error.message); });
     return () => { live = false; };
   }, [view, days]);
   if (!settings) return <TextViewer title="Settings" text={state.notice || 'Loading settings…'} onClose={onClose} />;
@@ -59,7 +62,7 @@ export function SettingsPanel({ controller, onClose }: { controller: TerminalCon
   if (view === 'profiles' && controller.detail) return <Profiles controller={controller} initial={controller.detail.session} onClose={back} />;
   if (view === 'rules') return <Rules initial={settings.permissionRules} onClose={() => setView('permissions')} feedback={feedback} onSave={rules => { void run(() => save({ permissionRules: rules }, 'permissions')); }} />;
   if (view === 'workspace') return <TextPrompt title="Default workspace for new sessions" value={settings.workspace} error={feedback} onClose={() => setView('general')} onSave={value => { void run(() => save({ workspace: value }, 'general')); }} />;
-  if (view === 'mcp-import') return <McpImporter controller={controller} workspace={workspace} onClose={() => setView('integrations')} onImported={result => { setView('integrations'); setFeedback(result.skipped.length ? `Imported ${result.imported.length}; skipped ${result.skipped.length}.` : `Imported ${result.imported.length} disabled server${result.imported.length === 1 ? '' : 's'}.`); void (async () => { try { await controller.settings(); setMcp(await controller.client.api<McpSnapshot>('/mcp')); } catch (error) { setFeedback(`Imported ${result.imported.length}; refresh failed: ${(error as Error).message}`); } })(); }} />;
+  if (view === 'mcp-import') return <McpImporter controller={controller} workspace={workspace} onClose={() => setView('integrations')} onImported={result => { setView('integrations'); setFeedback(result.connectionErrors?.length ? result.connectionErrors.join(' ') : result.connected ? `Imported ${result.imported.length}; connected ${result.connected.length}.` : result.skipped.length ? `Imported ${result.imported.length}; skipped ${result.skipped.length}.` : `Imported ${result.imported.length} disabled server${result.imported.length === 1 ? '' : 's'}.`); void (async () => { try { await controller.settings(); setMcp(await controller.client.api<McpSnapshot>('/mcp')); } catch (error) { setFeedback(`Imported ${result.imported.length}; refresh failed: ${(error as Error).message}`); } })(); }} />;
   if (view === 'mcp-config') return <TextPrompt title="MCP configuration" multiline value={JSON.stringify(settings.mcpServers, null, 2)} error={feedback} onClose={() => setView('integrations')} onSave={value => { void run(() => save({ mcpServers: JSON.parse(value), expectedMcpConfigRevision: settings.mcpConfigRevision }, 'integrations')); }} />;
   if (view === 'integrations' && review) {
     const config = settings.mcpServers[review.name];
@@ -81,10 +84,13 @@ export function SettingsPanel({ controller, onClose }: { controller: TerminalCon
     ...(mcp?.servers ?? []).map(server => ({ id: server.name, label: `${server.name} · ${server.status}`, description: server.error || `${server.tools.length} tools`, action: () => setReview(server) })),
     { id: 'refresh', label: 'Reload status', action: () => { void run(async () => { await controller.settings(); setMcp(await controller.client.api<McpSnapshot>('/mcp')); }); } },
   ]} />;
+  if (view === 'trust') return <WorkspacePermissions controller={controller} workspace={workspace} onClose={()=>setView('permissions')}/>;
   if (view === 'permissions') return <Menu title="Permissions" search={false} onClose={back} footer={feedback || 'Project rules, Plan mode, and profile limits still apply.'} items={[
     { id: 'ask', label: `${controller.detail?.session.permissionMode === 'ask' ? '●' : '○'} Ask before actions`, action: () => { void run(async () => { await controller.permissionMode('ask'); }); } },
-    { id: 'auto', label: `${controller.detail?.session.permissionMode === 'auto' ? '●' : '○'} Allow all tools`, description: 'This session and its workers; explicit ask/deny rules still apply', action: () => { void run(async () => { await controller.permissionMode('auto'); }); } },
-    { id: 'default', label: `New session default: ${settings.permissionMode === 'auto' ? 'Allow all tools' : 'Ask first'}`, action: () => { void run(() => save({ permissionMode: settings.permissionMode === 'ask' ? 'auto' : 'ask' }, 'permissions')); } },
+    { id: 'edit', label: `${controller.detail?.session.permissionMode === 'edit' ? '●' : '○'} Allow project edits`, description: 'Ask for commands and new external access', action: () => { void run(async () => { await controller.permissionMode('edit'); }); } },
+    { id: 'auto', label: `${controller.detail?.session.permissionMode === 'auto' ? '●' : '○'} Full access`, description: 'This session and its workers; explicit ask/deny rules still apply', action: () => { void run(async () => { await controller.permissionMode('auto'); }); } },
+    { id: 'default', label: `New session default: ${permissionModeLabels[settings.permissionMode]}`, action: () => { void run(() => save({ permissionMode: settings.permissionMode === 'ask' ? 'edit' : settings.permissionMode === 'edit' ? 'auto' : 'ask' }, 'permissions')); } },
+    { id: 'trust', label: 'Project trust and saved approvals', description: 'Review allow rules, executable hooks, and project grants', action: () => setView('trust') },
     { id: 'rules', separatorBefore: true, label: 'App permission rules', description: `${settings.permissionRules?.rules.length ?? 0} explicit rules`, action: () => setView('rules') },
     { id: 'grants', label: 'Clear “Always” approvals for this session', description: grants.join(', ') || 'No saved tool approvals', action: () => { void run(async () => { if (await controller.action('Clearing approvals', () => controller.client.api(controller.path('/tool-grants'), undefined, 'DELETE'))) setGrants([]); }); } },
   ]} />;

@@ -14,7 +14,7 @@ describe('MCP import', () => {
   it('imports an explicitly selected subset without exposing values or mutating sources', async () => {
     const root = await workspace(); const source = join(root, '.mcp.json'); const text = JSON.stringify({ mcpServers: { safe: { command: 'secret-command', args: ['secret-argument'], env: { API_KEY: 'secret-value' } }, other: { command: 'other' } } }); await writeFile(source, text);
     const found = await mcpImportDiscover(root, {}); expect(JSON.stringify(found)).not.toContain('secret-value'); const safe = found.candidates.find(value => value.name === 'safe')!;
-    const plan = await mcpImportPlan(root, {}, [safe.id]); expect(plan.candidates).toHaveLength(1); expect(JSON.stringify(plan)).not.toContain('secret-command');
+    const plan = await mcpImportPlan(root, {}, [safe.id]); expect(plan.candidates).toHaveLength(1); expect(plan.connections?.[0].command).toBe('secret-command'); expect(JSON.stringify(plan)).not.toContain('secret-value');
     const store = new Store(join(dir, 'state')); store.saveSettings({ workspace: root, providers: [], defaultProvider: '', defaultModel: '' }); const result = await mcpImportApply(root, store, [safe.id], plan.sourceHash, plan.sourceHash, () => plan.sourceHash);
     expect(result.imported).toEqual(['safe']); expect(store.settings().mcpServers.other).toBeUndefined(); expect(await (await import('node:fs/promises')).readFile(source, 'utf8')).toBe(text); store.close();
   });

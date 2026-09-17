@@ -12,7 +12,7 @@ export function visibleDelegations(detail: SessionDetail): DelegationSummary[] {
 export function reconcileSession(current: Session, incoming: Session): Session {
   if ((incoming.configRevision ?? 0) >= (current.configRevision ?? 0)) return incoming;
   return { ...incoming, providerId: current.providerId, model: current.model, mode: current.mode, planner: current.planner, architecture: current.architecture,
-    modelReasoning: current.modelReasoning, outputStyle: current.outputStyle, permissionMode: current.permissionMode, profile: current.profile, configRevision: current.configRevision,architectureConfigurations:current.architectureConfigurations,pendingArchitecture:current.pendingArchitecture };
+    modelReasoning: current.modelReasoning, outputStyle: current.outputStyle, permissionMode: current.permissionMode, commandSandbox:current.commandSandbox, profile: current.profile, configRevision: current.configRevision,architectureConfigurations:current.architectureConfigurations,pendingArchitecture:current.pendingArchitecture };
 }
 
 /** Idempotent for snapshot messages and tool updates; SSE replay is deduplicated by event ID by the caller. */

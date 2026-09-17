@@ -12,7 +12,7 @@ export interface McpCodeOptions {
   code: string;
   names: string[];
   signal: AbortSignal;
-  invoke(name: string, args: Record<string, unknown>, signal: AbortSignal): Promise<McpCodeResult>;
+  invoke(name: string, args: Record<string, unknown>, signal: AbortSignal, approvalWait: (waiting:boolean)=>void): Promise<McpCodeResult>;
   /** Injectable only by local callers, never by model arguments. */
   limits?: Partial<{ [K in keyof typeof MCP_CODE_LIMITS]: number }>;
 }
@@ -46,7 +46,17 @@ export async function executeMcpCode(options: McpCodeOptions): Promise<string> {
         if (error) reject(error); else resolve(output ?? '');
       };
       const abort = () => finish(new Error('MCP code execution cancelled. Calls already sent may have completed; they were not retried.'));
-      const timer = setTimeout(() => finish(new Error('MCP code execution timed out. Calls already sent may have completed; they were not retried.')), limits.timeoutMs);
+      let remaining = limits.timeoutMs, resumed = Date.now(), waiting = 0;
+      const expired = () => finish(new Error('MCP code execution timed out. Calls already sent may have completed; they were not retried.'));
+      let timer = setTimeout(expired, remaining);
+      const approvalWait = (paused:boolean) => {
+        if (settled) return;
+        if (paused) {
+          if (waiting++ === 0) { clearTimeout(timer); remaining = Math.max(0, remaining - (Date.now() - resumed)); }
+        } else if (waiting > 0 && --waiting === 0) {
+          resumed = Date.now(); timer = setTimeout(expired, remaining);
+        }
+      };
       signal.addEventListener('abort', abort, { once: true });
       if (signal.aborted) { abort(); return; }
       const drain = () => {
@@ -55,7 +65,7 @@ export async function executeMcpCode(options: McpCodeOptions): Promise<string> {
           const task = (async () => {
             try {
               signal.throwIfAborted();
-              const result = await options.invoke(request.name, request.args, signal);
+              const result = await options.invoke(request.name, request.args, signal, approvalWait);
               if (settled) return;
               const json = JSON.stringify(result);
               if (Buffer.byteLength(json) > limits.resultBytes) throw new Error('MCP result exceeds the code execution limit. Narrow the tool request.');

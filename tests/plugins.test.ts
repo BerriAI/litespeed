@@ -127,7 +127,7 @@ describe('plugin packages: plan, apply, uninstall', () => {
     expect(await readFile(join(workspace, '.litespeed', 'commands', 'deploy.md'), 'utf8')).toBe('# Deploy\nRun the deploy checklist.\n');
     const settings = store.settings();
     expect(settings.mcpServers.docs).toEqual({ command: 'docs-server', args: ['--stdio'], env: { DOCS_TOKEN: 'value' }, enabled: false });
-    expect(settings.hooks).toEqual([{ event: 'PreToolUse', command: 'echo pre', matcher: 'bash' }]);
+    expect(settings.hooks).toEqual([{ event: 'PreToolUse', command: 'echo pre', matcher: 'bash', enabled:false }]);
     const entry = settings.plugins?.toolkit;
     expect(entry).toMatchObject({ version: '1.2.0', workspace });
     expect(entry?.items).toHaveLength(4);

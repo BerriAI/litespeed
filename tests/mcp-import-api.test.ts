@@ -20,7 +20,7 @@ beforeEach(async () => {
   vi.stubEnv('HOME', join(dir, 'home')); vi.stubEnv('CODEX_HOME', join(dir, 'codex'));
   await mkdir(join(dir, 'home'));
   store = new Store(join(dir, 'state'));
-  const built = createApp({ store, external: { status: () => [], reconnect, refresh } as any });
+  const built = createApp({ store, external: { status: () => Object.entries(store.settings().mcpServers).map(([name,config])=>({name,revision:'fixture-revision',status:config.enabled===false?'disabled':'disconnected',tools:[]})), reconnect, refresh } as any });
   server = createServer(built.app);
   await new Promise<void>(resolve => server.listen(0, '127.0.0.1', resolve));
   base = `http://127.0.0.1:${(server.address() as any).port}/api`;
@@ -58,4 +58,13 @@ it('validates bodies, redacts responses, and imports only on explicit apply with
   });
   expect(JSON.stringify((await request('/settings')).data)).not.toContain('fixture-secret');
   expect(reconnect).not.toHaveBeenCalled(); expect(refresh).not.toHaveBeenCalled();
+});
+
+it('imports and connects only the reviewed selected configurations when explicitly requested',async()=>{
+  const workspace=join(dir,'work');await mkdir(workspace);await writeFile(join(workspace,'.mcp.json'),JSON.stringify({mcpServers:{demo:{command:'fixture-command',env:{TOKEN:'private-key'}}}}));
+  const found=await request(`/mcp/import/discover?workspace=${encodeURIComponent(workspace)}`),ids=[found.data.candidates[0].id];
+  const plan=await request('/mcp/import/plan',{workspace,ids});expect(plan.data.connections[0].command).toBe('fixture-command');expect(JSON.stringify(plan.data)).not.toContain('private-key');
+  const revision=(await request('/mcp')).data.configRevision;
+  const result=await request('/mcp/import/apply',{workspace,ids,sourceHash:plan.data.sourceHash,expectedMcpConfigRevision:revision,connect:true});
+  expect(result.status).toBe(200);expect(result.data.connected).toEqual(['demo']);expect(reconnect).toHaveBeenCalledTimes(1);expect(store.settings().mcpServers.demo.enabled).toBe(true);
 });

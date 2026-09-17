@@ -241,8 +241,7 @@ describe('fine-grained permission rules Runner/API integration',()=>{
     };
     const s=await create({architecture:{kind:'team-fusion',worker:{providerId:'test',model:'worker'}}});
     runner.start(s.id,'First round');await until(()=>runner.permissions(s.id).length>0);
-    // Approving the delegation tool covers both sibling assignments.
-    runner.decide(s.id,runner.permissions(s.id)[0].id,'always');
+    // Delegation is automatic; only the actual worker actions need approval.
     await until(()=>runner.permissions(s.id).filter(p=>p.tool==='write_file').length===2);
     const requests=runner.permissions(s.id);expect(requests.every(p=>Boolean(p.invocationId))).toBe(true);
     if(decision==='auto') runner.setPermissionMode(s.id,'auto',store.session(s.id).configRevision ?? 0);
@@ -255,6 +254,48 @@ describe('fine-grained permission rules Runner/API integration',()=>{
     expect(runner.permissions(s.id)).toHaveLength(0);
     await runner.whenIdle();expect(prompts(s.id)).toHaveLength(count);
     expect(batch).toBe(4);
+  });
+
+  it('allows project edits but still prompts for commands and outside reads',async()=>{
+    respond=oneCallThenText('write_file',{path:'edit-mode.txt',content:'done'});
+    const s=await create({permissionMode:'edit'});await run(s.id);
+    expect(await readFile(join(directory,'edit-mode.txt'),'utf8')).toBe('done');expect(prompts(s.id)).toEqual([]);
+    respond=oneCallThenText('bash',{command:'printf checked'});runner.start(s.id,'Check');
+    await until(()=>runner.permissions(s.id).length===1);expect(runner.permissions(s.id)[0].tool).toBe('bash');runner.decide(s.id,runner.permissions(s.id)[0].id,'deny');await runner.whenIdle();
+  });
+
+  it('remembers only the exact shell command and cwd, with opt-in project persistence',async()=>{
+    const s=await create();respond=oneCallThenText('bash',{command:'printf first'});runner.start(s.id,'First');
+    await until(()=>runner.permissions(s.id).length===1);
+    expect(runner.permissions(s.id)[0].scopeDescription).toContain('exact command');runner.decide(s.id,runner.permissions(s.id)[0].id,'project');await runner.whenIdle();
+    const second=await create();await run(second.id);expect(prompts(second.id)).toEqual([]);
+    respond=oneCallThenText('bash',{command:'printf second'});runner.start(second.id,'Changed command');
+    await until(()=>runner.permissions(second.id).length===1);runner.decide(second.id,runner.permissions(second.id)[0].id,'deny');await runner.whenIdle();
+    await mkdir(join(directory,'other'));respond=oneCallThenText('bash',{command:'printf first',cwd:'other'});runner.start(second.id,'Changed directory');
+    await until(()=>runner.permissions(second.id).length===1);runner.decide(second.id,runner.permissions(second.id)[0].id,'deny');await runner.whenIdle();
+    expect((await api('/workspaces/tool-grants',{workspace:directory},'DELETE')).status).toBe(200);
+    expect(store.projectToolGrants(directory)).toEqual([]);
+  });
+
+  it('requires review of project allow rules and invalidates trust when their contents change',async()=>{
+    await mkdir(join(directory,'.litespeed'));const file=join(directory,'.litespeed','permissions.json');
+    await writeFile(file,JSON.stringify(rules([{tool:'write_file',decision:'allow'}])));
+    respond=oneCallThenText('write_file',{path:'trusted.txt',content:'done'});const s=await create();runner.start(s.id,'Untrusted');
+    await until(()=>runner.permissions(s.id).length===1);runner.decide(s.id,runner.permissions(s.id)[0].id,'deny');await runner.whenIdle();
+    const review=(await api('/workspaces/permissions?workspace='+encodeURIComponent(directory))).body;
+    expect((await api('/workspaces/permission-rules',{workspace:directory,sourceHash:review.rules.sourceHash})).status).toBe(200);
+    await run(s.id);expect(await readFile(join(directory,'trusted.txt'),'utf8')).toBe('done');
+    await writeFile(file,JSON.stringify(rules([{tool:'write_file',decision:'allow'},{tool:'bash',decision:'allow'}])));
+    expect((await api('/workspaces/permission-rules',{workspace:directory,sourceHash:review.rules.sourceHash})).status).toBe(409);
+    respond=oneCallThenText('bash',{command:'printf unreviewed'});runner.start(s.id,'New authority');
+    await until(()=>runner.permissions(s.id).length===1);runner.decide(s.id,runner.permissions(s.id)[0].id,'deny');await runner.whenIdle();
+  });
+
+  it.each(['task','sidekick','delegate'])('supports an explicit deny rule for %s orchestration',async tool=>{
+    store.saveSettings({permissionRules:rules([{tool,decision:'deny'}])});
+    respond=oneCallThenText(tool,{description:'Work',prompt:'CHILD inspect'});
+    const s=await create({architecture:{kind:'sidekick-fusion',sidekick:{providerId:'test',model:'worker'}}});await run(s.id);
+    expect(toolCalls(s.id)[0].status).toBe('denied');expect(runner.delegations.list(s.id)).toEqual([]);
   });
 
 });

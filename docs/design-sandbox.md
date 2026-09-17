@@ -1,23 +1,13 @@
-# Design note: optional OS-level command sandbox
+# Workspace command confinement
 
-Status: proposed. No code yet. Today Litespeed documents plainly that approval is not a sandbox; this note is the path to making that sentence weaker.
+Implemented in 0.1.20; off by default. Enable per session in Settings → Permissions → Project access. It applies to model-initiated bash, verification, and background jobs. User terminals, configured hooks, sidecars, and MCP servers have separate authority.
 
-## Shape
+macOS uses `/usr/bin/sandbox-exec` with a deny-by-default Seatbelt profile. Linux uses `/usr/bin/bwrap` with separate namespaces and only explicit filesystem mounts. Workspace files and a private temporary home are writable; system/runtime resources are read-only. Credentials, app state, and Git metadata writes are protected. Existing protected symlinks and ordinary hard-linked files are refused. Large workspaces beyond the validation bound are refused.
 
-Opt-in per workspace (`Settings → Workspace`), three states: `off` (default, current behavior), `enforce`, and `enforce-or-fail`.
+Network access to the host is unavailable. The environment contains a limited runtime PATH and private HOME/TMPDIR rather than inherited secrets. macOS reads standard system libraries and tools; Linux mounts standard runtime directories. Dependencies outside those locations or the workspace may require explicit unrestricted access.
 
-- macOS: `sandbox-exec` (Seatbelt) profile generated per command: writable roots = workspace + session temp + explicitly configured extras; read denied for configured secret paths (always including the app's own config/database directory and any `.env` under the workspace root); network allowed only when the command's rule or approval says so.
-- Linux: `bwrap` with the same policy vocabulary.
-- Windows / missing backend: `enforce` degrades to `off` **with a visible per-command notice**; `enforce-or-fail` refuses the command. Never silently pretend.
+The backend must actually start successfully. Missing binaries, denied namespaces, invalid profiles, or unavailable paths produce an error without running an unrestricted fallback. `sandbox:"off"` requests normal unrestricted approval and has a separate remembered scope. Full access remains a broad user opt-in.
 
-## Interaction with existing layers
+This is filesystem/network confinement, not resource virtualization or a promise against OS vulnerabilities. Development servers needing network sockets, package downloads, and tools needing external caches can require a broader scope. Linux masks existing protected files; macOS also denies matching protected names created after launch. An untrusted local process already running outside Litespeed is outside this boundary.
 
-Permission rules and approvals decide *whether* a command runs; the sandbox constrains *what it can touch when it runs*. Deny rules still win first. The approval card shows the sandbox posture ("sandboxed: workspace-write, no network") so what the user approves includes the enforcement level. Terminal sessions (user-driven) are explicitly NOT sandboxed — the terminal is the user's own shell; only model-initiated `bash` calls are.
-
-## Honest limits to document
-
-Seatbelt/bwrap confine filesystem and network, not CPU/memory; profiles are best-effort against kernel-level escapes; and `enforce` mode on an unsupported platform is `off` with a notice, which is why `enforce-or-fail` exists for users who need the guarantee.
-
-## Cost
-
-Medium. One new module (profile generation + wrapper spawn), per-platform tests, runtime verification on macOS (CI has no Linux box here). Recommend scheduling after Phase 3; independent of everything else in the plan.
+Native macOS CI exercises workspace writes, denied outside reads/writes, protected files, and host-network denial. Release smoke additionally exercises the installed bundle's own Node runtime under confinement.

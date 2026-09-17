@@ -11,6 +11,7 @@ export type HookEvent = typeof HOOK_EVENTS[number];
  * rule tools: exact names, no patterns) and is only meaningful for the two
  * tool events; a hook without a matcher fires for every tool. */
 export interface HookConfig {
+  enabled?: boolean;
   event: HookEvent;
   command: string;
   matcher?: string;

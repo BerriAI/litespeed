@@ -58,7 +58,7 @@ describe('plugin API: plan/install/list/remove round trip', () => {
     expect(await readFile(join(workspace, '.litespeed', 'skills', 'audit', 'SKILL.md'), 'utf8')).toBe('AUDIT SKILL BODY\n');
     expect(await readFile(join(workspace, '.litespeed', 'commands', 'release.md'), 'utf8')).toBe('# Release\nChecklist.\n');
     expect(store.settings().mcpServers.search).toEqual({ url: 'https://mcp.example.com/sse', enabled: false });
-    expect(store.settings().hooks).toEqual([{ event: 'Stop', command: 'echo done' }]);
+    expect(store.settings().hooks).toEqual([{ event: 'Stop', command: 'echo done', enabled:false }]);
 
     const list = await request('/plugins');
     expect(list.status).toBe(200);

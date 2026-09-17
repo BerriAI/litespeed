@@ -1,4 +1,5 @@
 /** @jsxImportSource @opentui/react */
+import { permissionModeLabels } from '../shared/permissions.js';
 import { LiteFusionSettings } from './litefusion.js';
 import { liteFusionPreset, liteFusionConfiguration, specialistGateway, withLiteFusionLead } from '../shared/architecture-config.js';
 import { bindExactModels, type LiteFusionSelection } from '../shared/litefusion.js';
@@ -95,7 +96,7 @@ export function Onboarding({ controller, initial, onClose, quick = false }: { co
     ...(kind==='litefusion'?[{id:'litefusion',label:readiness?liteFusionReadinessLabel(readiness):'Connecting specialists…',description:readiness?.discoveryError??'View all 63 task assignments and handoffs',action:()=>setView('litefusion')}]:[]),
     ...(kind!=='litefusion'?[{ id: 'advanced', label: `Advanced settings · Shunt ${shunt.enabled ? 'On' : 'Off'}`, description: `${SHUNT_DESCRIPTION} ${shunt.enabled && !shuntConfigured(shunt, state.settings.providers) ? 'Choose a Shunt model to enable it.' : SHUNT_MODEL_HINT}`, action: () => setView('advanced') }]:[]),
     ...(!quick ? [{ id: 'providers', label: 'Manage providers', description: 'Connect an API or sign in to ChatGPT', action: () => setView('providers') },
-    { id: 'permissions', label: `Permissions: ${permissionMode === 'auto' ? 'Allow all tools' : 'Ask first'}`, description: permissionMode === 'ask' ? 'Review actions and remember tools you trust' : 'No routine prompts; explicit project rules still apply', action: () => setPermissionMode(permissionMode === 'auto' ? 'ask' : 'auto') }] : []),
+    { id: 'permissions', label: `Permissions: ${permissionModeLabels[permissionMode]}`, description: permissionMode === 'ask' ? 'Review actions and remember scopes you trust' : permissionMode === 'edit' ? 'Workspace edits run; commands and external access ask' : 'No routine prompts; explicit rules still apply', action: () => setPermissionMode(permissionMode === 'ask' ? 'edit' : permissionMode === 'edit' ? 'auto' : 'ask') }] : []),
     { id: 'import-skills', label: 'Import Claude/Codex skills…', description: 'Copy skills from your machine into this project', action: () => setView('skills') },
     { id: 'save', label: state.pending ? 'Saving…' : quick ? 'Start chatting' : 'Start with this setup', separatorBefore: true, disabled: Boolean(state.pending) || !canSave, action: () => { void save(); } },
   ]} />;

@@ -7,7 +7,7 @@ export interface Options {
   model?: string;
   providerId?: string;
   mode?: 'plan' | 'build';
-  permissionMode?: 'auto';
+  permissionMode?: 'ask' | 'edit' | 'auto';
 }
 
 export function parseOptions(args: string[], env: Record<string, string | undefined> = process.env, cwd = process.cwd()): Options {
@@ -19,6 +19,6 @@ export function parseOptions(args: string[], env: Record<string, string | undefi
     model: value('--model'),
     providerId: value('--provider'),
     mode: args.includes('--plan') ? 'plan' : args.includes('--build') ? 'build' : undefined,
-    permissionMode: args.includes('--auto') ? 'auto' : undefined,
+    permissionMode: args.includes('--auto') ? 'auto' : args.includes('--allow-edits') ? 'edit' : args.includes('--ask') ? 'ask' : undefined,
   };
 }

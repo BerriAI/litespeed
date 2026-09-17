@@ -1,13 +1,13 @@
 import { z } from 'zod';
 import type { PermissionDecision, PermissionRule, PermissionRuleSet, RuleMatch } from '../shared/permissions.js';
-import { PERMISSION_LIMITS } from '../shared/permissions.js';
+import { PERMISSION_LIMITS, RULE_TOOLS } from '../shared/permissions.js';
+export { RULE_TOOLS } from '../shared/permissions.js';
 
 // Tools a rule may target. Exact names only — a rule can never invent a tool,
-// auto-approve a connected (mcp_*) tool, or bypass the researcher/task checks.
-export const RULE_TOOLS = ['read_file', 'write_file', 'edit_file', 'glob', 'grep', 'bash', 'web_fetch', 'todo_read', 'todo_write', 'task', 'memory_remember', 'memory_forget', 'memory_recall'] as const;
+// bypass catalog membership or the researcher/task checks.
 const pattern = z.string().min(1).max(PERMISSION_LIMITS.patternLength).refine(value => value === value.trim() && !/[\p{Cc}\p{Cf}]/u.test(value), 'Patterns must be single-line printable text.');
 const ruleSchema = z.object({
-  tool: z.enum(RULE_TOOLS),
+  tool: z.string().refine(value => (RULE_TOOLS as readonly string[]).includes(value) || /^mcp_[a-zA-Z0-9_-]{1,200}$/.test(value), 'Use an exact built-in or connected tool name.'),
   decision: z.enum(['allow', 'ask', 'deny']),
   patterns: z.array(pattern).min(1).max(PERMISSION_LIMITS.patternsPerRule).optional(),
 }).strict();
@@ -24,7 +24,7 @@ export function validateRuleSet(value: unknown): PermissionRuleSet {
  * Tools without a subject (todo tools, task) only match pattern-free rules. */
 export function ruleSubject(tool: string, args: Record<string, unknown>): string | undefined {
   if (tool === 'bash') return typeof args.command === 'string' ? args.command : undefined;
-  if (['read_file', 'write_file', 'edit_file'].includes(tool)) return typeof args.path === 'string' ? args.path : undefined;
+  if (['read_file', 'write_file', 'edit_file', 'view_image'].includes(tool)) return typeof args.path === 'string' ? args.path : undefined;
   if (tool === 'glob' || tool === 'grep') return typeof args.path === 'string' ? args.path : typeof args.pattern === 'string' ? String(args.pattern) : '';
   if (tool === 'web_fetch') return typeof args.url === 'string' ? args.url : undefined;
   return undefined;

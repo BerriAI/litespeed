@@ -49,7 +49,7 @@ export class Jobs {
 
   /** Start a background job. cwd is validated by the caller (the bash tool path).
    * Rejects when the per-session running cap is reached. */
-  start(sessionId: string, command: string, cwd: string, callbacks?: { hidden?: boolean; onSettled?: (job: JobView) => void; onProgress?: () => void }): JobView {
+  start(sessionId: string, command: string, cwd: string, callbacks?: { launch?: import('./command-sandbox.js').ShellLaunch; hidden?: boolean; onSettled?: (job: JobView) => void; onProgress?: () => void }): JobView {
     if (typeof command !== 'string' || !command.trim()) throw new Error('command must be a non-empty string.');
     if (command.length > COMMAND_LIMIT || command.includes('\0')) throw new Error('Command is too large or contains a null byte.');
     const session = this.forSession(sessionId);
@@ -68,8 +68,10 @@ export class Jobs {
     // harness credentials stripped. detached so we can signal the whole tree.
     let child: ChildProcess;
     try {
-      child = spawn(process.platform === 'win32' ? 'bash.exe' : '/bin/bash', ['-o', 'pipefail', '-c', command], { cwd, env: shellEnvironment(), detached: process.platform !== 'win32', stdio: ['ignore', 'pipe', 'pipe'], windowsHide: true });
+      child = spawn(callbacks?.launch?.executable ?? (process.platform === 'win32' ? 'bash.exe' : '/bin/bash'), callbacks?.launch?.args ?? ['-o', 'pipefail', '-c', command], { cwd, env: callbacks?.launch?.env ?? shellEnvironment(), detached: process.platform !== 'win32', stdio: ['ignore', 'pipe', 'pipe'], windowsHide: true });
+      if(callbacks?.launch)child.once('close',()=>{void callbacks.launch!.cleanup().catch(()=>{});});
     } catch (error) {
+      if(callbacks?.launch)void callbacks.launch.cleanup().catch(()=>{});
       job.status = 'failed'; job.endedAt = Date.now();
       job.output = Buffer.from(`Could not start job: ${errorMessage(error)}`);
       this.settle(job);

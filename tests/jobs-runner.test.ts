@@ -125,21 +125,20 @@ describe('background shell jobs in the Runner', () => {
     expect(runner.jobs.list(s2.id)).toHaveLength(0);
   });
 
-  it('prompts for kill_shell in ask mode (it is not read-only)', async () => {
+  it('stops its own shell job in ask mode without an extra approval', async () => {
     respond = (body, res) => {
       const last = body.messages.at(-1);
       if (last?.role !== 'tool') return tools(res, [{ name: 'bash', args: { command: 'sleep 30', run_in_background: true } }]);
       const outputs = body.messages.filter((m: any) => m.role === 'tool');
       return outputs.length === 1 ? tools(res, [{ name: 'kill_shell', args: { job_id: 'job-1' } }]) : text(res, 'Stopped');
     };
-    // Auto-approve the initial bash so we reach kill_shell; then assert kill prompts.
+    // Authorize the initial command; stopping this owned job needs no further permission.
     const s = await create({ permissionMode: 'ask' });
     store.saveSettings({ permissionRules: rules([{ tool: 'bash', decision: 'allow' }]) });
     runner.start(s.id, 'Start then kill');
-    await until(() => runner.permissions(s.id).some(p => p.tool === 'kill_shell'));
-    const request = runner.permissions(s.id).find(p => p.tool === 'kill_shell')!;
-    runner.decide(s.id, request.id, 'allow');
     await runner.whenIdle();
+    expect(runner.permissions(s.id)).toEqual([]);
+    expect(store.events(s.id,0).filter(event=>event.type==='permission')).toEqual([]);
     const kill = toolCalls(s.id).find(c => c.name === 'kill_shell')!;
     expect(kill.status).toBe('completed');
     expect(kill.output).toContain('killed');

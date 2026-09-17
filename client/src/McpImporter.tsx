@@ -45,11 +45,11 @@ export function McpImporter({ workspace, onClose, onImported }: {
     } catch (cause) { setError(errorMessage(cause)); }
     finally { setBusy(false); }
   };
-  const apply = async () => {
+  const apply = async (connect=false) => {
     if (!plan || !reviewedRevision) return;
     setBusy(true); setError('');
     try {
-      const result = await post<McpImportResult>('/mcp/import/apply', { workspace, ids: selected, sourceHash: plan.sourceHash, expectedMcpConfigRevision: reviewedRevision });
+      const result = await post<McpImportResult>('/mcp/import/apply', { workspace, ids: selected, sourceHash: plan.sourceHash, expectedMcpConfigRevision: reviewedRevision, ...(connect?{connect:true}:{}) });
       onImported(result);
     } catch (cause) { setError(errorMessage(cause)); }
     finally { setBusy(false); }
@@ -58,7 +58,7 @@ export function McpImporter({ workspace, onClose, onImported }: {
 
   return <Modal title="Import Claude/Codex MCP servers" onClose={close}>
     <div className="form-stack">
-      <p>Choose configurations to copy into <strong>global Litespeed settings</strong>. Nothing connects automatically; imported servers are disabled.</p>
+      <p>Choose configurations to copy into <strong>global Litespeed settings</strong>. Review the selected commands and endpoints, then import disabled or import and connect.</p>
       {error && <div className="inline-alert" role="alert">{error}</div>}
       {issues.length > 0 && <div className="inline-alert" role="status">{issues.join(' · ')}</div>}
       {!plan && <>
@@ -73,11 +73,13 @@ export function McpImporter({ workspace, onClose, onImported }: {
         <div className="form-actions"><button className="button secondary" disabled={busy} onClick={() => setRefresh(value => value + 1)}>{error ? 'Retry discovery' : 'Refresh discovery'}</button><button className="button primary" disabled={busy || !selected.length} onClick={() => void preview()}>Review selected servers</button></div>
       </>}
       {plan && <>
+        {plan.connections?.map(connection=><div key={connection.name}><strong>{connection.name}</strong><pre>{connection.url||[connection.command,...connection.args??[]].join(' ')}</pre><p>Environment keys: {connection.envKeys.join(', ')||'none'}</p></div>)}
+        <p>Import and connect runs these executables or contacts these endpoints with the copied credentials.</p>
         <p><strong>{plan.candidates.filter(item => item.compatible && !item.conflict).length} server(s)</strong> will be copied to global settings, disabled and disconnected. Static environment values may include API keys and are copied server-side only on confirmation.</p>
         {plan.warnings.length > 0 && <div className="inline-alert" role="status">{plan.warnings.join(' · ')}</div>}
         <ul>{plan.candidates.map(item => <li key={item.id}>{item.name} — {item.conflict || !item.compatible ? `skipped: ${item.reason ?? 'unavailable'}` : 'disabled import'}</li>)}</ul>
         <p>OAuth caches, headers, environment forwarding, and interpolation are not imported. Remote servers may require authentication Litespeed does not support.</p>
-        <div className="form-actions"><button className="button secondary" disabled={busy} onClick={() => { setPlan(null); setError(''); }}>Back</button><button className="button primary" disabled={busy || !reviewedRevision || !plan.candidates.some(item => item.compatible && !item.conflict)} onClick={() => void apply()}>Confirm import</button></div>
+        <div className="form-actions"><button className="button secondary" disabled={busy} onClick={() => { setPlan(null); setError(''); }}>Back</button><button className="button primary" disabled={busy || !reviewedRevision || !plan.candidates.some(item => item.compatible && !item.conflict)} onClick={() => void apply()}>Confirm import</button><button className="button primary" disabled={busy || !reviewedRevision || !plan.connections?.length} onClick={()=>void apply(true)}>Import and connect selected</button></div>
       </>}
     </div>
   </Modal>;

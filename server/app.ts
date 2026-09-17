@@ -29,6 +29,8 @@ import { skillInvocationSchema, snapshotSkillInvocation } from './skill-invocati
 import { skillDiscover, skillPlan, skillApply } from './skill-import.js';
 import { mcpImportDiscover, mcpImportPlan, mcpImportApply } from './mcp-import.js';
 import { validateRuleSet } from './permissions.js';
+import { sandboxBackend } from './command-sandbox.js';
+import { permissionReview, hookReview, sourceHash } from './workspace-trust.js';
 import { validateHooks } from './hooks.js';
 import { validateSidecars } from './sidecars.js';
 import { planInstall, applyInstall, uninstall, publicPlan } from './plugins.js';
@@ -41,7 +43,7 @@ import type { Message, Provider, Session, Settings, UsageReport, UsageTotals } f
 
 const providerSchema = z.object({id:z.string().regex(/^[a-zA-Z0-9_-]{1,64}$/),name:z.string().min(1).max(100),kind:z.enum(['openai','anthropic','codex']),baseUrl:z.url().refine(v=>['http:','https:'].includes(new URL(v).protocol)),apiKey:z.string().max(8192).optional(),models:z.array(z.string().max(200)).max(500).optional(),anthropicCacheModels:z.array(z.string().min(1).max(250)).max(500).optional(),contextWindows:z.record(z.string().min(1).max(250),z.number().int().min(1024).max(10000000)).refine(value=>Object.keys(value).length<=100,'At most 100 model context windows may be configured.').optional()});
 const mcpSchema = z.object({command:z.string().max(1000).optional(),args:z.array(z.string().max(4000)).max(100).optional(),env:z.record(z.string(),z.string().max(8192)).optional(),url:z.url().optional(),enabled:z.boolean().optional(),advertise:z.boolean().optional()}).refine(v=>Boolean(v.command)!==Boolean(v.url),'Specify either a command or URL');
-const settingsSchema = z.object({providers:z.array(providerSchema).max(30).refine(p=>new Set(p.map(x=>x.id)).size===p.length,'Provider IDs must be unique').optional(),defaultProvider:z.string().max(64).optional(),defaultModel:z.string().max(250).optional(),workspace:z.string().max(4096).optional(),permissionMode:z.enum(['ask','auto']).optional(),maxSteps:z.number().int().min(1).max(200).optional(),theme:z.enum(['light','dark','system']).optional(),mcpServers:z.record(z.string().regex(/^[a-zA-Z0-9_-]{1,64}$/),mcpSchema).refine(value=>Object.keys(value).length<=30,'At most 30 MCP servers may be configured.').optional(),permissionRules:z.unknown().optional(),memoryEnabled:z.boolean().optional(),hooks:z.unknown().optional(),sidecars:z.unknown().optional(),trustedWorkspaces:z.array(z.string().min(1).max(4096)).max(HOOK_LIMITS.trustedWorkspaces).optional(),notifications:z.boolean().optional(),expectedMcpConfigRevision:z.string().min(1).max(128).optional()});
+const settingsSchema = z.object({providers:z.array(providerSchema).max(30).refine(p=>new Set(p.map(x=>x.id)).size===p.length,'Provider IDs must be unique').optional(),defaultProvider:z.string().max(64).optional(),defaultModel:z.string().max(250).optional(),workspace:z.string().max(4096).optional(),permissionMode:z.enum(['ask','edit','auto']).optional(),maxSteps:z.number().int().min(1).max(200).optional(),theme:z.enum(['light','dark','system']).optional(),mcpServers:z.record(z.string().regex(/^[a-zA-Z0-9_-]{1,64}$/),mcpSchema).refine(value=>Object.keys(value).length<=30,'At most 30 MCP servers may be configured.').optional(),permissionRules:z.unknown().optional(),memoryEnabled:z.boolean().optional(),hooks:z.unknown().optional(),sidecars:z.unknown().optional(),trustedWorkspaces:z.array(z.string().min(1).max(4096)).max(HOOK_LIMITS.trustedWorkspaces).optional(),notifications:z.boolean().optional(),expectedMcpConfigRevision:z.string().min(1).max(128).optional()});
 // planner: the optional planning half of a planner+executor pair; null clears it.
 // architecture: the optional multi-model arrangement (shared/architectures.ts); null clears it.
 const modelRouteSchema = z.object({providerId:z.string().min(1).max(64),model:z.string().min(1).max(250)}).strict();
@@ -51,7 +53,7 @@ const architectureSchema = z.discriminatedUnion('kind', [
   z.object({kind:z.literal('team-fusion'),worker:modelRouteSchema,concurrency:z.union([z.literal(1),z.literal(2),z.literal(3),z.literal(4)]).optional()}).strict(),
   z.object({kind:z.literal('expert-fusion'),expert:modelRouteSchema,concurrency:z.union([z.literal(1),z.literal(2),z.literal(3),z.literal(4)]).optional()}).strict(),
 ]);
-const sessionSchema = z.object({shunt:shuntSchema.nullable().optional(),modelReasoning:z.record(z.string().max(400),z.enum(REASONING_EFFORTS)).refine(value=>Object.keys(value).length<=100,'At most 100 model reasoning preferences may be configured.').optional(),title:z.string().trim().min(1).max(200).optional(),workspace:z.string().max(4096).optional(),providerId:z.string().max(64).optional(),model:z.string().max(250).optional(),mode:z.enum(['build','plan']).optional(),permissionMode:z.enum(['ask','auto']).optional(),planner:z.object({providerId:z.string().min(1).max(64),model:z.string().min(1).max(250)}).nullable().optional(),architecture:architectureSchema.nullable().optional(),outputStyle:z.string().regex(/^[a-zA-Z0-9_-]{1,64}$/).nullable().optional()});
+const sessionSchema = z.object({shunt:shuntSchema.nullable().optional(),modelReasoning:z.record(z.string().max(400),z.enum(REASONING_EFFORTS)).refine(value=>Object.keys(value).length<=100,'At most 100 model reasoning preferences may be configured.').optional(),title:z.string().trim().min(1).max(200).optional(),workspace:z.string().max(4096).optional(),providerId:z.string().max(64).optional(),model:z.string().max(250).optional(),mode:z.enum(['build','plan']).optional(),commandSandbox:z.enum(['off','workspace']).optional(),permissionMode:z.enum(['ask','edit','auto']).optional(),planner:z.object({providerId:z.string().min(1).max(64),model:z.string().min(1).max(250)}).nullable().optional(),architecture:architectureSchema.nullable().optional(),outputStyle:z.string().regex(/^[a-zA-Z0-9_-]{1,64}$/).nullable().optional()});
 const architectureConfigurationSchema=sessionSchema.pick({providerId:true,model:true,architecture:true,planner:true,shunt:true,modelReasoning:true,outputStyle:true}).required();
 const architectureConfigurationsSchema=z.object({single:architectureConfigurationSchema.optional(),'sidekick-fusion':architectureConfigurationSchema.optional(),'team-fusion':architectureConfigurationSchema.optional(),'expert-fusion':architectureConfigurationSchema.optional(),litefusion:architectureConfigurationSchema.optional()}).strict().refine(value=>Object.entries(value).every(([key,configuration])=>!configuration||(configuration.architecture?.kind??'single')===key),'Saved architecture must match its key.');
 const profileChoiceSchema=z.object({profileId:z.string().min(1).max(64).nullable(),skillIds:z.array(z.string().min(1).max(64)).max(100),catalogRevision:z.string().min(1).max(128).optional()}).strict().refine(choice=>new Set(choice.skillIds).size===choice.skillIds.length,'Skill IDs must be unique.').refine(choice=>(choice.profileId===null&&choice.skillIds.length===0)||Boolean(choice.catalogRevision),'Refresh the profile catalog before choosing profiles or skills.');
@@ -106,11 +108,29 @@ export function createApp(options:AppOptions = {}) {
   app.post('/api/skills/plan',async(req,res)=>{const input=z.object({workspace:z.string().max(4096).optional(),rootId:skillRootSchema,id:z.string().regex(/^[a-z0-9][a-z0-9-]{0,63}$/)}).strict().parse(req.body);const root=await workspace(input.workspace);res.json(await skillPlan(root,input.rootId,input.id));});
   app.post('/api/skills/import',async(req,res)=>{const input=z.object({workspace:z.string().max(4096).optional(),rootId:skillRootSchema,id:z.string().regex(/^[a-z0-9][a-z0-9-]{0,63}$/),sourceHash:z.string().regex(/^[a-f0-9]{64}$/)}).strict().parse(req.body);const root=await workspace(input.workspace);res.json(await skillApply(root,input.rootId,input.id,input.sourceHash));});
   // MCP import intentionally reads only fixed Claude Code/Codex config files.
-  // Its responses contain metadata only: never raw config, paths, URLs, args, or credentials.
+  // Discovery is metadata-only. Explicit plan review includes commands/endpoints, never environment credential values.
   const mcpImportIds=z.array(z.string().regex(/^[a-f0-9]{32}$/)).min(1).max(30).refine(value=>new Set(value).size===value.length);
   app.get('/api/mcp/import/discover',async(req,res)=>{const root=await workspace(req.query.workspace);res.json(await mcpImportDiscover(root,store.settings().mcpServers));});
   app.post('/api/mcp/import/plan',async(req,res)=>{const input=z.object({workspace:z.string().max(4096).optional(),ids:mcpImportIds}).strict().parse(req.body);const root=await workspace(input.workspace);res.json(await mcpImportPlan(root,store.settings().mcpServers,input.ids));});
-  app.post('/api/mcp/import/apply',async(req,res)=>{const input=z.object({workspace:z.string().max(4096).optional(),ids:mcpImportIds,sourceHash:z.string().regex(/^[a-f0-9]{64}$/),expectedMcpConfigRevision:z.string().min(1).max(128)}).strict().parse(req.body);const root=await workspace(input.workspace);res.json(await mcpImportApply(root,store,input.ids,input.sourceHash,input.expectedMcpConfigRevision,mcpConfigRevision));});
+  app.post('/api/mcp/import/apply',async(req,res)=>{
+    const input=z.object({workspace:z.string().max(4096).optional(),ids:mcpImportIds,sourceHash:z.string().regex(/^[a-f0-9]{64}$/),expectedMcpConfigRevision:z.string().min(1).max(128),connect:z.boolean().optional()}).strict().parse(req.body);
+    if(input.connect&&!options.external?.reconnect)throw httpError(503,'MCP connection operations are unavailable. Import disabled configurations instead.');
+    const root=await workspace(input.workspace),result=await mcpImportApply(root,store,input.ids,input.sourceHash,input.expectedMcpConfigRevision,mcpConfigRevision,input.connect);
+    if(input.connect){
+      result.connected=[];result.connectionErrors=[];
+      await runner.externalOperation(async signal=>{
+        for(const name of result.imported){
+          try{
+            if(result.configRevision!==mcpConfigRevision())throw httpError(409,'Saved configuration changed. Review before connecting.');
+            const server=options.external!.status!().find(server=>server.name===name);
+            if(!server)throw httpError(409,'Imported server is unavailable. Review its configuration.');
+            await options.external!.reconnect!(name,server.revision,signal);result.connected!.push(name);
+          }catch{result.connectionErrors!.push(`${name}: connection did not complete. Review its status in Integrations before retrying.`);}
+        }
+      },requestSignal(res));
+    }
+    res.json(result);
+  });
   app.get('/api/health',(_req,res)=>res.json({ok:true,name:'litespeed',version:VERSION,...(options.updates?.installation?{installation:options.updates.installation,pid:process.pid}:{})}));
   app.get('/api/updates',async(req,res)=>res.json(options.updates?await options.updates.status(req.query.check==='true'):{currentVersion:VERSION,available:false,packaged:false,restartRequired:false,releaseUrl:'https://github.com/BerriAI/litespeed/releases',command:'Update your source checkout and rebuild.'}));
   app.post('/api/updates/install',async(_req,res)=>{if(!options.updates)throw httpError(409,'Packaged updates are unavailable on this server.');res.json(await options.updates.install());});
@@ -163,10 +183,30 @@ export function createApp(options:AppOptions = {}) {
   // Workspace trust for project hooks (design note 4.3): one explicit act per
   // workspace, persisted as a CANONICAL (realpath) path so a symlinked alias
   // can never inherit trust. POST adds, DELETE removes; both are idempotent.
-  // These power a future trust prompt UI; the API is the v1 surface.
-  const trustInput=(body:unknown)=>z.object({workspace:z.string().min(1).max(4096)}).strict().parse(body).workspace;
+  const trustInput=(body:unknown)=>z.object({workspace:z.string().min(1).max(4096),sourceHash:z.string().optional()}).strict().parse(body).workspace;
+  app.get('/api/workspaces/permissions',async(req,res)=>{
+    const root=await workspace(queryString(req.query.workspace)||store.settings().workspace), settings=store.settings();
+    const rules=permissionReview(root), hooks=hookReview(root);
+    res.json({sandboxBackend:sandboxBackend(),workspace:root,rules:{...rules,trusted:settings.trustedPermissionRules?.[root]===rules.sourceHash},hooks:{...hooks,trusted:(settings.trustedWorkspaces??[]).includes(root)},grants:store.projectToolGrants(root),appHooks:settings.hooks??[],appHooksRevision:sourceHash(JSON.stringify(settings.hooks??[])),sidecars:settings.sidecars??[]});
+  });
+  app.post('/api/hooks/enabled',(req,res)=>{
+    const input=z.object({index:z.number().int().min(0),enabled:z.boolean(),expectedRevision:z.string()}).strict().parse(req.body), hooks=store.settings().hooks??[];
+    if(input.expectedRevision!==sourceHash(JSON.stringify(hooks))||!hooks[input.index])throw httpError(409,'App hooks changed. Review them again.');
+    store.saveSettings({hooks:hooks.map((hook,index)=>index===input.index?{...hook,enabled:input.enabled}:hook)});res.json({ok:true});
+  });
+  app.post('/api/workspaces/permission-rules',async(req,res)=>{
+    const input=z.object({workspace:z.string(),sourceHash:z.string()}).strict().parse(req.body), root=await workspace(input.workspace), review=permissionReview(root);
+    if(review.advisory||input.sourceHash!==review.sourceHash)throw httpError(409,'Project rules changed or are invalid. Review them again.');
+    store.saveSettings({trustedPermissionRules:{...store.settings().trustedPermissionRules,[root]:review.sourceHash}});
+    res.json({ok:true});
+  });
+  app.delete('/api/workspaces/permission-rules',async(req,res)=>{
+    const root=await workspace(trustInput(req.body)), values={...store.settings().trustedPermissionRules};delete values[root];store.saveSettings({trustedPermissionRules:values});res.json({ok:true});
+  });
+  app.delete('/api/workspaces/tool-grants',async(req,res)=>{const root=await workspace(trustInput(req.body));store.clearProjectToolGrants(root);res.json({ok:true});});
   app.post('/api/workspaces/trust',async(req,res)=>{
     const root=await workspace(trustInput(req.body));
+    if(req.body.sourceHash!==undefined&&req.body.sourceHash!==hookReview(root).sourceHash)throw httpError(409,'Project hooks changed. Review them again.');
     const current=store.settings().trustedWorkspaces??[];
     if(!current.includes(root)){
       if(current.length>=HOOK_LIMITS.trustedWorkspaces)throw httpError(400,`At most ${HOOK_LIMITS.trustedWorkspaces} workspaces may be trusted.`);
@@ -338,7 +378,7 @@ export function createApp(options:AppOptions = {}) {
     // outputStyle rewrites the system prompt of future turns (session-constant
     // cached-prefix config), so it follows the same contract: idle-only PATCH,
     // revision bump in the store, queue held.
-    const configChange=patch.shunt!==undefined||patch.modelReasoning!==undefined||patch.model!==undefined||patch.providerId!==undefined||patch.mode!==undefined||patch.permissionMode!==undefined||patch.planner!==undefined||patch.architecture!==undefined||patch.outputStyle!==undefined;
+    const configChange=patch.shunt!==undefined||patch.modelReasoning!==undefined||patch.model!==undefined||patch.providerId!==undefined||patch.mode!==undefined||patch.permissionMode!==undefined||patch.commandSandbox!==undefined||patch.planner!==undefined||patch.architecture!==undefined||patch.outputStyle!==undefined;
     if(configChange){runner.assertIdle(req.params.id);runner.history.assertReady(req.params.id);}
     if(!shuntConfigured(patch.shunt,store.settings().providers))throw httpError(400,'Choose an API-key Shunt model or turn Shunt off.');
     checkProvider(patch.providerId);if(patch.planner)checkProvider(patch.planner.providerId);if(patch.architecture)checkArchitecture(patch.architecture);
@@ -437,10 +477,10 @@ export function createApp(options:AppOptions = {}) {
     runner.interrupt(req.params.id,turnId);res.json({ok:true});
   });
   app.patch('/api/sessions/:id/permission-mode',(req,res)=>{
-    const {permissionMode,expectedConfigRevision}=z.object({permissionMode:z.enum(['ask','auto']),expectedConfigRevision:configRevisionSchema}).strict().parse(req.body);
+    const {permissionMode,expectedConfigRevision}=z.object({permissionMode:z.enum(['ask','edit','auto']),expectedConfigRevision:configRevisionSchema}).strict().parse(req.body);
     res.json(runner.setPermissionMode(req.params.id,permissionMode,expectedConfigRevision));
   });
-  app.post('/api/sessions/:id/permissions/:requestId',(req,res)=>{const{decision}=z.object({decision:z.enum(['allow','always','deny'])}).parse(req.body);runner.decide(req.params.id,req.params.requestId,decision);res.json({ok:true});});
+  app.post('/api/sessions/:id/permissions/:requestId',(req,res)=>{const{decision}=z.object({decision:z.enum(['allow','always','project','deny'])}).parse(req.body);runner.decide(req.params.id,req.params.requestId,decision);res.json({ok:true});});
   app.get('/api/sessions/:id/questions',(req,res)=>res.json({questions:runner.questions.pending(req.params.id)}));
   app.post('/api/sessions/:id/questions/:questionId/answer',(req,res)=>res.json(runner.questions.answer(req.params.id,req.params.questionId,req.body)));
   app.get('/api/sessions/:id/tool-grants',(req,res)=>res.json({tools:[...new Set(store.toolGrants(req.params.id).map(g=>g.tool))]}));

@@ -49,9 +49,10 @@ describe('foreground bounded researcher Runner/API integration',()=>{
     const s=await create();await run(s.id);const delegation=runner.delegations.list(s.id)[0],transcript=runner.delegations.transcript(s.id,delegation.id);expect(delegation.status).toBe('failed');expect(names(calls[1])).not.toContain(name);expect(transcript.messages.flatMap(m=>m.toolCalls??[])[0].status).toBe('denied');expect(await readFile(join(directory,'research.txt'),'utf8')).toBe('Verified workspace evidence');expect(runner.delegations.list(s.id)).toHaveLength(1);expect(runner.permissions(delegation.childSessionId)).toEqual([]);expect(runner.questions.pending(delegation.childSessionId)).toEqual([]);expect(store.queue(s.id).paused).toBe(true);
   });
 
-  it('Plan ASK launches require permission while a remembered task grant remains effective',async()=>{
-    const s=await create({mode:'plan',permissionMode:'ask'});runner.start(s.id,'ROOT first');await until(()=>runner.permissions(s.id).length===1);expect(calls).toHaveLength(1);runner.decide(s.id,runner.permissions(s.id)[0].id,'always');await runner.whenIdle();
-    await run(s.id);expect(calls).toHaveLength(8);expect(runner.permissions(s.id)).toEqual([]);expect(runner.delegations.list(s.id)).toHaveLength(2);
+  it('Plan Ask launches researchers without prompting and retains the read-only ceiling',async()=>{
+    const s=await create({mode:'plan',permissionMode:'ask'});await run(s.id);await run(s.id);
+    expect(calls).toHaveLength(8);expect(runner.permissions(s.id)).toEqual([]);expect(runner.delegations.list(s.id)).toHaveLength(2);
+    expect(store.events(s.id,0).filter(event=>event.type==='permission')).toEqual([]);
   });
 
   it('Plan Auto authorizes launch without expanding the child read-only ceiling',async()=>{
@@ -59,6 +60,7 @@ describe('foreground bounded researcher Runner/API integration',()=>{
   });
 
   it('accepted provider, model, project guidance and skills survive source and settings replacement before child launch',async()=>{
+    store.saveSettings({permissionRules:{version:1,rules:[{tool:'task',decision:'ask'}]}});
     await mkdir(join(directory,'.litespeed','skills','inspect'),{recursive:true});await writeFile(join(directory,'.litespeed','skills','inspect','SKILL.md'),'Pinned skill body');await writeFile(join(directory,'.litespeed','profiles.json'),JSON.stringify({version:1,profiles:[],skills:[{id:'inspect',name:'Inspect',description:'Inspect project'}]}));
     const catalog=(await api('/profiles')).body;const s=await create({permissionMode:'ask',profile:{profileId:null,skillIds:['inspect'],catalogRevision:catalog.revision}});runner.start(s.id,'ROOT pin');await until(()=>runner.permissions(s.id).length===1);
     store.saveSettings({providers:[{id:'test',name:'Replacement',kind:'openai',baseUrl:'http://127.0.0.1:1',apiKey:'fake-new-key'}]});await writeFile(join(directory,'AGENTS.md'),'Replacement guidance');await rm(join(directory,'.litespeed','skills','inspect','SKILL.md'));runner.decide(s.id,runner.permissions(s.id)[0].id,'allow');await runner.whenIdle();

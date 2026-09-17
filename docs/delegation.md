@@ -5,7 +5,7 @@ A research task lets the main agent delegate a focused question to a separate mo
 ## A complete research workflow
 
 1. Ask the main agent to delegate a specific inspection: for example, find the modules responsible for configuration and summarize their behavior.
-2. In ask mode, review the `task` launch request and choose Allow once, Always allow, or Deny. Plan mode does not automatically exempt task launches from approval. Automatic approval or a matching remembered task grant authorizes the launch, not additional researcher tools.
+2. Researchers launch automatically in Ask and Plan modes unless an explicit rule asks or denies. External reads still use normal scoped approvals; launch never grants additional researcher tools.
 3. The **Research task** card shows the description and status. Expand the card to inspect its inline conversation, including actual read/search results and streamed progress.
 4. The parent waits for a bounded report before continuing. Its conversation records one task result. **Cancel task** stops that researcher; **Stop generation** stops the parent and its researcher.
 

@@ -50,7 +50,7 @@ export function McpImporter({ controller, workspace, onClose, onImported }: {
     } catch (cause) { setError((cause as Error).message); }
     finally { setBusy(false); }
   };
-  const confirm = async () => {
+  const confirm = async (connect=false) => {
     if (busy || !plan || !revision) return;
     setBusy(true); setError('');
     try {
@@ -83,8 +83,11 @@ export function McpImporter({ controller, workspace, onClose, onImported }: {
       disabled: busy || !revision || !plan.candidates.some(item => item.compatible && !item.conflict),
       action: () => { void confirm(); },
     }, {
+      id:'connect',label:'Import and connect selected',description:'Runs the reviewed commands or contacts endpoints with copied credentials.',disabled:busy||!revision||!plan.connections?.length,action:()=>{void confirm(true);},
+    }, {
       id: 'back', label: 'Back', disabled: busy, action: () => { setPlan(null); setError(''); },
     });
+    for(const connection of plan.connections??[])choices.unshift({id:`connection-${connection.name}`,label:connection.name,description:connection.url||[connection.command,...connection.args??[]].join(' '),disabled:true,action(){}});
     return <Menu title="Review MCP import" onClose={close} footer={error || plan.warnings.join(' · ')} items={choices} />;
   }
 

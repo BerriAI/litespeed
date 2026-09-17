@@ -1,3 +1,5 @@
+import { WorkspacePermissions } from './WorkspacePermissions';
+import { RULE_TOOLS, permissionModeLabels } from '../../shared/permissions.js';
 import { useCallback, useEffect, useRef, useState, type ReactNode } from 'react';
 import { Activity, ArrowUpRight, Check, ChevronRight, Eye, EyeOff, KeyRound, Plus, Server, Settings2, Shield, ShieldCheck, Star, Trash2, Unplug, X } from 'lucide-react';
 import type { McpServerConfig, Provider, Settings as SettingsType, UsageReport } from '../../shared/types';
@@ -15,14 +17,13 @@ type McpReview = { servers: Record<string, McpServerConfig>; revision: string };
 const mcpStatusLabels: Record<McpServerStatus['status'], string> = { disabled: 'Disabled', disconnected: 'Configured · disconnected', connecting: 'Connecting', connected: 'Connected', refreshing: 'Refreshing tools', stale: 'Stale', error: 'Error' };
 type Login = { loginId: string; method: 'device' | 'browser'; url: string; userCode?: string; expiresAt: number; providerId: string };
 type ContextLimitRow = { id: string; model: string; tokens: string };
-// Mirrors the server's RULE_TOOLS allowlist (server/permissions.ts stays the authority; rules never target mcp_* tools).
-const RULE_TOOLS = ['read_file', 'write_file', 'edit_file', 'glob', 'grep', 'bash', 'web_fetch', 'todo_read', 'todo_write', 'task', 'memory_remember', 'memory_forget', 'memory_recall'] as const;
+// Mirrors the server's RULE_TOOLS allowlist (server/permissions.ts stays the authority; rules support exact connected tool names).
 const decisionLabels: [PermissionDecision, string][] = [['allow', 'Allow without asking'], ['ask', 'Ask every time'], ['deny', 'Deny always']];
 type RuleRow = { id: string; tool: string; decision: PermissionDecision; patterns: string };
 const ruleRowsFor = (ruleSet?: PermissionRuleSet): RuleRow[] => (ruleSet?.rules ?? []).map(rule => ({ id: crypto.randomUUID(), tool: rule.tool, decision: rule.decision, patterns: (rule.patterns ?? []).join('\n') }));
 const rowPatterns = (row: RuleRow) => row.patterns.split('\n').map(line => line.trim()).filter(Boolean);
 function ruleRowError(row: RuleRow): string {
-  if (!(RULE_TOOLS as readonly string[]).includes(row.tool)) return 'Choose a built-in tool.';
+  if (!(RULE_TOOLS as readonly string[]).includes(row.tool) && !/^mcp_[a-zA-Z0-9_-]{1,200}$/.test(row.tool)) return 'Choose a built-in or exact connected tool name.';
   const patterns = rowPatterns(row);
   if (patterns.length > PERMISSION_LIMITS.patternsPerRule) return `Use at most ${PERMISSION_LIMITS.patternsPerRule} patterns per rule.`;
   const over = patterns.find(value => value.length > PERMISSION_LIMITS.patternLength);
@@ -51,7 +52,7 @@ function parseContextRows(rows: ContextLimitRow[]): Record<string, number> {
   }
   return Object.fromEntries(entries);
 }
-export function Settings({ settings, workspace, onClose, onSave, onProfiles, profilesDisabled, profiles }: { workspace?: string; profiles?: ReactNode; onProfiles?: () => void; profilesDisabled?: boolean; settings: SettingsType; onClose: () => void; onSave: (settings: SettingsType) => void }) {
+export function Settings({ session, settings, workspace, onClose, onSave, onProfiles, profilesDisabled, profiles }: { session?: import('../../shared/types').Session; workspace?: string; profiles?: ReactNode; onProfiles?: () => void; profilesDisabled?: boolean; settings: SettingsType; onClose: () => void; onSave: (settings: SettingsType) => void }) {
   const [draft, setDraft] = useState<SettingsType>(() => ({ ...settings, providers: settings.providers.map(({ apiKey: _key, ...p }) => p) }));
   const [contextRows, setContextRows] = useState(() => contextRowsFor(settings.providers));
   const [ruleRows, setRuleRows] = useState(() => ruleRowsFor(settings.permissionRules));
@@ -333,7 +334,7 @@ export function Settings({ settings, workspace, onClose, onSave, onProfiles, pro
   }
   const importedMcp = (result: import('../../shared/mcp-import').McpImportResult) => {
     setImportingMcp(false); setBusy(true); saving.current = true;
-    setNotice(`Imported ${result.imported.length} disabled MCP server${result.imported.length === 1 ? '' : 's'}${result.skipped.length ? `; skipped ${result.skipped.length}` : ''}.`);
+    setNotice(result.connectionErrors?.length ? result.connectionErrors.join(' ') : result.connected ? `Imported ${result.imported.length}; connected ${result.connected.length}.` : `Imported ${result.imported.length} disabled MCP server${result.imported.length === 1 ? '' : 's'}${result.skipped.length ? `; skipped ${result.skipped.length}` : ''}.`);
     void (async () => {
       try {
         const saved = await api<SettingsType>('/settings');
@@ -390,7 +391,7 @@ export function Settings({ settings, workspace, onClose, onSave, onProfiles, pro
       {tab === 'general' && <div className="form-stack"><div className="section-heading"><div><h3>A workspace that feels like yours.</h3><p>Defaults apply to new sessions.</p></div></div>
         <label>Workspace path<input value={draft.workspace} placeholder="/absolute/path/to/your/project" onChange={e => setDraft(s => ({ ...s, workspace: e.target.value }))} spellCheck={false} /><span className="field-hint">File tools are scoped here. Shell commands start here but are not sandboxed.</span></label>
         <div className="form-columns"><label>Default provider<select value={draft.defaultProvider} onChange={e => setDraft(s => ({ ...s, defaultProvider: e.target.value }))}>{draft.providers.map(p => <option key={p.id} value={p.id}>{p.name}</option>)}</select></label><label>Default model<input value={draft.defaultModel} onChange={e => setDraft(s => ({ ...s, defaultModel: e.target.value }))} /></label></div>
-        <label>Permissions<select value={draft.permissionMode} onChange={e => setDraft(s => ({ ...s, permissionMode: e.target.value as SettingsType['permissionMode'] }))}><option value="ask">Ask before changes and commands</option><option value="auto">Allow changes and commands automatically</option></select><span className="field-hint">Automatic mode lets the agent modify files and execute shell commands without asking.</span></label>
+        <label>Permissions<select value={draft.permissionMode} onChange={e => setDraft(s => ({ ...s, permissionMode: e.target.value as SettingsType['permissionMode'] }))}><option value="ask">Ask before changes and commands</option><option value="edit">Allow project edits</option><option value="auto">Full access</option></select><span className="field-hint">Automatic mode lets the agent modify files and execute shell commands without asking.</span></label>
         <div className="form-columns"><label>Appearance<select value={draft.theme} onChange={e => setDraft(s => ({ ...s, theme: e.target.value as SettingsType['theme'] }))}><option value="system">System</option><option value="light">Light</option><option value="dark">Dark</option></select></label></div>
         <label className="notifications-toggle"><input type="checkbox" checked={Boolean(draft.notifications)} disabled={busy} onChange={e => { notificationsTouched.current = true; setNotice(''); const notifications = e.target.checked; setDraft(s => ({ ...s, notifications })); }} />Notify when a response finishes or needs approval</label>
         <p className="field-hint">Off by default. Uses your operating system’s notifications (macOS and Linux); only responses longer than 10 seconds notify on finish. Changes apply immediately, even to a running response.</p>
@@ -412,13 +413,13 @@ export function Settings({ settings, workspace, onClose, onSave, onProfiles, pro
         </section>
         <div className="quiet-callout"><ShieldCheck size={18} /><p>Plan mode is read-only. Switch to Build when you are ready to make changes.</p></div>
       </div>}
-      {tab === 'permissions' && <div className="form-stack"><div className="section-heading"><div><h3>Decide once, ahead of time.</h3><p>Explicit rules run before the session’s permission mode.</p></div></div>
-        <p className="field-hint">An explicit Deny always wins. Ask beats Allow. Per-project rules in <code>.litespeed/permissions.json</code> in your workspace (same shape: <code>{'{"version":1,"rules":[…]}'}</code>) override these app rules at equal severity. When no rule matches, the session’s permission mode decides as usual. Rules never widen tool availability — Plan mode and profile limits still apply, and connected (mcp_*) tools cannot be targeted. Rules for a turn are captured when the message is accepted, so edits here apply to future turns.</p>
+      {tab === 'permissions' && <div className="form-stack"><WorkspacePermissions workspace={workspace || settings.workspace} session={session}/><datalist id="permission-rule-tools">{RULE_TOOLS.map(tool=><option key={tool} value={tool}/>)}</datalist><div className="section-heading"><div><h3>Decide once, ahead of time.</h3><p>Explicit rules run before the session’s permission mode.</p></div></div>
+        <p className="field-hint">An explicit Deny always wins. Ask beats Allow. Per-project rules in <code>.litespeed/permissions.json</code> in your workspace (same shape: <code>{'{"version":1,"rules":[…]}'}</code>) override these app rules at equal severity. When no rule matches, the session’s permission mode decides as usual. Rules never widen tool availability — Plan mode and profile limits still apply, and exact connected (mcp_*) tool names are supported. Rules for a turn are captured when the message is accepted, so edits here apply to future turns.</p>
         <p className="field-hint">Patterns, one per line, match the tool’s sensitive argument: the command for bash, the workspace-relative path for file tools. A rule with no patterns matches every call of the tool. For bash, a pattern without wildcards matches as a command prefix at a word boundary (“git status” covers “git status --short”, not “git statusx”); <code>*</code> spans words and flags but never crosses shell operators like <code>;</code> <code>&&</code> <code>|</code>; <code>**</code> matches anything. For file tools, <code>*</code> stays within one path segment and <code>**</code> crosses segments.</p>
         {ruleRows.length === 0 ? <div className="empty-state"><Shield size={25} /><strong>No permission rules</strong><p>Every tool call falls back to the session’s permission mode. Add a rule to always allow, always ask, or always deny specific tools or patterns.</p><button className="button secondary" disabled={busy} onClick={() => updateRuleRows([{ id: crypto.randomUUID(), tool: 'bash', decision: 'ask', patterns: '' }])}><Plus size={15} />Add rule</button></div> : <>
           {ruleRows.map((row, index) => <div className="permission-rule" key={row.id}>
             <div className="permission-rule-row">
-              <label>Tool<select aria-label={`Rule ${index + 1} tool`} value={row.tool} disabled={busy} onChange={e => updateRuleRows(ruleRows.map(item => item.id === row.id ? { ...item, tool: e.target.value } : item))}>{RULE_TOOLS.map(tool => <option key={tool} value={tool}>{tool}</option>)}</select></label>
+              <label>Tool<select aria-label={`Rule ${index + 1} tool`} value={row.tool.startsWith('mcp_')?'mcp_':row.tool} disabled={busy} onChange={e => updateRuleRows(ruleRows.map(item => item.id === row.id ? { ...item, tool: e.target.value } : item))}>{RULE_TOOLS.map(tool => <option key={tool} value={tool}>{tool}</option>)}<option value="mcp_">Connected tool…</option></select>{row.tool.startsWith('mcp_')&&<input aria-label={`Rule ${index + 1} connected tool`} placeholder="Exact mcp_ tool name" value={row.tool} onChange={e=>updateRuleRows(ruleRows.map(item=>item.id===row.id?{...item,tool:e.target.value}:item))}/>}</label>
               <label>Decision<select aria-label={`Rule ${index + 1} decision`} value={row.decision} disabled={busy} onChange={e => updateRuleRows(ruleRows.map(item => item.id === row.id ? { ...item, decision: e.target.value as PermissionDecision } : item))}>{decisionLabels.map(([value, label]) => <option key={value} value={value}>{label}</option>)}</select></label>
               <button className="icon-button danger" type="button" disabled={busy} aria-label={`Remove rule ${index + 1}`} title="Remove rule" onClick={() => updateRuleRows(ruleRows.filter(item => item.id !== row.id))}><Trash2 size={15} /></button>
             </div>

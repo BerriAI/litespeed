@@ -41,10 +41,12 @@ try {
   let nextRelease, nextArchive;
   const finish = res => { res.writeHead(200, { 'Content-Type': 'text/event-stream' }); res.end('data: {"choices":[{"index":0,"delta":{"content":"Package smoke answer"},"finish_reason":null}]}\n\ndata: {"choices":[{"index":0,"delta":{},"finish_reason":"stop"}],"usage":{"prompt_tokens":100,"completion_tokens":5}}\n\ndata: [DONE]\n\n'); };
   const sessionHeaders = [];
+  const confinedCode = 'const fs=require("node:fs"); fs.writeFileSync("confined.txt","confined"); try { fs.writeFileSync('+JSON.stringify(join(temporary,'outside-write.txt'))+',"bad"); process.exit(61); } catch {} if(process.env.NODE_OPTIONS)process.exit(62);';
+  const confinedCommand="node -e '"+confinedCode.replaceAll("'","'\\''")+"'";
   provider = createServer(async (req, res) => {
     if (req.url.endsWith('/manifest.json')) { res.setHeader('Content-Type', 'application/json'); res.end(JSON.stringify(nextRelease || release)); return; }
     if (nextRelease && req.url.endsWith(nextRelease.assets[platform].file)) { res.end(await readFile(nextArchive)); return; }
-    if (req.url.endsWith('/chat/completions')) { let text = ''; for await (const chunk of req) text += chunk; const body = JSON.parse(text); sessionHeaders.push(req.headers['x-litellm-session-id']); if (body.messages.at(-1)?.content === 'hold for update') { held = res; return; } finish(res); return; }
+    if (req.url.endsWith('/chat/completions')) { let text = ''; for await (const chunk of req) text += chunk; const body = JSON.parse(text); sessionHeaders.push(req.headers['x-litellm-session-id']); if(body.messages.at(-1)?.content==='confined package smoke'){res.writeHead(200,{'Content-Type':'text/event-stream'});res.end('data: '+JSON.stringify({choices:[{index:0,delta:{tool_calls:[{index:0,id:'confined-smoke',type:'function',function:{name:'bash',arguments:JSON.stringify({command:confinedCommand})}}]},finish_reason:'tool_calls'}]})+'\n\ndata: [DONE]\n\n');return;} if (body.messages.at(-1)?.content === 'hold for update') { held = res; return; } finish(res); return; }
     res.writeHead(404).end();
   });
   provider.listen(0, '127.0.0.1'); await once(provider, 'listening'); const gateway = `http://127.0.0.1:${provider.address().port}`;
@@ -60,7 +62,17 @@ try {
   const session = await api('/sessions', { workspace, providerId: 'fixture', model: 'fixture', permissionMode: 'auto' });
   await api(`/sessions/${session.id}/messages`, { content: 'hello from the package' });
   await waitFor(async () => (await api(`/sessions/${session.id}`)).messages.some(message => message.content === 'Package smoke answer'), 'Bundled provider call failed');
-  console.log('Bundled backend and provider call passed; starting TUI.');
+  await api(`/sessions/${session.id}`,{permissionMode:'edit',commandSandbox:'workspace'},'PATCH');
+  await api(`/sessions/${session.id}/messages`,{content:'confined package smoke'});
+  await waitFor(async()=>{const detail=await api(`/sessions/${session.id}`);return ['idle','error'].includes(detail.session.status)&&detail.messages.flatMap(message=>message.toolCalls??[]).some(call=>call.id==='confined-smoke');},'Confined package command did not finish');
+  const confined=await api(`/sessions/${session.id}`);
+  assert.equal(confined.permissions.length,0,'Confined commands should not prompt in Allow project edits');
+  const confinedCall=confined.messages.flatMap(message=>message.toolCalls??[]).find(call=>call.id==='confined-smoke');
+  assert.equal(confinedCall?.execution?.exitCode,0,JSON.stringify(confinedCall));
+  assert.equal(await readFile(join(workspace,'confined.txt'),'utf8'),'confined');
+  await assert.rejects(readFile(join(temporary,'outside-write.txt')));
+  await api(`/sessions/${session.id}`,{permissionMode:'auto',commandSandbox:'off'},'PATCH');
+  console.log('Bundled backend, provider, and enforced command confinement passed; starting TUI.');
   terminal = pty.spawn('/bin/zsh', ['-lic','exec litespeed "$@"','litespeed','--url', base, '--session', session.id], { cwd: workspace, env, cols: 110, rows: 34, name: 'xterm-256color' });
   const tuiExited = new Promise(done => terminal.onExit(done)); terminal.onData(data => emulator.write(data));
   await waitFor(() => screen().includes('Commands [Ctrl+P]') && screen().includes('Package smoke answer'), 'Bundled TUI did not render');
@@ -92,7 +104,7 @@ try {
   await waitFor(async () => (await api(`/sessions/${session.id}`)).session.status === 'idle', 'Task did not finish before restart');
   await api('/updates/restart', {});
   await waitFor(async () => { try { return (await api('/health')).version === version; } catch { return false; } }, 'Updated backend did not start');
-  const oldSession = await api(`/sessions/${session.id}`); assert.equal(oldSession.session.id, session.id); assert.equal(oldSession.messages.filter(message => message.content === 'Package smoke answer').length, 2);
+  const oldSession = await api(`/sessions/${session.id}`); assert.equal(oldSession.session.id, session.id); assert.equal(oldSession.messages.filter(message => message.content === 'Package smoke answer').length, 3);
   assert.equal(await readFile(join(workspace, 'keep.txt'), 'utf8'), 'user work stays here');
   assert.equal(execFileSync(command, ['--version'], { env, encoding: 'utf8' }).trim(), version);
   assert(sessionHeaders.every(id => id === session.id));

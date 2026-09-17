@@ -28,7 +28,7 @@ See [installation, updates, and the source-build alternative](docs/installing.md
 Litespeed has its own command, separate from the [LiteLLM gateway CLI](https://docs.litellm.ai/docs/proxy/management_cli). If you used an earlier version of this agent, follow the [upgrade guide](docs/upgrading.md) to carry over saved sessions and configuration.
 
 1. On your first launch, choose your setup, connect your **LiteLLM gateway base URL** and **API key**, and pick your models. **Sidekick Fusion is recommended:** choose a strong driver to plan and review, and a cheaper sidekick to handle implementation. **LiteFusion is experimental**; its task-specific routing policy is available for evaluation. Choose **Single model** if you prefer one model for everything. Litespeed remembers the connection and models; running `litespeed` in another project opens chat directly. Gateways that do not require a key can leave it blank.
-2. Use **Models** or `/models` to change your arrangement. **Ask first** is the default; **Allow all tools** is available in permissions. The full setup is available from the web sidebar or `/setup`. If you already use Claude Code or Codex skills, /skills (or **Settings → Project profiles**) offers **Import a Claude/Codex skill…** to copy one into the project — see [Project profiles and skills](docs/profiles.md).
+2. Use **Models** or `/models` to change your arrangement. **Ask first** is the default. Handoffs run automatically; choose **Allow project edits** for routine coding or **Full access** in permissions. The full setup is available from the web sidebar or `/setup`. If you already use Claude Code or Codex skills, /skills (or **Settings → Project profiles**) offers **Import a Claude/Codex skill…** to copy one into the project — see [Project profiles and skills](docs/profiles.md).
 3. Type a task. **Build** can edit files and run commands; **Plan** uses read-only tools. Type `/` for command suggestions in either client; use **↑/↓**, **Tab** or **Enter** to complete, and **Esc** to dismiss. **Ctrl+P** opens terminal commands and navigation.
 
 See the [terminal guide](docs/tui.md) for shortcuts, resuming sessions, and configuration.
@@ -67,7 +67,7 @@ Choose any connected model for each role. An optional **Planner model** handles 
 - [Agent memory](docs/memory.md) · [History search](docs/search.md) · [Research tasks](docs/delegation.md)
 - [Feature coverage and known gaps](docs/coverage.md) · [Development and tests](docs/development.md)
 
-Approved commands run with your local user’s capabilities; permissions are not a sandbox. Keep the server local. Provider keys stay server-side, and provider usage may incur charges.
+Unrestricted commands run with your local user’s capabilities. Optional [workspace command confinement](docs/permissions.md#command-confinement) restricts model-initiated commands; permissions alone are not a sandbox. Keep the server local. Provider keys stay server-side, and provider usage may incur charges.
 
 ## License
 

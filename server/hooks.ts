@@ -31,6 +31,7 @@ export type HookResult = { code: number | null; stdout: string; stderr: string; 
 // schema mirrors validateRuleSet (zod, strict, bounded) so an invalid file is
 // rejected as a whole — never partially applied.
 const hookSchema = z.object({
+  enabled:z.boolean().optional(),
   event: z.enum(HOOK_EVENTS),
   command: z.string().min(1).max(HOOK_LIMITS.commandChars),
   matcher: z.string().min(1).max(HOOK_LIMITS.matcherChars).optional(),
@@ -63,7 +64,7 @@ export class Hooks {
     // state — revalidate defensively so a hand-edited database cannot smuggle
     // an unbounded command into a spawn.
     const app = hooksArraySchema.safeParse(settings.hooks ?? []);
-    if (app.success) hooks.push(...app.data);
+    if (app.success) hooks.push(...app.data.filter(hook=>hook.enabled!==false));
     else advisory = 'App hooks in Settings are invalid and were ignored for this turn.';
     let canonical: string | undefined;
     try { canonical = realpathSync(workspace); } catch { /* unreadable workspace: acceptance fails elsewhere */ }
@@ -80,7 +81,7 @@ export class Hooks {
       try {
         const parsed = projectHooksSchema.safeParse(JSON.parse(source.text.replace(/^﻿/, '')));
         if (!parsed.success) throw new Error();
-        hooks.push(...parsed.data.hooks);
+        hooks.push(...parsed.data.hooks.filter(hook=>hook.enabled!==false));
       } catch { advisory = [advisory, 'Project hooks in .litespeed/hooks.json are invalid and were ignored for this turn.'].filter(Boolean).join(' '); }
     }
     return { hooks, ...(advisory ? { advisory } : {}) };

@@ -1,12 +1,14 @@
-# Litespeed 0.1.19
+# Litespeed 0.1.20
 
-Sidekick Fusion is the recommended architecture for launch.
+Fewer interruptions, with clearer approval scopes across the browser, terminal, and CLI.
 
-- Sidekick Fusion is recommended in the terminal and web architecture pickers and selected for new setups. Choose a strong driver and a cheaper sidekick.
-- LiteFusion remains available as **Experimental**. Existing sessions keep their saved architecture and model choices.
-- Includes the MCP integration improvements prepared for 0.1.18: tool search by default, build-mode TypeScript processing, and reviewed imports from Claude Code and Codex configuration.
-- Release checks allow more time for cold server startup on Intel Macs, while retaining shutdown, history recovery, install, terminal, and update assertions.
+- Researcher, Sidekick, Team, Expert, and LiteFusion handoffs run automatically; worker actions retain the session's permissions and explicit rules.
+- New Allow project edits mode, exact-command shell approvals, and opt-in persistent project grants. Saved modes are preserved; legacy broad grant hashes are retired.
+- Approval cards show the actual action and scope. Full access moves out of the approval card shortcuts.
+- Optional enforced workspace command confinement, shared by foreground commands, verification, and background jobs. No unrestricted fallback.
+- Visible project-rule/hook trust and revocation. Plugin hooks install disabled until explicitly reviewed and enabled.
+- Reviewed MCP import-and-connect, exact connected-tool rules, scoped MCP grants, and approval-aware script timeouts.
+- Automatic stopping of owned jobs, consistent history confirmations, and direct user-requested context compaction.
+- Sidekick Fusion remains recommended; LiteFusion remains experimental.
 
-Run `litespeed update`, then reopen Litespeed after active work finishes. New installations use the latest downloadable bundle.
-
-Includes the terminal runtime and web app for Apple silicon and Intel Macs.
+Includes bundled runtimes and the web/terminal apps for Apple silicon and Intel Macs. Run `litespeed update` and restart after active work finishes.
