@@ -385,9 +385,10 @@ describe('runner and turn history integration', () => {
     });
     try {
       await until(() => {
-        if (child.exitCode !== null) throw new Error(`Fixture exited before startup: ${stderr}`);
+        if (child.exitCode !== null || child.signalCode !== null) throw new Error(`Fixture exited before startup: ${stderr}`);
         return stdout.includes(`http://localhost:${port}`);
-      }, 8000);
+      // Cold TypeScript/server startup competes with the full suite on Intel CI.
+      }, 30000).catch(error => { throw new Error(`${error.message}\nFixture stdout: ${stdout}\nFixture stderr: ${stderr}`); });
       const response = await fetch(`http://127.0.0.1:${port}/api/sessions/${s.id}/messages`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ content: 'Write before stopping' }) });
       expect(response.status).toBe(202); await response.json();
       await until(() => stdout.includes('TEST_HISTORY_MUTATION_WRITTEN'));
@@ -423,7 +424,7 @@ describe('runner and turn history integration', () => {
       if (child.exitCode === null && child.signalCode === null) child.kill('SIGKILL');
       await exited.catch(() => {});
     }
-  }, 15000);
+  }, 60000);
 
   it('does not leave a stale advertised undo checkpoint when manual compaction checkpoint refresh fails', async () => {
     const s = store.createSession(); await turn(s.id, 'First'); await turn(s.id, 'Second'); const before = store.messages(s.id);

@@ -49,7 +49,8 @@ jobs:
           retention-days: 7
   publish:
     needs: package
-    if: startsWith(github.ref, 'refs/tags/v')
+    # An explicit [release] main-branch commit can publish after both Mac builds pass.
+    if: startsWith(github.ref, 'refs/tags/v') || (github.event_name == 'push' && github.ref == 'refs/heads/main' && contains(github.event.head_commit.message, '[release]'))
     runs-on: ubuntu-latest
     permissions:
       contents: write
@@ -66,4 +67,9 @@ jobs:
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
-          gh release create "$GITHUB_REF_NAME" release-artifacts/*.tar.gz release-artifacts/manifest.json scripts/install.sh --verify-tag --title "Litespeed $GITHUB_REF_NAME" --notes-file docs/release-notes.md
+          RELEASE_TAG="v$(node -p 'require("./package.json").version')"
+          if [ "$GITHUB_REF_TYPE" = tag ]; then
+            gh release create "$RELEASE_TAG" release-artifacts/*.tar.gz release-artifacts/manifest.json scripts/install.sh --verify-tag --title "Litespeed $RELEASE_TAG" --notes-file docs/release-notes.md
+          else
+            gh release create "$RELEASE_TAG" release-artifacts/*.tar.gz release-artifacts/manifest.json scripts/install.sh --target "$GITHUB_SHA" --title "Litespeed $RELEASE_TAG" --notes-file docs/release-notes.md
+          fi
