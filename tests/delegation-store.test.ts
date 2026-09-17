@@ -57,7 +57,7 @@ describe('durable foreground researcher storage', () => {
     const second=delegations.reuse({...next.input,delegationId:first.delegation.id,contextKey:'compatible'});
     expect(second.child.id).toBe(first.child.id);expect(second.delegation.id).not.toBe(first.delegation.id);
     expect(delegations.transcript(root.parent.id,first.delegation.id).messages).toEqual(before.messages);
-    expect(store.db.prepare('SELECT version FROM schema_migrations').all()).toEqual([{version:1},{version:2}]);
+    expect(store.db.prepare('SELECT version FROM schema_migrations ORDER BY version').all()).toEqual([{version:1},{version:2},{version:3}]);
   });
   it.each(['build', 'plan'] as const)('atomically creates hidden child, prompt, pin, history and exact parent link from %s', async mode => {
     const profile = await skill(), root = origin({ profile, mode }); const { child, user, delegation } = delegations.create(root.input);

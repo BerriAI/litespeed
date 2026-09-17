@@ -267,23 +267,17 @@ describe('independent researcher delegation seam audit', () => {
     expect(requests).toHaveLength(4);
   });
 
-  it('requires Plan Ask approval without widening child authority when a grant or explicit Auto authorizes launch', async () => {
+  it.each(['ask', 'edit', 'auto'] as const)('automatically launches Plan researchers in %s without widening child authority', async permissionMode => {
     respond = (request, res) => {
       if (isResearch(request)) stream(res, 'Approved read-only report.');
       else stream(res, request.messages.at(-1)?.role === 'tool' ? 'Parent complete.' : [task()]);
     };
-    const parent = store.createSession({ mode: 'plan', permissionMode: 'ask' });
-    app.runner.start(parent.id, 'Approve Plan researcher once.');
-    await until(() => app.runner.permissions(parent.id).length === 1);
-    expect(requests).toHaveLength(1); expect(app.runner.delegations.list(parent.id)).toEqual([]);
-    const pending = app.runner.permissions(parent.id)[0]; expect(pending.tool).toBe('task');
-    app.runner.decide(parent.id, pending.id, 'always'); await app.runner.whenIdle();
+    const parent = store.createSession({ mode: 'plan', permissionMode });
+    app.runner.start(parent.id, 'Run a Plan researcher.'); await app.runner.whenIdle();
     expect(requests).toHaveLength(3);
-    app.runner.start(parent.id, 'Use explicitly remembered Plan grant.'); await app.runner.whenIdle();
+    app.runner.start(parent.id, 'Continue read-only research.'); await app.runner.whenIdle();
     expect(requests).toHaveLength(6); expect(app.runner.permissions(parent.id)).toEqual([]);
-    const auto = store.createSession({ mode: 'plan', permissionMode: 'auto' });
-    app.runner.start(auto.id, 'Use explicit Plan Auto.'); await app.runner.whenIdle();
-    expect(requests).toHaveLength(9); expect(app.runner.permissions(auto.id)).toEqual([]);
+    expect(store.toolGrants(parent.id)).toEqual([]);
     for (const research of requests.filter(isResearch)) expect(research.tools?.map(tool => tool.function.name).sort()).toEqual(['glob', 'grep', 'history_search', 'read_file', 'todo_read', 'tool_output_page', 'view_image', 'web_fetch', 'web_search']);
     expect(app.runner.delegations.list(parent.id).map(delegation => delegation.status)).toEqual(['completed', 'completed']);
   });

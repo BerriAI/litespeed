@@ -41,14 +41,21 @@ export async function sandboxCommand(command:string,cwd:string,workspace:string,
         '(version 1)','(deny default)',
         '(allow process-exec process-fork sysctl-read)',
         '(allow signal (target self))',
-        '(allow file-read-metadata)',
+        '(allow process-info* (target same-sandbox))',
+        '(allow file-read-metadata file-test-existence)',
+        // macOS requires executable mappings separately from file reads, even
+        // to load /bin/bash and the system dynamic linker.
+        `(allow file-map-executable ${readable.map(value=>`(subpath ${quote(value)})`).join(' ')} (literal ${quote(runtime)}))`,
+        '(allow system-mac-syscall (mac-policy-name "vnguard"))',
+        '(allow system-mac-syscall (require-all (mac-policy-name "Sandbox") (mac-syscall-number 67)))',
+        '(allow mach-lookup (global-name "com.apple.system.opendirectoryd.libinfo"))',
         `(allow file-read* ${readable.map(value=>`(subpath ${quote(value)})`).join(' ')} (literal ${quote(runtime)}) (subpath "/dev"))`,
         `(allow file-write* (subpath ${quote(root)}) (subpath ${quote(scratch)}) (literal "/dev/null"))`,
         // Denies also cover symlink destinations and files created after launch.
-        '(deny file-read* file-write* (regex #"(^|/)([.]env([.][^/]+)?|[.]ssh|[.]litespeed|[.]netrc|[.]git-credentials|id_rsa|id_ed25519)(/|$)"))',
+        '(deny file-read* file-write* file-map-executable (regex #"(^|/)([.]env([.][^/]+)?|[.]ssh|[.]litespeed|[.]netrc|[.]git-credentials|id_rsa|id_ed25519)(/|$)"))',
         '(deny file-write* (regex #"(^|/)[.]git(/|$)"))',
-        '(deny file-read* file-write* (regex #"[.](pem|p12|pfx|key)$"))',
-        `(deny file-read* file-write* (subpath ${quote(data)}))`,
+        '(deny file-read* file-write* file-map-executable (regex #"[.](pem|p12|pfx|key)$"))',
+        `(deny file-read* file-write* file-map-executable (subpath ${quote(data)}))`,
       ].join('\n');
       return {executable:'/usr/bin/sandbox-exec',args:['-p',profile,'/bin/bash','--noprofile','--norc','-o','pipefail','-c',command],env,cleanup};
     }

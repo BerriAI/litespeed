@@ -514,7 +514,7 @@ describe('spawned litespeed executable against a real local provider', () => {
       expect(output.some(event => event.type === 'permission_resolved' && event.data.decision === 'deny')).toBe(true);
       expect(output.at(-1)).toMatchObject({ type: 'done', data: { status: 'idle' } });
     } else expect(result.stdout).toBe('Tool request finished.\n');
-    expect(result.stderr).toContain('Denied write_file: interactive approval required (or explicitly use --auto).');
+    expect(result.stderr).toContain('Denied write_file: interactive approval required; approve a project scope interactively before running unattended.');
     const detail = await api<SessionDetail>(`/sessions/${sessionId(result)}`);
     expect(detail.session.status).toBe('idle'); expect(detail.permissions).toEqual([]);
     expect(detail.messages.flatMap(m => m.toolCalls ?? []).map(tool => tool.status)).toEqual(['denied']);
@@ -735,7 +735,7 @@ describe('spawned litespeed executable against a real local provider', () => {
       permissionId = (await api<SessionDetail>(`/sessions/${session.id}`)).permissions[0]?.id;
       return Boolean(permissionId);
     });
-    await until(() => terminal.stderr().includes('[y/N]'));
+    await until(() => terminal.stderr().includes('[y] once, [s] session, [p] project, [N] deny'));
     await api(`/sessions/${session!.id}/permissions/${permissionId!}`, { decision: 'deny' });
     const result = await terminal.result;
     expect(result.code).toBe(0);
