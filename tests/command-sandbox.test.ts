@@ -10,7 +10,7 @@ const execute=promisify(execFile);
 async function reportNativeFailure(error:unknown):Promise<never>{
   const detail=error as {code?:unknown;signal?:unknown;stderr?:unknown;stdout?:unknown};
   let denials='';
-  if(process.platform==='darwin')try{denials=(await execute('/usr/bin/log',['show','--last','1m','--style','compact','--predicate','eventMessage CONTAINS "Sandbox:"'],{timeout:10000,maxBuffer:1024*1024})).stdout.slice(-12000);}catch{}
+  if(process.platform==='darwin')try{denials=(await execute('/usr/bin/log',['show','--last','1m','--style','compact','--predicate','eventMessage CONTAINS "Sandbox: bash(" OR eventMessage CONTAINS "Sandbox: node("'],{timeout:10000,maxBuffer:1024*1024})).stdout.slice(-12000);}catch{}
   throw new Error(`Native confinement failed: ${JSON.stringify({code:detail.code,signal:detail.signal,stderr:detail.stderr,stdout:detail.stdout})}\n${denials}`,{cause:error});
 }
 const quote=(value:string)=>"'"+value.replaceAll("'","'\\''")+"'";

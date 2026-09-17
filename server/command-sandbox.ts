@@ -43,6 +43,9 @@ export async function sandboxCommand(command:string,cwd:string,workspace:string,
         '(allow signal (target self))',
         '(allow process-info* (target same-sandbox))',
         '(allow file-read-metadata file-test-existence)',
+        // libSystem opens the root directory during process initialization.
+        // A literal match permits that directory only, never its descendants.
+        '(allow file-read* (literal "/"))',
         // macOS requires executable mappings separately from file reads, even
         // to load /bin/bash and the system dynamic linker.
         `(allow file-map-executable ${readable.map(value=>`(subpath ${quote(value)})`).join(' ')} (literal ${quote(runtime)}))`,
