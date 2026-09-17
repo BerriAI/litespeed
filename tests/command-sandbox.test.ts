@@ -7,6 +7,12 @@ import { join } from 'node:path';
 import { tmpdir } from 'node:os';
 import { sandboxCommand, sandboxBackend } from '../server/command-sandbox.js';
 const execute=promisify(execFile);
+async function reportNativeFailure(error:unknown):Promise<never>{
+  const detail=error as {code?:unknown;signal?:unknown;stderr?:unknown;stdout?:unknown};
+  let denials='';
+  if(process.platform==='darwin')try{denials=(await execute('/usr/bin/log',['show','--last','1m','--style','compact','--predicate','eventMessage CONTAINS "Sandbox:"'],{timeout:10000,maxBuffer:1024*1024})).stdout.slice(-12000);}catch{}
+  throw new Error(`Native confinement failed: ${JSON.stringify({code:detail.code,signal:detail.signal,stderr:detail.stderr,stdout:detail.stdout})}\n${denials}`,{cause:error});
+}
 const quote=(value:string)=>"'"+value.replaceAll("'","'\\''")+"'";
 let directory:string,workspace:string,data:string;
 beforeEach(async()=>{directory=await realpath(await mkdtemp(join(tmpdir(),'litespeed-confinement-test-')));workspace=join(directory,'project');data=join(directory,'state');await mkdir(workspace);await mkdir(data);});
@@ -22,7 +28,7 @@ it('enforces workspace writes, protected reads, outside paths, and network isola
   // CI always exercises the actual backend; Linux checks fail closed below.
   const probe=await sandboxCommand('true',workspace,workspace,data);
   try {await execute(probe.executable,probe.args,{cwd:workspace,env:probe.env,timeout:5000});}
-  catch(error){if(process.platform==='linux'&&/Operation not permitted|namespace/i.test(String(error))){await probe.cleanup();context.skip();return;}throw error;}
+  catch(error){if(process.platform==='linux'&&/Operation not permitted|namespace/i.test(String(error))){await probe.cleanup();context.skip();return;}await reportNativeFailure(error);}
   finally{await probe.cleanup();}
   await writeFile(join(directory,'outside'),'outside');await writeFile(join(workspace,'.env'),'secret');await writeFile(join(data,'private'),'private');
   const host=createServer(socket=>socket.destroy());await new Promise<void>(resolve=>host.listen(0,'127.0.0.1',resolve));
@@ -38,6 +44,7 @@ it('enforces workspace writes, protected reads, outside paths, and network isola
   ].join('\n');
   let launch:Awaited<ReturnType<typeof sandboxCommand>>|undefined;
   try{launch=await sandboxCommand(command,workspace,workspace,data);await execute(launch.executable,launch.args,{cwd:workspace,env:launch.env,timeout:10000});}
+  catch(error){await reportNativeFailure(error);}
   finally{await launch?.cleanup();await new Promise<void>(resolve=>host.close(()=>resolve()));}
   expect(await readFile(join(workspace,'inside.txt'),'utf8')).toBe('success');
   expect(await readFile(join(directory,'outside'),'utf8')).toBe('outside');
