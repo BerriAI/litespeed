@@ -22,7 +22,7 @@ const workerLabel = (kind: 'single' | ArchitectureKind) => kind === 'expert-fusi
 
 export function Onboarding({ controller, initial, onClose, quick = false }: { controller: TerminalController; quick?: boolean; initial: Session; onClose: () => void }) {
   const state = useSyncExternalStore(controller.subscribe, controller.getState);
-  const [step, setStep] = useState<SetupStep>('architecture'), [kind, setKind] = useState<'single' | ArchitectureKind>(initial.architecture?.kind ?? (quick || !initial.model ? 'litefusion' : 'single'));
+  const [step, setStep] = useState<SetupStep>('architecture'), [kind, setKind] = useState<'single' | ArchitectureKind>(initial.architecture?.kind ?? (quick || !initial.model ? 'sidekick-fusion' : 'single'));
   const [from, setFrom] = useState<'walkthrough' | 'review'>('walkthrough');
   const [shunt, setShunt] = useState<ShuntSelection>(initial.shunt ?? { enabled: false });
   const [driver, setDriver] = useState<ModelRoute>({ providerId: initial.providerId, model: initial.model });

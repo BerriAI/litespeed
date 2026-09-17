@@ -27,7 +27,7 @@ See [installation, updates, and the source-build alternative](docs/installing.md
 
 Litespeed has its own command, separate from the [LiteLLM gateway CLI](https://docs.litellm.ai/docs/proxy/management_cli). If you used an earlier version of this agent, follow the [upgrade guide](docs/upgrading.md) to carry over saved sessions and configuration.
 
-1. On your first launch, choose your setup, connect your **LiteLLM gateway base URL** and **API key**, and pick your models. **LiteFusion is recommended:** choose a capable lead, then review the task-specific routes resolved from your gateway. Its 63-task research policy is a starting point for evaluation. Choose **Single model** if you prefer one model for everything. Litespeed remembers the connection and models; running `litespeed` in another project opens chat directly. Gateways that do not require a key can leave it blank.
+1. On your first launch, choose your setup, connect your **LiteLLM gateway base URL** and **API key**, and pick your models. **Sidekick Fusion is recommended:** choose a strong driver to plan and review, and a cheaper sidekick to handle implementation. **LiteFusion is experimental**; its task-specific routing policy is available for evaluation. Choose **Single model** if you prefer one model for everything. Litespeed remembers the connection and models; running `litespeed` in another project opens chat directly. Gateways that do not require a key can leave it blank.
 2. Use **Models** or `/models` to change your arrangement. **Ask first** is the default; **Allow all tools** is available in permissions. The full setup is available from the web sidebar or `/setup`. If you already use Claude Code or Codex skills, /skills (or **Settings → Project profiles**) offers **Import a Claude/Codex skill…** to copy one into the project — see [Project profiles and skills](docs/profiles.md).
 3. Type a task. **Build** can edit files and run commands; **Plan** uses read-only tools. Type `/` for command suggestions in either client; use **↑/↓**, **Tab** or **Enter** to complete, and **Esc** to dismiss. **Ctrl+P** opens terminal commands and navigation.
 
@@ -44,8 +44,8 @@ For a web-only session, run `litespeed serve`. For development, use `npm run dev
 | Architecture | How it works |
 | --- | --- |
 | **Single model** | One model investigates, implements, and checks the task. |
-| **LiteFusion** · Recommended | One persistent lead routes 63 task categories to specific models and reasoning levels, with one shared hard/escalation map. |
-| **Sidekick Fusion** | A strong driver plans and reviews; a cheaper sidekick keeps context across handoffs. |
+| **Sidekick Fusion** · Recommended | A strong driver plans and reviews; a cheaper sidekick keeps context across handoffs. |
+| **LiteFusion** · Experimental | One persistent lead routes 63 task categories to specific models and reasoning levels, with one shared hard/escalation map. |
 | **Team Fusion** | A strong driver assigns fresh cheaper workers, runs independent work in parallel, and verifies the combined result. |
 | **Expert Fusion** | A cheaper driver coordinates fresh strong experts and verifies their work. Independent assignments can run in parallel. |
 

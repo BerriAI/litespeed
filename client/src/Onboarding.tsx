@@ -18,7 +18,7 @@ export function Onboarding({ settings, selection, workspace, onSave, onClose, re
   const [providers, setProviders] = useState(false);
   const [skills, setSkills] = useState(false);
   const [simple, setSimple] = useState(quick);
-  const [step, setStep] = useState(quick && settings.providers.some(p => p.id === selection.providerId && p.baseUrl) ? 2 : 0), [kind, setKind] = useState<'single' | ArchitectureKind>(selection.architecture?.kind ?? (quick || !selection.model ? 'litefusion' : 'single'));
+  const [step, setStep] = useState(quick && settings.providers.some(p => p.id === selection.providerId && p.baseUrl) ? 2 : 0), [kind, setKind] = useState<'single' | ArchitectureKind>(selection.architecture?.kind ?? (quick || !selection.model ? 'sidekick-fusion' : 'single'));
   const [draft, setDraft] = useState(selection), [worker, setWorker] = useState(selection.architecture ? architectureWorker(selection.architecture) : null);
   const [fusion,setFusion]=useState<LiteFusionSelection>(selection.architecture?.kind==='litefusion'?selection.architecture:{kind:'litefusion',gatewayProviderId:selection.providerId||settings.providers.find(p=>p.kind!=='codex')?.id||''});
   const [open, setOpen] = useState<string | null>(null), [saving, setSaving] = useState(false), [error, setError] = useState('');

@@ -44,7 +44,7 @@ test('LiteFusion settings expose all 63 cards, alias binding, and one shared esc
   try{
     await page.goto(`/#session/${session.id}`);await page.locator('.model-trigger').click();
     await page.getByRole('button',{name:'Architecture',exact:true}).click();
-    await page.getByRole('option',{name:/^LiteFusionRecommended/}).click();
+    await page.getByRole('option',{name:/^LiteFusion \(Experimental\)/}).click();
     await expect(page.getByRole('region',{name:'LiteFusion task routing'})).toBeVisible();
     await expect(page.getByLabel('LiteFusion task',{exact:true}).locator('option')).toHaveCount(63);
     await page.getByText('Inspect and customize all 63 tasks',{exact:true}).click();

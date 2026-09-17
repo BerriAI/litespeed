@@ -6,9 +6,9 @@ The aim is to reserve stronger models for the work that benefits from them while
 
 ## Arrangements
 
-- **LiteFusion (recommended):** one persistent lead routes task categories to versioned model/reasoning pairs. It can work directly, retain compatible serial workers, start isolated parallel workers, or escalate with evidence. See the [LiteFusion guide](litefusion.md) and [all 63 task cards](litefusion-tasks.md).
+- **LiteFusion (experimental):** one persistent lead routes task categories to versioned model/reasoning pairs. It can work directly, retain compatible serial workers, start isolated parallel workers, or escalate with evidence. See the [LiteFusion guide](litefusion.md) and [all 63 task cards](litefusion-tasks.md).
 - **Single model:** the existing general-purpose tool loop.
-- **Sidekick Fusion:** the lead plans, delegates, and reviews; a write-capable sidekick retains context across compatible handoffs. Foreground calls wait for its report while the server remains responsive to events, steering, approvals, and cancellation. The two model calls do not run simultaneously during a handoff.
+- **Sidekick Fusion (recommended):** the lead plans, delegates, and reviews; a write-capable sidekick retains context across compatible handoffs. Foreground calls wait for its report while the server remains responsive to events, steering, approvals, and cancellation. The two model calls do not run simultaneously during a handoff.
 - **Team Fusion:** the lead uses `delegate` for fresh task-scoped workers. Each receives a self-contained brief with relevant paths, constraints, and acceptance criteria. Source editing belongs to workers; the lead inspects the result and uses `verify` for combined checks.
 - **Expert Fusion:** a cheaper driver uses fresh strong experts for implementation and repairs, then runs verification itself. An expert receives the selected brief and workspace tools, not a fork of the driver conversation. It cannot delegate or ask the user questions.
 

@@ -26,15 +26,15 @@ export interface ArchitectureInfo { kind: ArchitectureKind; name: string; descri
 
 export const ARCHITECTURES: readonly ArchitectureInfo[] = [
   {
-    kind: 'litefusion', name: 'LiteFusion', recommended: true,
-    description: 'One lead routes tasks to specialists, preserves useful context, and verifies their work.',
-    roles: [],
-  },
-  {
     kind: 'sidekick-fusion',
-    name: 'Sidekick Fusion',
+    name: 'Sidekick Fusion', recommended: true,
     description: 'A lead plans and reviews while a persistent sidekick explores, implements, tests, and repairs.',
     roles: [{ id: 'sidekick', label: 'Sidekick model', hint: 'cheaper/faster' }],
+  },
+  {
+    kind: 'litefusion', name: 'LiteFusion (Experimental)',
+    description: 'One lead routes tasks to specialists, preserves useful context, and verifies their work.',
+    roles: [],
   },
   {
     kind: 'team-fusion', name: 'Team Fusion',
