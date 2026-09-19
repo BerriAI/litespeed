@@ -3,7 +3,8 @@ import type { SkillInvocation } from '../shared/skill-commands.js';
 import { SessionSync, type SyncState } from './sync.js';
 import { ApiError, LitespeedClient } from './client.js';
 
-export interface Draft { text: string; attachments: Attachment[] }
+export interface DraftImage { start: number; end: number; label: string; attachmentIndex: number }
+export interface Draft { text: string; attachments: Attachment[]; inlineImages?: DraftImage[] }
 export interface DraftStorage { load(key: string): Draft; save(key: string, draft: Draft): void; remember?(text: string): void; history?(): string[] }
 export interface ClientState { sync: SyncState; draft: Draft; pending: string | null; notice: string; settings: Settings | null }
 const empty = (): Draft => ({ text: '', attachments: [] });

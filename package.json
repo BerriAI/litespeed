@@ -34,6 +34,7 @@
     "test:tui:litefusion": "node scripts/test-tui-litefusion.mjs",
     "test:tui": "node scripts/test-tui.mjs",
     "test:tui:queue": "node scripts/test-tui-queue.mjs",
+    "test:tui:images": "node scripts/test-tui-images.mjs",
     "test:tui:stream": "node scripts/test-tui-stream.mjs",
     "test:tui:flow": "node scripts/test-tui-flow.mjs",
     "test:tui:interactions": "node scripts/test-tui-interactions.mjs",

@@ -6,7 +6,7 @@ import { Footer, shortcutLabel } from './footer.js';
 import { goalTurnLabel } from '../shared/goals.js';
 import { useCallback, useEffect, useMemo, useRef, useState, useSyncExternalStore, type ReactNode, type RefObject } from 'react';
 import { useBlur, useFocus, useKeyboard, useRenderer, useSelectionHandler, useTerminalDimensions } from '@opentui/react';
-import type { TextareaRenderable } from '@opentui/core';
+import { SyntaxStyle, type TextareaRenderable } from '@opentui/core';
 import { readFile, writeFile } from 'node:fs/promises';
 import { resolve } from 'node:path';
 import type { Message, Session } from '../shared/types.js';
@@ -25,6 +25,7 @@ import { ACTIVE_KEY_ACTIONS, COMMAND_ORDER, KEY_COMMANDS } from './commands.js';
 import { parseBinding, strokeMatches, LEADER_TOKEN, type KeymapRouter } from './keymap.js';
 import { Button, Menu, TextPrompt, TextViewer, type MenuItem } from './ui.js';
 import { EditorKeys } from './editor.js';
+import { ComposerImages, removeDraftAttachment } from './composerImages.js';
 import { Sessions } from './sessions.js';
 import { FilePicker } from './files.js';
 import { attachmentFromClipboard, attachmentFromFile, editDraft, openShell, suspendTerminal } from './terminalIO.js';
@@ -55,14 +56,27 @@ function LoadingScreen() {
   return <box flexGrow={1} justifyContent="center" alignItems="center" flexDirection="column">{visible && <><Brand /><box marginTop={1} flexDirection="row" gap={1}><WorkingScanner color={toHex(theme.primary)} /><text fg={toHex(theme.textMuted)}>Connecting to Litespeed…</text></box></>}</box>;
 }
 
-function Composer({ editorRef, controller, focused, onSubmit, onReference, onSuggestionsChange, commands }: { editorRef:RefObject<TextareaRenderable|null>; commands: {name: string; description: string; skill?: boolean}[]; controller: TerminalController; focused: boolean; onSubmit: () => void; onReference: (prefix: string) => void; onSuggestionsChange: (open: boolean) => void }) {
+function Composer({ editorRef, imagesRef, controller, focused, onSubmit, onReference, onSuggestionsChange, commands }: { editorRef:RefObject<TextareaRenderable|null>; imagesRef:RefObject<ComposerImages|null>; commands: {name: string; description: string; skill?: boolean}[]; controller: TerminalController; focused: boolean; onSubmit: () => void; onReference: (prefix: string) => void; onSuggestionsChange: (open: boolean) => void }) {
   const theme = useTheme(), editor = editorRef;
   const { draft, pending, sync } = useSyncExternalStore(controller.subscribe, controller.getState);
   const queued = Boolean(sync.detail?.queue?.items.length);
   const { height, width } = useTerminalDimensions(), config = useConfig();
   const editorKeys = useMemo(() => new EditorKeys(config.keybinds), [config.keybinds]);
+  const imageStyle = useMemo(() => SyntaxStyle.fromStyles({ image: { fg: toHex(theme.primary), bold: true } }), [theme]);
   useEffect(() => () => editorKeys.dispose(), [editorKeys]);
-  useEffect(() => { if (editor.current && editor.current.plainText !== draft.text) editor.current.setText(draft.text); }, [draft.text]);
+  useEffect(() => () => imageStyle.destroy(), [imageStyle]);
+  useEffect(() => {
+    if (!editor.current) return;
+    if (imagesRef.current?.editor !== editor.current) imagesRef.current = new ComposerImages(editor.current);
+    const next = imagesRef.current.load(draft);
+    if (next !== draft) controller.setDraft(next);
+  }, [draft, controller, editor, imagesRef]);
+  useEffect(() => () => { imagesRef.current = null; }, [imagesRef]);
+  function saveEditor() {
+    const current = controller.getState().draft;
+    const next = imagesRef.current?.read(current);
+    if (next && next !== current) controller.setDraft(next);
+  }
   const [selected, setSelected] = useState(0), [dismissed, setDismissed] = useState(false);
   const token = draft.text.match(/^\/([\w-]*)$/);
   const matches = focused && token && !dismissed ? commands.filter(item => item.name.startsWith(token[1].toLowerCase())) : [];
@@ -82,7 +96,7 @@ function Composer({ editorRef, controller, focused, onSubmit, onReference, onSug
       <text height={1} fg={toHex(theme.textMuted)}>{`↑↓ choose · Tab/Enter complete · Esc dismiss${matches.length > visibleCount ? ` · ${highlighted + 1}/${matches.length}` : ''}`}</text>
     </box>}
     <box width={config.prompt.max_width === 'auto' ? '100%' : Math.min(width, config.prompt.max_width)} alignSelf="center" border borderColor={toHex(focused ? theme.primary : theme.border)} height={rows + 2} paddingLeft={1} paddingRight={1} flexShrink={0}>
-    <textarea ref={editor} focused={focused} initialValue={draft.text} wrapMode="word"
+    <textarea ref={editor} focused={focused} initialValue={draft.text} wrapMode="word" syntaxStyle={imageStyle}
       placeholder={pending ? `${pending}…` : queued ? 'Press Up to edit queued messages' : isRunning(controller.detail) ? 'Queue a follow-up… (Alt+Enter to steer)' : 'Ask Litespeed to do something…'}
       backgroundColor={toHex(theme.background)} textColor={toHex(theme.text)}
       onKeyDown={key => {
@@ -100,11 +114,12 @@ function Composer({ editorRef, controller, focused, onSubmit, onReference, onSug
           return;
         }
         const reference = /(?:^|\s)@([^\s]*)$/.exec(editor.current.plainText);
-        if (key.name === 'tab' && reference) { key.preventDefault(); key.stopPropagation(); controller.setDraft({ ...controller.getState().draft, text: editor.current.plainText }); onReference(reference[1]); return; }
-        editorKeys.handle(editor.current, key);
+        if (key.name === 'tab' && reference) { key.preventDefault(); key.stopPropagation(); saveEditor(); onReference(reference[1]); return; }
+        const action = editorKeys.handle(editor.current, key);
+        if (action === 'undo' || action === 'redo') saveEditor();
       }}
-      onContentChange={() => { const text = editor.current?.plainText ?? ''; setSelected(0); setDismissed(false); if (text !== controller.getState().draft.text) controller.setDraft({ ...controller.getState().draft, text }); }}
-      onSubmit={() => { controller.setDraft({ ...controller.getState().draft, text: editor.current?.plainText ?? '' }); onSubmit(); const next = controller.getState().draft.text; if (editor.current && next !== editor.current.plainText) editor.current.setText(next); }} />
+      onContentChange={() => { const changed = editor.current; if (imagesRef.current?.updating) return; queueMicrotask(() => { if (!changed || editor.current !== changed || imagesRef.current?.updating) return; setSelected(0); setDismissed(false); saveEditor(); }); }}
+      onSubmit={() => { saveEditor(); onSubmit(); }} />
     </box>
   </box>;
 }
@@ -123,6 +138,7 @@ function SessionApp({ controller, router, onQuit, chooseTheme, themeName, themeM
   const theme = useTheme(), { width } = useTerminalDimensions(), renderer = useRenderer();
   const state = useSyncExternalStore(controller.subscribe, controller.getState);
   const composerEditor=useRef<TextareaRenderable>(null);
+  const composerImages=useRef<ComposerImages>(null);
   const config = useConfig(), terminalFocused = useRef(true), previousStatus = useRef<string | undefined>(undefined);
   useFocus(() => { terminalFocused.current = true; }); useBlur(() => { terminalFocused.current = false; });
   useSelectionHandler(selection => {
@@ -179,14 +195,13 @@ function SessionApp({ controller, router, onQuit, chooseTheme, themeName, themeM
     controller.setDraft({ ...controller.getState().draft, attachments: [...controller.getState().draft.attachments, attachment] });
   });
   const pasteImage = async () => {
-    const sessionId = controller.sessionId, current = controller.getState().draft;
+    const sessionId = controller.sessionId, current = controller.getState().draft, composer = composerImages.current, generation = composer?.generation;
     if (current.attachments.length >= 10) return;
     const attachment = await attachmentFromClipboard();
-    if (controller.sessionId !== sessionId || !attachment) return;
+    if (controller.sessionId !== sessionId || !attachment || !composer || composerImages.current !== composer || composer.generation !== generation || controller.getState().pending) return;
     const draft = controller.getState().draft;
     if (draft.attachments.length >= 10) return;
-    controller.setDraft({ ...draft, attachments: [...draft.attachments, attachment] });
-    controller.notice('Attached clipboard image.');
+    controller.setDraft(composer.insert(draft, attachment));
   };
   const copyResponse = () => { const text = renderer.getSelection()?.getSelectedText() || controller.detail?.messages.findLast(message => message.role === 'assistant' && message.content)?.content; if (text) run(async () => { await copyTerminalText(renderer, text); controller.notice('Copied.'); }); else controller.notice('There is no response to copy yet.'); close(); };
   const commands: MenuItem[] = [
@@ -204,7 +219,7 @@ function SessionApp({ controller, router, onQuit, chooseTheme, themeName, themeM
     { id: 'animations', label: 'Toggle animations', action: () => { toggle('animations'); close(); } },
     { id: 'files', label: 'Add a workspace file reference', description: 'The server snapshots the file when you send', action: () => setPanel(<FilePicker controller={controller} onClose={close} onPick={file => { const draft = controller.getState().draft; if (draft.attachments.length >= 10) { controller.notice('A message can have up to 10 attachments.'); return; } controller.setDraft({ ...draft, attachments: [...draft.attachments, { name: file.name, path: file.path }] }); close(); }} />) },
     { id: 'attach', label: 'Attach a text file or image', description: 'Read a file from this computer', action: () => prompt('File to attach', '', attach) },
-    { id: 'attachments', label: 'Manage draft attachments', action: () => menu('Draft attachments', controller.getState().draft.attachments.map((item, index) => ({ id: String(index), label: item.name, description: 'Select to remove', action: () => { const draft = controller.getState().draft; controller.setDraft({ ...draft, attachments: draft.attachments.filter((_, offset) => offset !== index) }); close(); } }))) },
+    { id: 'attachments', label: 'Manage draft attachments', action: () => menu('Draft attachments', controller.getState().draft.attachments.map((item, index) => ({ id: String(index), label: item.name, description: 'Select to remove', action: () => { controller.setDraft(removeDraftAttachment(controller.getState().draft, index)); close(); } }))) },
     { id: 'editor', label: 'Open draft in external editor', description: 'Uses VISUAL or EDITOR, then returns to Litespeed', action: () => { close(); run(() => controller.action('Editing draft', async () => { const text = await editDraft(renderer, controller.getState().draft.text, controller.detail!.session.workspace); controller.setDraft({ ...controller.getState().draft, text }); })); } },
     { id: 'shell', label: 'Open workspace shell', description: 'Type exit to return to Litespeed', action: () => { close(); run(() => openShell(renderer, controller.detail!.session.workspace)); } },
     { id: 'skills', label: 'Browse and use project skills', disabled: busy, action: () => run(() => { controller.configurationReady(); if (controller.detail) setPanel(<Profiles skillsOnly controller={controller} initial={controller.detail.session} onCatalog={catalog => setSkillCatalog(catalog)} onClose={close} />); }) },
@@ -326,8 +341,8 @@ function SessionApp({ controller, router, onQuit, chooseTheme, themeName, themeM
         {detail.queue.items.slice(0, 3).map(item => <box key={item.id} height={1} backgroundColor={toHex(theme.backgroundElement)}><text fg={toHex(theme.textMuted)}>{terminalText(`› ${item.content || 'Attached context'}${item.attachments.length ? ` · ${item.attachments.length} attachment(s)` : ''}`).replace(/\s+/g, ' ').slice(0, Math.max(8, width - 4))}</text></box>)}
         {detail.queue.items.length > 3 && <text height={1} fg={toHex(theme.textMuted)}>{`  +${detail.queue.items.length - 3} more · /queue to view all`}</text>}
       </box> : null}
-      {state.draft.attachments.length > 0 && <text fg={toHex(theme.textMuted)}>{state.draft.attachments.map(item => `⌕ ${item.name}`).join('  ')}</text>}
-      {!panel && permission ? <PermissionPrompt key={permission.id} request={permission} controller={controller} onOverlayChange={setPromptOverlay} disabled={Boolean(state.pending)} /> : !panel && question ? <QuestionPrompt key={question.id} request={question} controller={controller} onOverlayChange={setPromptOverlay} disabled={Boolean(state.pending)} /> : <Composer editorRef={composerEditor} onSuggestionsChange={setSuggestionsOpen} commands={[...commands.map(item => ({name:item.id, description:item.label})), {name:'help', description:'Browse all commands'}, ...projectCommands.filter(item => !commands.some(command => command.id === item.name)).map(item => ({name:item.name, description:item.description})), ...skillCommands(skills, reserved)]} controller={controller} focused={!panel} onSubmit={submit} onReference={prefix => setPanel(<FilePicker controller={controller} initialQuery={prefix} onClose={close} onPick={file => { const draft = controller.getState().draft; if (draft.attachments.length >= 10) { controller.notice('A message can have up to 10 attachments.'); return; } controller.setDraft({ text: draft.text.replace(/@[^\s]*$/, ''), attachments: [...draft.attachments, { name: file.name, path: file.path }] }); close(); }} />)} />}
+      {state.draft.attachments.some((_, index) => !state.draft.inlineImages?.some(image => image.attachmentIndex === index)) && <text fg={toHex(theme.textMuted)}>{state.draft.attachments.filter((_, index) => !state.draft.inlineImages?.some(image => image.attachmentIndex === index)).map(item => `⌕ ${item.name}`).join('  ')}</text>}
+      {!panel && permission ? <PermissionPrompt key={permission.id} request={permission} controller={controller} onOverlayChange={setPromptOverlay} disabled={Boolean(state.pending)} /> : !panel && question ? <QuestionPrompt key={question.id} request={question} controller={controller} onOverlayChange={setPromptOverlay} disabled={Boolean(state.pending)} /> : <Composer key={controller.sessionId} editorRef={composerEditor} imagesRef={composerImages} onSuggestionsChange={setSuggestionsOpen} commands={[...commands.map(item => ({name:item.id, description:item.label})), {name:'help', description:'Browse all commands'}, ...projectCommands.filter(item => !commands.some(command => command.id === item.name)).map(item => ({name:item.name, description:item.description})), ...skillCommands(skills, reserved)]} controller={controller} focused={!panel} onSubmit={submit} onReference={prefix => setPanel(<FilePicker controller={controller} initialQuery={prefix} onClose={close} onPick={file => { const draft = controller.getState().draft; if (draft.attachments.length >= 10) { controller.notice('A message can have up to 10 attachments.'); return; } controller.setDraft({ ...draft, text: draft.text.replace(/@[^\s]*$/, ''), attachments: [...draft.attachments, { name: file.name, path: file.path }] }); close(); }} />)} />}
     </> : state.sync.phase === 'error' ? <box flexGrow={1} justifyContent="center" alignItems="center" flexDirection="column"><text fg={toHex(theme.error)}>{state.sync.error}</text><Button onPress={() => run(() => controller.open(controller.sessionId))}>Reconnect</Button><Button onPress={palette}>Commands</Button></box> : <LoadingScreen />}
     <UpdateNotice controller={controller} onRestart={() => { process.send?.({ type: 'litespeed-restart', sessionId: controller.sessionId }); onQuit(75); }} />
     {(state.notice || pendingLeader || state.sync.connection === 'reconnecting') && <text height={1} flexShrink={0} paddingLeft={1} fg={toHex(theme.warning)}>{terminalText(pendingLeader ? 'Leader…' : state.notice || 'Reconnecting… Showing the last known state.').replace(/\s+/g, ' ').slice(0, width - 2)}</text>}
