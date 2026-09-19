@@ -3,7 +3,8 @@ import { WorkspacePermissions } from './workspacePermissions.js';
 import { RULE_TOOLS, permissionModeLabels } from '../shared/permissions.js';
 import { useEffect, useState, useSyncExternalStore } from 'react';
 import type { PermissionRule, PermissionRuleSet } from '../shared/permissions.js';
-import type { McpServerStatus } from '../shared/mcp.js';
+import { McpLoginScreen } from './mcpLogin.js';
+import type { McpServerStatus, McpLoginStart } from '../shared/mcp.js';
 import type { MemoryFactSummary } from '../shared/memory.js';
 import type { Settings, UsageReport } from '../shared/types.js';
 import { TerminalController } from './controller.js';
@@ -36,10 +37,11 @@ function Rules({ initial, onSave, onClose, feedback }: { initial: PermissionRule
 }
 
 type McpSnapshot = { servers: McpServerStatus[]; configRevision: string };
-export function SettingsPanel({ controller, onClose }: { controller: TerminalController; onClose: () => void }) {
+export function SettingsPanel({ controller, onClose, initialView = 'main' }: { controller: TerminalController; onClose: () => void; initialView?: 'main' | 'integrations' }) {
   const state = useSyncExternalStore(controller.subscribe, controller.getState), settings = state.settings;
-  const [view, setView] = useState('main'), [feedback, setFeedback] = useState('');
+  const [view, setView] = useState<string>(initialView), [feedback, setFeedback] = useState('');
   const [memory, setMemory] = useState<MemoryFactSummary[]>([]), [mcp, setMcp] = useState<McpSnapshot | null>(null), [review, setReview] = useState<McpServerStatus | null>(null);
+  const [mcpLogin, setMcpLogin] = useState<{ name: string; login: McpLoginStart } | null>(null);
   const [usage, setUsage] = useState<UsageReport | null>(null), [days, setDays] = useState(30), [grants, setGrants] = useState<string[]>([]);
   const back = () => { setView('main'); setFeedback(''); };
   const run = async (operation: () => Promise<unknown>) => { setFeedback(''); try { await operation(); } catch (error) { setFeedback((error as Error).message); } };
@@ -58,6 +60,7 @@ export function SettingsPanel({ controller, onClose }: { controller: TerminalCon
     return () => { live = false; };
   }, [view, days]);
   if (!settings) return <TextViewer title="Settings" text={state.notice || 'Loading settings…'} onClose={onClose} />;
+  if (mcpLogin) return <McpLoginScreen controller={controller} name={mcpLogin.name} login={mcpLogin.login} onClose={() => { setMcpLogin(null); setReview(null); setView('integrations'); void controller.client.api<McpSnapshot>('/mcp').then(setMcp).catch(() => setFeedback('Could not refresh status.')); }} />;
   if (view === 'providers') return <Providers controller={controller} onClose={back} />;
   if (view === 'profiles' && controller.detail) return <Profiles controller={controller} initial={controller.detail.session} onClose={back} />;
   if (view === 'rules') return <Rules initial={settings.permissionRules} onClose={() => setView('permissions')} feedback={feedback} onSave={rules => { void run(() => save({ permissionRules: rules }, 'permissions')); }} />;
@@ -66,13 +69,16 @@ export function SettingsPanel({ controller, onClose }: { controller: TerminalCon
   if (view === 'mcp-config') return <TextPrompt title="MCP configuration" multiline value={JSON.stringify(settings.mcpServers, null, 2)} error={feedback} onClose={() => setView('integrations')} onSave={value => { void run(() => save({ mcpServers: JSON.parse(value), expectedMcpConfigRevision: settings.mcpConfigRevision }, 'integrations')); }} />;
   if (view === 'integrations' && review) {
     const config = settings.mcpServers[review.name];
-    const connect = async (action: 'reconnect' | 'refresh') => {
-      if (await controller.action('Connecting tools', () => controller.client.api(`/mcp/${encodeURIComponent(review.name)}/${action}`, { expectedRevision: review.revision, expectedConfigRevision: mcp!.configRevision }))) { setReview(null); setMcp(await controller.client.api<McpSnapshot>('/mcp')); }
-      else setFeedback(controller.getState().notice);
+    const connect = async (action: 'reconnect' | 'refresh' | 'logout') => {
+      const ok = await controller.action('Connecting tools', () => controller.client.api(`/mcp/${encodeURIComponent(review.name)}/${action}`, { expectedRevision: review.revision, expectedConfigRevision: mcp!.configRevision }));
+      setMcp(await controller.client.api<McpSnapshot>('/mcp')); setReview(null);
+      if (!ok) setFeedback(controller.getState().notice);
     };
-    return <Menu title={`Review integration · ${review.name}`} search={false} onClose={() => setReview(null)} footer={feedback || (config?.url ? 'Connecting contacts this configured endpoint.' : 'Connecting runs this server with the listed environment.')} items={[
+    return <Menu title={`Review integration · ${review.name}`} search={false} header={review.error || review.reason} onClose={() => { setReview(null); setFeedback(''); }} footer={feedback || (config?.url ? 'Connecting contacts this configured endpoint.' : 'Connecting runs this server with the listed environment.')} items={[
       { id: 'config', label: config?.url || `${config?.command ?? ''} ${(config?.args ?? []).join(' ')}`, description: `Environment: ${Object.keys(config?.env ?? {}).join(', ') || 'none configured'}`, disabled: true, action() {} },
       { id: 'tools', label: `${review.tools.length} cached tools`, description: review.tools.map(tool => tool.remoteName).join(', '), disabled: true, action() {} },
+      ...(config?.url ? [{ id: 'login', label: 'Sign in', disabled: Boolean(state.pending) || config.enabled === false, action: () => { void run(async () => { const login = await controller.client.api<McpLoginStart>(`/mcp/${encodeURIComponent(review.name)}/login`, { expectedRevision: review.revision, expectedConfigRevision: mcp!.configRevision }); setMcpLogin({ name: review.name, login }); }); } }] : []),
+      ...(review.signedIn ? [{ id: 'logout', label: 'Sign out', disabled: Boolean(state.pending), action: () => { void run(() => connect('logout')); } }] : []),
       { id: 'connect', label: 'Connect / reconnect', disabled: Boolean(state.pending) || config?.enabled === false, action: () => { void run(() => connect('reconnect')); } },
       { id: 'refresh', label: 'Refresh tool definitions', disabled: Boolean(state.pending) || config?.enabled === false, action: () => { void run(() => connect('refresh')); } },
       { id: 'toggle', label: config?.enabled === false ? 'Enable configuration' : 'Disable integration', action: () => { void run(async () => { await save({ mcpServers: { ...settings.mcpServers, [review.name]: { ...config, enabled: config?.enabled === false } }, expectedMcpConfigRevision: settings.mcpConfigRevision }, 'integrations'); setReview(null); setMcp(await controller.client.api<McpSnapshot>('/mcp')); }); } },
@@ -81,7 +87,7 @@ export function SettingsPanel({ controller, onClose }: { controller: TerminalCon
   if (view === 'integrations') return <Menu title="Integrations" onClose={back} footer={feedback || 'Review configuration before connecting a tool server.'} items={[
     { id: 'import', label: 'Import Claude/Codex MCP servers…', description: 'Select compatible configurations; imports are global and disabled', action: () => setView('mcp-import') },
     { id: 'edit', label: 'Edit MCP configuration', description: 'Tool search and TypeScript execution on by default; each call keeps normal approval', action: () => setView('mcp-config') },
-    ...(mcp?.servers ?? []).map(server => ({ id: server.name, label: `${server.name} · ${server.status}`, description: server.error || `${server.tools.length} tools`, action: () => setReview(server) })),
+    ...(mcp?.servers ?? []).map(server => ({ id: server.name, label: `${server.name} · ${server.status === 'auth_required' ? 'sign-in required' : server.status}`, description: server.error || `${server.tools.length} tools`, action: () => setReview(server) })),
     { id: 'refresh', label: 'Reload status', action: () => { void run(async () => { await controller.settings(); setMcp(await controller.client.api<McpSnapshot>('/mcp')); }); } },
   ]} />;
   if (view === 'trust') return <WorkspacePermissions controller={controller} workspace={workspace} onClose={()=>setView('permissions')}/>;

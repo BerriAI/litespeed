@@ -75,3 +75,15 @@ test('built-in slash commands complete with Tab and execute locally without a pr
   expect((await detail(request,session)).messages).toHaveLength(0);
   await expect(page.getByRole('button',{name:'Litespeed home',exact:true})).toHaveText('Litespeed');
 });
+
+
+test('/mcp opens integrations directly without sending a model request', async ({ page, request }) => {
+  const session = await create(request); await page.goto(`/#session/${session.id}`);
+  await composer(page).pressSequentially('/mc');
+  await expect(page.getByRole('option', { name: /mcp/ })).toBeVisible();
+  await composer(page).press('Tab'); await expect(composer(page)).toHaveValue('/mcp ');
+  await composer(page).press('Enter');
+  const settings = page.getByRole('dialog', { name: 'Settings', exact: true });
+  await expect(settings.getByLabel('MCP servers', { exact: true })).toBeVisible();
+  expect((await detail(request, session)).messages).toHaveLength(0);
+});

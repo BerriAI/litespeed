@@ -556,15 +556,23 @@ export function createApp(options:AppOptions = {}) {
     res.json(await uninstall(name,root,store));
   });
   app.get('/api/mcp',(_req,res)=>res.json(mcpStatus()));
-  for(const action of ['refresh','reconnect'] as const)app.post(`/api/mcp/:name/${action}`,async(req,res)=>{
+  for(const action of ['refresh','reconnect','login','logout'] as const)app.post(`/api/mcp/:name/${action}`,async(req,res)=>{
     const name=z.string().regex(/^[a-zA-Z0-9_-]{1,64}$/).parse(req.params.name);
     const input=z.object({expectedRevision:z.string().min(1).max(128),expectedConfigRevision:z.string().min(1).max(128)}).strict().parse(req.body);
-    const operation=options.external?.[action];if(!operation)throw httpError(503,'MCP lifecycle operations are unavailable.');
-    await runner.externalOperation(signal=>{
+    const operation: ((name:string, revision:string, signal:AbortSignal)=>Promise<unknown>) | undefined = options.external?.[action];if(!operation)throw httpError(503,'MCP lifecycle operations are unavailable.');
+    const result = await runner.externalOperation(signal=>{
       if(input.expectedConfigRevision!==mcpConfigRevision())throw httpError(409,'Saved MCP configuration changed. Review it before connecting tools.');
       return operation.call(options.external,name,input.expectedRevision,signal);
     },requestSignal(res));
-    res.json(mcpStatus());
+    res.json(action === 'login' ? result : mcpStatus());
+  });
+  app.get('/api/mcp/login/:id',(req,res)=>{
+    if(!options.external?.loginStatus)throw httpError(503,'MCP sign-in is unavailable.');
+    res.json(options.external.loginStatus(z.string().uuid().parse(req.params.id)));
+  });
+  app.delete('/api/mcp/login/:id',(req,res)=>{
+    if(!options.external?.cancelLogin)throw httpError(503,'MCP sign-in is unavailable.');
+    options.external.cancelLogin(z.string().uuid().parse(req.params.id));res.json({ok:true});
   });
   app.post('/api/auth/codex/start',async(req,res)=>{if(!options.auth)throw httpError(503,'Subscription login is unavailable.');const{providerId,method}=z.object({providerId:z.string(),method:z.enum(['browser','device']).default('device')}).parse(req.body);if(!store.settings().providers.some(p=>p.id===providerId&&p.kind==='codex'))throw httpError(400,'Add a ChatGPT subscription provider first.');res.json(await options.auth.start(providerId,method));});
   app.get('/api/auth/codex/:loginId',(req,res)=>{if(!options.auth)throw httpError(503,'Subscription login is unavailable.');res.json(options.auth.status(req.params.loginId));});

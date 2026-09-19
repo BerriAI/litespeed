@@ -258,7 +258,7 @@ export async function mcpImportPlan(workspace: string, existing: Record<string, 
     candidates, sourceHash: sha(choices.map(value => value.identity)), destination: 'global-settings',
     warnings: [
       'Imported servers are saved globally, disabled, and disconnected. Static environment values may include API keys and are copied only on confirmation.',
-      'OAuth logins are not transferred. Remote endpoints may require authentication that Litespeed does not support.',
+      'OAuth logins are not transferred. Remote endpoints may require a separate sign-in in Litespeed.',
       ...candidates.filter(value => !value.compatible || value.conflict).map(value => `${value.name} will be skipped.`),
     ],
   };

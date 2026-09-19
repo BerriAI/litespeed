@@ -1,3 +1,6 @@
+import { extractWWWAuthenticateParams } from '@modelcontextprotocol/sdk/client/auth.js';
+import { McpAuth, type McpAuthChallenge } from './mcp-auth.js';
+import { McpConnectionError, connectionError } from './mcp-errors.js';
 import { createHash, randomUUID } from 'node:crypto';
 import { spawn, type ChildProcessWithoutNullStreams } from 'node:child_process';
 import { Client } from '@modelcontextprotocol/sdk/client/index.js';
@@ -38,8 +41,8 @@ function bounded(text: string, max: number) {
   let end = max; while (end > 0 && (bytes[end] & 0xc0) === 0x80) end--;
   return bytes.subarray(0, end).toString('utf8');
 }
-function secrets(config: McpServerConfig): string[] {
-  const values = Object.values(config.env ?? {});
+function secrets(config: McpServerConfig, extra: Iterable<string> = []): string[] {
+  const values = [...Object.values(config.env ?? {}), ...extra];
   if (config.url) {
     try {
       const url = new URL(config.url); values.push(url.username, url.password, ...url.searchParams.values());
@@ -48,17 +51,17 @@ function secrets(config: McpServerConfig): string[] {
   }
   return [...new Set(values.filter(Boolean))].sort((a, b) => b.length - a.length);
 }
-function clean(text: string, config: McpServerConfig, max: number = MCP_LIMITS.outputBytes) {
-  for (const secret of secrets(config)) text = text.split(secret).join('[redacted]');
+function clean(text: string, config: McpServerConfig, max: number = MCP_LIMITS.outputBytes, extra: Iterable<string> = []) {
+  for (const secret of secrets(config, extra)) text = text.split(secret).join('[redacted]');
   // Strip terminal escapes and invisible/control characters, retaining newlines and tabs.
   text = text.replace(/\x1b\[[0-?]*[ -/]*[@-~]/g, '').replace(/[\p{Cf}\x00-\x08\x0b-\x1f\x7f-\x9f]/gu, '');
   return bounded(text, max);
 }
-function cleanData(value: unknown, config: McpServerConfig, depth = 0): unknown {
+function cleanData(value: unknown, config: McpServerConfig, depth = 0, extra: Iterable<string> = []): unknown {
   if (depth > MCP_LIMITS.schemaDepth) throw new SafeError('MCP result is too deeply nested.');
-  if (typeof value === 'string') return clean(value, config, MCP_LIMITS.frameBytes);
-  if (Array.isArray(value)) return value.map(item => cleanData(item, config, depth + 1));
-  if (value && typeof value === 'object') return Object.fromEntries(Object.entries(value).map(([key, item]) => [clean(key, config, MCP_LIMITS.frameBytes), cleanData(item, config, depth + 1)]));
+  if (typeof value === 'string') return clean(value, config, MCP_LIMITS.frameBytes, extra);
+  if (Array.isArray(value)) return value.map(item => cleanData(item, config, depth + 1, extra));
+  if (value && typeof value === 'object') return Object.fromEntries(Object.entries(value).map(([key, item]) => [clean(key, config, MCP_LIMITS.frameBytes, extra), cleanData(item, config, depth + 1, extra)]));
   return value;
 }
 function abortable<T>(promise: Promise<T>, signal: AbortSignal): Promise<T> {
@@ -71,7 +74,7 @@ function abortable<T>(promise: Promise<T>, signal: AbortSignal): Promise<T> {
 function deadline(signals: AbortSignal[], ms: number) {
   const timerController = new AbortController();
   const timer = setTimeout(() => timerController.abort(), ms); timer.unref();
-  return { signal: AbortSignal.any([...signals, timerController.signal]), clear: () => clearTimeout(timer) };
+  return { signal: AbortSignal.any([...signals, timerController.signal]), clear: () => clearTimeout(timer), timedOut: () => timerController.signal.aborted };
 }
 
 /** The SDK's stdio reader has no frame limit. Bound bytes before parsing, use
@@ -120,7 +123,7 @@ class BoundedStdioTransport implements Transport {
     });
     await new Promise<void>((resolve, reject) => {
       child.once('spawn', resolve);
-      child.on('error', () => { const error = new SafeError('Unable to start MCP server.'); this.onerror?.(error); reject(error); });
+      child.on('error', () => { const error = new McpConnectionError('process'); this.onerror?.(error); reject(error); });
     });
   }
   private fail() { this.onerror?.(new SafeError('Invalid or oversized MCP transport data.')); void this.close(); }
@@ -153,14 +156,25 @@ class BoundedStdioTransport implements Transport {
 
 /** Bound JSON bodies and individual SSE events before the SDK parser buffers
  * them. HTTP redirects and transport retries are never implicit authorization. */
-function guardedFetch(lifetime: AbortSignal): FetchLike {
+function guardedFetch(lifetime: AbortSignal, endpoint: string | undefined, token: () => Promise<string | undefined>, challenge: (value: McpAuthChallenge) => void): FetchLike {
   return async (input, init) => {
     let toolCall = false;
     try { toolCall = typeof init?.body === 'string' && JSON.parse(init.body).method === 'tools/call'; } catch { /* No data or errors from the request are exposed. */ }
     const request = deadline([lifetime, ...(init?.signal ? [init.signal] : [])], toolCall ? MCP_LIMITS.toolMs : MCP_LIMITS.requestMs);
     let response: Response;
-    try { response = await fetch(input, { ...init, redirect: 'error', signal: request.signal }); }
-    catch (error) { request.clear(); throw error; }
+    try {
+      const target = new URL(input instanceof Request ? input.url : String(input));
+      if (endpoint && target.origin !== new URL(endpoint).origin) throw new McpConnectionError('redirect');
+      const accessToken = await abortable(token(), request.signal);
+      if (request.signal.aborted) throw cancelled();
+      const headers = new Headers(init?.headers);
+      if (accessToken) headers.set('Authorization', `Bearer ${accessToken}`);
+      response = await fetch(input, { ...init, headers, redirect: 'manual', signal: request.signal });
+      if (response.status === 401) challenge(extractWWWAuthenticateParams(response));
+      const code = response.status === 401 ? 'auth_required' : response.status === 403 ? 'forbidden' : response.status >= 300 && response.status < 400 ? 'redirect' : undefined;
+      if (code) { await response.body?.cancel(); throw new McpConnectionError(code); }
+    }
+    catch (error) { request.clear(); throw request.timedOut() ? new McpConnectionError('timeout') : error; }
     // GET event streams are long-lived; POST response bodies retain their
     // request deadline, including a peer that sends headers then never ends.
     if (!response.body || !init?.method || init.method === 'GET') request.clear();
@@ -213,6 +227,9 @@ interface Entry {
   validity: AbortController;
   status: McpServerStatus['status'];
   error?: string;
+  errorCode?: string;
+  authChallenge?: McpAuthChallenge;
+  authSecrets: Set<string>;
   reason?: string;
   updatedAt: number;
   connection?: Connection;
@@ -229,7 +246,7 @@ export class McpManager implements ExternalTools {
   private shutdown = new AbortController();
   private closing?: Promise<void>;
   private configDigest = '';
-  constructor(private getConfig: () => Settings['mcpServers']) {}
+  constructor(private getConfig: () => Settings['mcpServers'], private auth?: McpAuth) {}
 
   private track<T>(promise: Promise<T>): Promise<T> {
     this.work.add(promise);
@@ -274,6 +291,7 @@ export class McpManager implements ExternalTools {
     }
     for (const [name, old] of this.entries) {
       if (!Object.hasOwn(configs, name) || digest(configs[name]) !== old.fingerprint) {
+        if (old.config.url) this.auth?.cancelServer(name, old.config.url);
         this.invalidate(old); old.operation?.abort(); void this.dispose(old.connection); this.entries.delete(name);
       }
     }
@@ -281,7 +299,7 @@ export class McpManager implements ExternalTools {
       if (this.entries.has(name)) continue;
       this.entries.set(name, {
         name, config: freeze(structuredClone(config)), fingerprint: digest(config),
-        generation: ++this.generation, validity: new AbortController(),
+        generation: ++this.generation, validity: new AbortController(), authSecrets: new Set(),
         status: config.enabled === false ? 'disabled' : 'disconnected', updatedAt: Date.now(),
         reason: config.enabled === false ? 'Disabled in saved configuration.' : 'Explicit refresh or reconnect required.',
       });
@@ -295,7 +313,8 @@ export class McpManager implements ExternalTools {
     return [...this.entries.values()].map(entry => ({
       name: entry.name, revision: this.revision(entry), status: entry.status,
       tools: entry.catalog?.definitions.map(tool => ({ name: tool.function.name, remoteName: entry.catalog!.names.get(tool.function.name)!, description: tool.function.description })) ?? [],
-      ...(entry.error ? { error: entry.error } : {}), ...(entry.reason ? { reason: entry.reason } : {}), updatedAt: entry.updatedAt,
+      ...(entry.config.url && this.auth?.revision(entry.name, entry.config.url) ? { signedIn: true } : {}),
+      ...(entry.error ? { error: entry.error, errorCode: entry.errorCode } : {}), ...(entry.reason ? { reason: entry.reason } : {}), updatedAt: entry.updatedAt,
     }));
   }
   capture(signal: AbortSignal): ExternalToolLease {
@@ -314,7 +333,7 @@ export class McpManager implements ExternalTools {
       for (const definition of entry.catalog.definitions) {
         const name = definition.function.name;
         if (routes.has(name)) throw new SafeError('Ambiguous MCP tool catalog.');
-        routes.set(name, { entry, connection: entry.connection, generation: entry.generation, remote: entry.catalog.names.get(name)!, scope: digest([entry.name, entry.fingerprint, entry.catalog.digest]), validity: entry.validity.signal });
+        routes.set(name, { entry, connection: entry.connection, generation: entry.generation, remote: entry.catalog.names.get(name)!, scope: digest([entry.name, entry.fingerprint, entry.catalog.digest, entry.config.url ? this.auth?.revision(entry.name, entry.config.url) : undefined]), validity: entry.validity.signal });
         if (entry.config.advertise !== true) gateway.set(name, entry.name);
         definitions.push(definition);
         if(entry.catalog.readOnly.has(name))readOnly.add(name);
@@ -343,9 +362,9 @@ export class McpManager implements ExternalTools {
           assert(name); if (request.signal.aborted) throw cancelled();
           if (result.isError) {
             const text = result.content.filter(part => part.type === 'text').map(part => part.text).join('\n') || (result.structuredContent ? JSON.stringify(result.structuredContent) : '');
-            throw new SafeError(clean(text, route.entry.config) || 'The MCP tool returned an error.', 502);
+            throw new SafeError(clean(text, route.entry.config, MCP_LIMITS.outputBytes, route.entry.authSecrets) || 'The MCP tool returned an error.', 502);
           }
-          return { result, config: route.entry.config };
+          return { result, config: route.entry.config, authSecrets: route.entry.authSecrets };
         } catch (error) {
           if (request.signal.aborted) throw cancelled();
           if (error instanceof SafeError) throw error;
@@ -361,21 +380,21 @@ export class McpManager implements ExternalTools {
       scope: (name: string) => assert(name).scope,
       assertCurrent: (name: string) => { assert(name); },
       execute: async (name: string, args: Record<string, unknown>, requestSignal: AbortSignal) => {
-        const { result, config } = await call(name, args, requestSignal);
+        const { result, config, authSecrets } = await call(name, args, requestSignal);
         const pieces: string[] = []; let remaining = MCP_LIMITS.outputBytes;
         for (const part of result.content) {
-          const text = clean(part.type === 'text' ? part.text : `[${part.type} content omitted]`, config, remaining);
+          const text = clean(part.type === 'text' ? part.text : `[${part.type} content omitted]`, config, remaining, authSecrets);
           pieces.push(text); remaining -= Buffer.byteLength(text) + 1; if (remaining <= 0) break;
         }
-        return clean(pieces.join('\n') || (result.structuredContent ? JSON.stringify(result.structuredContent) : ''), config);
+        return clean(pieces.join('\n') || (result.structuredContent ? JSON.stringify(result.structuredContent) : ''), config, MCP_LIMITS.outputBytes, authSecrets);
       },
       executeForCode: async (name: string, args: Record<string, unknown>, requestSignal: AbortSignal): Promise<McpCodeResult> => {
-        const { result, config } = await call(name, args, requestSignal);
+        const { result, config, authSecrets } = await call(name, args, requestSignal);
         // Keep structured data and complete text (within the transport limit)
         // in the sandbox. Never silently feed truncated JSON into a workflow.
         const safe: McpCodeResult = {
-          content: result.content.map(part => ({ type: 'text', text: clean(part.type === 'text' ? part.text : `[${part.type} content omitted]`, config, MCP_LIMITS.frameBytes) })),
-          ...(result.structuredContent ? { structuredContent: cleanData(result.structuredContent, config) as Record<string, unknown> } : {}),
+          content: result.content.map(part => ({ type: 'text', text: clean(part.type === 'text' ? part.text : `[${part.type} content omitted]`, config, MCP_LIMITS.frameBytes, authSecrets) })),
+          ...(result.structuredContent ? { structuredContent: cleanData(result.structuredContent, config, 0, authSecrets) as Record<string, unknown> } : {}),
         };
         if (Buffer.byteLength(JSON.stringify(safe)) > MCP_LIMITS.frameBytes) throw new SafeError('MCP result exceeds the code execution limit. Narrow the tool request.');
         return safe;
@@ -385,6 +404,31 @@ export class McpManager implements ExternalTools {
   }
   refresh(name: string, expectedRevision: string, signal: AbortSignal) { return this.operate(name, expectedRevision, signal, false); }
   reconnect(name: string, expectedRevision: string, signal: AbortSignal) { return this.operate(name, expectedRevision, signal, true); }
+
+  login(name: string, expectedRevision: string, signal: AbortSignal) {
+    this.reconcile();
+    const entry = this.entries.get(name);
+    if (!this.auth) throw new SafeError('MCP sign-in is unavailable.', 503);
+    if (!entry || expectedRevision !== this.revision(entry)) throw new SafeError('MCP server state changed. Review current status before signing in.');
+    if (!entry.config.url || entry.config.enabled === false || entry.operation) throw new SafeError('Enable a remote MCP server before signing in.');
+    const valid = () => { this.reconcile(); return !this.shutdown.signal.aborted && this.entries.get(name) === entry; };
+    return this.track(this.auth.start(name, entry.config.url, entry.authChallenge ?? {}, signal, valid, () => {
+      this.invalidate(entry); entry.operation?.abort(); void this.dispose(entry.connection); entry.connection = undefined;
+      entry.status = 'disconnected'; entry.error = undefined; entry.errorCode = undefined;
+      entry.reason = 'Signed in. Reconnect to load tools.';
+    }));
+  }
+  async logout(name: string, expectedRevision: string, signal: AbortSignal) {
+    this.reconcile(); const entry = this.entries.get(name);
+    if (signal.aborted || this.shutdown.signal.aborted) throw cancelled();
+    if (!this.auth || !entry?.config.url || expectedRevision !== this.revision(entry)) throw new SafeError('MCP server state changed. Review current status before signing out.');
+    this.auth.forget(name, entry.config.url); this.invalidate(entry); entry.operation?.abort();
+    const connection = entry.connection; entry.connection = undefined;
+    entry.status = entry.config.enabled === false ? 'disabled' : 'disconnected'; entry.error = undefined; entry.errorCode = undefined; entry.reason = 'Signed out.';
+    await this.dispose(connection); return this.status();
+  }
+  loginStatus(id: string) { if (!this.auth) throw new SafeError('MCP sign-in is unavailable.', 503); return this.auth.status(id); }
+  cancelLogin(id: string) { this.auth?.cancel(id); }
 
   private operate(name: string, expectedRevision: string, signal: AbortSignal, reconnect: boolean): Promise<McpServerStatus[]> {
     // All authorization/revision checks and invalidation precede the first await.
@@ -401,7 +445,7 @@ export class McpManager implements ExternalTools {
       if (!reconnect && (!entry.connection?.ready || !['connected', 'stale'].includes(entry.status))) throw new SafeError('MCP server is disconnected. Explicit reconnect required.');
       const reuse = !reconnect ? entry.connection : undefined;
       this.invalidate(entry);
-      entry.status = reuse ? 'refreshing' : 'connecting'; entry.error = undefined; entry.reason = undefined;
+      entry.status = reuse ? 'refreshing' : 'connecting'; entry.error = undefined; entry.errorCode = undefined; entry.reason = undefined;
       const generation = entry.generation, controller = new AbortController(); entry.operation = controller; this.operationCount++;
       const operation = deadline([signal, controller.signal, this.shutdown.signal], MCP_LIMITS.operationMs);
       return this.track((async () => {
@@ -415,10 +459,13 @@ export class McpManager implements ExternalTools {
           entry.catalog = catalog; entry.status = 'connected'; entry.updatedAt = Date.now();
           return this.status();
         } catch (error) {
+          const failure = operation.timedOut() ? new McpConnectionError('timeout') : connectionError(error);
+          const wasCancelled = operation.signal.aborted && !operation.timedOut();
           if (this.entries.get(name) === entry && entry.generation === generation) {
-            this.invalidate(entry); entry.status = operation.signal.aborted ? 'disconnected' : 'error';
-            entry.error = operation.signal.aborted ? undefined : 'Unable to load MCP tools. Check the saved configuration and server, then explicitly retry.';
-            entry.reason = operation.signal.aborted ? 'Operation cancelled or timed out. Explicit retry required.' : undefined;
+            this.invalidate(entry); entry.status = wasCancelled ? 'disconnected' : failure.code === 'auth_required' ? 'auth_required' : 'error';
+            entry.error = wasCancelled ? undefined : error instanceof SafeError ? error.message : failure.message;
+            entry.errorCode = wasCancelled ? undefined : failure.code;
+            entry.reason = wasCancelled ? 'Operation cancelled. Explicit retry required.' : undefined;
           }
           const connection = entry.connection; entry.connection = undefined;
           if (this.entries.get(name) === entry && entry.operation === controller && entry.status === 'stale') {
@@ -427,9 +474,9 @@ export class McpManager implements ExternalTools {
             entry.status = 'disconnected'; entry.reason = 'Catalog changed during discovery. Explicit reconnect required.'; entry.updatedAt = Date.now();
           }
           await this.dispose(connection);
-          if (operation.signal.aborted) throw cancelled();
-          if (error instanceof SafeError) throw error;
-          throw new SafeError('Unable to load MCP tools. The operation was not retried.', 502);
+          if (wasCancelled) throw cancelled();
+          if (error instanceof SafeError && !operation.timedOut()) throw error;
+          throw failure;
         } finally { operation.clear(); entry.operation = undefined; this.operationCount--; }
       })());
     } catch (error) { return Promise.reject(error); }
@@ -446,7 +493,11 @@ export class McpManager implements ExternalTools {
   }
   private createConnection(entry: Entry, legacy: boolean): Connection {
     const lifetime = new AbortController();
-    const fetch = guardedFetch(lifetime.signal);
+    const fetch = guardedFetch(lifetime.signal, entry.config.url, async () => {
+      const token = entry.config.url ? await this.auth?.token(entry.name, entry.config.url) : undefined;
+      if (token) entry.authSecrets.add(token);
+      return token;
+    }, value => { entry.authChallenge = value; });
     const transport: Transport = entry.config.command ? new BoundedStdioTransport(entry.config) : legacy
       ? new SSEClientTransport(new URL(entry.config.url!), { fetch, eventSourceInit: { fetch } })
       : new StreamableHTTPClientTransport(new URL(entry.config.url!), { fetch, reconnectionOptions: { maxRetries: 0, maxReconnectionDelay: 0, initialReconnectionDelay: 0, reconnectionDelayGrowFactor: 1 } });
@@ -468,8 +519,14 @@ export class McpManager implements ExternalTools {
     };
     // Transport failures invalidate; late protocol response warnings after a
     // cancellation do not. Never log either class of raw server error.
-    transport.onerror = () => {
-      if (connection.ready) disconnected();
+    transport.onerror = error => {
+      if (connection.ready) {
+        const failure = connectionError(error); disconnected();
+        if (failure.code !== 'unknown' && this.entries.get(entry.name) === entry) {
+          entry.status = failure.code === 'auth_required' ? 'auth_required' : 'error';
+          entry.error = failure.message; entry.errorCode = failure.code; entry.reason = undefined;
+        }
+      }
       else if (legacy) void this.dispose(connection); // EventSource must not retry.
     };
     client.onclose = disconnected;
@@ -514,14 +571,14 @@ export class McpManager implements ExternalTools {
         if (tool.execution?.taskSupport === 'required') throw new SafeError('Task-only MCP tools are not supported.');
         this.validateSchema(tool.inputSchema);
         const schema = JSON.stringify(tool.inputSchema);
-        if (secrets(entry.config).some(secret => tool.name.includes(secret) || schema.includes(secret))) throw new SafeError('MCP catalog contains configured credentials.');
+        if (secrets(entry.config, entry.authSecrets).some(secret => tool.name.includes(secret) || schema.includes(secret))) throw new SafeError('MCP catalog contains configured credentials.');
         const raw = `${entry.name}_${tool.name}`.replace(/[^a-zA-Z0-9_-]/g, '_');
         const suffix = createHash('sha256').update(`${entry.name}\0${tool.name}`).digest('hex').slice(0, 8);
         const name = `mcp_${raw.slice(0, 48)}_${suffix}`;
         if (names.has(name)) throw new SafeError('MCP tool name collision.');
         names.set(name, tool.name);
         if(tool.annotations?.readOnlyHint===true)readOnly.add(name);
-        definitions.push({ type: 'function', function: { name, description: clean(`[${entry.name}] ${tool.description || tool.name}`, entry.config, 8000), parameters: structuredClone(tool.inputSchema) } });
+        definitions.push({ type: 'function', function: { name, description: clean(`[${entry.name}] ${tool.description || tool.name}`, entry.config, 8000, entry.authSecrets), parameters: structuredClone(tool.inputSchema) } });
         identity.push(tool);
       }
       if (result.nextCursor === undefined) {
@@ -577,6 +634,7 @@ export class McpManager implements ExternalTools {
   close(): Promise<void> {
     if (this.closing) return this.closing;
     this.shutdown.abort();
+    if (this.auth) this.track(this.auth.close());
     for (const entry of this.entries.values()) {
       this.invalidate(entry); entry.operation?.abort(); entry.status = entry.config.enabled === false ? 'disabled' : 'disconnected'; entry.error = undefined; entry.reason = 'MCP manager closed.';
       void this.dispose(entry.connection); entry.connection = undefined;

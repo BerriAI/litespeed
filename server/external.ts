@@ -1,5 +1,5 @@
 import type { ToolDefinition } from '../shared/types.js';
-import type { McpServerStatus, McpCodeResult } from '../shared/mcp.js';
+import type { McpServerStatus, McpCodeResult, McpLoginStart, McpLoginStatus } from '../shared/mcp.js';
 
 /** A turn's immutable catalog and connection identity; never resolves a name
  * against a later configuration. Releasing invalidates this handle only. */
@@ -41,5 +41,9 @@ export interface ExternalTools {
   configRevision?(): string;
   refresh?(name: string, expectedRevision: string, signal: AbortSignal): Promise<McpServerStatus[]>;
   reconnect?(name: string, expectedRevision: string, signal: AbortSignal): Promise<McpServerStatus[]>;
+  login?(name: string, expectedRevision: string, signal: AbortSignal): Promise<McpLoginStart>;
+  logout?(name: string, expectedRevision: string, signal: AbortSignal): Promise<McpServerStatus[]>;
+  loginStatus?(id: string): McpLoginStatus;
+  cancelLogin?(id: string): void;
   close?(): Promise<void>;
 }

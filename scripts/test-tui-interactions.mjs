@@ -74,6 +74,17 @@ try{
   await waitFor(()=>!screen().includes('API connections and ChatGPT sign-in'),'close footer settings');
   terminal.resize(80,24);emulator.resize(80,24);
 
+  terminal.write('/mcp');await waitFor(()=>screen().split('\n').some(line=>/^│ \/mcp\s+│$/.test(line)),'mcp command entered');terminal.write('\r');
+  await waitFor(()=>screen().includes('Edit MCP configuration'),'mcp opens integrations directly');
+  assert(!screen().includes('API connections and ChatGPT sign-in'));
+  assert.equal((await api(`/sessions/${session.id}`)).messages.length,0);
+  await save('00-mcp-integrations');
+  terminal.write('\x1b');await waitFor(()=>screen().includes('API connections and ChatGPT sign-in'),'back from integrations');
+  terminal.write('\x1b');await waitFor(()=>!screen().includes('API connections and ChatGPT sign-in'),'close integrations settings');
+
+  if (process.argv.includes('--mcp-only')) {
+    console.log('TUI /mcp passed: opens Integrations directly, sends no model message, and returns to chat.');
+  } else {
   terminal.write('/set');await waitFor(()=>screen().includes('/settings')&&screen().includes('/setup'),'slash suggestions');await save('00-slash-commands');
   terminal.write('\t');await waitFor(()=>screen().includes('/settings '),'Tab completes command');
   terminal.write('\x15/setup\r');
@@ -232,4 +243,5 @@ try{
   const next=await api('/sessions',{workspace:settings.workspace+'/src'});await launch(next,80,24);await waitFor(()=>screen().includes('A fresh start.'),'next folder opens chat');assert(!screen().includes('Gateway base URL'));assert.equal(next.model,'test-model');assert.equal(next.architecture.kind,'litefusion');await save('10-next-folder-ready');
   console.log('Fresh TUI gateway setup passed: blank URL, masked key, failed authentication, model discovery, and saved setup.');
   console.log('TUI interactions passed: first-run setup, saved models, scoped project grants, two workers, two experts, automatic Sidekick handoff, and narrow/wide rendering.');
+  }
 }finally{await stopTerminal();await browser?.close();server.kill('SIGTERM');await rm(config,{recursive:true,force:true});}

@@ -227,6 +227,7 @@ function SessionApp({ controller, router, onQuit, chooseTheme, themeName, themeM
     { id: 'setup', label: 'Set up Litespeed', description: 'A quick guide to architecture, models, and permissions', disabled: busy, action: () => run(() => openSetup()) },
     { id: 'models', label: 'Choose models', description: 'Architecture and its saved model configuration', disabled: Boolean(state.pending||detail?.history?.pendingRecovery), action: () => run(openModels) },
     { id: 'permissions', label: 'Permissions', description: 'Ask first or allow all tools, including workers', action: permissions },
+    { id: 'mcp', label: 'MCP integrations', description: 'Open connected tools and sign-in settings', action: () => setPanel(<SettingsPanel key="integrations" controller={controller} initialView="integrations" onClose={close} />) },
     { id: 'settings', label: 'Settings', description: 'Providers, project profiles, permissions, integrations, and usage', action: openSettings },
     { id: 'sessions', label: 'Sessions', description: 'Switch sessions or start a new one', action: () => run(sessions) },
     { id: 'new', label: 'New session', description: 'Start with empty context; keep this session and its draft', action: () => { close(); run(() => controller.create(detail?.session.workspace ?? process.cwd())); } },

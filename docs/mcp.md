@@ -6,7 +6,7 @@
 
 Choose one or more compatible servers; none are selected by default. Preview returns names, source/scope, transport, environment-variable *names*, compatibility, and collision status only: never commands, arguments, paths, URL credentials/query values, or environment values. The selection is source-hash revalidated at import and guarded by the saved MCP configuration revision. Imports go to **global Litespeed settings**, skip existing names, and are forced to `enabled: false` and `advertise: false`; nothing connects automatically.
 
-Supported imports are stdio `command`/`args`/static `env`, plus HTTP/Streamable HTTP URLs. Static environment values are copied server-side only after confirmation because they may include API keys, and remain masked in Settings. Entries needing headers, bearer/env-header forwarding, `env_vars`, `cwd`, tool filtering, explicit SSE, WebSocket, interpolation, URL credentials/query values/fragments, or other client-specific behavior are rejected rather than changed silently. OAuth login caches, registrations, callback metadata, and cached tokens are never read or copied. A remote endpoint without static credentials may still require authentication that Litespeed does not support.
+Supported imports are stdio `command`/`args`/static `env`, plus HTTP/Streamable HTTP URLs. Static environment values are copied server-side only after confirmation because they may include API keys, and remain masked in Settings. Entries needing headers, bearer/env-header forwarding, `env_vars`, `cwd`, tool filtering, explicit SSE, WebSocket, interpolation, URL credentials/query values/fragments, or other client-specific behavior are rejected rather than changed silently. OAuth login caches, registrations, callback metadata, and cached tokens are never read or copied. Remote servers that require OAuth use a separate browser sign-in in Litespeed.
 
 The picker is available in both the terminal (`/settings` → Integrations) and browser Settings. It supports up to 30 selected servers and 30 saved servers total; duplicate names and capacity limits are shown in the review and skipped. Malformed or unavailable sources are reported independently, so other sources can still be imported. This imports **Claude Code**, not Claude Desktop, and never changes the originals. Review any project-relative commands and paths before enabling an imported server.
 
@@ -14,7 +14,7 @@ MCP connects Litespeed to tools supplied by another process or service. These to
 
 ## Configure, then connect
 
-Open **Settings → Integrations** and edit **MCP servers**. Configuration is a JSON object keyed by a server name:
+Type **`/mcp`** in the terminal or browser chat to open Integrations directly, or open **Settings → Integrations**, and edit **MCP servers**. Configuration is a JSON object keyed by a server name:
 
 ```json
 {
@@ -72,12 +72,23 @@ The tool detail view records each inner tool's name, status, timestamps, and inp
 
 Run `npm run test:mcp:code` for the built-runtime smoke check. It uses a real local stdio MCP server and a local provider stub, discovers two tools, approves each call, and transfers a 520 KB document while verifying that no intermediate document content enters the model requests. It needs no provider credentials and does not measure provider token costs.
 
+## Browser sign-in
+
+For a remote server that requires OAuth, choose **Sign in** in its integration controls, then **Continue sign-in in your browser** (or **Open sign-in in browser** in the terminal). Complete the provider’s consent screen, return to Litespeed, and choose **Reconnect** to load tools. Importing another client’s configuration never imports its login.
+
+Litespeed discovers the authorization server, registers a public client, and uses an authorization code with PKCE and a state-checked loopback callback. Pending sign-ins expire after 10 minutes and can be cancelled. Configuration changes cancel pending sign-ins; signing into a different account invalidates the previous tool catalog and remembered tool approvals. Servers requiring a pre-registered client rather than dynamic registration are not supported by this flow.
+
+Credentials are stored separately from settings in `mcp-auth.json` in Litespeed’s data directory, with owner-only file permissions. Expiring access tokens are refreshed before requests. **Sign out** removes local credentials and disconnects tools; it does not revoke the provider’s consent grant. A rejected MCP tool call is never replayed after authentication. If authorization has expired or been revoked, sign in again and reconnect.
+
+Connection errors distinguish sign-in required, access denied, DNS failures, refused connections, certificate failures, timeouts, HTTP status failures, and endpoint redirects. Messages omit remote response bodies, credentials, and subprocess output. The terminal’s integration review shows the full message even when the list truncates it.
+
 ## Status and explicit actions
 
 - **Disconnected:** configured but not connected, or the connection closed. Use Connect or Reconnect deliberately.
 - **Connecting / refreshing:** a lifecycle operation is in progress. It does not make partially discovered tools available.
 - **Connected:** the current catalog is available to a new eligible turn.
 - **Stale:** the server announced a changed tool list. Use **Refresh tools** to review and adopt the new catalog for future turns. Notifications do not automatically refresh it.
+- **Sign-in required:** the server rejected authorization. Choose Sign in, then reconnect after completing browser consent.
 - **Error:** discovery or connection failed. Inspect the safe error and retry explicitly after addressing the cause.
 - **Disabled:** no tools are available. Enable and save the server configuration before connecting.
 
@@ -101,7 +112,7 @@ A disconnected lifecycle HTTP request or app shutdown cancels its preparation. A
 
 ## Current scope
 
-Supported workflows are explicit stdio/Streamable HTTP/legacy SSE tool connection, discovery, tool search, TypeScript execution, approval, dispatch, cancellation, status, refresh, and reconnect. MCP OAuth login, resources, prompts, and automatic reconnection are not part of this version. Provider API keys are not forwarded to local MCP subprocesses by the app; configure only the environment entries the tool needs and never place secrets in prompts or share unreviewed configuration exports.
+Supported workflows are explicit stdio/Streamable HTTP/legacy SSE tool connection, discovery, tool search, TypeScript execution, approval, dispatch, cancellation, status, refresh, and reconnect. Browser OAuth login, PKCE, dynamic public-client registration, and token refresh are supported for remote servers. Resources, prompts, and automatic reconnection are not part of this version. Provider API keys are not forwarded to local MCP subprocesses by the app; configure only the environment entries the tool needs and never place secrets in prompts or share unreviewed configuration exports.
 
 ## Approval improvements in 0.1.20
 

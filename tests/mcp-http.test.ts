@@ -329,7 +329,7 @@ describe('remote MCP catalog refusal and discovery cancellation', () => {
     const fixture = await remoteFixture('http', { initializationStatus: status, failure: `Failure ${secret}${String.fromCharCode(27)}[2J` });
     const manager = managerFor({ remote: { url: `${fixture.url}?token=${secret}` } });
     await manager.reconnect('remote', manager.status()[0].revision, signal()).catch(() => {});
-    expect(manager.status()[0]).toMatchObject({ status: 'error', tools: [] });
+    expect(manager.status()[0]).toMatchObject({ status: status === 401 ? 'auth_required' : 'error', tools: [] });
     const observation = manager.status()[0].error ?? '';
     expect(observation).not.toContain(secret); expect(observation).not.toContain(String.fromCharCode(27));
     expect(fixture.requests).toEqual([{ method: 'POST', path: '/mcp', rpc: 'initialize' }]);
