@@ -27,7 +27,7 @@ import { Button, Menu, TextPrompt, TextViewer, type MenuItem } from './ui.js';
 import { EditorKeys } from './editor.js';
 import { Sessions } from './sessions.js';
 import { FilePicker } from './files.js';
-import { attachmentFromFile, editDraft, openShell, suspendTerminal } from './terminalIO.js';
+import { attachmentFromClipboard, attachmentFromFile, editDraft, openShell, suspendTerminal } from './terminalIO.js';
 import { PendingTaskInspector, WorkerChooser, Changes, WorkInspector, WorkerInspector } from './inspectors.js';
 import { conversationGroups, usageDetails } from './conversation.js';
 import { TaskProgress } from './tasks.js';
@@ -178,6 +178,16 @@ function SessionApp({ controller, router, onQuit, chooseTheme, themeName, themeM
     const attachment = await attachmentFromFile(filename, controller.detail!.session.workspace);
     controller.setDraft({ ...controller.getState().draft, attachments: [...controller.getState().draft.attachments, attachment] });
   });
+  const pasteImage = async () => {
+    const sessionId = controller.sessionId, current = controller.getState().draft;
+    if (current.attachments.length >= 10) return;
+    const attachment = await attachmentFromClipboard();
+    if (controller.sessionId !== sessionId || !attachment) return;
+    const draft = controller.getState().draft;
+    if (draft.attachments.length >= 10) return;
+    controller.setDraft({ ...draft, attachments: [...draft.attachments, attachment] });
+    controller.notice('Attached clipboard image.');
+  };
   const copyResponse = () => { const text = renderer.getSelection()?.getSelectedText() || controller.detail?.messages.findLast(message => message.role === 'assistant' && message.content)?.content; if (text) run(async () => { await copyTerminalText(renderer, text); controller.notice('Copied.'); }); else controller.notice('There is no response to copy yet.'); close(); };
   const commands: MenuItem[] = [
     { id: 'copy', label: 'Copy selected text or last response', action: copyResponse },
@@ -275,6 +285,7 @@ function SessionApp({ controller, router, onQuit, chooseTheme, themeName, themeM
     const result = router.dispatch({ name: key.name, ctrl: key.ctrl, shift: key.shift, meta: key.meta });
     if (result.preventDefault) { key.preventDefault(); key.stopPropagation(); }
     if (result.pending) return;
+    if (result.command === 'prompt.paste') { run(() => pasteImage()); return; }
     if (result.command === 'terminal.suspend') return suspendTerminal(renderer);
     if (result.command === 'app.exit') return onQuit();
     if (result.command === 'command.palette.show' || result.command === 'help.show') return palette();
