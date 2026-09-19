@@ -1,14 +1,12 @@
-# Litespeed 0.1.20
+# Litespeed 0.1.21
 
-Fewer interruptions, with clearer approval scopes across the browser, terminal, and CLI.
+Sign in to remote MCP servers, see why a connection failed, and open Integrations with `/mcp`.
 
-- Researcher, Sidekick, Team, Expert, and LiteFusion handoffs run automatically; worker actions retain the session's permissions and explicit rules.
-- New Allow project edits mode, exact-command shell approvals, and opt-in persistent project grants. Saved modes are preserved; legacy broad grant hashes are retired.
-- Approval cards show the actual action and scope. Full access moves out of the approval card shortcuts.
-- Optional enforced workspace command confinement, shared by foreground commands, verification, and background jobs. No unrestricted fallback.
-- Visible project-rule/hook trust and revocation. Plugin hooks install disabled until explicitly reviewed and enabled.
-- Reviewed MCP import-and-connect, exact connected-tool rules, scoped MCP grants, and approval-aware script timeouts.
-- Automatic stopping of owned jobs, consistent history confirmations, and direct user-requested context compaction.
-- Sidekick Fusion remains recommended; LiteFusion remains experimental.
+- Browser OAuth sign-in, token refresh, and sign-out for remote MCP servers that support dynamic client registration. Imported configurations use a separate Litespeed sign-in.
+- Clear connection errors for sign-in requirements, access denied, DNS, refused connections, certificate failures, timeouts, HTTP errors, and redirects.
+- `/mcp` opens Integrations directly in the terminal and browser without sending a chat message.
+- Paste clipboard images into the terminal with Ctrl+V.
+
+After updating, open `/mcp`, choose **Sign in** for a remote server, complete browser consent, and choose **Reconnect** to load its tools. Servers requiring a pre-registered OAuth client are not supported by this flow.
 
 Includes bundled runtimes and the web/terminal apps for Apple silicon and Intel Macs. Run `litespeed update` and restart after active work finishes.
