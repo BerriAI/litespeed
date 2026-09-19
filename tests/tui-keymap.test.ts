@@ -6,6 +6,7 @@ import {
   type KeyEvent, type Layer,
 } from '../tui/keymap.js';
 import { KEYBIND_DEFAULTS, LEADER_DEFAULT } from '../tui/keybinds.js';
+import { ACTIVE_KEY_ACTIONS } from '../tui/commands.js';
 
 function key(name: string, mods: Partial<KeyEvent> = {}): KeyEvent {
   return { name, ...mods };
@@ -122,11 +123,11 @@ describe('KeymapRouter', () => {
     expect(router.dispatch(key('n')).handled).toBe(false);
   });
 
-  it('honors preventDefault:false from the object form', () => {
+  it('keeps text paste native while activating clipboard-image paste', () => {
+    expect(ACTIVE_KEY_ACTIONS).toContain('input_paste');
     router.addLayer({ name: 'paste', bindings: buildBindings({}, ['input_paste']) });
     const hit = router.dispatch(key('v', { ctrl: true }));
-    expect(hit.handled).toBe(true);
-    expect(hit.preventDefault).toBe(false);
+    expect(hit).toMatchObject({ handled: true, command: 'prompt.paste', preventDefault: false });
   });
 
   it('completes a leader sequence within the timeout', () => {
