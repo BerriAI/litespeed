@@ -2,7 +2,7 @@ import { createHash, randomUUID } from 'node:crypto';
 import { mkdirSync, readFileSync, renameSync, writeFileSync } from 'node:fs';
 import { homedir } from 'node:os';
 import { join } from 'node:path';
-import type { Draft, DraftStorage } from './controller.js';
+import type { Draft, DraftImage, DraftStorage } from './controller.js';
 
 /** A private local cache. Drafts are namespaced by server and session. */
 export class TerminalStorage implements DraftStorage {
@@ -14,7 +14,18 @@ export class TerminalStorage implements DraftStorage {
     if (this.pending.has(key)) return this.pending.get(key)!;
     try {
       const value = JSON.parse(readFileSync(this.path(key), 'utf8'));
-      if (typeof value.text === 'string' && Array.isArray(value.attachments)) return { text: value.text, attachments: value.attachments.filter((item: unknown) => typeof item === 'object' && item !== null && 'name' in item && typeof item.name === 'string') };
+      if (typeof value.text === 'string' && Array.isArray(value.attachments)) {
+        const indices = new Map<number, number>();
+        const attachments = value.attachments.filter((item: unknown, index: number) => {
+          if (typeof item !== 'object' || item === null || !('name' in item) || typeof item.name !== 'string') return false;
+          indices.set(index, indices.size); return true;
+        });
+        const inlineImages = Array.isArray(value.inlineImages) ? value.inlineImages.filter((image: DraftImage) =>
+          image && Number.isInteger(image.start) && Number.isInteger(image.end) && image.start >= 0 && image.end > image.start &&
+          indices.has(image.attachmentIndex) && /^\[Image-\d+\]$/.test(image.label) && value.text.slice(image.start, image.end) === image.label,
+        ).map((image: DraftImage) => ({ ...image, attachmentIndex: indices.get(image.attachmentIndex)! })) : undefined;
+        return { text: value.text, attachments, ...(inlineImages ? { inlineImages } : {}) };
+      }
     } catch { /* A missing or invalid cache never prevents startup. */ }
     return { text: '', attachments: [] };
   }

@@ -25,4 +25,10 @@ describe('terminal drafts', () => {
     cache.savePreferences({ theme: 'litespeed', mode: 'light' });
     expect(new TerminalStorage(cache.directory).preferences()).toEqual({ theme: 'litespeed', mode: 'light' });
   });
+  it('preserves inline image positions and payloads in a saved draft', () => {
+    const cache = storage();
+    const draft = { text: 'See [Image-1]', attachments: [{ name: 'Image-1.png', mimeType: 'image/png', dataUrl: 'data:image/png;base64,iVBORw0KGgo=' }], inlineImages: [{ start: 4, end: 13, label: '[Image-1]', attachmentIndex: 0 }] };
+    cache.save('images', draft); cache.flush();
+    expect(new TerminalStorage(cache.directory).load('images')).toEqual(draft);
+  });
 });

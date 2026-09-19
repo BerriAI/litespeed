@@ -30,8 +30,10 @@ export class EditorKeys {
       const method = movements[movement] ?? operations[command];
       if (method) {
         key.preventDefault(); key.stopPropagation();
+        if (command === 'undo' && !editor.editBuffer.canUndo() || command === 'redo' && !editor.editBuffer.canRedo()) return;
         const fn = editor[method] as (options?: { select: boolean }) => unknown;
         fn.call(editor, movements[movement] ? { select: selected } : undefined);
+        return command;
       }
     } else if (this.suppressed.dispatch(stroke).handled) { key.preventDefault(); key.stopPropagation(); }
   }

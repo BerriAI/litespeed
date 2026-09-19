@@ -250,7 +250,12 @@ app.get('/fixture/summaries',(_req,res)=>res.json({pending:pendingSummaries.size
 app.post('/fixture/summaries/release',(_req,res)=>{for(const release of [...pendingSummaries])release();res.json({ok:true});});
 const vite=process.env.LITESPEED_E2E_NO_VITE ? undefined : await createViteServer({server:{middlewareMode:true,hmr:{port:24679}},appType:'spa'});if(vite)app.use(vite.middlewares);
 const fixturePort=Number(process.env.LITESPEED_E2E_PORT || 3211);
-const server=app.listen(fixturePort,'127.0.0.1',()=>console.log(`Litespeed E2E ready at http://127.0.0.1:${(server.address() as {port:number}).port}`));
+const snapshotDelay=Number(process.env.LITESPEED_E2E_SNAPSHOT_DELAY_MS || 0);
+const server=createServer((req,res)=>{
+  // Exercise the terminal's loading screen independently of runner speed.
+  if(snapshotDelay>0&&req.method==='GET'&&/^\/api\/sessions\/[^/?]+$/.test(req.url??''))setTimeout(()=>app(req,res),snapshotDelay);
+  else app(req,res);
+}).listen(fixturePort,'127.0.0.1',()=>console.log(`Litespeed E2E ready at http://127.0.0.1:${(server.address() as {port:number}).port}`));
 const terminals=attachTerminals(server,store);
 let closing=false;
 async function close(){if(closing)return;closing=true;runner.stopAll();await Promise.all([runner.whenIdle(),terminals.close(),mcp.close()]);server.closeAllConnections();server.close();mock.closeAllConnections();mock.close();await vite?.close();store.close();await rm(root,{recursive:true,force:true});process.exit(0);}
