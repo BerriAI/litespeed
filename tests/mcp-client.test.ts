@@ -207,3 +207,40 @@ describe('MCP asynchronous safety', () => {
     await act(async () => vi.advanceTimersByTimeAsync(6000)); expect(api.calls.filter(call => call.method === 'POST')).toHaveLength(1);
   });
 });
+
+describe('MCP browser sign-in controls', () => {
+  it('uses reviewed revisions, waits for OAuth, reloads status before reconnecting, and keeps the link out of configuration', async () => {
+    const api = server(snapshot([status({ status: 'auth_required', error: 'Sign-in required. Choose Sign in to authorize this MCP server.' })]));
+    const settings = { ...base, mcpServers: { demo: { url: 'https://example.invalid/mcp', enabled: true } } }; api.saved = settings;
+    const login = { loginId: 'fixture-login', url: 'https://issuer.example/authorize?state=fixture', expiresAt: Date.now() + 600000 };
+    let complete = false;
+    api.intercept = (path, method) => {
+      if (path === '/api/mcp/demo/login' && method === 'POST') return login;
+      if (path === '/api/mcp/login/fixture-login') return { status: complete ? 'complete' : 'pending' };
+      return undefined;
+    };
+    await mount(settings); await press('Integrations');
+    expect(card().textContent).toContain('Sign-in required');
+    await press('Sign in', card());
+    expect(api.calls.find(call => call.path.endsWith('/demo/login'))?.body).toEqual({ expectedRevision: 'demo-1', expectedConfigRevision: 'config-a' });
+    expect(el<HTMLAnchorElement>('[aria-label="MCP sign-in"] a').href).toBe(login.url);
+    expect(el<HTMLTextAreaElement>('[aria-label="MCP servers"]').value).not.toContain('authorize');
+    complete = true; api.cache = snapshot([status({ revision: 'after-login', status: 'disconnected', signedIn: true })]);
+    await act(async () => { await vi.advanceTimersByTimeAsync(1500); });
+    expect(el('[aria-label="MCP sign-in"]').textContent).toContain('Signed in');
+    expect(api.calls.filter(call => call.path.endsWith('/reconnect'))).toHaveLength(0);
+    await press('Reconnect', el('[aria-label="MCP sign-in"]'));
+    expect(api.calls.find(call => call.path.endsWith('/reconnect'))?.body.expectedRevision).toBe('after-login');
+  });
+  it('cancels a pending login and blocks sign-in for unsaved edits', async () => {
+    const api = server(), settings = { ...base, mcpServers: { demo: { url: 'https://example.invalid/mcp' } } }; api.saved = settings;
+    api.intercept = (path, method) => {
+      if (path.endsWith('/demo/login') && method === 'POST') return { loginId: 'fixture-login', url: 'https://issuer.example/authorize', expiresAt: Date.now() + 600000 };
+      if (path === '/api/mcp/login/fixture-login') return { status: 'pending' };
+      return undefined;
+    };
+    await mount(settings); await press('Integrations'); await press('Sign in', card()); await press('Cancel sign-in');
+    expect(api.calls.some(call => call.path === '/api/mcp/login/fixture-login' && call.method === 'DELETE')).toBe(true);
+    await fill('[aria-label="MCP servers"]', '{}'); expect(button('Sign in', card()).disabled).toBe(true);
+  });
+});

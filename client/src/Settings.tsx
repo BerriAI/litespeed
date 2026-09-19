@@ -9,12 +9,13 @@ import { api, errorMessage, patch, post, query } from './api';
 import { CopyButton, Modal, LiteSpeed } from './ui';
 import { McpImporter } from './McpImporter';
 
-import type { McpServerStatus } from '../../shared/mcp';
+import { McpLogin } from './McpLogin';
+import type { McpServerStatus, McpLoginStart } from '../../shared/mcp';
 import type { MemoryFactSummary } from '../../shared/memory';
 
 type McpSnapshot = { servers: McpServerStatus[]; configRevision: string };
 type McpReview = { servers: Record<string, McpServerConfig>; revision: string };
-const mcpStatusLabels: Record<McpServerStatus['status'], string> = { disabled: 'Disabled', disconnected: 'Configured · disconnected', connecting: 'Connecting', connected: 'Connected', refreshing: 'Refreshing tools', stale: 'Stale', error: 'Error' };
+const mcpStatusLabels: Record<McpServerStatus['status'], string> = { disabled: 'Disabled', disconnected: 'Configured · disconnected', connecting: 'Connecting', connected: 'Connected', refreshing: 'Refreshing tools', stale: 'Stale', auth_required: 'Sign-in required', error: 'Error' };
 type Login = { loginId: string; method: 'device' | 'browser'; url: string; userCode?: string; expiresAt: number; providerId: string };
 type ContextLimitRow = { id: string; model: string; tokens: string };
 // Mirrors the server's RULE_TOOLS allowlist (server/permissions.ts stays the authority; rules support exact connected tool names).
@@ -52,13 +53,13 @@ function parseContextRows(rows: ContextLimitRow[]): Record<string, number> {
   }
   return Object.fromEntries(entries);
 }
-export function Settings({ session, settings, workspace, onClose, onSave, onProfiles, profilesDisabled, profiles }: { session?: import('../../shared/types').Session; workspace?: string; profiles?: ReactNode; onProfiles?: () => void; profilesDisabled?: boolean; settings: SettingsType; onClose: () => void; onSave: (settings: SettingsType) => void }) {
+export function Settings({ initialTab = 'providers', session, settings, workspace, onClose, onSave, onProfiles, profilesDisabled, profiles }: { initialTab?: 'providers' | 'integrations'; session?: import('../../shared/types').Session; workspace?: string; profiles?: ReactNode; onProfiles?: () => void; profilesDisabled?: boolean; settings: SettingsType; onClose: () => void; onSave: (settings: SettingsType) => void }) {
   const [draft, setDraft] = useState<SettingsType>(() => ({ ...settings, providers: settings.providers.map(({ apiKey: _key, ...p }) => p) }));
   const [contextRows, setContextRows] = useState(() => contextRowsFor(settings.providers));
   const [ruleRows, setRuleRows] = useState(() => ruleRowsFor(settings.permissionRules));
   const rulesTouched = useRef(false);
   const saving = useRef(false);
-  const [tab, setTab] = useState<'providers' | 'general' | 'permissions' | 'integrations' | 'usage' | 'profiles'>('providers');
+  const [tab, setTab] = useState<'providers' | 'general' | 'permissions' | 'integrations' | 'usage' | 'profiles'>(initialTab);
   const [selected, setSelected] = useState(settings.defaultProvider || settings.providers[0]?.id || '');
   const [busy, setBusy] = useState(false);
   const [testing, setTesting] = useState(false);
@@ -70,6 +71,7 @@ export function Settings({ session, settings, workspace, onClose, onSave, onProf
   const [mcpLoading, setMcpLoading] = useState(false);
   const [mcpError, setMcpError] = useState('');
   const [mcpFeedback, setMcpFeedback] = useState<Record<string, string>>({});
+  const [mcpLogins, setMcpLogins] = useState<Record<string, McpLoginStart>>({});
   const [mcpActions, setMcpActions] = useState(new Set<string>());
   const [mcpReview, setMcpReview] = useState<McpReview | null>(null);
   const [importingMcp, setImportingMcp] = useState(false);
@@ -216,7 +218,7 @@ export function Settings({ session, settings, workspace, onClose, onSave, onProf
   const mcpDirty = mcp !== initialMcp.current;
   const mcpMismatch = !reviewedRevision.current || Boolean(mcpSnapshot && mcpSnapshot.configRevision !== reviewedRevision.current);
   const anyMcpAction = mcpActions.size > 0;
-  async function runMcp(server: McpServerStatus, action: 'refresh' | 'reconnect') {
+  async function runMcp(server: McpServerStatus, action: 'refresh' | 'reconnect' | 'login' | 'logout') {
     const snapshot = currentSnapshot.current, expectedConfigRevision = reviewedRevision.current;
     if (saving.current || mcpOperations.current.has(server.name) || reviewOperation.current || currentMcp.current !== initialMcp.current || !expectedConfigRevision || !snapshot || snapshot.configRevision !== expectedConfigRevision || snapshot.servers.find(item => item.name === server.name)?.revision !== server.revision || ['disabled', 'connecting', 'refreshing'].includes(server.status)) return;
     if (action === 'refresh' && !['connected', 'stale'].includes(server.status)) return;
@@ -226,10 +228,17 @@ export function Settings({ session, settings, workspace, onClose, onSave, onProf
     const baseline = baselineVersion.current;
     try {
       // Actions use only saved server identity and reviewed revisions, never editor JSON or credentials.
-      await post<McpSnapshot>(`/mcp/${encodeURIComponent(server.name)}/${action}`, { expectedRevision: server.revision, expectedConfigRevision });
-      if (alive.current && baselineVersion.current === baseline) setMcpFeedback(current => ({ ...current, [server.name]: action === 'refresh' ? 'Tool refresh completed. Future turns use the refreshed catalog.' : 'Connection request completed. Future turns use the current catalog.' }));
+      const path = `/mcp/${encodeURIComponent(server.name)}/${action}`;
+      const input = { expectedRevision: server.revision, expectedConfigRevision };
+      if (action === 'login') {
+        const login = await post<McpLoginStart>(path, input);
+        if (alive.current && baselineVersion.current === baseline) setMcpLogins(current => ({ ...current, [server.name]: login }));
+        return;
+      }
+      await post<McpSnapshot>(path, input);
+      if (alive.current && baselineVersion.current === baseline) setMcpFeedback(current => ({ ...current, [server.name]: action === 'logout' ? 'Signed out.' : action === 'refresh' ? 'Tool refresh completed. Future turns use the refreshed catalog.' : 'Connection request completed. Future turns use the current catalog.' }));
     } catch (e) {
-      if (alive.current && baselineVersion.current === baseline) setMcpFeedback(current => ({ ...current, [server.name]: `${errorMessage(e)} Review the cached status before an explicit retry. If saved configuration changed, review it below first.` }));
+      if (alive.current && baselineVersion.current === baseline) setMcpFeedback(current => ({ ...current, [server.name]: errorMessage(e) }));
     } finally {
       if (alive.current) await refreshMcp(true);
       mcpOperations.current.delete(server.name);
@@ -451,13 +460,14 @@ export function Settings({ session, settings, workspace, onClose, onSave, onProf
             {server.status === 'error' && <p>No automatic retry. Review the server and choose Reconnect when ready.</p>}
             {server.status === 'disabled' && <p>This saved server is disabled. Enable it in the JSON and save first.</p>}
             <details className="mcp-tool-catalog"><summary>{server.tools.length} cached tool{server.tools.length === 1 ? '' : 's'}{server.status !== 'connected' ? ' · not currently available' : ''}</summary>{server.tools.length ? <ul>{server.tools.map(tool => <li key={tool.name}><code>{tool.name}</code><span>{tool.description}</span>{tool.remoteName !== tool.name && <small>Server tool · {tool.remoteName}</small>}</li>)}</ul> : <p>No tools cached. A connection or refresh may discover tools.</p>}</details>
-            <div className="mcp-server-actions">{server.status === 'disconnected' ? <button className="button secondary" disabled={unavailable} onClick={() => void runMcp(server, 'reconnect')}>Connect</button> : <><button className="button secondary" disabled={unavailable || !['connected', 'stale'].includes(server.status)} onClick={() => void runMcp(server, 'refresh')}>Refresh tools</button><button className="button secondary" disabled={unavailable} onClick={() => void runMcp(server, 'reconnect')}>Reconnect</button></>}</div>
+            <div className="mcp-server-actions">{savedMcp.current[server.name]?.url && <button className="button secondary" disabled={unavailable || Boolean(mcpLogins[server.name])} onClick={() => void runMcp(server, 'login')}>Sign in</button>}{server.signedIn && <button className="text-button" disabled={unavailable} onClick={() => void runMcp(server, 'logout')}>Sign out</button>}{server.status === 'disconnected' ? <button className="button secondary" disabled={unavailable} onClick={() => void runMcp(server, 'reconnect')}>Connect</button> : <><button className="button secondary" disabled={unavailable || !['connected', 'stale'].includes(server.status)} onClick={() => void runMcp(server, 'refresh')}>Refresh tools</button><button className="button secondary" disabled={unavailable} onClick={() => void runMcp(server, 'reconnect')}>Reconnect</button></>}</div>
+            {mcpLogins[server.name] && <McpLogin key={mcpLogins[server.name].loginId} login={mcpLogins[server.name]} onComplete={() => refreshMcp(true)} disabled={unavailable} onReconnect={() => void runMcp(server, 'reconnect')} onClose={() => setMcpLogins(current => { const next = { ...current }; delete next[server.name]; return next; })} />}
             {mcpFeedback[server.name] && <p className="mcp-action-feedback" role="status">{mcpFeedback[server.name]}</p>}
           </section>;
         })}</div>
         {!mcpLoading && mcpSnapshot?.servers.length === 0 && <p className="field-hint">No saved MCP servers. Add configuration above and save, then connect explicitly.</p>}
         <section className="mcp-config-review" aria-label="Review saved MCP configuration"><button className="text-button" disabled={busy || anyMcpAction || reviewLoading} onClick={() => void reviewMcp()}>{reviewLoading ? 'Loading saved configuration…' : 'Review saved MCP configuration'}</button>{mcpReview && <><p>Review the saved commands and endpoints below. Environment values stay masked; using this configuration accepts its saved environment too. This does not connect or retry a server.</p><pre aria-label="Saved MCP configuration preview">{JSON.stringify(mcpReview.servers, null, 2)}</pre>{mcpDirty && <p className="mcp-warning">Your MCP editor has unsaved changes. Copy them somewhere safe, then return the editor to its original content before using the reviewed configuration. Nothing will be discarded automatically.</p>}<button className="button secondary" disabled={busy || anyMcpAction || reviewLoading || mcpDirty} onClick={adoptMcpReview}>Use reviewed configuration</button></>}</section>
-        <div className="quiet-callout"><ShieldCheck size={18} /><p>MCP commands are trusted executable code, not sandboxed configuration. Only connect servers you trust: tools can access resources outside this workspace. Cancelling a request does not guarantee a remote mutation stopped. This integration supports tools only, not OAuth, resources, or prompts; it never automatically retries a connection.</p></div>
+        <div className="quiet-callout"><ShieldCheck size={18} /><p>MCP commands are trusted executable code, not sandboxed configuration. Only connect servers you trust: tools can access resources outside this workspace. Cancelling a request does not guarantee a remote mutation stopped. Remote servers support browser OAuth sign-in. Resources and prompts are not supported; it never automatically retries a connection.</p></div>
       </div>}
       {tab === 'usage' && (() => {
         // cached column only when SOME entry reported one: absence is a
