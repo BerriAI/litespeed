@@ -13,7 +13,7 @@ const artifacts = join(root, 'test-results-tui', 'images'); await mkdir(artifact
 const png = 'iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8/x8AAwMCAO+jC1sAAAAASUVORK5CYII=';
 const image = join(directory, 'clipboard.png'); await writeFile(image, Buffer.from(png, 'base64'));
 for (const name of ['osascript', 'wl-paste', 'xclip']) await writeFile(join(directory, name), '#!/bin/sh\ncat "$LITESPEED_IMAGE_FIXTURE"\n', { mode: 0o700 });
-const server = spawn(process.execPath, ['--import', 'tsx', 'scripts/e2e-server.ts'], { cwd: root, env: { ...process.env, LITESPEED_E2E_PORT: '0', LITESPEED_E2E_NO_VITE: '1' }, stdio: ['ignore', 'pipe', 'pipe'] });
+const server = spawn(process.execPath, ['--import', 'tsx', 'scripts/e2e-server.ts'], { cwd: root, env: { ...process.env, LITESPEED_E2E_PORT: '0', LITESPEED_E2E_NO_VITE: '1', LITESPEED_E2E_SNAPSHOT_DELAY_MS: '250' }, stdio: ['ignore', 'pipe', 'pipe'] });
 let log = '', terminal, emulator;
 server.stdout.on('data', chunk => { log += chunk; }); server.stderr.on('data', chunk => { log += chunk; });
 const delay = ms => new Promise(done => setTimeout(done, ms));
@@ -34,11 +34,12 @@ try {
   const settings = await api('/settings');
   for (const [cols, rows] of [[80, 24], [110, 36]]) {
     const session = await api('/sessions', { workspace: settings.workspace });
-    const launch = async () => {
+    const launch = async (composerText = 'Ask Litespeed to do something') => {
       emulator = new xterm.Terminal({ cols, rows, allowProposedApi: true });
       terminal = pty.spawn(process.execPath, ['bin/litespeed.mjs', 'tui', '--url', base, '--session', session.id], { cwd: root, cols, rows, name: 'xterm-256color', env: { ...process.env, PATH: directory + ':' + process.env.PATH, LITESPEED_IMAGE_FIXTURE: image, TERM: 'xterm-256color', LITESPEED_DISABLE_PROJECT_CONFIG: '1', LITESPEED_CONFIG_DIR: directory, XDG_STATE_HOME: directory } });
       const display = emulator; terminal.onData(chunk => display.write(chunk));
-      await waitFor(() => screen().includes('Commands [Ctrl+P]'), 'terminal ready');
+      // The footer renders during loading, before a textarea exists to receive keys.
+      await waitFor(() => screen().includes('Send [Enter]') && screen().includes(composerText), 'composer ready');
     };
     await launch();
     terminal.write('Compare '); await waitFor(() => screen().includes('Compare '), 'typing ready');
@@ -63,8 +64,7 @@ try {
     await waitFor(() => screen().includes(' versus  please') && !screen().includes('[Image-2]'), 'backspace removes image token');
     terminal.write('\x1b[45;5u');
     await waitFor(() => screen().includes('[Image-2] please'), 'undo restores image');
-    await delay(350); await stop(); await launch();
-    await waitFor(() => screen().includes('Compare [Image-1] versus [Image-2] please'), 'draft restored after terminal restart');
+    await delay(350); await stop(); await launch('Compare [Image-1] versus [Image-2] please');
     terminal.write('\r');
     await waitFor(async () => (await api(`/sessions/${session.id}`)).messages.some(message => message.role === 'user'), 'image message sent');
     const message = (await api(`/sessions/${session.id}`)).messages.find(message => message.role === 'user');
