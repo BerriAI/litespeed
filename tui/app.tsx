@@ -176,7 +176,7 @@ function SessionApp({ controller, router, onQuit, chooseTheme, themeName, themeM
   const permissions = () => menu('Permissions', [
     { id: 'ask', label: `${controller.detail?.session.permissionMode === 'ask' ? '●' : '○'} Ask first`, description: 'Review actions; remember tools you trust for this session.', action: () => { close(); run(() => controller.permissionMode('ask')); } },
     { id: 'edit', label: `${controller.detail?.session.permissionMode === 'edit' ? '●' : '○'} Allow project edits`, description: 'Ask for commands and new external access.', action: () => { close(); run(() => controller.permissionMode('edit')); } },
-    { id: 'auto', label: `${controller.detail?.session.permissionMode === 'auto' ? '●' : '○'} Full access`, description: 'This session and its workers. Explicit ask/deny rules still apply.', action: () => { close(); run(() => controller.permissionMode('auto')); } },
+    { id: 'auto', label: `${controller.detail?.session.permissionMode === 'auto' ? '●' : '○'} Allow all tools`, description: 'This session and its workers. Explicit ask/deny rules still apply.', action: () => { close(); run(() => controller.permissionMode('auto')); } },
     { id: 'settings', label: 'Rules and defaults', action: () => openSettings() },
   ]);
   const openSettings = () => setPanel(<SettingsPanel controller={controller} onClose={close} />);

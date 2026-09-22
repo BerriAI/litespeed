@@ -6,7 +6,11 @@ Permission rules let you decide, per tool and per argument pattern, whether a to
 
 - **Ask first** reviews edits, commands, connected actions, and external paths.
 - **Allow project edits** automatically permits guarded workspace file edits. Commands and new external access still ask unless separately authorized.
-- **Full access** permits all available tools, including pending actions. Explicit ask/deny rules and mode/profile limits remain in force.
+- **Allow all tools** (previously Full access) permits all available tools, including pending actions. Explicit ask/deny rules and mode/profile limits remain in force.
+
+When a task pauses for approval, choose **Allow all tools** directly on the approval card (**5** in the terminal). This resumes pending actions and remembers the mode for this session and its workers across turns and restarts. You can also change it from `/permissions` or the browser composer. **Remember for session/project** only approves the displayed scope; it does not enable all tools.
+
+To use this mode for new sessions in the project, choose **Permissions → Allow all tools** during `/setup` or browser setup, then save. Permissions are visible in quick setup too.
 
 Internal researcher, Sidekick, Team, Expert, and LiteFusion handoffs run automatically within the selected architecture. The worker's actual actions follow the parent session policy. Explicit delegation rules still apply. Stopping the session's own shell jobs is automatic; read-only profiles do not acquire shell controls.
 

@@ -72,7 +72,8 @@ test('gateway setup asks for the URL and key, handles failure inline, and then s
     expect((await (await request.get('/api/settings')).json()).providers).toEqual([]);
     await key.fill('fixture-key');await dialog.getByRole('button',{name:'Connect & continue'}).click();
     await expect(dialog.getByRole('group',{name:'Architecture'})).toHaveCount(0);
-    await expect(dialog.getByRole('combobox',{name:'Setup permissions'})).toHaveCount(0);
+    await expect(dialog.getByRole('combobox',{name:'Setup permissions'})).toBeVisible();
+    await dialog.getByRole('combobox',{name:'Setup permissions'}).selectOption('auto');
     await expect(dialog.getByRole('combobox',{name:'Setup architecture'})).toHaveValue('sidekick-fusion');
     await expect(dialog.getByRole('combobox',{name:'Setup architecture'}).getByRole('option',{name:'Sidekick Fusion · Recommended',exact:true})).toHaveCount(1);
     await expect(dialog.getByRole('combobox',{name:'Setup architecture'}).getByRole('option',{name:'LiteFusion (Experimental)',exact:true})).toHaveCount(1);
@@ -85,6 +86,9 @@ test('gateway setup asks for the URL and key, handles failure inline, and then s
     await dialog.getByRole('button',{name:'Start chatting'}).click();
     const preferences=await (await request.get(`/api/workspace-preferences?workspace=${encodeURIComponent(settings.workspace)}`)).json();
     expect(preferences.architecture).toMatchObject({kind:'sidekick-fusion',sidekick:{model:'test-fast'}});
+    expect(preferences.permissionMode).toBe('auto');
+    const sameProject=await (await request.post('/api/sessions',{data:{workspace:settings.workspace}})).json();
+    expect(sameProject.permissionMode).toBe('auto');
     await expect(dialog).toHaveCount(0);
     const saved=await (await request.get('/api/settings')).json();
     expect(saved.providers[0].baseUrl).toBe(settings.providers[0].baseUrl+'/setup-auth');expect(JSON.stringify(saved)).not.toContain('fixture-key');

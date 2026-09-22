@@ -74,8 +74,8 @@ export function Onboarding({ settings, selection, workspace, onSave, onClose, re
         {kind!=='litefusion'&&<ShuntSettings settings={settings} selection={draft} onChange={shunt=>setDraft({...draft,shunt})} onPending={setShuntPending}/>}
         <div className="setup-links"><button className="text-button" onClick={() => simple ? setStep(0) : setProviders(true)}>{simple ? 'Change gateway' : 'Manage providers'}</button>
         {simple && <button className="text-button" onClick={() => { setSimple(false); setStep(1); setOpen(null); }}>Customize setup</button>}</div>
-        {!simple && <><label className="model-setting-row setup-permissions">Permissions<select aria-label="Setup permissions" value={draft.permissionMode} onChange={event => setDraft({ ...draft, permissionMode: event.target.value as 'ask' | 'edit' | 'auto' })}><option value="ask">Ask first</option><option value="edit">Allow project edits</option><option value="auto">Full access</option></select></label>
-        <p className="field-hint">{SETUP_PERMISSIONS}</p></>}
+        <label className="model-setting-row setup-permissions">Permissions<select aria-label="Setup permissions" value={draft.permissionMode} onChange={event => setDraft({ ...draft, permissionMode: event.target.value as 'ask' | 'edit' | 'auto' })}><option value="ask">Ask first</option><option value="edit">Allow project edits</option><option value="auto">Allow all tools</option></select></label>
+        <p className="field-hint">{SETUP_PERMISSIONS} Saved for new sessions in this project, including workers.</p>
         <div className="setup-links"><button className="text-button" onClick={() => setSkills(true)}>Import Claude/Codex skills from your machine</button></div>
       </>}
       {step > 0 && connection && <p className="field-hint">{connection}</p>}

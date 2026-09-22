@@ -1,5 +1,5 @@
 /** @jsxImportSource @opentui/react */
-import { permissionModeLabels } from '../shared/permissions.js';
+import { PERMISSION_MODES, permissionModeLabels } from '../shared/permissions.js';
 import { LiteFusionSettings } from './litefusion.js';
 import { liteFusionPreset, liteFusionConfiguration, specialistGateway, withLiteFusionLead } from '../shared/architecture-config.js';
 import { bindExactModels, type LiteFusionSelection } from '../shared/litefusion.js';
@@ -29,7 +29,7 @@ export function Onboarding({ controller, initial, onClose, quick = false }: { co
   const [driver, setDriver] = useState<ModelRoute>({ providerId: initial.providerId, model: initial.model });
   const [fusion,setFusion]=useState<LiteFusionSelection>(initial.architecture?.kind==='litefusion'?initial.architecture:{kind:'litefusion',gatewayProviderId:initial.providerId});
   const [worker, setWorker] = useState<ModelRoute | null>(initial.architecture ? architectureWorker(initial.architecture) : null);
-  const [permissionMode, setPermissionMode] = useState(initial.permissionMode), [view, setView] = useState<'main' | 'providers' | 'advanced' | 'skills' | 'litefusion'>('main');
+  const [permissionMode, setPermissionMode] = useState(initial.permissionMode), [view, setView] = useState<'main' | 'providers' | 'advanced' | 'skills' | 'litefusion' | 'permissions'>('main');
   const [loading,setLoading]=useState(false);
   const [revision, setRevision] = useState(initial.configRevision ?? 0);
 
@@ -38,6 +38,11 @@ export function Onboarding({ controller, initial, onClose, quick = false }: { co
 
   if (!state.settings) return null;
   const back = () => setView('main');
+  if (view === 'permissions') return <Menu title="Setup permissions" search={false} onClose={back} footer="Saved for new sessions in this project, including workers. Explicit rules still apply." items={PERMISSION_MODES.map(mode => ({
+    id: mode, label: `${permissionMode === mode ? '●' : '○'} ${permissionModeLabels[mode]}`,
+    description: mode === 'ask' ? 'Review actions before they run.' : mode === 'edit' ? 'Allow workspace edits; ask for commands and external access.' : 'Run tools without routine approval prompts.',
+    action: () => { setPermissionMode(mode); back(); },
+  }))} />;
   const changeFusion=(value:LiteFusionSelection)=>{setFusion(value);const config=liteFusionConfiguration(value,{...driver,modelReasoning:initial.modelReasoning});setDriver({providerId:config.providerId,model:config.model});};
   if(view==='litefusion')return <LiteFusionSettings controller={controller} settings={state.settings} value={fusion} onChange={changeFusion} onClose={back}/>;
   if (view === 'skills') return <SkillImporter controller={controller} workspace={initial.workspace} onClose={back} onImported={() => {}} />;
@@ -95,8 +100,8 @@ export function Onboarding({ controller, initial, onClose, quick = false }: { co
     ...(roles.includes('worker') ? [{ id: 'worker', label: `${workerLabel(kind)}: ${worker?.model || 'Choose a model'}`, description: modelGuidance(kind, 'worker'), action: () => openRole('worker', true) }] : []),
     ...(kind==='litefusion'?[{id:'litefusion',label:readiness?liteFusionReadinessLabel(readiness):'Connecting specialists…',description:readiness?.discoveryError??'View all 63 task assignments and handoffs',action:()=>setView('litefusion')}]:[]),
     ...(kind!=='litefusion'?[{ id: 'advanced', label: `Advanced settings · Shunt ${shunt.enabled ? 'On' : 'Off'}`, description: `${SHUNT_DESCRIPTION} ${shunt.enabled && !shuntConfigured(shunt, state.settings.providers) ? 'Choose a Shunt model to enable it.' : SHUNT_MODEL_HINT}`, action: () => setView('advanced') }]:[]),
-    ...(!quick ? [{ id: 'providers', label: 'Manage providers', description: 'Connect an API or sign in to ChatGPT', action: () => setView('providers') },
-    { id: 'permissions', label: `Permissions: ${permissionModeLabels[permissionMode]}`, description: permissionMode === 'ask' ? 'Review actions and remember scopes you trust' : permissionMode === 'edit' ? 'Workspace edits run; commands and external access ask' : 'No routine prompts; explicit rules still apply', action: () => setPermissionMode(permissionMode === 'ask' ? 'edit' : permissionMode === 'edit' ? 'auto' : 'ask') }] : []),
+    ...(!quick ? [{ id: 'providers', label: 'Manage providers', description: 'Connect an API or sign in to ChatGPT', action: () => setView('providers') }] : []),
+    { id: 'permissions', label: `Permissions: ${permissionModeLabels[permissionMode]}`, description: 'Choose your default for new sessions in this project; workers use the same mode.', action: () => setView('permissions') },
     { id: 'import-skills', label: 'Import Claude/Codex skills…', description: 'Copy skills from your machine into this project', action: () => setView('skills') },
     { id: 'save', label: state.pending ? 'Saving…' : quick ? 'Start chatting' : 'Start with this setup', separatorBefore: true, disabled: Boolean(state.pending) || !canSave, action: () => { void save(); } },
   ]} />;

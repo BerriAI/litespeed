@@ -42,8 +42,10 @@ export function PermissionPrompt({ request, controller, disabled, onOverlayChang
   }, [preview, request.id]);
   useEffect(() => { onOverlayChange(preview); return () => onOverlayChange(false); }, [preview, onOverlayChange]);
   const decide = (decision: 'allow' | 'always' | 'project' | 'deny') => { if (!disabled) void controller.decide(request, decision); };
+  const allowAll = () => { if (!disabled) void controller.permissionMode('auto'); };
   useKeyboard(key => {
     if (!active || key.defaultPrevented || preview) return;
+    if (key.name === '5' && request.ruleMatch?.decision !== 'ask') { key.preventDefault(); key.stopPropagation(); allowAll(); return; }
     if (key.name === '4' && request.ruleMatch?.decision !== 'ask') { key.preventDefault(); key.stopPropagation(); if (!disabled) decide('project'); return; }
     const decision = key.name === '1' ? 'allow' : key.name === '2' && request.ruleMatch?.decision !== 'ask' ? 'always' : key.name === '3' ? 'deny' : null;
     if (decision || (key.ctrl && key.name === 'f')) { key.preventDefault(); key.stopPropagation(); if (decision) decide(decision); else setPreview(true); }
@@ -61,6 +63,7 @@ export function PermissionPrompt({ request, controller, disabled, onOverlayChang
     {presentation.body && <text fg={toHex(theme.text)} wrapMode="word" maxHeight={lines + 1}>{body.output}</text>}
     <text fg={toHex(theme.textMuted)}>{forced ? `${request.ruleMatch!.source} rule requires approval each time` : request.scopeDescription || 'Remembered approval applies to this tool in this session.'}</text>
     <box flexDirection="row" flexWrap="wrap" gap={1}><Button disabled={disabled} onPress={() => decide('allow')}>1 Allow once</Button>{!forced && <Button disabled={disabled} onPress={() => decide('always')}>2 Remember for session</Button>}<Button disabled={disabled} onPress={() => decide('deny')}>3 Deny</Button>{!forced && <Button disabled={disabled} onPress={() => decide('project')}>4 Remember for project</Button>}</box>
+    {!forced && <box flexDirection="row" flexWrap="wrap" gap={1}><Button disabled={disabled} onPress={allowAll}>5 Allow all tools</Button><text fg={toHex(theme.textMuted)}>This session and its workers · explicit rules still apply</text></box>}
   </box>
     {preview && <Dialog title={`Review · ${presentation.title}`} onClose={() => setPreview(false)}><scrollbox height={Math.max(4, height - 10)} focused><text fg={toHex(theme.text)} wrapMode="word">{terminalText([presentation.target, presentation.body, previewText, summary, 'Tool arguments', args].filter(Boolean).join('\n\n'), true)}</text></scrollbox></Dialog>}
   </>;

@@ -67,6 +67,7 @@ test('an ask rule forces a prompt in automatic mode and deny stays final after r
   const session = await create(request, { permissionMode: 'auto' }); await open(page, session);
   await send(page, session, 'RULES_BROWSER RUN_COMMAND[git push origin main]');
   await expect(permission(page)).toBeVisible();
+  await expect(permission(page).getByRole('button', { name: 'Allow all tools', exact: true })).toHaveCount(0);
   await page.reload(); await expect(permission(page)).toBeVisible();
   await permission(page).getByRole('button', { name: 'Deny', exact: true }).click();
   const result = await done(request, session);
@@ -158,9 +159,28 @@ test('an external read in Plan mode shows the resolved path and completes after 
   await send(page,session,'RULES_BROWSER READ_PATH[../notes.txt]');
   await expect(permission(page)).toContainText('Read outside this session’s workspace');
   await expect(permission(page)).toContainText(join(workspace,'notes.txt'));
-  await expect(permission(page).getByRole('button',{name:'Allow at this path',exact:true})).toBeVisible();
+  await expect(permission(page).getByRole('button',{name:'Remember for session',exact:true})).toBeVisible();
   await page.reload();await expect(permission(page)).toBeVisible();
   await permission(page).getByRole('button',{name:'Allow once',exact:true}).click();
   const result=await done(request,session);expect(toolResults(result).join('\n')).toContain('Rule fixture file.');
+  await expect(permission(page)).toHaveCount(0);
+});
+
+test('allow all resumes an external read and persists through reload for different files and commands', async ({ page, request }) => {
+  expect((await rules(request, [])).ok()).toBe(true);
+  const project = join(workspace, 'project'); await mkdir(project);
+  await writeFile(join(workspace, 'second.txt'), 'Second external file.');
+  const session = await create(request, { workspace: project, architecture: null }); await open(page, session);
+  await send(page, session, 'RULES_BROWSER READ_PATH[../notes.txt]');
+  await permission(page).getByRole('button', { name: 'Allow all tools', exact: true }).click();
+  const first = await done(request, session);
+  expect(first.session.permissionMode).toBe('auto');
+  expect(toolResults(first).join('\n')).toContain('Rule fixture file.');
+  await page.reload();
+  await expect(page.locator('.permission-select summary')).toContainText('Allow all tools');
+  await send(page, session, 'RULES_BROWSER READ_PATH[../second.txt]');
+  expect(toolResults(await done(request, session)).join('\n')).toContain('Second external file.');
+  await send(page, session, 'RULES_BROWSER RUN_COMMAND[echo allow-all-command]');
+  expect(toolResults(await done(request, session)).join('\n')).toContain('allow-all-command');
   await expect(permission(page)).toHaveCount(0);
 });
