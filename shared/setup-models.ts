@@ -1,10 +1,10 @@
 import type { Model } from './types.js';
 
-type Family = 'astra' | 'fable' | 'opus' | 'sol';
+type Family = 'astra' | 'fable' | 'opus' | 'sol' | 'sonnet';
 type Candidate = { id: string; family: Family; version: number[]; snapshot: number; rank: number };
 export const SETUP_MODEL_PRIORITIES = {
   driver: ['astra', 'fable', 'opus', 'sol'],
-  sidekick: ['sol', 'opus', 'fable', 'astra'],
+  sidekick: ['sol', 'opus', 'sonnet'],
 } as const;
 
 /** Recognize full model families, never arbitrary display names or mini/batch variants. */
@@ -12,9 +12,9 @@ function identity(id: string): Omit<Candidate, 'id' | 'rank'> | undefined {
   const name = id.toLowerCase().split('/').at(-1)!.replace(/^(?:(?:global|us|eu|au|jp|us-gov)\.)?anthropic\./, '');
   let match = /^gpt-(\d+(?:[.-]\d{1,2})*)-(astra|sol)(?:-(\d{4}-\d{2}-\d{2}|\d{8}))?$/.exec(name);
   if (match) return { family: match[2] as Family, version: match[1].split(/[.-]/).map(Number), snapshot: Number(match[3]?.replaceAll('-', '') ?? 0) };
-  match = /^claude-(fable|opus)-(\d+(?:[.-]\d{1,2})*)(?:[-@](\d{8}|latest|default))?(?::\d+|-v\d+:\d+)?$/.exec(name);
+  match = /^claude-(fable|opus|sonnet)-(\d+(?:[.-]\d{1,2})*)(?:[-@](\d{8}|latest|default))?(?::\d+|-v\d+:\d+)?$/.exec(name);
   if (match) return { family: match[1] as Family, version: match[2].split(/[.-]/).map(Number), snapshot: /^\d{8}$/.test(match[3] ?? '') ? Number(match[3]) : 0 };
-  match = /^claude-(\d+(?:[.-]\d{1,2})*)-(fable|opus)(?:-(\d{8}))?(?::\d+|-v\d+:\d+)?$/.exec(name);
+  match = /^claude-(\d+(?:[.-]\d{1,2})*)-(fable|opus|sonnet)(?:-(\d{8}))?(?::\d+|-v\d+:\d+)?$/.exec(name);
   if (match) return { family: match[2] as Family, version: match[1].split(/[.-]/).map(Number), snapshot: Number(match[3] ?? 0) };
 }
 

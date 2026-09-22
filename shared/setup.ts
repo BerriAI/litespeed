@@ -12,7 +12,7 @@ export function sidekickPreset(providerId: string, models: readonly Pick<Model, 
 }
 export function sidekickPresetNotice(preset: ArchitectureConfiguration): string {
   const missing = [!preset.model && 'driver', preset.architecture?.kind === 'sidekick-fusion' && !preset.architecture.sidekick.model && 'sidekick'].filter(Boolean);
-  return missing.length ? `Choose a model for your ${missing.join(' and ')}. No Astra, Fable, Opus, or Sol model is available from this provider.` : '';
+  return missing.length ? `Choose a model for your ${missing.join(' and ')}. No matching default model is available from this provider.` : '';
 }
 
 /** Keep the first-run explanations identical in both clients. */

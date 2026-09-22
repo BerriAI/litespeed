@@ -113,6 +113,7 @@ test('a configured install opens straight into chat even without a workspace set
 for (const scenario of [
   {path:'setup-defaults',driver:'openai/gpt-6-astra',sidekick:'openai/gpt-6-sol'},
   {path:'setup-fallbacks',driver:'anthropic/claude-fable-5-1',sidekick:'anthropic/claude-opus-5-5'},
+  {path:'setup-sonnet',driver:'openai/gpt-6-astra',sidekick:'anthropic/claude-sonnet-5'},
   {path:'setup-unknown',driver:'',sidekick:''},
 ]) test(`setup automatically reviews ${scenario.path} and keeps choices editable`, async ({page,request},testInfo)=>{
   const settings=await(await request.get('/api/settings')).json();

@@ -29,6 +29,7 @@ try{
   for(const scenario of [
     {path:'setup-defaults',driver:'openai/gpt-6-astra',sidekick:'openai/gpt-6-sol'},
     {path:'setup-fallbacks',driver:'anthropic/claude-fable-5-1',sidekick:'anthropic/claude-opus-5-5'},
+    {path:'setup-sonnet',driver:'openai/gpt-6-astra',sidekick:'anthropic/claude-sonnet-5'},
     {path:'setup-unknown',driver:'',sidekick:''},
   ]){
     await api('/settings',{providers:[{...settings.providers[0],baseUrl:settings.providers[0].baseUrl+'/'+scenario.path}],defaultModel:''},'PATCH');
@@ -58,5 +59,5 @@ try{
     }
     await stop();
   }
-  console.log('TUI setup passed: automatic Astra/Sol, latest Fable/Opus fallback, manual missing-model prompt, Shunt off, editable saved models, and narrow rendering.');
+  console.log('TUI setup passed: automatic Astra/Sol, latest Fable/Opus and Sonnet fallbacks, manual missing-model prompt, Shunt off, editable saved models, and narrow rendering.');
 }finally{await stop();server.kill('SIGTERM');await rm(config,{recursive:true,force:true});}

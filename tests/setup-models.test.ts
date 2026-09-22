@@ -17,8 +17,23 @@ describe('automatic Sidekick setup', () => {
     expect(defaultSetupModel(catalog('claude-opus-5-5','gpt-6-sol'),'driver')).toBe('claude-opus-5-5');
     for (const id of ['gpt-6-astra','claude-fable-5-1','claude-opus-5-5','gpt-6-sol']) {
       expect(defaultSetupModel(catalog(id),'driver')).toBe(id);
+    }
+    for (const id of ['gpt-6-sol','claude-opus-5-5','claude-sonnet-5']) {
       expect(defaultSetupModel(catalog(id),'sidekick')).toBe(id);
     }
+  });
+  it('uses Sol, then Opus, then the latest Sonnet for the sidekick', () => {
+    const sonnets=catalog('anthropic/claude-3-5-sonnet-20241022','anthropic/claude-sonnet-4-5','anthropic/claude-sonnet-4-6','anthropic/claude-sonnet-5');
+    expect(defaultSetupModel(sonnets,'sidekick')).toBe('anthropic/claude-sonnet-5');
+    expect(defaultSetupModel([...sonnets,{id:'claude-opus-5-5'}],'sidekick')).toBe('claude-opus-5-5');
+    expect(defaultSetupModel([...sonnets,{id:'claude-opus-5-5'},{id:'gpt-6-sol'}],'sidekick')).toBe('gpt-6-sol');
+    expect(defaultSetupModel(catalog('gpt-6-astra','claude-fable-5-1'),'sidekick')).toBe('');
+    const missingSidekick=sidekickPreset('gateway',catalog('gpt-6-astra'));
+    expect(missingSidekick.model).toBe('gpt-6-astra');
+    expect(sidekickPresetNotice(missingSidekick)).toContain('Choose a model for your sidekick.');
+    const missingDriver=sidekickPreset('gateway',sonnets);
+    expect(missingDriver.model).toBe('');
+    expect(sidekickPresetNotice(missingDriver)).toContain('Choose a model for your driver.');
   });
   it('prioritizes family before version and compares version components numerically', () => {
     expect(defaultSetupModel(catalog('gpt-5-astra','claude-fable-6','claude-opus-7'),'driver')).toBe('gpt-5-astra');

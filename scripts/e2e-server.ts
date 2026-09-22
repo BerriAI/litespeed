@@ -21,6 +21,7 @@ const mock=createServer(async(req,res)=>{
   const setupCatalogs:Record<string,string[]>={
     '/setup-defaults/':['openai/gpt-6-astra','openai/gpt-6-sol','anthropic/claude-fable-5-1','anthropic/claude-opus-5-5','test-fast'],
     '/setup-fallbacks/':['anthropic/claude-fable-5','anthropic/claude-fable-5-1','anthropic/claude-opus-4-6','anthropic/claude-opus-5-5'],
+    '/setup-sonnet/':['openai/gpt-6-astra','anthropic/claude-fable-5-1','anthropic/claude-sonnet-4-6','anthropic/claude-sonnet-5'],
     '/setup-unknown/':['test-model','test-fast'],
   };
   const setupCatalog=Object.entries(setupCatalogs).find(([prefix])=>req.url?.startsWith(prefix));
