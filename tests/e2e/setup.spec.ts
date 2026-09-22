@@ -9,11 +9,9 @@ test('setup explains roles, saves a workspace default, and keeps advanced contro
     await page.getByRole('button',{name:'Set up Litespeed',exact:true}).click();
     const dialog = page.getByRole('dialog', { name:'Set up Litespeed', exact:true });
     await expect(dialog).toBeVisible();
-    await dialog.getByRole('button', { name:'Connect & continue', exact:true }).click();
-    await expect(dialog.getByText('Connected · 3 models available')).toBeVisible();
-    await dialog.getByRole('button', { name:/Team Fusion/ }).click();
+    await expect(dialog.getByText('Review your setup', {exact:true})).toBeVisible();
+    await dialog.getByRole('combobox', { name:'Setup architecture' }).selectOption('team-fusion');
     await page.screenshot({ path:testInfo.outputPath('setup-architecture.png') });
-    await dialog.getByRole('button', { name:'Continue', exact:true }).click();
     await dialog.getByRole('button', { name:'Worker model', exact:true }).click();
     await dialog.getByRole('option', { name:'test-fast', exact:true }).click();
     await expect(dialog.getByRole('combobox', { name:/reasoning/i })).toHaveCount(0);
@@ -110,4 +108,53 @@ test('a configured install opens straight into chat even without a workspace set
   await page.getByRole('button',{name:'Send message',exact:true}).click();
   await expect(page.getByRole('article',{name:'Assistant message'})).toContainText('Hello from Litespeed.');
   await expect(page.getByRole('dialog',{name:'Set up Litespeed',exact:true})).toHaveCount(0);
+});
+
+for (const scenario of [
+  {path:'setup-defaults',driver:'openai/gpt-6-astra',sidekick:'openai/gpt-6-sol'},
+  {path:'setup-fallbacks',driver:'anthropic/claude-fable-5-1',sidekick:'anthropic/claude-opus-5-5'},
+  {path:'setup-unknown',driver:'',sidekick:''},
+]) test(`setup automatically reviews ${scenario.path} and keeps choices editable`, async ({page,request},testInfo)=>{
+  const settings=await(await request.get('/api/settings')).json();
+  const original=await(await request.get(`/api/workspace-preferences?workspace=${encodeURIComponent(settings.workspace)}`)).json();
+  try {
+    await request.patch('/api/settings',{data:{providers:[{...settings.providers[0],id:'setup-fixture',baseUrl:settings.providers[0].baseUrl+'/'+scenario.path}],defaultProvider:'setup-fixture',defaultModel:''}});
+    await request.post('/api/workspace-preferences',{data:{workspace:settings.workspace,providerId:'setup-fixture',model:'',architecture:null,shunt:{enabled:false},setupComplete:false}});
+    await page.goto('/');
+    const dialog=page.getByRole('dialog',{name:'Set up Litespeed',exact:true});
+    await expect(dialog.getByText('Review your setup',{exact:true})).toBeVisible();
+    await expect(dialog.getByRole('combobox',{name:'Setup architecture'})).toHaveValue('sidekick-fusion');
+    const driver=dialog.getByRole('button',{name:'Driver model',exact:true});
+    const sidekick=dialog.getByRole('button',{name:'Sidekick model',exact:true});
+    const save=dialog.getByRole('button',{name:'Start chatting',exact:true});
+    if(scenario.driver){
+      await expect(driver).toContainText(scenario.driver.split('/').at(-1)!);
+      await expect(sidekick).toContainText(scenario.sidekick.split('/').at(-1)!);
+      await expect(save).toBeEnabled();
+    }else{
+      await expect(dialog.getByRole('status')).toContainText('Choose a model for your driver and sidekick');
+      await expect(save).toBeDisabled();
+      await driver.click();await dialog.getByRole('option',{name:'test-model',exact:true}).click();
+      await expect(save).toBeDisabled();
+      await sidekick.click();await dialog.getByRole('option',{name:'test-fast',exact:true}).click();
+      await expect(save).toBeEnabled();
+    }
+    if(scenario.path==='setup-defaults'){
+      await page.setViewportSize({width:390,height:844});
+      await page.screenshot({path:testInfo.outputPath('automatic-defaults-mobile.png'),animations:'disabled'});
+      await expect(save).toBeInViewport();
+      await sidekick.click();await dialog.getByRole('option',{name:'test-fast',exact:true}).click();
+      await expect(driver).toContainText(scenario.driver.split('/').at(-1)!);
+      await save.click();await expect(dialog).toHaveCount(0);
+      const preferences=await(await request.get(`/api/workspace-preferences?workspace=${encodeURIComponent(settings.workspace)}`)).json();
+      expect(preferences).toMatchObject({model:scenario.driver,architecture:{kind:'sidekick-fusion',sidekick:{model:'test-fast'}},shunt:{enabled:false}});
+      await page.reload();
+      await page.setViewportSize({width:1440,height:1000});
+      await page.getByRole('button',{name:'Set up Litespeed',exact:true}).click();
+      await expect(dialog.getByRole('button',{name:'Sidekick model',exact:true})).toContainText('test-fast');
+    }
+  }finally{
+    await request.patch('/api/settings',{data:{providers:settings.providers,defaultProvider:settings.defaultProvider,defaultModel:settings.defaultModel}});
+    await request.post('/api/workspace-preferences',{data:{...original,workspace:settings.workspace,architecture:original.architecture??null,shunt:original.shunt??null,setupComplete:true}});
+  }
 });

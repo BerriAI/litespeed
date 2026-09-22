@@ -88,7 +88,7 @@ try{
   terminal.write('/set');await waitFor(()=>screen().includes('/settings')&&screen().includes('/setup'),'slash suggestions');await save('00-slash-commands');
   terminal.write('\t');await waitFor(()=>screen().includes('/settings '),'Tab completes command');
   terminal.write('\x15/setup\r');
-  await waitFor(()=>screen().includes('How would you like to work?'),'architecture-first setup');await save('00-setup-architecture');
+  await waitFor(()=>screen().includes('Review your setup'),'review-first setup');terminal.write('\x1b[H\r');await waitFor(()=>screen().includes('How would you like to work?'),'edit architecture');await save('00-setup-architecture');
   terminal.write('\x1b[B\x1b[B\x1b[B\r');await waitFor(()=>screen().includes('Choose your driver model'),'driver chooser');await waitFor(()=>screen().includes('✓ test-model')||screen().includes('test-model'),'driver listed');terminal.write('test-model');await waitFor(()=>screen().includes('✓ test-model'),'driver found');terminal.write('\r');
   await waitFor(()=>screen().includes('Choose your worker model'),'worker chooser');terminal.write('test-fast');await waitFor(()=>screen().includes('› test-fast'),'worker found');terminal.write('\r');
   await waitFor(()=>screen().includes('Worker: test-fast')&&screen().includes('Driver: test-model'),'review selected');await save('02-setup-models');
@@ -228,19 +228,17 @@ try{
   await api('/workspace-preferences',{workspace:settings.workspace,providerId:'fixture',model:'test-model',architecture:null,setupComplete:false});
   const fresh=await api('/sessions',{workspace:settings.workspace,providerId:'fixture',model:'test-model',architecture:null});
   await api('/settings',{providers:[],defaultModel:''},'PATCH');await launch(fresh,80,24);
-  await waitFor(()=>screen().includes('How would you like to work?'),'fresh architecture prompt');assert(screen().includes('Sidekick Fusion'));assert(screen().includes('Recommended'));await save('08-fresh-architecture');
-  terminal.write('\x1b[H\x1b[B\r');await waitFor(()=>screen().includes('Gateway base URL')&&screen().includes('Enter save'),'fresh gateway prompt');assert(!screen().includes('localhost:4000'));await save('08-fresh-gateway');
+  await waitFor(()=>screen().includes('Gateway base URL')&&screen().includes('Enter save'),'fresh gateway prompt');assert(!screen().includes('localhost:4000'));await save('08-fresh-gateway');
   const freshBase=settings.providers[0].baseUrl+'/setup-auth';
   await waitFor(()=>screen().includes('Gateway base URL'));terminal.write(freshBase+'\r');
   await waitFor(()=>screen().includes('LiteLLM API key'),'enter fresh key');terminal.write('wrong-key\r');
   await waitFor(()=>screen().includes('HTTP 401'),'gateway error stays in setup');assert.equal((await api('/settings')).providers.length,0);
   terminal.write('\x1b[H\r');await waitFor(()=>screen().includes('LiteLLM API key'),'correct key');terminal.write('fixture-key\r');
-  await waitFor(()=>screen().includes('Choose your driver model'),'driver chooser');assert(screen().includes('persistent lead'));assert(screen().includes('Astra, Fable, Sol, Opus'));await save('09-driver-guidance');await waitFor(()=>screen().includes('test-model'),'driver listed');assert(!screen().includes('Gateway base URL'));terminal.write('test-model');await waitFor(()=>screen().includes('test-model')&&screen().includes('› '),'driver found');terminal.write('\r');
-  await waitFor(()=>screen().includes('Review your setup')&&screen().includes('Driver: test-model'),'lead chosen');await save('09-recommended-models');terminal.write('\x1b[F\r');
+  await waitFor(()=>screen().includes('Review your setup')&&screen().includes('Driver: test-model'),'automatic setup');assert(screen().includes('Sidekick: test-model'));await save('09-recommended-models');terminal.write('\x1b[F\r');
   await waitFor(async()=>(await api('/workspace-preferences?workspace='+encodeURIComponent(settings.workspace))).setupComplete===true,'fresh setup persisted');
   const freshSettings=await api('/settings');assert.equal(freshSettings.providers[0].baseUrl,settings.providers[0].baseUrl+'/setup-auth');assert(!JSON.stringify(freshSettings).includes('fixture-key'));
-  assert.equal(freshSettings.defaultModel,'test-model');assert.equal((await api('/workspace-preferences?workspace='+encodeURIComponent(settings.workspace))).architecture.kind,'litefusion');
-  const next=await api('/sessions',{workspace:settings.workspace+'/src'});await launch(next,80,24);await waitFor(()=>screen().includes('A fresh start.'),'next folder opens chat');assert(!screen().includes('Gateway base URL'));assert.equal(next.model,'test-model');assert.equal(next.architecture.kind,'litefusion');await save('10-next-folder-ready');
+  assert.equal(freshSettings.defaultModel,'test-model');assert.equal((await api('/workspace-preferences?workspace='+encodeURIComponent(settings.workspace))).architecture.kind,'sidekick-fusion');
+  const next=await api('/sessions',{workspace:settings.workspace+'/src'});await launch(next,80,24);await waitFor(()=>screen().includes('A fresh start.'),'next folder opens chat');assert(!screen().includes('Gateway base URL'));assert.equal(next.model,'test-model');assert.equal(next.architecture.kind,'sidekick-fusion');await save('10-next-folder-ready');
   console.log('Fresh TUI gateway setup passed: blank URL, masked key, failed authentication, model discovery, and saved setup.');
   console.log('TUI interactions passed: first-run setup, saved models, scoped project grants, two workers, two experts, automatic Sidekick handoff, and narrow/wide rendering.');
   }

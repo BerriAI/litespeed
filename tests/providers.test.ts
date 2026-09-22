@@ -208,6 +208,52 @@ describe('provider protocol', () => {
       { id: 'vision', name: 'Vision', providerId: 'test', contextWindow: 128000 },
     ]);
   });
+  it('discovers available family routes missing from the standard LiteLLM catalog', async () => {
+    const paths: string[] = [];
+    const base = await mock((req, res) => {
+      paths.push(req.url!);
+      expect(req.headers.authorization).toBe('Bearer test-secret-never-expose');
+      res.setHeader('Content-Type','application/json');
+      res.end(JSON.stringify({data:req.url==='/gateway/v1/models'?[{id:'openai/gpt-6-astra'}]:[
+        {model_name:'openai/gpt-6-sol',litellm_params:{api_key:'never-return-this'}},
+        {model_name:'anthropic/claude-fable-5-1'}, {model_name:'batch/openai/gpt-6-sol'}, {model_name:'unknown'},
+      ]}));
+    });
+    const models = await listModels(provider(base+'/gateway/v1'));
+    expect(paths).toEqual(['/gateway/v1/models','/gateway/model/info']);
+    expect(models.map(model=>model.id)).toEqual(['anthropic/claude-fable-5-1','openai/gpt-6-astra','openai/gpt-6-sol']);
+    expect(JSON.stringify(models)).not.toContain('never-return-this');
+  });
+  it('keeps the normal catalog if optional gateway metadata is unavailable', async () => {
+    const base = await mock((req, res) => {
+      if(req.url==='/model/info'){res.writeHead(403).end();return;}
+      res.setHeader('Content-Type','application/json');res.end(JSON.stringify({data:[{id:'openai/gpt-6-astra'}]}));
+    });
+    expect((await listModels(provider(base))).map(model=>model.id)).toEqual(['openai/gpt-6-astra']);
+  });
+  it.each(['gpt-6-sol','openai/gpt-6-sol','openai/gpt-6-sol-2026-09-22'])('uses API-key Responses for %s, including reasoning and tool-result continuation', async model => {
+    const bodies:any[]=[];
+    const events = [
+      {type:'response.output_item.done',output_index:0,item:{id:'reasoning-id',type:'reasoning',summary:[],encrypted_content:'opaque'}},
+      {type:'response.output_item.added',output_index:1,item:{type:'function_call',call_id:'call-1',name:'check',arguments:''}},
+      {type:'response.output_item.done',output_index:1,item:{type:'function_call',call_id:'call-1',name:'check',arguments:'{}'}},
+      {type:'response.completed',response:{usage:{input_tokens:10,output_tokens:3}}},
+    ];
+    const base=await mock((req,res,body)=>{
+      expect(req.url).toBe('/gateway/v1/responses');
+      expect(req.headers.authorization).toBe('Bearer test-secret-never-expose');
+      expect(req.headers['chatgpt-account-id']).toBeUndefined();
+      bodies.push(body);res.writeHead(200,{'Content-Type':'text/event-stream'});res.end(events.map(frame).join(''));
+    });
+    const p=provider(base+'/gateway/v1');
+    const chunks:StreamChunk[]=[];
+    for await(const chunk of streamCompletion({provider:p,model,messages:[{role:'user',content:'check'}],tools:[{type:'function',function:{name:'check',description:'Check',parameters:{type:'object',properties:{}}}}],reasoningEffort:'low',maxOutputTokens:500,signal:new AbortController().signal}))chunks.push(chunk);
+    const providerMetadata=chunks.find(chunk=>chunk.type==='metadata')?.metadata;
+    for await(const chunk of streamCompletion({provider:p,model,messages:[{role:'assistant',content:null,providerMetadata,tool_calls:[{id:'call-1',type:'function',function:{name:'check',arguments:'{}'}}]},{role:'tool',tool_call_id:'call-1',content:'ok'}],signal:new AbortController().signal}))void chunk;
+    expect(bodies[0]).toMatchObject({model,reasoning:{effort:'low'},max_output_tokens:500,store:false,stream:true,tools:[{type:'function',name:'check'}]});
+    expect(bodies[1].input).toEqual([{type:'reasoning',summary:[],encrypted_content:'opaque'},{type:'function_call',call_id:'call-1',name:'check',arguments:'{}'},{type:'function_call_output',call_id:'call-1',output:'ok'}]);
+    expect(chunks.some(chunk=>chunk.type==='tool'&&chunk.tool?.name==='check')).toBe(true);
+  });
   it('sanitizes catalog context windows, identifiers, duplicate metadata and labels', async () => {
     const base = await mock((_req, res) => { res.setHeader('Content-Type', 'application/json'); res.end(JSON.stringify({ data: [
       { id: 'valid', context_window: 32768 }, { id: 'tiny', context_window: 1023 }, { id: 'fraction', context_window: 8192.5 },

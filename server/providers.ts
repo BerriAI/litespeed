@@ -1,5 +1,6 @@
 import { progressTimeout } from './progress-timeout.js';
 import { REASONING_EFFORTS } from '../shared/types.js';
+import { setupModelIdentity } from '../shared/setup-models.js';
 import { randomUUID } from 'node:crypto';
 import { validContextWindow } from './budget.js';
 import { anthropicMaxOutputTokens } from './output-tokens.js';
@@ -474,6 +475,8 @@ export async function* streamCompletion(options: CompletionOptions): AsyncGenera
   if (!model) throw new ProviderError('Select a model before sending a message.');
   const headers: Record<string, string> = { 'Content-Type': 'application/json', Accept: 'text/event-stream' };
   if (options.sessionId) headers['x-litellm-session-id'] = options.sessionId;
+  const identity = setupModelIdentity({id:model});
+  const useResponses = provider.kind === 'codex' || (provider.kind === 'openai' && identity?.family === 'sol' && identity.version[0] >= 6);
   let body: any, url: string;
   if (provider.kind === 'anthropic') {
     if (!provider.apiKey) throw new ProviderError('Anthropic requires an API key. Subscription login is not supported for third-party applications.');
@@ -484,14 +487,16 @@ export async function* streamCompletion(options: CompletionOptions): AsyncGenera
       ...(instructions ? { system: [{ type: 'text', text: instructions, cache_control: { type: 'ephemeral' } }] } : {}),
       ...(anthropicTools ? { tools: anthropicTools } : {}) };
     url = endpoint(provider.baseUrl || 'https://api.anthropic.com', 'messages');
-  } else if (provider.kind === 'codex') {
-    Object.assign(headers, codexHeaders(await getCodexCredential(provider)));
-    headers['session-id'] = options.sessionId ?? randomUUID();
-    body = { model, ...(options.reasoningEffort ? { reasoning: { effort: options.reasoningEffort } } : {}), instructions: [system, ...messages.filter(m => m.role === 'system').map(m => contentText(m.content))].filter(Boolean).join('\n\n') || 'You are a helpful coding assistant.',
+  } else if (useResponses) {
+    if (provider.kind === 'codex') {
+      Object.assign(headers, codexHeaders(await getCodexCredential(provider)));
+      headers['session-id'] = options.sessionId ?? randomUUID();
+    } else if (provider.apiKey) headers.Authorization = `Bearer ${provider.apiKey}`;
+    body = { model, ...(provider.kind !== 'codex' && options.maxOutputTokens ? { max_output_tokens: options.maxOutputTokens } : {}), ...(options.reasoningEffort ? { reasoning: { effort: options.reasoningEffort } } : {}), instructions: [system, ...messages.filter(m => m.role === 'system').map(m => contentText(m.content))].filter(Boolean).join('\n\n') || 'You are a helpful coding assistant.',
       input: codexInput(messages, provider.id, model), stream: true, store: false, include: ['reasoning.encrypted_content'],
       ...(tools?.length ? { tools: tools.map(t => ({ type: 'function', name: t.function.name, description: t.function.description, parameters: t.function.parameters, strict: false })), tool_choice: 'auto', parallel_tool_calls: true } : {}) };
     // Subscription credentials must never be forwarded to a configurable endpoint.
-    url = `${CODEX_BASE}/responses`;
+    url = provider.kind === 'codex' ? `${CODEX_BASE}/responses` : endpoint(provider.baseUrl, 'responses');
   } else {
     if (provider.apiKey) headers.Authorization = `Bearer ${provider.apiKey}`;
     const optInCache = /\bclaude\b|anthropic/i.test(model) || provider.anthropicCacheModels?.includes(model);
@@ -505,7 +510,7 @@ export async function* streamCompletion(options: CompletionOptions): AsyncGenera
     await response.body?.cancel();
     throw new ProviderError('Provider did not return an SSE stream. Check that this endpoint supports streaming.');
   }
-  const chunks = provider.kind === 'anthropic' ? anthropicStream(response, signal, { providerId: provider.id, model }, body.max_tokens, options.requireCompleteText) : provider.kind === 'codex' ? responsesStream(response, signal, { providerId: provider.id, model }) : chatStream(response, signal, { providerId: provider.id, model }, options.requireCompleteText);
+  const chunks = provider.kind === 'anthropic' ? anthropicStream(response, signal, { providerId: provider.id, model }, body.max_tokens, options.requireCompleteText) : useResponses ? responsesStream(response, signal, { providerId: provider.id, model }) : chatStream(response, signal, { providerId: provider.id, model }, options.requireCompleteText);
   for await (const chunk of chunks) { watchdog.progress(); yield chunk; }
   } finally { watchdog.close(); }
 }
@@ -573,5 +578,16 @@ export async function listModels(provider: Provider, signal?: AbortSignal): Prom
     });
   }
   for (const id of provider.models || []) if (validName(id) && !models.some(m => m.id === id)) models.push({ id, name: id, providerId: provider.id });
+  if (provider.kind === 'openai' && models.some(model => /^(openai|anthropic)\//.test(model.id) && setupModelIdentity(model))) {
+    // LiteLLM's standard catalog can lag the routes exposed by model/info.
+    try {
+      const response = await fetch(endpoint(provider.baseUrl, 'models').replace(/\/v1\/models$/, '/model/info'), { headers, redirect: 'error', signal: AbortSignal.any([requestSignal, AbortSignal.timeout(3000)]) });
+      const info = response.ok ? await response.json() : undefined;
+      for (const entry of Array.isArray(info?.data) ? info.data.slice(0, 2000) : []) {
+        const id = entry?.model_name;
+        if (validName(id) && setupModelIdentity({id}) && !models.some(model => model.id === id)) models.push({ id, name: id, providerId: provider.id });
+      }
+    } catch { /* Optional gateway metadata must not hide the standard catalog. */ }
+  }
   return models.sort((a, b) => a.name.localeCompare(b.name));
 }

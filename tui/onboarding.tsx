@@ -6,12 +6,12 @@ import { bindExactModels, type LiteFusionSelection } from '../shared/litefusion.
 import { liteFusionReadinessLabel, type LiteFusionReadiness } from '../shared/litefusion-readiness.js';
 import { useEffect, useState, useSyncExternalStore } from 'react';
 import { architectureWorker, selectArchitecture, type ArchitectureKind, type ModelRoute } from '../shared/architectures.js';
-import { SETUP_ARCHITECTURES, modelGuidance, providerIsConfigured, roleGuidance, roleStepTitle } from '../shared/setup.js';
+import { SETUP_ARCHITECTURES, modelGuidance, providerIsConfigured, roleGuidance, roleStepTitle, sidekickPreset, sidekickPresetNotice } from '../shared/setup.js';
 import { SHUNT_DESCRIPTION, SHUNT_MODEL_HINT, shuntConfigured, type ShuntSelection } from '../shared/shunt.js';
 import {
-  backFromReview, backFromRole, modelRoles, nextAfterArchitecture, nextAfterRole, saveEnabled, type SetupStep,
+  backFromRole, modelRoles, nextAfterArchitecture, nextAfterRole, saveEnabled, type SetupStep,
 } from '../shared/setupFlow.js';
-import type { Session } from '../shared/types.js';
+import type { Model, Session } from '../shared/types.js';
 import type { TerminalController } from './controller.js';
 import { Menu } from './ui.js';
 import { ModelChooser, ShuntSettings } from './models.js';
@@ -23,18 +23,31 @@ const workerLabel = (kind: 'single' | ArchitectureKind) => kind === 'expert-fusi
 
 export function Onboarding({ controller, initial, onClose, quick = false }: { controller: TerminalController; quick?: boolean; initial: Session; onClose: () => void }) {
   const state = useSyncExternalStore(controller.subscribe, controller.getState);
-  const [step, setStep] = useState<SetupStep>('architecture'), [kind, setKind] = useState<'single' | ArchitectureKind>(initial.architecture?.kind ?? (quick || !initial.model ? 'sidekick-fusion' : 'single'));
+  const connected = state.settings?.providers.some(provider => provider.id === initial.providerId && providerIsConfigured(provider));
+  const fresh = !initial.model && !initial.architecture;
+  const [autoProvider] = useState(connected && fresh ? initial.providerId : null);
+  const [step, setStep] = useState<SetupStep>(connected ? 'review' : 'gateway'), [kind, setKind] = useState<'single' | ArchitectureKind>(initial.architecture?.kind ?? (quick || fresh ? 'sidekick-fusion' : 'single'));
   const [from, setFrom] = useState<'walkthrough' | 'review'>('walkthrough');
   const [shunt, setShunt] = useState<ShuntSelection>(initial.shunt ?? { enabled: false });
   const [driver, setDriver] = useState<ModelRoute>({ providerId: initial.providerId, model: initial.model });
   const [fusion,setFusion]=useState<LiteFusionSelection>(initial.architecture?.kind==='litefusion'?initial.architecture:{kind:'litefusion',gatewayProviderId:initial.providerId});
   const [worker, setWorker] = useState<ModelRoute | null>(initial.architecture ? architectureWorker(initial.architecture) : null);
   const [permissionMode, setPermissionMode] = useState(initial.permissionMode), [view, setView] = useState<'main' | 'providers' | 'advanced' | 'skills' | 'litefusion' | 'permissions'>('main');
-  const [loading,setLoading]=useState(false);
+  const [loading,setLoading]=useState(Boolean(autoProvider)), [presetNotice, setPresetNotice] = useState('');
   const [revision, setRevision] = useState(initial.configRevision ?? 0);
 
   const [readiness,setReadiness]=useState<LiteFusionReadiness|null>(null);
   useEffect(()=>{let live=true;setReadiness(null);if(kind==='litefusion'&&fusion.gatewayProviderId)void controller.client.api<{readiness:LiteFusionReadiness}>('/litefusion/routes',fusion).then(result=>{if(live)setReadiness(result.readiness);}).catch(()=>{});return()=>{live=false;};},[kind,fusion]);
+  useEffect(() => {
+    if (!autoProvider) return;
+    let live = true;
+    controller.client.api<{models: Model[]}>(`/models?providerId=${encodeURIComponent(autoProvider)}`).then(({models}) => {
+      if (!live) return;
+      const preset = sidekickPreset(autoProvider, models);
+      setDriver({providerId: preset.providerId, model: preset.model}); setWorker(architectureWorker(preset.architecture!)); setPresetNotice(sidekickPresetNotice(preset));
+    }).catch(error => { if (live) setPresetNotice(error.message); }).finally(() => { if (live) setLoading(false); });
+    return () => { live = false; };
+  }, [controller, autoProvider]);
 
   if (!state.settings) return null;
   const back = () => setView('main');
@@ -57,6 +70,7 @@ export function Onboarding({ controller, initial, onClose, quick = false }: { co
   // Transition helpers shared by the role pickers and the review rows.
   const openRole = (role: 'driver' | 'worker', editing: boolean) => { setFrom(editing ? 'review' : 'walkthrough'); setStep(role); };
   const onRoleChange = (role: 'driver' | 'worker', route: ModelRoute) => {
+    setPresetNotice('');
     if(role==='driver'){setDriver(route);if(kind==='litefusion')setFusion(withLiteFusionLead(fusion,route,fusion.lead?.effort));}else setWorker(route);
     setStep(from === 'review' ? 'review' : nextAfterRole(kind, role));
   };
@@ -77,12 +91,15 @@ export function Onboarding({ controller, initial, onClose, quick = false }: { co
   }
 
   if (step === 'gateway') {
-    return <GatewaySetup quick={quick} controller={controller} settings={state.settings} providerId={driver.providerId || defaultProviderId} onClose={() => setStep('architecture')} onProviders={() => setView('providers')} onContinue={providerId => {if(kind==='litefusion'){void chooseArchitecture(kind,providerId);return;}setDriver(current=>({providerId,model:current.providerId===providerId?current.model:''}));setStep(nextAfterArchitecture(true));}} onConnected={result => {
+    return <GatewaySetup quick={quick} controller={controller} settings={state.settings} providerId={driver.providerId || defaultProviderId} onClose={onClose} onProviders={() => setView('providers')} onContinue={providerId => {
+      if(kind==='litefusion'){void chooseArchitecture(kind,providerId);return;}
+      setLoading(true); setStep('review');
+      controller.client.api<{models:Model[]}>(`/models?providerId=${encodeURIComponent(providerId)}`).then(({models}) => applyConnectedModels(providerId,models)).catch(error => setPresetNotice(error.message)).finally(() => setLoading(false));
+    }} onConnected={result => {
       if(kind==='litefusion'){changeFusion(liteFusionPreset(result.providerId,result.models));setFrom('walkthrough');setStep('review');return;}
-      setDriver(current => ({ providerId: result.providerId, model: current.providerId === result.providerId && result.models.some(model => model.id === current.model) ? current.model : '' }));
-      setWorker(current => current?.providerId === result.providerId && result.models.some(model => model.id === current.model) ? current : null);
+      applyConnectedModels(result.providerId,result.models);
       setShunt(current => current.enabled && current.model.providerId === result.providerId && !result.models.some(model => model.id === current.model.model) ? { ...current, model: { providerId: result.providerId, model: '' } } : current);
-      setFrom('walkthrough'); setStep(nextAfterArchitecture(true));
+      setFrom('review'); setStep('review');
     }} />;
   }
 
@@ -93,8 +110,8 @@ export function Onboarding({ controller, initial, onClose, quick = false }: { co
   }
 
   // Review
-  const canSave = saveEnabled({ step, kind, driver, worker, shuntOk:kind==='litefusion'||shuntConfigured(shunt,state.settings.providers), providerConfigured });
-  return <Menu title="Review your setup" search={false} onClose={() => { setFrom('walkthrough'); setStep(backFromReview(kind)); }} footer={state.notice || (kind==='litefusion'?'Your lead plans and selects specialists. Use /models to customize.':`${SHUNT_DESCRIPTION} Use /models for advanced options.`)} items={[
+  const canSave = !loading && saveEnabled({ step, kind, driver, worker, shuntOk:kind==='litefusion'||shuntConfigured(shunt,state.settings.providers), providerConfigured });
+  return <Menu title="Review your setup" search={false} onClose={onClose} footer={loading ? 'Choosing available models…' : presetNotice || state.notice || (kind==='litefusion'?'Your lead plans and selects specialists. Use /models to customize.':'Ready to start. Select any setting to change it, or use /setup later.')} items={[
     { id: 'architecture', label: `Architecture: ${SETUP_ARCHITECTURES.find(item => item.kind === kind)!.name}`, description: SETUP_ARCHITECTURES.find(item => item.kind === kind)!.description, action: () => { setFrom('walkthrough'); setStep('architecture'); } },
     { id: 'driver', label: `${kind === 'single' ? 'Model' : kind==='litefusion'?'Lead':'Driver'}: ${driver.model || 'Choose a model'}`, description: modelGuidance(kind, 'driver'), action: () => openRole('driver', true) },
     ...(roles.includes('worker') ? [{ id: 'worker', label: `${workerLabel(kind)}: ${worker?.model || 'Choose a model'}`, description: modelGuidance(kind, 'worker'), action: () => openRole('worker', true) }] : []),
@@ -104,7 +121,16 @@ export function Onboarding({ controller, initial, onClose, quick = false }: { co
     { id: 'permissions', label: `Permissions: ${permissionModeLabels[permissionMode]}`, description: 'Choose your default for new sessions in this project; workers use the same mode.', action: () => setView('permissions') },
     { id: 'import-skills', label: 'Import Claude/Codex skills…', description: 'Copy skills from your machine into this project', action: () => setView('skills') },
     { id: 'save', label: state.pending ? 'Saving…' : quick ? 'Start chatting' : 'Start with this setup', separatorBefore: true, disabled: Boolean(state.pending) || !canSave, action: () => { void save(); } },
-  ]} />;
+  ].map(item => ({...item, disabled: loading || ('disabled' in item && Boolean(item.disabled))}))} />;
+
+  function applyConnectedModels(providerId: string, models: Model[]) {
+    const preset = sidekickPreset(providerId, models);
+    const available = (route: ModelRoute | null) => route?.providerId === providerId && models.some(model => model.id === route.model);
+    const nextDriver = available(driver) ? driver : {providerId,model:kind==='sidekick-fusion'?preset.model:''};
+    const nextWorker = available(worker) ? worker : kind==='sidekick-fusion'?architectureWorker(preset.architecture!):null;
+    setDriver(nextDriver); setWorker(nextWorker);
+    setPresetNotice(kind==='sidekick-fusion'?sidekickPresetNotice({...preset,...nextDriver,architecture:selectArchitecture('sidekick-fusion',nextWorker!)}):'');
+  }
 
   async function save() {
     const patch = kind==='litefusion'?{...liteFusionConfiguration(fusion,{...driver,modelReasoning:initial.modelReasoning}),permissionMode}:{ ...driver, architecture: kind === 'single' ? null : worker ? selectArchitecture(kind, worker) : null, permissionMode, shunt };

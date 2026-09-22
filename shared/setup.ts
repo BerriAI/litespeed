@@ -1,5 +1,19 @@
 import type { Model, Settings } from './types.js';
 import { ARCHITECTURES, type ArchitectureKind } from './architectures.js';
+import type { ArchitectureConfiguration } from './architecture-config.js';
+import { defaultSetupModel } from './setup-models.js';
+
+export function sidekickPreset(providerId: string, models: readonly Pick<Model, 'id' | 'canonicalId'>[]): ArchitectureConfiguration {
+  return {
+    providerId, model: defaultSetupModel(models, 'driver'),
+    architecture: { kind: 'sidekick-fusion', sidekick: { providerId, model: defaultSetupModel(models, 'sidekick') } },
+    shunt: { enabled: false }, planner: null, modelReasoning: {}, outputStyle: null,
+  };
+}
+export function sidekickPresetNotice(preset: ArchitectureConfiguration): string {
+  const missing = [!preset.model && 'driver', preset.architecture?.kind === 'sidekick-fusion' && !preset.architecture.sidekick.model && 'sidekick'].filter(Boolean);
+  return missing.length ? `Choose a model for your ${missing.join(' and ')}. No Astra, Fable, Opus, or Sol model is available from this provider.` : '';
+}
 
 /** Keep the first-run explanations identical in both clients. */
 export const SETUP_ARCHITECTURES = [

@@ -1,6 +1,6 @@
 {
   "name": "@litellm/litespeed",
-  "version": "0.1.22",
+  "version": "0.1.23",
   "private": true,
   "license": "Apache-2.0",
   "type": "module",
@@ -43,6 +43,7 @@
     "test:tui:stream": "node scripts/test-tui-stream.mjs",
     "test:tui:flow": "node scripts/test-tui-flow.mjs",
     "test:tui:interactions": "node scripts/test-tui-interactions.mjs",
+    "test:tui:setup": "node scripts/test-tui-setup.mjs",
     "test:tui:startup": "npm run build && node scripts/test-tui-startup.mjs"
   },
   "dependencies": {

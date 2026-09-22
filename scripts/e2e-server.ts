@@ -18,6 +18,13 @@ const delegationRequests:{model:string;messages:any[];tools:any[];reasoningEffor
 const pendingDelegations=new Set<()=>void>();
 const mock=createServer(async(req,res)=>{
   if(req.url?.startsWith('/setup-auth/')&&req.headers.authorization!=='Bearer fixture-key'){res.writeHead(401,{'Content-Type':'application/json'});res.end(JSON.stringify({error:{message:'Invalid API key'}}));return;}
+  const setupCatalogs:Record<string,string[]>={
+    '/setup-defaults/':['openai/gpt-6-astra','openai/gpt-6-sol','anthropic/claude-fable-5-1','anthropic/claude-opus-5-5','test-fast'],
+    '/setup-fallbacks/':['anthropic/claude-fable-5','anthropic/claude-fable-5-1','anthropic/claude-opus-4-6','anthropic/claude-opus-5-5'],
+    '/setup-unknown/':['test-model','test-fast'],
+  };
+  const setupCatalog=Object.entries(setupCatalogs).find(([prefix])=>req.url?.startsWith(prefix));
+  if(setupCatalog){res.setHeader('Content-Type','application/json');res.end(JSON.stringify({data:req.url?.endsWith('/models')?setupCatalog[1].map(id=>({id})):[]}));return;}
   if(req.url==='/no-specialists/models'){res.setHeader('Content-Type','application/json');res.end(JSON.stringify({data:[{id:'unknown-lead'}]}));return;}
   if(req.url?.endsWith('/models')){res.setHeader('Content-Type','application/json');res.end(JSON.stringify({data:[{id:'test-model',model_info:{base_model:'claude-opus-5'}},{id:'test-fast',model_info:{base_model:'gemini-3.8-flash'}},{id:'budget-model',context_window:16384}]}));return;}
   const chunks:Buffer[]=[];for await(const chunk of req)chunks.push(chunk);let data:any;

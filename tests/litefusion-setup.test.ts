@@ -63,7 +63,7 @@ describe('automatic setup through the real API and runner with a local fake gate
   beforeEach(async()=>{
     modelCatalog.clear();requests=[];catalogRequests=0;models=[{id:'anthropic/claude-opus-5'},{id:'gemini/gemini-3.8-flash'},{id:'openai/gpt-6-astra'}];directory=await mkdtemp(join(tmpdir(),'lf-setup-'));store=new Store(join(directory,'state'));
     gateway=createServer(async(req,res)=>{
-      if(req.method==='GET'){catalogRequests++;res.setHeader('content-type','application/json');res.end(JSON.stringify({data:models}));return;}
+      if(req.method==='GET'){if(req.url==='/v1/models')catalogRequests++;res.setHeader('content-type','application/json');res.end(JSON.stringify({data:req.url==='/v1/models'?models:[]}));return;}
       const chunks:Buffer[]=[];for await(const chunk of req)chunks.push(chunk);const body=JSON.parse(Buffer.concat(chunks).toString());requests.push(body);
       const root=body.model==='anthropic/claude-opus-5';
       const runtime=body.messages.map((m:any)=>m.content).filter((c:any)=>typeof c==='string').join('\n').split('\n').find((line:string)=>line.startsWith('LiteFusion availability captured'));

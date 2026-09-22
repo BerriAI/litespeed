@@ -7,8 +7,8 @@ test('Advanced settings keeps onboarding simple and saves an independently chose
     await request.post('/api/workspace-preferences',{data:{workspace:settings.workspace,providerId:'fixture',model:'test-model',architecture:null,shunt:null,setupComplete:false}});
     await page.goto('/');await page.getByRole('button',{name:'Set up Litespeed',exact:true}).click();
     const dialog=page.getByRole('dialog',{name:'Set up Litespeed',exact:true});
-    await dialog.getByRole('button',{name:'Connect & continue'}).click();
-    await dialog.getByRole('button',{name:/Single model/}).click();await dialog.getByRole('button',{name:'Continue',exact:true}).click();
+    await expect(dialog.getByText('Review your setup',{exact:true})).toBeVisible();
+    await dialog.getByRole('combobox',{name:'Setup architecture'}).selectOption('single');
     await expect(dialog.locator('.shunt-settings')).not.toHaveAttribute('open');
     await expect(dialog.getByRole('switch',{name:'Enable Shunt'})).not.toBeVisible();
     await dialog.locator('.shunt-settings > summary').click();

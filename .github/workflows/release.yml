@@ -37,6 +37,7 @@ jobs:
         run: npx vitest run tests/command-sandbox.test.ts
       - run: npm run check
       - run: npm run test:tui:startup
+      - run: npm run test:tui:setup
       - run: npm run test:tui:images
       - run: npm run test:tui:stream
       - run: npm run test:tui:flow
