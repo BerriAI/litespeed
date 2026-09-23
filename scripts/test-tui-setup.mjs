@@ -35,14 +35,11 @@ try{
     await api('/settings',{providers:[{...settings.providers[0],baseUrl:settings.providers[0].baseUrl+'/'+scenario.path}],defaultModel:''},'PATCH');
     const session=await api('/sessions',{workspace:settings.workspace,providerId:'fixture',model:'',architecture:null,shunt:{enabled:false}});
     await launch(session);
-    await waitFor(()=>screen().includes('Review your setup')&&!screen().includes('Choosing available models'),'automatic review');
-    assert(screen().includes('Sidekick Fusion'));assert(screen().includes('Shunt Off'));
-    if(scenario.driver){
-      assert(screen().includes('Driver: '+scenario.driver));assert(screen().includes('Sidekick: '+scenario.sidekick));
-    }else{
-      assert(screen().includes('Driver: Choose a model'));assert(screen().includes('Sidekick: Choose a model'));
-      assert(screen().includes('Choose a model for your driver and sidekick'));
-    }
+    const expected=['Review your setup','Sidekick Fusion','Shunt Off',
+      'Driver: '+(scenario.driver||'Choose a model'),'Sidekick: '+(scenario.sidekick||'Choose a model'),
+      ...(!scenario.driver?['Choose a model for your driver and sidekick']:[])];
+    // PTY output can arrive in chunks; the title may render before the remaining rows.
+    await waitFor(()=>{const output=screen();return !output.includes('Choosing available models')&&expected.every(text=>output.includes(text));},scenario.path+' automatic review');
     await writeFile(join(artifacts,scenario.path+'.txt'),screen());
     if(scenario.path==='setup-defaults'){
       terminal.resize(80,24);emulator.resize(80,24);await delay(200);
