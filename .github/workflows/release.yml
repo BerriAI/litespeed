@@ -6,6 +6,11 @@ on:
   pull_request:
     branches: [main]
   workflow_dispatch:
+    inputs:
+      notarize:
+        description: Build Developer ID signed and Apple-notarized desktop artifacts
+        type: boolean
+        default: false
 permissions:
   contents: read
 concurrency:
@@ -22,7 +27,11 @@ jobs:
           - runner: macos-15-intel
             architecture: x64
     runs-on: ${{ matrix.runner }}
-    timeout-minutes: 25
+    timeout-minutes: 60
+    env:
+      # PRs and routine builds use local signatures. Public releases must pass
+      # Apple notarization; a missing certificate must not silently downgrade.
+      LITESPEED_NOTARIZE: ${{ (inputs.notarize || startsWith(github.ref, 'refs/tags/v') || (github.event_name == 'push' && github.ref == 'refs/heads/main' && contains(github.event.head_commit.message, '[release]'))) && '1' || '0' }}
     steps:
       - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
       - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4
@@ -47,10 +56,23 @@ jobs:
       - run: npm run test:tui:handoff
       - run: node scripts/release/package.mjs
       - run: node scripts/release/smoke.mjs
+      - name: Prepare Apple release credentials
+        if: env.LITESPEED_NOTARIZE == '1'
+        env:
+          APPLE_DEVELOPER_ID_P12_BASE64: ${{ secrets.APPLE_DEVELOPER_ID_P12_BASE64 }}
+          APPLE_DEVELOPER_ID_PASSWORD: ${{ secrets.APPLE_DEVELOPER_ID_PASSWORD }}
+          APPLE_TEAM_ID: ${{ secrets.APPLE_TEAM_ID }}
+          APPLE_NOTARY_KEY_ID: ${{ secrets.APPLE_NOTARY_KEY_ID }}
+          APPLE_NOTARY_ISSUER_ID: ${{ secrets.APPLE_NOTARY_ISSUER_ID }}
+          APPLE_NOTARY_KEY_P8_BASE64: ${{ secrets.APPLE_NOTARY_KEY_P8_BASE64 }}
+        run: node scripts/desktop/ci-signing.mjs
       - name: Build portable desktop app
         run: node scripts/desktop/package.mjs
       - name: Verify portable desktop app
         run: node scripts/desktop/package-smoke.mjs
+      - name: Remove Apple release credentials
+        if: always() && env.LITESPEED_SIGNING_KEYCHAIN != ''
+        run: node scripts/desktop/ci-signing.mjs cleanup
       - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
         with:
           name: macos-${{ matrix.architecture }}
@@ -78,6 +100,9 @@ jobs:
           merge-multiple: true
       - name: Combine verified manifests
         run: node scripts/release/manifest.mjs
+      - name: Require notarized desktop downloads
+        run: |
+          node --input-type=module -e 'import { readFileSync } from "node:fs"; for (const platform of ["darwin-arm64", "darwin-x64"]) { const m = JSON.parse(readFileSync(`release-artifacts/desktop-manifest-${platform}.json`, "utf8")); if (m.notarized !== true || !m.installer || !/^[A-Z0-9]{10}$/.test(m.signingTeam || "")) throw new Error(`Refusing to publish an unnotarized desktop download: ${platform}`); }'
       - name: Publish packages
         env:
           GH_TOKEN: ${{ github.token }}

@@ -23,9 +23,16 @@ try {
   execFileSync('/usr/bin/ditto', ['-x', '-k', archive, moved]);
   const app = join(moved, 'Litespeed.app'), root = join(app, 'Contents/Resources/litespeed'), node = join(root, 'runtime/node');
   execFileSync('/usr/bin/codesign', ['--verify', '--deep', '--strict', app], { stdio: 'pipe' });
+  if (manifest.notarized) {
+    execFileSync('xcrun', ['stapler', 'validate', app], { stdio: 'pipe' });
+    execFileSync('/usr/sbin/spctl', ['--assess', '--type', 'execute', '--verbose=2', app], { stdio: 'pipe' });
+  }
   const configuration = JSON.parse(await readFile(join(app, 'Contents/Resources/desktop.json'), 'utf8'));
   assert.equal(configuration.bundledRuntime, true); assert.equal(configuration.sourceRoot, undefined); assert.equal(configuration.nodePath, undefined); assert.equal(configuration.attachOnly, undefined);
   assert.equal(execFileSync(node, ['--version'], { encoding: 'utf8' }).trim(), 'v26.8.1');
+  const bun = join(root, 'node_modules/.bin/bun');
+  assert.match(execFileSync(bun, ['--version'], { encoding: 'utf8' }).trim(), /^\d+\.\d+\.\d+/);
+  assert.equal(execFileSync(bun, ['-e', 'console.log([1,2,3].map(n=>n*n).join(","))'], { encoding: 'utf8', cwd: root }).trim(), '1,4,9');
   provider = createServer((request, response) => {
     if (request.url === '/preview') { response.end('<title>Bundled preview</title><button onclick="document.title=\'Bundled browser works\'">Continue</button><a href="/report">Download report</a>'); return; }
     if (request.url === '/report') { response.writeHead(200, { 'Content-Disposition': 'attachment; filename="portable-report.csv"', 'Content-Type': 'text/csv' }); response.end('runtime,bundled\nnode,true\n'); return; }
@@ -73,6 +80,10 @@ try {
     const disk = join(artifacts, manifest.installer.file), digest = createHash('sha256');
     for await (const chunk of createReadStream(disk)) digest.update(chunk);
     assert.equal(digest.digest('hex'), manifest.installer.sha256);
+    if (manifest.notarized) {
+      execFileSync('xcrun', ['stapler', 'validate', disk], { stdio: 'pipe' });
+      execFileSync('/usr/sbin/spctl', ['--assess', '--type', 'open', '--context', 'context:primary-signature', '--verbose=2', disk], { stdio: 'pipe' });
+    }
     const mount = join(temporary, 'Installer'); await mkdir(mount);
     execFileSync('/usr/bin/hdiutil', ['attach', '-nobrowse', '-readonly', '-mountpoint', mount, disk], { stdio: 'pipe' });
     try {
