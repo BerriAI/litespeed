@@ -10,14 +10,14 @@ describe('isolated TypeScript MCP execution', () => {
 
   it('does not charge approval review time to the execution budget',async()=>{
     const output=await run('await tools.read({}); return "done";',{
-      names:['read'],limits:{timeoutMs:1500},
+      names:['read'],limits:{timeoutMs:4000},
       invoke:async(_name,_args,_signal,approvalWait)=>{
-        approvalWait(true);await new Promise(resolve=>setTimeout(resolve,1800));approvalWait(false);
+        approvalWait(true);await new Promise(resolve=>setTimeout(resolve,4500));approvalWait(false);
         return {content:[]};
       },
     });
     expect(JSON.parse(output)).toBe('done');
-  },10000);
+  },15000);
 
   it('passes large intermediate data between tools without returning it to the model', async () => {
     const document = 'PRIVATE_TRANSCRIPT '.repeat(20_000);

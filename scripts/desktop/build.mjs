@@ -11,13 +11,16 @@ const output = resolve(options.get('--output') || join(root, 'release-artifacts/
 if (!output.endsWith('.app')) throw new Error('The output must end in .app.');
 const contents = join(output, 'Contents'), resources = join(contents, 'Resources'), executable = join(contents, 'MacOS/Litespeed');
 await mkdir(dirname(executable), { recursive: true }); await mkdir(resources, { recursive: true });
-const version = JSON.parse(await readFile(join(root, 'package.json'), 'utf8')).version;
+const metadata = JSON.parse(await readFile(join(root, 'package.json'), 'utf8')), version = metadata.version, build = metadata.desktopBuild || 1;
 const escape = value => value.replaceAll('&', '&amp;').replaceAll('<', '&lt;').replaceAll('>', '&gt;');
 await writeFile(join(contents, 'Info.plist'), `<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd"><plist version="1.0"><dict>
-<key>CFBundleIdentifier</key><string>ai.litellm.litespeed.desktop</string><key>CFBundleName</key><string>Litespeed</string><key>CFBundleDisplayName</key><string>Litespeed</string><key>CFBundleExecutable</key><string>Litespeed</string><key>CFBundlePackageType</key><string>APPL</string><key>CFBundleShortVersionString</key><string>${escape(version)}</string><key>CFBundleVersion</key><string>1</string><key>LSMinimumSystemVersion</key><string>14.0</string><key>NSHighResolutionCapable</key><true/><key>NSPrincipalClass</key><string>NSApplication</string><key>NSAppTransportSecurity</key><dict><key>NSAllowsLocalNetworking</key><true/></dict>
+<key>CFBundleIdentifier</key><string>ai.litellm.litespeed.desktop</string><key>CFBundleName</key><string>Litespeed</string><key>CFBundleDisplayName</key><string>Litespeed</string><key>CFBundleExecutable</key><string>Litespeed</string><key>CFBundlePackageType</key><string>APPL</string><key>CFBundleShortVersionString</key><string>${escape(version)}</string><key>CFBundleVersion</key><string>${build}</string><key>LSMinimumSystemVersion</key><string>14.0</string><key>NSHighResolutionCapable</key><true/><key>NSPrincipalClass</key><string>NSApplication</string><key>NSAppTransportSecurity</key><dict><key>NSAllowsLocalNetworking</key><true/></dict>
 <key>CFBundleIconFile</key><string>Litespeed</string>
 </dict></plist>`);
-if (options.has('--bundle')) await cp(resolve(options.get('--bundle')), join(resources, 'litespeed'), { recursive: true, verbatimSymlinks: true });
+if (options.has('--bundle')) {
+  await cp(resolve(options.get('--bundle')), join(resources, 'litespeed'), { recursive: true, verbatimSymlinks: true });
+  await writeFile(join(resources, 'litespeed/desktop-release.json'), JSON.stringify({ schema: 1, version, build, platform: `${process.platform}-${process.arch}` }) + '\n');
+}
 await writeFile(join(resources, 'desktop.json'), JSON.stringify({ serverURL: options.get('--url') || 'http://127.0.0.1:3215', ...(options.has('--bundle') ? { bundledRuntime: true } : { sourceRoot: root, nodePath: process.execPath }), ...(options.has('--url') ? { attachOnly: true } : {}), ...(options.has('--data-directory') ? { dataDirectory: resolve(options.get('--data-directory')) } : {}), ...(options.has('--workspace') ? { workspace: resolve(options.get('--workspace')) } : {}) }, null, 2));
 execFileSync('xcrun', ['swiftc', '-swift-version', '5', '-O', '-target', `${process.arch === 'arm64' ? 'arm64' : 'x86_64'}-apple-macosx14.0`, '-framework', 'AppKit', '-framework', 'WebKit', join(root, 'desktop/macos/Litespeed.swift'), '-o', executable], { stdio: 'inherit' });
 const iconset = join(dirname(output), 'Litespeed.iconset');

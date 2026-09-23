@@ -15,7 +15,7 @@ The implementation includes unit/API checks for task ownership, stale responses,
 
 ## Preview validation
 
-For the September 23, 2026 Apple silicon preview:
+For the initial September 23, 2026 Apple silicon preview:
 
 - Full unit/API suite: **2,477 passed**, one skipped (165 passing test files).
 - Final targeted interaction runs: **19 Chrome** and **21 WebKit** cases passed, covering conversation reading, long prompts, search, streaming, documents, and workspace behavior.
@@ -24,6 +24,14 @@ For the September 23, 2026 Apple silicon preview:
 - Dark desktop and narrow light conversation layouts were visually reviewed.
 
 The full browser suites are available below; the counts above describe the final targeted runs, not a claim that every browser test ran for this preview.
+
+## Installer and updater verification
+
+The second desktop preview passed **2,488 unit/API tests** (one skipped), type checking, and the production build. It adds a DMG with a Retina background, aligned app/Applications icons, and persistent Finder window settings. The mounted image is read only; the app’s signature and the Applications shortcut are checked. The installer layout was reviewed from the mounted image’s background, icons, and Finder metadata; this does not claim a direct Finder screenshot.
+
+The updater has focused checks for build ordering, concurrent staging, corrupt archives, unsafe paths/links, pending-state validation, startup locks, failed-launch rollback, and changed app identities. Five interaction cases pass in Chrome and WebKit, including icon replacement, waiting for active work, cancellation, retained drafts after failure, keyboard dismissal, and narrow layouts.
+
+A native update smoke check uses a disposable installation and the real WebKit-to-native restart bridge. It verifies that queued work blocks restart, closes the old app/server, installs the new build, restarts both, keeps the same saved-data identity and settings/task, and produces an app-owned WebKit snapshot after relaunch. No model generation or existing user data is needed for the check.
 
 ## Reproduce the checks
 
@@ -37,9 +45,9 @@ npm run desktop:package
 npm run test:desktop-package
 ```
 
-On a Mac with a desktop session, `LITESPEED_NATIVE_PACKAGE_SMOKE=1 npm run test:desktop-package` also launches the relocated native app and checks its own WebKit snapshot. Package smoke uses disposable data and closes only its owned processes.
+On a Mac with a desktop session, `LITESPEED_NATIVE_PACKAGE_SMOKE=1 npm run test:desktop-package` also launches the relocated native app and checks its own WebKit snapshot. `npm run test:desktop-update` runs the full native update check on a Mac desktop session. Package smoke uses disposable data and closes only its owned processes.
 
-The release workflow builds terminal archives and desktop ZIPs separately on Apple silicon and Intel runners and runs the corresponding package checks before publication. The initial downloadable desktop preview is Apple silicon only.
+The release workflow builds terminal archives, desktop ZIPs, and DMG installers on Apple silicon and Intel runners and runs the corresponding package checks before publication. The initial downloadable desktop preview is Apple silicon only.
 
 ## Limits of the evidence
 

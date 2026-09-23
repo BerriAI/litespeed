@@ -6,7 +6,7 @@ import { join, resolve } from 'node:path';
 
 if (process.platform !== 'darwin') throw new Error('Build the desktop app on its target Mac architecture.');
 const source = resolve(import.meta.dirname, '../..'), platform = `${process.platform}-${process.arch}`;
-const version = JSON.parse(await readFile(join(source, 'package.json'), 'utf8')).version;
+const metadata = JSON.parse(await readFile(join(source, 'package.json'), 'utf8')), version = metadata.version, build = metadata.desktopBuild || 1;
 const output = resolve(process.argv[2] || join(source, 'release-artifacts'));
 const temporary = await mkdtemp(join(tmpdir(), 'litespeed-desktop-package-'));
 const run = (executable, args, cwd = source, env = process.env) => execFileSync(executable, args, { cwd, env, stdio: 'inherit' });
@@ -28,7 +28,19 @@ try {
   run('/usr/bin/ditto', ['-c', '-k', '--sequesterRsrc', '--keepParent', app, staging]);
   await rename(staging, archive);
   const data = await readFile(archive);
-  await writeFile(join(output, `desktop-manifest-${platform}.json`), JSON.stringify({ schema: 1, version, platform, minimumMacOS: '14.0', notarized: false, asset: { file, sha256: createHash('sha256').update(data).digest('hex'), size: (await stat(archive)).size } }, null, 2) + '\n');
+  const background = join(temporary, 'background.png'), retina = join(temporary, 'background@2x.png');
+  run('xcrun', ['swift', join(source, 'scripts/desktop/dmg-background.swift'), retina]);
+  run('/usr/bin/sips', ['-z', '440', '720', retina, '--out', background]);
+  let python = process.env.LITESPEED_DMG_PYTHON;
+  if (!python) {
+    const environment = join(temporary, 'dmg-tools');
+    run('python3', ['-m', 'venv', environment]); python = join(environment, 'bin/python');
+    run(python, ['-m', 'pip', 'install', '--disable-pip-version-check', '-r', join(source, 'scripts/desktop/dmg-requirements.txt')]);
+  }
+  const diskFile = `Litespeed-${version}-${platform}.dmg`, disk = join(output, diskFile);
+  run(python, [join(source, 'scripts/desktop/dmg.py'), app, background, disk]);
+  run('/usr/bin/hdiutil', ['verify', disk]);
+  await writeFile(join(output, `desktop-manifest-${platform}.json`), JSON.stringify({ schema: 1, version, build, platform, minimumMacOS: '14.0', notarized: false, asset: { file, sha256: createHash('sha256').update(data).digest('hex'), size: (await stat(archive)).size }, installer: { file: diskFile, sha256: createHash('sha256').update(await readFile(disk)).digest('hex'), size: (await stat(disk)).size } }, null, 2) + '\n');
   // Keep the existing development wrapper intact. The portable copy has its
   // own output directory and can be moved or installed independently.
   const portable = join(output, 'portable'); await mkdir(portable, { recursive: true });

@@ -4,23 +4,34 @@ The desktop shell uses AppKit and WebKit and shares the same local application a
 
 ## Download and install
 
-1. [Download Litespeed for Apple silicon Macs](https://github.com/BerriAI/litespeed/releases/download/desktop-v0.1.23-preview.1/Litespeed-0.1.23-darwin-arm64.zip). The preview requires macOS 14 or later.
-2. Unzip the download and move **Litespeed.app** into Applications.
-3. Open Litespeed. Connect your provider, or let it import an existing Litespeed setup.
+1. [Download Litespeed for Apple silicon Macs](https://github.com/BerriAI/litespeed/releases/download/desktop-v0.1.23-preview.2/Litespeed-0.1.23-darwin-arm64.dmg). The preview requires macOS 14 or later.
+2. Open the `.dmg` and drag **Litespeed** onto the **Applications** shortcut.
+3. Open Litespeed from Applications, then eject the disk image.
+4. Connect your provider, or let it import an existing Litespeed setup.
 
 The preview is locally signed and is **not notarized by Apple**. If macOS prevents the first launch, open **System Settings → Privacy & Security**, find the notice for Litespeed, and choose **Open Anyway**, then confirm opening the app. This applies to this app; no system-wide security change is needed. On managed Macs, your organization's installation policy may apply.
 
-The [release page](https://github.com/BerriAI/litespeed/releases/tag/desktop-v0.1.23-preview.1) includes the ZIP and its SHA-256 manifest. The current downloadable desktop preview is for Apple silicon; the terminal packages also support Intel. Desktop builds for both architectures are part of the release workflow, but an Intel desktop preview is not included in this initial download.
+The [release page](https://github.com/BerriAI/litespeed/releases/tag/desktop-v0.1.23-preview.2) includes the DMG installer, the update ZIP, and their SHA-256 manifest. The current downloadable desktop preview is for Apple silicon; the terminal packages also support Intel. Desktop builds for both architectures are part of the release workflow, but an Intel desktop preview is not included in this initial download.
 
-For updates, wait for tasks to finish, quit Litespeed, and replace it with the newer app. Then restart your Mac before reopening Litespeed so its background server also uses the new version. Saved data stays in Application Support. The terminal installation remains separate.
+If you already ran desktop preview 1, finish your work and restart your Mac once after installing this version. Preview 1 did not include the desktop updater, and its background server can outlive the old app. Later updates use the in-app flow below.
+
+## In-app updates
+
+Litespeed checks the official GitHub releases automatically at launch, hourly while open, and when returning to the app after the cached check expires. When a newer desktop build is available, an update icon replaces the question mark at the bottom of the sidebar. You can also choose **Litespeed → Check for Updates** or use **Help & updates**.
+
+Choose **Update and restart** to download, verify, and install it. If work is active, **Update when idle** downloads first and waits. Running tasks, approvals, background commands, workspace operations, queued messages, and open terminals prevent restart. The dialog explains what remains; **Cancel restart** keeps the downloaded update for later. Keep the app open while waiting.
+
+Restart closes both the Mac app and its local server, replaces the app, and reopens them with the same saved data. The updater checks the official archive checksum, bundle identity, build and local code signature, and restores the previous app if the replacement fails to start. Conversations, settings and drafts stay outside the bundle. Updates cannot replace an app on a read-only disk image or in a folder you cannot write to; drag it into Applications first, or use Applications in your home folder.
+
+The first manual install from preview 1 needs the one-time Mac restart described above. Subsequent sidebar updates restart only Litespeed.
 
 ## Portable Mac app
 
-`npm run desktop:package` produces `release-artifacts/portable/Litespeed.app` and a versioned zip archive. The app includes its own Node runtime, production dependencies and Chromium headless shell. It can be moved to another folder without retaining this checkout or installing Node or Chrome. Build on the target Mac architecture; the current verified package is for Apple silicon.
+`npm run desktop:package` produces `release-artifacts/portable/Litespeed.app` plus a DMG installer and a ZIP used by the updater. The app includes its own Node runtime, production dependencies and Chromium headless shell. It can be moved to another folder without retaining this checkout or installing Node or Chrome. DMG creation uses Python 3 and pinned `dmgbuild` dependencies in a temporary build environment. Build on the target Mac architecture; the current verified package is for Apple silicon.
 
-Open the app directly, or copy it to Applications. Saved work lives outside the app bundle, in Application Support. The original terminal installation remains separate. Updating this locally built desktop package means replacing the app; the terminal package updater does not modify a signed desktop bundle.
+Open the app directly, or copy it to Applications. Saved work lives outside the app bundle, in Application Support. The original terminal installation remains separate. Desktop updates replace the complete app bundle; the terminal updater remains independent.
 
-The zip contains no user configuration, sign-ins or task data. Node is pinned and checked against its published checksum; package dependencies use the lockfile, and browser versions follow the pinned Playwright package. Bundled licenses are retained alongside the runtime and dependencies.
+The installer and update ZIP contain no user configuration, sign-ins or task data. Node is pinned and checked against its published checksum; package dependencies use the lockfile, and browser versions follow the pinned Playwright package. Bundled licenses are retained alongside the runtime and dependencies.
 
 ## Build and open
 
@@ -49,10 +60,12 @@ Computer control uses a separately installed Cua Driver with Accessibility and S
 
 `npm run test:desktop` builds the frontend/server and exercises a real isolated launch: importing saved settings/history, serving the UI, and reusing the existing process. Import unit cases cover live SQLite backup, paused copied schedules, file permissions, repeat launches, and unsafe credential-file links.
 
-`npm run test:desktop-package` verifies the zip checksum, moves the signed app to a temporary path containing spaces, and runs its bundled server and browser against disposable data. It checks live browser interaction, page search, a saved download, process reuse and rejection of a different saved-data directory. `LITESPEED_NATIVE_PACKAGE_SMOKE=1 npm run test:desktop-package` also opens the relocated native app, verifies that it starts its bundled server, and records an app-owned WebKit snapshot. It closes only its owned test app/server and removes its temporary data.
+`npm run test:desktop-package` verifies the zip checksum, checks the DMG and its Applications shortcut, moves the signed app to a temporary path containing spaces, and runs its bundled server and browser against disposable data. It checks live browser interaction, page search, a saved download, process reuse and rejection of a different saved-data directory. `LITESPEED_NATIVE_PACKAGE_SMOKE=1 npm run test:desktop-package` also opens the relocated native app, verifies that it starts its bundled server, and records an app-owned WebKit snapshot. It closes only its owned test app/server and removes its temporary data.
 
 `npx playwright test --config playwright.webkit.config.ts` runs browser tests with the WebKit engine. The native wrapper can attach to a disposable fixture with `node scripts/desktop/build.mjs --url http://127.0.0.1:3213`. An attach-only wrapper accepts `--audit-dir /absolute/path` and optional `--audit-command settings` to save its own DOM state and WebKit snapshot for development. These snapshots exclude native title-bar and save/open dialog chrome.
 
 `LITESPEED_DESKTOP_URL` can override the local server address for isolated testing. `LITESPEED_DESKTOP_AUDIT=1` explicitly enables the app-owned audit in a packaged build. Both still restrict the shell to a local HTTP application origin.
 
 Direct OS shortcut dispatch, native dialogs, and window chrome still need verification. App-owned snapshots cover the WebKit content only; DOM readback by itself does not confirm that a backgrounded window has repainted.
+
+`npm run test:desktop-update` verifies a real native upgrade using a disposable installed copy, queued-work blocking, app/server replacement, retained saved data, and an app-owned WebKit snapshot after relaunch. It never updates the user’s installed app.
