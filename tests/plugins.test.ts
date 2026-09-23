@@ -6,6 +6,7 @@ import { join } from 'node:path';
 import { Store } from '../server/store.js';
 import { planInstall, applyInstall, uninstall } from '../server/plugins.js';
 import type { HookConfig } from '../shared/hooks.js';
+import { readProfileCatalog } from '../server/profiles.js';
 
 const sha256 = (value: string) => createHash('sha256').update(value, 'utf8').digest('hex');
 
@@ -212,6 +213,41 @@ describe('plugin packages: plan, apply, uninstall', () => {
     expect(settings.mcpServers.docs).toBeUndefined();
     expect(settings.hooks).toEqual([]);
     expect(settings.plugins?.toolkit).toBeUndefined();
+    expect((await readProfileCatalog(workspace)).skills).toEqual([]);
+  });
+
+  it('registers installed skills without activating them or changing project profiles', async () => {
+    await fullPackage();
+    await mkdir(join(workspace, '.litespeed'));
+    const profile = { id: 'planner', name: 'Planner', tools: ['read_file'], defaultMode: 'plan' };
+    await writeFile(join(workspace, '.litespeed', 'profiles.json'), JSON.stringify({ version: 1, profiles: [profile], skills: [] }));
+    await applyInstall(await planInstall(pkg, workspace, store), workspace, store);
+    const catalog = await readProfileCatalog(workspace);
+    expect(catalog.skills).toEqual([{ id: 'review', name: 'review', description: 'A test toolkit.' }]);
+    expect(catalog.profiles).toEqual([profile]);
+    expect(store.sessions()).toEqual([]);
+  });
+
+  it.each(['metadata', 'profile', 'content'])('keeps user-owned skill %s and its catalog entry during removal', async reason => {
+    await fullPackage(); await applyInstall(await planInstall(pkg, workspace, store), workspace, store);
+    const manifestFile = join(workspace, '.litespeed', 'profiles.json');
+    const manifest = JSON.parse(await readFile(manifestFile, 'utf8'));
+    if (reason === 'metadata') manifest.skills[0].name = 'My custom review';
+    if (reason === 'profile') manifest.profiles.push({ id: 'custom', name: 'Custom', tools: ['read_file'], skills: ['review'] });
+    if (reason === 'content') await writeFile(join(workspace, '.litespeed', 'skills', 'review', 'SKILL.md'), 'My own checklist.');
+    await writeFile(manifestFile, JSON.stringify(manifest));
+    const result = await uninstall('toolkit', workspace, store);
+    expect(result.removed.some(item => item.kind === 'skill')).toBe(false);
+    expect((await readProfileCatalog(workspace)).skills).toHaveLength(1);
+    expect(result.warnings.length).toBeGreaterThan(0);
+  });
+
+  it('rejects a plan when another operation changes the skill catalog before apply', async () => {
+    await fullPackage(); const plan = await planInstall(pkg, workspace, store);
+    await mkdir(join(workspace, '.litespeed'));
+    await writeFile(join(workspace, '.litespeed', 'profiles.json'), JSON.stringify({ version: 1, profiles: [], skills: [] }));
+    await expect(applyInstall(plan, workspace, store)).rejects.toThrow('catalog changed');
+    await expect(readFile(join(workspace, '.litespeed', 'skills', 'review', 'SKILL.md'))).rejects.toMatchObject({ code: 'ENOENT' });
   });
 
   it('uninstall leaves a user-modified file with a warning, never deleting it', async () => {

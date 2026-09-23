@@ -10,13 +10,14 @@ const composer = (page: Page) => page.getByRole('textbox', { name: 'Message Lite
 const taskCard = (page: Page) => page.getByRole('region', { name: 'Research task', exact: true, includeHidden: true });
 const transcript = (page: Page) => page.getByRole('region', { name: 'Research transcript', exact: true });
 const permission = (page: Page) => page.getByRole('region', { name: 'Permission requested', exact: true });
-let workspace: string, sessions: Session[], browserErrors: string[];
+let workspace: string, sessions: Session[], browserErrors: string[], originalRules: unknown;
 const fixtureText = 'RESEARCH_FILE_VERIFIED: this project uses a local SQLite database.\n';
 
-test.beforeEach(async ({ page }) => {
+test.beforeEach(async ({ page, request }) => {
   browserErrors = []; page.on('pageerror', error => browserErrors.push(error.message));
   workspace = await realpath(await mkdtemp(join(tmpdir(), 'litespeed-delegation-browser-'))); sessions = [];
   await writeFile(join(workspace, 'research.txt'), fixtureText);
+  originalRules = (await (await request.get('/api/settings')).json()).permissionRules ?? { version: 1, rules: [] };
 });
 test.afterEach(async ({ request }) => {
   for (const session of sessions) {
@@ -25,6 +26,7 @@ test.afterEach(async ({ request }) => {
   }
   await request.post('/fixture/delegations/release', { data: {} });
   await expect.poll(async () => (await fixture(request)).pending).toBe(0);
+  expect((await request.patch('/api/settings', { data: { permissionRules: originalRules } })).ok()).toBe(true);
   await rm(workspace, { recursive: true, force: true });
   expect(browserErrors).toEqual([]);
 });
@@ -62,10 +64,10 @@ async function approve(page: Page) { await expect(permission(page)).toBeVisible(
 async function waitHeld(request: APIRequestContext, session: Session) { const delegation = await latest(request, session); await expect.poll(async () => (await fixture(request)).pending).toBe(1); return delegation; }
 async function assertUnchanged() { expect(await readFile(join(workspace, 'research.txt'), 'utf8')).toBe(fixtureText); await expect(readFile(join(workspace, 'child-forbidden.txt'))).rejects.toMatchObject({ code: 'ENOENT' }); }
 
-for (const mode of ['build', 'plan'] as const) test(`${mode} requires deliberate task permission and records an independent real read-only transcript`, async ({ page, request }) => {
+for (const mode of ['build', 'plan'] as const) test(`${mode} starts authorized research automatically and records an independent read-only transcript`, async ({ page, request }) => {
   const session = await create(request, { mode }); await open(page, session); await send(page, session);
-  await expect(permission(page)).toBeVisible(); expect(await calls(request, session)).toHaveLength(1); expect((await detail(request, session)).delegations ?? []).toEqual([]);
-  await approve(page); const completed = await done(request, session), delegation = await latest(request, session), research = await child(request, session, delegation);
+  const completed = await done(request, session), delegation = await latest(request, session), research = await child(request, session, delegation);
+  await expect(permission(page)).toHaveCount(0);
   expect(delegation.status).toBe('completed'); expect(research.session.id).not.toBe(session.id);
   expect(research.messages.flatMap(message => message.toolCalls ?? []).map(tool => tool.name)).toEqual(['read_file']);
   expect(research.messages.some(message => message.role === 'tool' && message.content.includes('RESEARCH_FILE_VERIFIED'))).toBe(true);
@@ -75,7 +77,8 @@ for (const mode of ['build', 'plan'] as const) test(`${mode} requires deliberate
   await expect(transcript(page).getByRole('button', { name: 'Fork session', exact: true })).toHaveCount(0); await assertUnchanged();
 });
 
-test('denying delegation creates no child and sends no child model request', async ({ page, request }) => {
+test('an explicit ask rule allows denying research before any child model request', async ({ page, request }) => {
+  expect((await request.patch('/api/settings', { data: { permissionRules: { version: 1, rules: [{ tool: 'task', decision: 'ask' }] } } })).ok()).toBe(true);
   const session = await create(request); await open(page, session); await send(page, session); await expect(permission(page)).toBeVisible();
   await permission(page).getByRole('button', { name: 'Deny', exact: true }).click(); const result = await done(request, session);
   expect(result.delegations ?? []).toEqual([]); expect(await calls(request, session)).toHaveLength(2); await expect(taskCard(page)).toHaveCount(0); await assertUnchanged();
@@ -172,6 +175,7 @@ test('named profiles exclude task while explicitly selected instruction skills r
 });
 
 test('a pending task inherits accepted provider and project guidance rather than later settings or file changes', async ({ page, request }) => {
+  expect((await request.patch('/api/settings', { data: { permissionRules: { version: 1, rules: [{ tool: 'task', decision: 'ask' }] } } })).ok()).toBe(true);
   await writeFile(join(workspace, 'AGENTS.md'), 'ACCEPTED_PROJECT_GUIDANCE: inspect actual local files.');
   const settings = await (await request.get('/api/settings')).json(), session = await create(request); await open(page, session); await send(page, session); await expect(permission(page)).toBeVisible();
   try {

@@ -75,6 +75,21 @@ describe('plugin API: plan/install/list/remove round trip', () => {
     expect(store.settings().hooks).toEqual([]);
   });
 
+  it('binds the desktop installation to the complete reviewed contents, including beyond the visible excerpt', async () => {
+    await writePackage();
+    await writeFile(join(pkg, 'skills', 'audit.md'), 'Safe description. '.repeat(60));
+    const reviewed = await request('/plugins/plan', { source: pkg, workspace });
+    expect(reviewed.data.planHash).toMatch(/^[a-f0-9]{64}$/);
+    await writeFile(join(pkg, 'skills', 'audit.md'), 'Safe description. '.repeat(60) + '\nChanged instructions after review.');
+    const stale = await request('/plugins/install', { source: pkg, workspace, expectedPlanHash: reviewed.data.planHash });
+    expect(stale.status).toBe(409);
+    expect(stale.data.error).toContain('Review');
+    expect((await request('/plugins')).data.plugins).toEqual({});
+    const fresh = await request('/plugins/plan', { source: pkg, workspace });
+    expect(fresh.data.planHash).not.toBe(reviewed.data.planHash);
+    expect((await request('/plugins/install', { source: pkg, workspace, expectedPlanHash: fresh.data.planHash })).status).toBe(200);
+  });
+
   it('installing twice is an idempotent same-plugin update, not a conflict', async () => {
     await writePackage();
     expect((await request('/plugins/install', { source: pkg, workspace })).status).toBe(200);

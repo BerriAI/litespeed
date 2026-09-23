@@ -30,7 +30,7 @@ const packageRoot = resolve(dirname(fileURLToPath(import.meta.url)), fileURLToPa
 const installation = await installed(packageRoot);
 const updater = updateService({ root: packageRoot, version: VERSION, directory: store.directory });
 let restarting = false;
-const { app, runner } = createApp({ store, external:mcp, auth, updates: {
+const { app, runner, schedules } = createApp({ store, external:mcp, auth, workspaceHasTerminal: workspace => terminals.active(workspace), updates: {
   ...updater, installation: installation?.home, draining: () => restarting,
   async restart() {
     if (!installation) throw Object.assign(new Error('Restart updates are only available in the packaged install.'), { status: 409 });
@@ -56,9 +56,10 @@ if (production) {
 }
 
 const server = app.listen(port,'127.0.0.1', () => {
+  schedules.start();
   console.log(`\n  ≋ Litespeed\n  Your ideas, up to speed.\n\n  http://localhost:${port}\n  Workspace: ${store.settings().workspace}\n  Press Ctrl+C to stop.\n`);
 });
-const terminals = attachTerminals(server,store,()=>restarting);
+const terminals = attachTerminals(server,store,()=>restarting,workspace=>runner.workspaceOperationActive(workspace));
 server.on('error',error => { console.error(error.message); process.exitCode=1; void close(); });
 let closing=false;
 async function close(restartRoot?: string) {
@@ -66,8 +67,9 @@ async function close(restartRoot?: string) {
   const timeout=setTimeout(()=>{console.error('Shutdown timed out. Interrupted work may require recovery after restart.');process.exit(1);},5000);
   const disconnected=new Promise<void>(resolve=>server.close(()=>resolve()));
   server.closeAllConnections();
+  const scheduledShutdown=schedules.stop();
   runner.stopAll();
-  const results=await Promise.allSettled([runner.whenIdle(),disconnected,terminals.close(),mcp.close(),Promise.resolve(auth.close()),vite?.close()]);
+  const results=await Promise.allSettled([scheduledShutdown,runner.whenIdle(),disconnected,terminals.close(),mcp.close(),Promise.resolve(auth.close()),vite?.close()]);
   const failed=results.some(result=>result.status==='rejected');
   if(failed)console.error('A resource could not close cleanly. Review interrupted work after restart.');
   store.close();releaseOwnership();clearTimeout(timeout);

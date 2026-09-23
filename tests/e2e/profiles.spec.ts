@@ -100,7 +100,7 @@ test('edited and deleted source files never silently change the active pinned in
   const pinned = (await detail(request, session.id)).session.profile;
   await writeFile(join(workspace, '.litespeed', 'skills', 'review', 'SKILL.md'), 'SKILL_REVIEW_CHANGED: This is a different instruction.');
   let panel = await picker(page); await expect(panel).toContainText(/changed|reload/i);
-  await panel.getByRole('button', { name: 'Close dialog', exact: true }).click();
+  await panel.getByRole('button', { name: 'Back to app', exact: true }).click();
   let prompt = 'PROFILE_BROWSER keep accepted snapshot'; await send(page, request, session, prompt);
   let [call] = await profileCalls(request, prompt); expect(systemText(call)).toContain('SKILL_REVIEW_PINNED'); expect(systemText(call)).not.toContain('SKILL_REVIEW_CHANGED');
   expect((await detail(request, session.id)).session.profile).toEqual(pinned);
@@ -235,7 +235,7 @@ test('profiles use the Settings layout and can be created, edited, and deliberat
   await panel.getByLabel('Profile name', { exact: true }).fill('Release reviewer');
   await panel.getByLabel('Profile description', { exact: true }).fill('Review changes before release.');
   await panel.getByLabel('Profile instructions', { exact: true }).fill('PROFILE_RELEASE_PINNED: Check compatibility and document verification.');
-  await panel.getByRole('button', { name: 'Workspace', exact: true }).click();
+  await panel.getByRole('button', { name: 'General', exact: true }).click();
   await expect(panel.getByLabel('Profile instructions', { exact: true })).toBeHidden();
   await panel.getByRole('button', { name: 'Project profiles', exact: true }).click();
   await expect(panel.getByLabel('Profile instructions', { exact: true })).toHaveValue('PROFILE_RELEASE_PINNED: Check compatibility and document verification.');

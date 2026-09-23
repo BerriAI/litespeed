@@ -1,0 +1,18 @@
+.pdf-viewer { display: flex; flex: 1; flex-direction: column; min-height: 0; min-width: 0; }
+.pdf-toolbar { display: flex; align-items: center; gap: 3px; padding: 5px 10px; min-height: 37px; flex-shrink: 0; border-bottom: 1px solid var(--border); color: var(--muted); font-size: 11px; }
+.pdf-toolbar .icon-button { width: 26px; height: 26px; flex-shrink: 0; }
+.pdf-toolbar input { width: 38px; min-width: 0; padding: 3px 4px; font-size: 11px; line-height: 20px; height: 26px; border-radius: 4px; text-align: center; font-variant-numeric: tabular-nums; }
+.pdf-page-count { white-space: nowrap; padding: 0 4px; font-variant-numeric: tabular-nums; }
+.pdf-zoom-controls { margin-left: auto; display: flex; align-items: center; gap: 2px; }
+.pdf-zoom-value { min-width: 40px; height: 26px; border-radius: 4px; font-size: 11px; font-variant-numeric: tabular-nums; color: var(--muted); }
+.pdf-zoom-value:hover { background: var(--hover); color: var(--text); }
+.pdf-preview { position: relative; overflow-anchor: none; }
+.pdf-page { flex-shrink: 0; }
+/* PDF.js text positioning uses the same CSS-pixel viewport as the visible canvas. */
+.pdf-text-layer { position: absolute; inset: 0; overflow: clip; text-align: initial; line-height: 1; letter-spacing: normal; word-spacing: normal; -webkit-text-size-adjust: none; text-size-adjust: none; forced-color-adjust: none; transform-origin: 0 0; color-scheme: only light; --scale-round-x: 1px; --scale-round-y: 1px; --min-font-size: 1; --text-scale-factor: calc(var(--total-scale-factor) * var(--min-font-size)); --min-font-size-inv: calc(1 / var(--min-font-size)); }
+.pdf-text-layer :is(span, br) { position: absolute; white-space: pre; cursor: text; transform-origin: 0 0; color: transparent; -webkit-user-select: text; user-select: text; }
+.pdf-text-layer > :not(.markedContent), .pdf-text-layer .markedContent span:not(.markedContent) { --font-height: 0; --scale-x: 1; --rotate: 0deg; font-size: calc(var(--text-scale-factor) * var(--font-height)); transform: rotate(var(--rotate)) scaleX(var(--scale-x)) scale(var(--min-font-size-inv)); }
+.pdf-text-layer .markedContent { display: contents; }
+.pdf-text-layer span[role='img'] { user-select: none; cursor: default; }
+.pdf-text-layer ::selection { color: transparent; background: #326eaa55; }
+.pdf-text-layer br::selection { background: transparent; }

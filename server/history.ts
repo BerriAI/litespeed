@@ -98,6 +98,32 @@ export class History {
     this.assertReady(id);
     if (this.rows(id).some(row => row.status === 'undone')) throw conflict('Redo history is retained. Redo it or accept a new turn before compacting.');
   }
+  assertCanMove(id: string): void {
+    this.assertReady(id);
+    if (this.rows(id).some(row => row.status === 'open')) throw conflict('Finish the current turn before moving this task.');
+  }
+  moveToWorktree(id: string, worktreeId: string, expectedConfigRevision: number, expectedHistoryRevision: number): Session {
+    return this.moveWorkspace(id, expectedHistoryRevision, 'worktree', () => this.store.attachTaskWorktree(id, worktreeId, expectedConfigRevision));
+  }
+  moveToLocal(id: string, worktreeId: string, expectedConfigRevision: number, expectedHistoryRevision: number): Session {
+    return this.moveWorkspace(id, expectedHistoryRevision, 'local', () => this.store.detachTaskWorktree(id, worktreeId, expectedConfigRevision));
+  }
+  private moveWorkspace(id: string, expectedHistoryRevision: number, destination: 'worktree' | 'local', move: () => Session): Session {
+    return this.store.atomic(() => {
+      this.assertCanMove(id);
+      const previous = this.store.session(id);
+      if ((previous.historyRevision ?? 0) !== expectedHistoryRevision) throw conflict('The conversation changed. Review the move again.');
+      const session = move();
+      for (const row of this.rows(id)) {
+        const checkpoint = this.read(row);
+        checkpoint.unavailableReason = 'This task moved to another workspace. Undo is available for new turns made there.';
+        this.save(row, checkpoint);
+      }
+      this.store.clearChanges(id);
+      this.store.saveMessage({ id: randomUUID(), sessionId: id, role: 'system', createdAt: Date.now(), workspaceMove: { from: previous.workspace, to: session.workspace, destination }, content: `Workspace changed from ${previous.workspace} to ${session.workspace}. Continue this task in the ${destination === 'local' ? 'local project' : 'new working copy'}. The previous workspace files were preserved. Earlier file undo history stays with the previous workspace; new turns can be undone here.` });
+      return session;
+    });
+  }
   /** Atomically archive and replace messages with the matching undo checkpoint.
    * Caller holds the runner's manual operation or active-turn lock. */
   compact(id: string, messages: Message[]): Session {

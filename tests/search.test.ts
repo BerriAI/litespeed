@@ -31,6 +31,50 @@ function fixture(): { session: Session; messages: Message[] } {
 }
 
 describe('cross-session history search', () => {
+  it('finds task names and prose with one useful current-message match per task', () => {
+    const named = store.createSession({ title: 'Flumoxide notes' }), prose = store.createSession({ title: 'A parser investigation' });
+    const target = message(prose.id, 'user', 'Please preserve the flumoxide grammar.'); store.saveMessage(target);
+    store.saveMessage(message(prose.id, 'assistant', 'The flumoxide parser needs a careful change.')); search.index(prose.id);
+    const results = search.tasks({ query: 'flumoxide', includeArchived: true }); expect(results.more).toBe(false); expect(results.items.map(item => item.id)).toEqual([named.id, prose.id]);
+    expect(results.items[1]).toMatchObject({ title: prose.title, project: directory, archived: false }); expect(results.items[1].messageId).toBeTruthy(); expect(results.items[1].snippet).toContain('flumoxide');
+    expect(search.tasks({ query: 'nothing-matches' }).items).toEqual([]); expect(search.tasks({ query: '%' }).items).toEqual([]);
+  });
+  it('deduplicates before limiting and excludes tools and attachment contents from task search', () => {
+    const first = store.createSession({ title: 'A long discussion' }), second = store.createSession({ title: 'Another discussion' });
+    for (let index = 0; index < 80; index++) store.saveMessage(message(first.id, 'user', `Flumoxide thought ${index}`));
+    store.saveMessage(message(second.id, 'assistant', 'Flumoxide is the relevant term.'));
+    store.saveMessage(message(second.id, 'tool', 'InvisibleToolMarker')); store.saveMessage(message(second.id, 'user', 'A useful reference', { attachments: [{ name: 'note.txt', content: 'InvisibleAttachmentMarker' }] }));
+    search.index(first.id); search.index(second.id);
+    expect(search.tasks({ query: 'flumoxide' }).items.map(item => item.id).sort()).toEqual([first.id, second.id].sort());
+    expect(search.tasks({ query: 'InvisibleToolMarker' }).items).toEqual([]); expect(search.tasks({ query: 'InvisibleAttachmentMarker' }).items).toEqual([]);
+  });
+  it('filters projects and archived tasks and never returns stale or deleted message matches', () => {
+    const archived = store.createSession({ title: 'Saved discussion' }), other = store.createSession({ title: 'Another project', workspace: join(directory, 'other') });
+    store.updateSession(archived.id, { archived: true });
+    const target = message(archived.id, 'assistant', 'A flumoxide decision'); store.saveMessage(target); store.saveMessage(message(other.id, 'user', 'Another flumoxide result')); search.index(archived.id); search.index(other.id);
+    expect(search.tasks({ query: 'flumoxide' }).items.map(item => item.id)).toEqual([other.id]);
+    expect(search.tasks({ query: 'flumoxide', project: directory, includeArchived: true }).items.map(item => item.id)).toEqual([archived.id]);
+    store.saveMessage({ ...target, content: 'An unrelated message' }); expect(search.tasks({ query: 'flumoxide', project: directory, includeArchived: true }).items).toEqual([]);
+    store.deleteSession(other.id); expect(search.tasks({ query: 'flumoxide', includeArchived: true }).items).toEqual([]);
+  });
+  it('bounds recent task lists and treats query punctuation as ordinary text', () => {
+    for (let index = 0; index < 52; index++) store.createSession({ title: `Task ${index}` });
+    expect(search.tasks({ query: '' }).items).toHaveLength(50); expect(search.tasks({ query: '' }).more).toBe(true);
+    const quoted = store.createSession({ title: 'Build "the parser"' }); expect(search.tasks({ query: '"the parser"' }).items.map(item => item.id)).toEqual([quoted.id]);
+    expect(() => search.tasks({ query: '" OR * NOT ) :' })).not.toThrow();
+  });
+  it('keeps child transcripts out of task navigation and groups worktrees with their original project', () => {
+    const parent = store.createSession({ title: 'Parent discussion' }), child = store.createSession({ title: 'Flumoxide internal worker' }), copy = store.createSession({ title: 'Worktree discussion' });
+    store.saveMessage(message(child.id, 'assistant', 'Flumoxide internal report'));
+    store.db.prepare('INSERT INTO delegations(id,parent_session_id,parent_turn_id,parent_message_id,tool_call_id,child_session_id,status,data) VALUES(?,?,?,?,?,?,?,?)').run('child-record', parent.id, 'turn', 'message', 'tool', child.id, 'completed', '{}');
+    search.index(child.id);
+    const metadata = { ...copy, workspace: join(directory, 'working-copy'), worktree: { id: 'copy', project: directory, branch: 'feature', head: 'a'.repeat(40) } };
+    store.db.prepare('UPDATE sessions SET data=? WHERE id=?').run(JSON.stringify(metadata), copy.id);
+    store.saveMessage(message(copy.id, 'user', 'Flumoxide in the working copy')); search.index(copy.id);
+    expect(search.tasks({ query: 'flumoxide', includeArchived: true }).items.map(item => item.id)).toEqual([copy.id]);
+    expect(search.tasks({ query: 'flumoxide', project: directory }).items[0].project).toBe(directory);
+    expect(search.tasks({ query: 'flumoxide', project: metadata.workspace }).items).toEqual([]);
+  });
   it('indexes user, assistant, tool_input and tool_error kinds and finds them by term', () => {
     const { session, messages } = fixture(); search.index(session.id);
     const { hits, indexed } = search.search({ query: 'flumoxide' });

@@ -203,7 +203,7 @@ describe('independent read-only research transcript', () => {
   });
   it('shows an inert empty transcript rather than prompting for a new run', async () => {
     const api = server(); api.child = child({ messages: [] }); await mountTranscript();
-    expect(document.body.textContent).toContain('No transcript yet'); expect(document.body.textContent).not.toContain('Give your agent a task'); expect(document.querySelector('textarea')).toBeNull();
+    expect(document.body.textContent).toContain('No activity yet'); expect(document.body.textContent).not.toContain('Give your agent a task'); expect(document.querySelector('textarea')).toBeNull();
   });
   it('rejects malformed or unnumbered events and supports authoritative reconnect recovery', async () => {
     const api = server(); await mountTranscript(); const stream = transcriptSource();

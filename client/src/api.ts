@@ -95,6 +95,15 @@ export function useSessionDraft(sessionId: string | null) {
     draft: drafts.current.get(key)!, notice: notices.current.get(key),
     setText: (text: string) => update({ text }),
     setAttachments: (attachments: Attachment[]) => update({ attachments }),
+    seed: (id: string, draft: ComposerDraft) => {
+      if (!validDraft(draft)) throw new Error('This review snapshot is too large for a saved draft.');
+      const target = DRAFT_PREFIX + id;
+      // New-task seeding may never replace a draft created by another tab.
+      if (drafts.current.has(target)) throw new Error('This task already has a draft.');
+      try { if (localStorage.getItem(target)) throw new Error('This task already has a saved draft.'); }
+      catch (error) { if (error instanceof Error && error.message.startsWith('This task')) throw error; }
+      drafts.current.set(target, draft); persist(target, draft); rerender(value => value + 1);
+    },
     prepareDelete: (id: string) => {
       const target = DRAFT_PREFIX + id;
       // Capture before the server request, including for an unopened sidebar session.

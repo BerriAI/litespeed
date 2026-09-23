@@ -131,6 +131,7 @@ test('provider limits save explicitly, override catalog metadata, survive reload
   await discover(request); const session = await create(request); await open(page, session);
   await page.getByRole('button', { name: 'Settings', exact: true }).click();
   const dialog = page.getByRole('dialog', { name: 'Settings', exact: true });
+  await dialog.getByRole('button', { name: 'Providers', exact: true }).click();
   await dialog.getByRole('button', { name: provider.name, exact: true }).click();
   await dialog.locator('summary').filter({ hasText: 'Context window overrides' }).click();
   await dialog.getByRole('button', { name: 'Add context limit', exact: true }).click();
@@ -148,6 +149,7 @@ test('provider limits save explicitly, override catalog metadata, survive reload
   const completed = await send(page, request, session, 'Use the configured provider limit.');
   expect(latestContext(completed)).toMatchObject({ contextWindow: 24000, limitSource: 'override' });
   await page.getByRole('button', { name: 'Settings', exact: true }).click();
+  await dialog.getByRole('button', { name: 'Providers', exact: true }).click();
   await dialog.getByRole('button', { name: provider.name, exact: true }).click();
   await dialog.locator('summary').filter({ hasText: 'Context window overrides' }).click();
   await dialog.getByRole('button', { name: 'Remove context limit budget-model', exact: true }).click();

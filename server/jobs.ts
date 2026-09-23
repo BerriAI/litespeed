@@ -16,6 +16,7 @@ export type JobStatus = 'running' | 'exited' | 'killed' | 'failed';
 export interface JobView { id: string; command: string; status: JobStatus; pid?: number; startedAt: number; endedAt?: number; exitCode?: number; signal?: string; timedOut: boolean; truncated: boolean }
 
 interface Job {
+  cwd: string;
   hidden?: boolean;
   id: string; sessionId: string; command: string;
   child?: ChildProcess; pid?: number;
@@ -42,7 +43,7 @@ export class Jobs {
   private jobs = new Map<string, Job>();       // Global id -> job.
   private counters = new Map<string, number>();  // Per-session 'job-N' counter.
 
-  active() { return [...this.jobs.values()].some(job => job.status === 'running'); }
+  active(workspace?: string) { return [...this.jobs.values()].some(job => job.status === 'running' && (!workspace || job.cwd === workspace || job.cwd.startsWith(workspace + path.sep))); }
   private key(sessionId: string, id: string): string { return `${sessionId}\0${id}`; }
   private find(sessionId: string, id: string): Job | undefined { return this.jobs.get(this.key(sessionId, id)); }
   private forSession(sessionId: string): Job[] { return [...this.jobs.values()].filter(job => job.sessionId === sessionId); }
@@ -62,7 +63,7 @@ export class Jobs {
     const count = (this.counters.get(sessionId) ?? 0) + 1;
     this.counters.set(sessionId, count);
     const id = `job-${count}`;
-    const job: Job = { id, sessionId, command, startedAt: Date.now(), status: 'running', timedOut: false, truncated: false, output: Buffer.alloc(0), cursor: 0, dropped: 0, consumed: false, waiters: new Set(), ...callbacks };
+    const job: Job = { id, sessionId, command, cwd, startedAt: Date.now(), status: 'running', timedOut: false, truncated: false, output: Buffer.alloc(0), cursor: 0, dropped: 0, consumed: false, waiters: new Set(), ...callbacks };
     this.jobs.set(this.key(sessionId, id), job);
     // Same shell and environment as the foreground bash tool: /bin/bash -c with
     // harness credentials stripped. detached so we can signal the whole tree.

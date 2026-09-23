@@ -52,7 +52,7 @@ afterEach(async () => { await act(async () => roots.splice(0).forEach(root => ro
 
 describe('memory settings section', () => {
   it('renders the toggle on by default with the automatic-memory hint and saves memoryEnabled only when touched', async () => {
-    const api = server(); const view = await mount(); await press('Workspace');
+    const api = server(); const view = await mount(); await press('General');
     const checkbox = el<HTMLInputElement>('.memory-toggle input[type="checkbox"]');
     expect(checkbox.checked).toBe(true);
     const text = document.body.textContent!;
@@ -62,7 +62,7 @@ describe('memory settings section', () => {
     expect(view.onClose).toHaveBeenCalledTimes(1);
   });
   it('PATCHes memoryEnabled true after the toggle is enabled and saved', async () => {
-    const disabled={...base,memoryEnabled:false}; const api = server(disabled); const view = await mount(disabled); await press('Workspace');
+    const disabled={...base,memoryEnabled:false}; const api = server(disabled); const view = await mount(disabled); await press('General');
     await toggle('.memory-toggle input[type="checkbox"]');
     expect(el<HTMLInputElement>('.memory-toggle input[type="checkbox"]').checked).toBe(true);
     await press('Save settings');
@@ -71,7 +71,7 @@ describe('memory settings section', () => {
     expect(view.onSave).toHaveBeenCalledTimes(1); expect(view.onClose).toHaveBeenCalledTimes(1);
   });
   it('lists fetched facts with name, description, updated date and delete buttons', async () => {
-    server(); await mount(); await press('Workspace');
+    server(); await mount(); await press('General');
     const list = el('.memory-facts');
     expect(list.textContent).toContain('build-command'); expect(list.textContent).toContain('Use npm run check before shipping.');
     expect(list.textContent).toContain('style-guide'); expect(list.textContent).toContain('Updated');
@@ -79,7 +79,7 @@ describe('memory settings section', () => {
     expect(document.querySelector('[aria-label="Delete fact build-command"]')).not.toBeNull();
   });
   it('deletes a fact against the exact URL and refreshes the list', async () => {
-    const api = server(); await mount(); await press('Workspace');
+    const api = server(); await mount(); await press('General');
     await click('[aria-label="Delete fact build-command"]');
     expect(api.deletes()).toEqual([{ path: '/api/memory/build-command?workspace=%2Fworkspace', method: 'DELETE', body: undefined }]);
     expect(api.memoryReads().length).toBeGreaterThanOrEqual(2);
@@ -88,13 +88,13 @@ describe('memory settings section', () => {
   });
   it('shows the empty state when memory is enabled and no facts are recorded', async () => {
     const api = server({ ...base, memoryEnabled: true } as SettingsType); api.memory = [];
-    await mount({ ...base, memoryEnabled: true } as SettingsType); await press('Workspace');
+    await mount({ ...base, memoryEnabled: true } as SettingsType); await press('General');
     expect(document.body.textContent).toContain('No recorded facts for this workspace.');
     expect(document.querySelector('.memory-facts')).toBeNull();
   });
   it('surfaces a fetch error inline without breaking the rest of Settings', async () => {
     const api = server(); api.intercept = (path, method) => path.startsWith('/api/memory') && method === 'GET' ? Promise.reject(new Error('memory store offline')) : undefined;
-    const view = await mount(); await press('Workspace');
+    const view = await mount(); await press('General');
     expect(el('[aria-label="Agent memory"] [role="alert"]').textContent).toContain('memory store offline');
     expect(el<HTMLInputElement>('.memory-toggle input[type="checkbox"]').checked).toBe(true);
     await fill('input[placeholder="/absolute/path/to/your/project"]', '/workspace');
@@ -105,7 +105,7 @@ describe('memory settings section', () => {
   it('ignores a stale memory response after the workspace changed mid-fetch', async () => {
     const api = server(); const wait = deferred<{ facts: MemoryFactSummary[] }>();
     api.intercept = (path, method) => path.startsWith('/api/memory?') && method === 'GET' && path.includes('%2Fworkspace') && !path.includes('%2Fother') ? wait.promise : undefined;
-    await mount(); await press('Workspace');
+    await mount(); await press('General');
     api.memory = [{ id: 'fact-b', name: 'other-fact', description: 'Belongs to the other workspace.', pinned: false, updatedAt: Date.UTC(2026, 8, 5) }];
     await fill('input[placeholder="/absolute/path/to/your/project"]', '/other');
     expect(el('.memory-facts').textContent).toContain('other-fact');
@@ -121,7 +121,7 @@ describe('memory pin controls', () => {
       { id: 'fact-1', name: 'build-command', description: 'Use npm run check.', pinned: true, updatedAt: Date.UTC(2026, 8, 1) },
       { id: 'fact-2', name: 'style-guide', description: 'Dense JSX.', pinned: false, updatedAt: Date.UTC(2026, 8, 3) },
     ];
-    await mount(); await press('Workspace');
+    await mount(); await press('General');
     expect(document.querySelector('[aria-label="Unpin fact build-command"]')).not.toBeNull();
     expect(document.querySelector('[aria-label="Pin fact style-guide"]')).not.toBeNull();
     const pinnedRow = el('.memory-fact.pinned');
@@ -129,7 +129,7 @@ describe('memory pin controls', () => {
     expect(pinnedRow.textContent).toContain('Pinned');
   });
   it('pins via PATCH against the exact URL and reorders pinned facts first on refresh', async () => {
-    const api = server(); await mount(); await press('Workspace');
+    const api = server(); await mount(); await press('General');
     // Initial order is the fixture order: build-command then style-guide.
     expect([...document.querySelectorAll('.memory-fact strong')].map(item => item.textContent)).toEqual(['build-command', 'style-guide']);
     await click('[aria-label="Pin fact style-guide"]');
@@ -143,7 +143,7 @@ describe('memory pin controls', () => {
   it('surfaces a pin failure (e.g. the 10-pin cap) inline without a stray refresh masking it', async () => {
     const api = server();
     api.intercept = (path, method) => path.startsWith('/api/memory/') && method === 'PATCH' ? Promise.reject(new Error('At most 10 facts can be pinned per workspace.')) : undefined;
-    await mount(); await press('Workspace');
+    await mount(); await press('General');
     const readsBefore = api.memoryReads().length;
     await click('[aria-label="Pin fact build-command"]');
     expect(el('[aria-label="Agent memory"] [role="alert"]').textContent).toContain('At most 10 facts');

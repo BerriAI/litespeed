@@ -17,6 +17,17 @@ describe('local API and agent loop',()=>{
   let calls:any[],mode:'text'|'tool'|'repeat'|'slow'|'error'|'overflow'|'summary-error'|'summary-slow'|'overflow-always';
   async function request(path:string,body?:unknown,method?:string){const response=await fetch(base+'/api'+path,{method:method||(body===undefined?'GET':'POST'),headers:{'Content-Type':'application/json'},body:body===undefined?undefined:JSON.stringify(body)});return{status:response.status,data:await response.json()};}
   async function session(extra:Record<string,unknown>={}){return(await request('/sessions',extra)).data;}
+  it('serves task search locally, validates filters and indexes imported history in bounded passes', async () => {
+    const saved = await session({ title: 'Earlier discussion' }); store.saveMessage({ id: 'search-target', sessionId: saved.id, role: 'user', content: 'A tessellated interface with careful alignment.', createdAt: 1 });
+    const result = await request('/task-search?query=tessellated&includeArchived=true'); expect(result.status).toBe(200); expect(result.data.items).toMatchObject([{ id: saved.id, messageId: 'search-target', role: 'user' }]); expect(calls).toEqual([]);
+    store.updateSession(saved.id, { archived: true }); expect((await request('/task-search?query=tessellated&includeArchived=false')).data.items).toEqual([]);
+    for (const query of ['query=' + 'a'.repeat(201), 'includeArchived=yes', 'project=', 'extra=not-allowed']) expect((await request('/task-search?' + query)).status).toBe(400);
+    for (let index = 0; index < 202; index++) store.createSession({ title: `Older task ${index}` });
+    const late = store.createSession({ title: 'Last imported task' }); store.saveMessage({ id: 'late-search-target', sessionId: late.id, role: 'assistant', content: 'A crystalline reference.', createdAt: 2 });
+    expect((await request('/task-search?query=crystalline')).data.indexing).toBe(true);
+    const finished = await request('/task-search?query=crystalline'); expect(finished.data.indexing).toBe(false); expect(finished.data.items.map((item: any) => item.id)).toEqual([late.id]);
+    const headers = await fetch(base + '/api/task-search?query=crystalline'); expect(headers.headers.get('cache-control')).toBe('no-store');
+  });
   beforeEach(async()=>{
     dir=await mkdtemp(join(tmpdir(),'litespeed-api-'));store=new Store(join(dir,'state'));calls=[];mode='text';
     provider=createServer(async(req,res)=>{
@@ -45,6 +56,38 @@ describe('local API and agent loop',()=>{
     const foreign=await fetch(base+'/api/settings',{headers:{Origin:'https://evil.example'}});expect(foreign.status).toBe(403);
     const rebound=await new Promise<number>(resolve=>{httpRequest(base+'/api/settings',{headers:{Host:'evil.example'}},res=>{res.resume();resolve(res.statusCode!);}).end();});expect(rebound).toBe(403);
     const cross=await fetch(base+'/api/settings',{headers:{'Sec-Fetch-Site':'cross-site'}});expect(cross.status).toBe(403);
+  });
+  it('validates browser preferences and requires explicit clear/reset actions while refusing reset during a task', async () => {
+    expect((await request('/settings', { browser: { searchEngine: 'duckduckgo', rememberHistory: false } }, 'PATCH')).data.browser).toEqual({ searchEngine: 'duckduckgo', rememberHistory: false });
+    expect((await request('/settings', { browser: { searchEngine: 'untrusted', rememberHistory: true } }, 'PATCH')).status).toBe(400);
+    expect((await request('/browser/history')).data.entries).toEqual([]);
+    expect((await request('/browser/history', {}, 'DELETE')).status).toBe(400);
+    expect((await request('/browser/history', { confirm: true }, 'DELETE')).status).toBe(200);
+    expect((await request('/browser/reset', {})).status).toBe(400);
+    expect((await request('/browser/reset', { confirm: true })).status).toBe(200);
+    mode = 'slow'; const s = await session(); await request(`/sessions/${s.id}/messages`, { content: 'Hold this response.' });
+    await until(() => runner.active(s.id)); expect((await request('/browser/reset', { confirm: true })).status).toBe(409);
+  });
+  it('validates browser inspection and gates it against active and archived tasks', async () => {
+    const s = await session(), action = { action: 'select', tabId: '7a2e5692-4815-4606-a46c-cf0804645871', url: 'https://example.com/', width: 800, height: 600, x: 50, y: 40 };
+    expect((await request(`/sessions/${s.id}/browser/inspect`, { ...action, script: 'alert(1)' })).status).toBe(400);
+    expect((await request(`/sessions/${s.id}/browser/inspect`, action)).status).toBe(409);
+    mode = 'slow'; await request(`/sessions/${s.id}/messages`, { content: 'Hold this response.' }); await until(() => runner.active(s.id));
+    expect((await request(`/sessions/${s.id}/browser/inspect`, action)).status).toBe(409);
+    await request(`/sessions/${s.id}/cancel`, {}); await until(() => !runner.active(s.id));
+    await request(`/sessions/${s.id}`, { archived: true }, 'PATCH');
+    const result = await request(`/sessions/${s.id}/browser/inspect`, action); expect(result.status).toBe(409); expect(result.data.error).toContain('Restore this task');
+  });
+  it('validates download destinations and allows automatic saving to be disabled after a folder disappears', async () => {
+    const destination = join(dir, 'downloads'); await mkdir(destination);
+    const browser = { searchEngine: 'google', rememberHistory: true, autoSaveDownloads: true, downloadDirectory: destination };
+    const saved = await request('/settings', { browser }, 'PATCH'); expect(saved.status).toBe(200); expect(saved.data.browser.downloadDirectory).toBe(await fsPromises.realpath(destination));
+    await rm(destination, { recursive: true });
+    expect((await request('/settings', { browser: { ...saved.data.browser, autoSaveDownloads: false } }, 'PATCH')).status).toBe(200);
+    expect((await request('/settings', { browser }, 'PATCH')).status).toBe(400);
+    expect((await request('/settings', { browser: { ...browser, downloadDirectory: store.directory } }, 'PATCH')).status).toBe(400);
+    expect((await request('/settings', { browser: { ...browser, downloadDirectory: 'relative' } }, 'PATCH')).status).toBe(400);
+    expect((await request('/browser/download-directory')).data.defaultDirectory).toMatch(/Downloads$/);
   });
   it('validates inputs and returns actionable not-found errors',async()=>{expect((await request('/sessions',{mode:'invalid'})).status).toBe(400);expect((await request('/sessions/missing')).status).toBe(404);expect((await request('/settings',{maxSteps:0},'PATCH')).status).toBe(400);});
   it('streams and persists a real multi-chunk provider response',async()=>{

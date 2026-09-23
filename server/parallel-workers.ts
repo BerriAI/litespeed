@@ -7,6 +7,7 @@ import type { FileChange } from '../shared/types.js';
 import { snapshotWorkspace, snapshotChanges, SNAPSHOT_IGNORES, type WorkspaceSnapshot } from './workspace-snapshot.js';
 import { readRestoreTarget, restoreChanges } from './tools.js';
 import type { History } from './history.js';
+import { allowStateWorkspace } from './state-paths.js';
 
 export interface WorkerWorkspace { workspace: string; batch: ParallelWorkers; key: string }
 export interface Outcome { accepted: boolean; changes: FileChange[]; note: string }
@@ -20,6 +21,7 @@ export class ParallelWorkers {
   private ready: Promise<void>;
   private resolveReady!: () => void;
   readonly workspaces = new Map<string,WorkerWorkspace>();
+  private releaseWorkspaces: (() => void)[] = [];
   private constructor(private root:string,private parentId:string,private keys:string[],private baseline:WorkspaceSnapshot,private history:History,private signal:AbortSignal,private directory:string,private isCurrent:()=>boolean) {
     this.ready=new Promise(resolve=>{this.resolveReady=resolve;});
   }
@@ -42,6 +44,7 @@ export class ParallelWorkers {
           else await cp(source,target,{preserveTimestamps:true,dereference:false,verbatimSymlinks:true});
         };
         await copy(root,destination);
+        batch.releaseWorkspaces.push(allowStateWorkspace(destination));
         // Reuse installed packages. They are explicitly outside file history;
         // copied source and test outputs remain local to the worker workspace.
         try {if((await lstat(join(root,'node_modules'))).isDirectory())await symlink(join(root,'node_modules'),join(destination,'node_modules'),'dir');} catch(error) {if((error as NodeJS.ErrnoException).code!=='ENOENT')throw error;}
@@ -53,7 +56,7 @@ export class ParallelWorkers {
         batch.workspaces.set(key,{workspace:destination,batch,key});
       }
       return batch;
-    } catch(error) {await rm(directory,{recursive:true,force:true});throw error;}
+    } catch(error) {for(const release of batch.releaseWorkspaces)release();await rm(directory,{recursive:true,force:true});throw error;}
   }
   /** Reconcile root changes into a retained task workspace. Local work survives
    * a yield; overlapping changes require a fresh context and explicit review. */
@@ -68,12 +71,14 @@ export class ParallelWorkers {
     const conflicts=upstream.changes.filter(change=>edits.changes.some(edit=>edit.path===change.path&&edit.after!==change.after));
     if(conflicts.length)throw new Error(`Retained work conflicts with root changes in ${conflicts.map(change=>change.path).join(', ')}.`);
     signal.throwIfAborted();if(!isCurrent())throw new Error('New steering arrived before workspace reconciliation.');
+    const releaseWorkspace = allowStateWorkspace(workspace);
     for(const change of upstream.changes) {
       if(edits.changes.some(edit=>edit.path===change.path))continue;
       await restoreChanges(workspace,[{path:change.path,before:change.after,after:change.before}],()=>{});
     }
     await writeFile(workspace+'.baseline.json',JSON.stringify(baseline),{mode:0o600});
     const batch=new ParallelWorkers(root,parentId,[key],baseline,history,signal,dirname(workspace),isCurrent);
+    batch.releaseWorkspaces.push(releaseWorkspace);
     batch.workspaces.set(key,{workspace,batch,key});return batch;
   }
   async complete(key:string,success:boolean,actorSessionId?:string,invocationId?:string):Promise<Outcome> {
@@ -125,6 +130,6 @@ export class ParallelWorkers {
   async cleanup():Promise<void> {
     await this.ready;
     // Keep failed/conflicting work available for inspection and fresh repairs.
-    if([...this.outcomes.values()].every(outcome=>outcome.accepted))await rm(this.directory,{recursive:true,force:true});
+    if([...this.outcomes.values()].every(outcome=>outcome.accepted)) {for(const release of this.releaseWorkspaces)release();await rm(this.directory,{recursive:true,force:true});}
   }
 }
