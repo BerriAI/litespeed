@@ -53,7 +53,7 @@ for (const [name, kind, role] of [['Team Fusion', 'team-fusion', 'Worker'], ['Ex
       await expect(page.getByRole('region', { name: `${role} 1 transcript`, exact: true })).toContainText('Implementation complete');
       await page.getByRole('button',{name:'Back to conversation',exact:false}).click();
       await page.getByRole('button', { name: 'Session actions', exact: true }).click();
-      await page.getByRole('button', { name: 'Undo last turn', exact: true }).click();
+      await page.locator('.session-menu').getByRole('button', { name: 'Undo last turn', exact: true }).click();
       await page.getByRole('dialog').getByRole('button', { name: 'Undo last turn', exact: true }).click();
       await expect.poll(async () => (await detail()).messages.filter(message => message.role === 'user').length).toBe(0);
       await expect(readFile(join(workspace, 'answer.txt'))).rejects.toMatchObject({ code: 'ENOENT' });

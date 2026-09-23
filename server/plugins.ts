@@ -18,6 +18,7 @@ import { HOOK_LIMITS, type HookConfig } from '../shared/hooks.js';
 import { PLUGIN_LIMITS, type InstallAction, type InstallPlan, type PluginItem, type PluginRegistryEntry, type UninstallResult } from '../shared/plugins.js';
 import type { McpServerConfig, Settings } from '../shared/types.js';
 import type { Store } from './store.js';
+import { readStrictManifest, writeStrictManifest, withProfileWriteLock, validateStrictManifest, type StrictManifest } from './profiles.js';
 
 const httpError = (status: number, message: string) => Object.assign(new Error(message), { status });
 const hash = (value: string) => createHash('sha256').update(value, 'utf8').digest('hex');
@@ -53,7 +54,7 @@ type Manifest = z.infer<typeof manifestSchema>;
 // Registry rows are durable state: revalidate defensively (like captureHooks
 // does for Settings.hooks) so a hand-edited database cannot corrupt uninstall.
 const itemSchema = z.object({ kind: z.enum(['skill', 'command', 'mcp', 'hook']), target: z.string().min(1).max(256), hash: z.string().regex(/^[a-f0-9]{64}$/) }).strict();
-const registryEntrySchema = z.object({ version, description: description.optional(), installedAt: z.number().int().min(0), workspace: z.string().min(1).max(4096), items: z.array(itemSchema).max(256) }).strict();
+const registryEntrySchema = z.object({ version, description: description.optional(), installedAt: z.number().int().min(0), workspace: z.string().min(1).max(4096), items: z.array(itemSchema).max(256), skillCatalog: z.array(z.object({ id: slug, hash: z.string().regex(/^[a-f0-9]{64}$/) }).strict()).max(64).optional() }).strict();
 
 const SKILL_TARGET = /^\.litespeed\/skills\/([a-z0-9][a-z0-9-]{0,63})\/SKILL\.md$/;
 const COMMAND_TARGET = /^\.litespeed\/commands\/([a-z0-9][a-z0-9-]{0,63})\.md$/;
@@ -63,7 +64,8 @@ const HOOK_TARGET = /^hooks#([a-f0-9]{16})$/;
 /** Server-internal plan: carries the full content to install per action so
  * apply never re-reads the package (the API strips it via publicPlan). */
 export interface PlannedAction extends InstallAction { content: string }
-export interface PluginPlan extends Omit<InstallPlan, 'actions'> { actions: PlannedAction[]; workspace: string }
+export interface PluginPlan extends Omit<InstallPlan, 'actions'> { actions: PlannedAction[]; workspace: string; skillCatalog?: { before: string | null; manifest: StrictManifest; owned: { id: string; hash: string }[] } }
+export const pluginPlanHash = (plan: PluginPlan) => hash(canonical(plan));
 export function publicPlan(plan: PluginPlan): InstallPlan {
   return { plugin: plan.plugin, actions: plan.actions.map(({ content: _content, ...action }) => action), warnings: plan.warnings, ...(plan.unmapped ? { unmapped: plan.unmapped } : {}) };
 }
@@ -259,7 +261,28 @@ export async function planInstall(source: string, workspace: string, store: Stor
     if (conflict === 'exists' && present) warnings.push(`Hook "${hookConfig.event}: ${hookConfig.command.slice(0, 80)}" already exists in Settings and is not owned by this plugin; it will be skipped.`);
     actions.push({ kind: 'hook', name: hookConfig.event, target, preview: preview(content), ...(conflict ? { conflict } : {}), content });
   }
-  return { plugin: { name: manifest.name, version: manifest.version, ...(manifest.description ? { description: manifest.description } : {}) }, actions, warnings, ...(unmapped?.length ? { unmapped } : {}), workspace: canonicalWorkspace };
+  let skillCatalog: PluginPlan['skillCatalog'];
+  const skillActions = actions.filter(action => action.kind === 'skill' && action.conflict !== 'exists');
+  if (skillActions.length) {
+    const current = await readStrictManifest(canonicalWorkspace);
+    const next = structuredClone(current.manifest), owned: { id: string; hash: string }[] = [];
+    for (const action of skillActions) {
+      const id = SKILL_TARGET.exec(action.target)![1];
+      const declared = next.skills.find(skill => skill.id === id);
+      if (declared) {
+        // Preserve user-authored metadata; retain ownership only while it is unchanged.
+        const prior = sameWorkspace && existing?.skillCatalog?.find(skill => skill.id === id);
+        if (prior && prior.hash === hash(canonical(declared))) owned.push(prior);
+      } else {
+        const frontmatter = /^\uFEFF?---\r?\n([\s\S]*?)\r?\n---/.exec(action.content)?.[1] || '';
+        const field = (key: string) => new RegExp(`^${key}:\\s*(.*)$`, 'm').exec(frontmatter)?.[1]?.replace(/^["']|["']$/g, '').replace(/[\p{Cc}\p{Cf}]/gu, ' ').trim();
+        const row = { id, name: (field('name') || id).slice(0, 200).trim(), description: (field('description') || manifest.description || '').slice(0, 2000) };
+        next.skills.push(row); owned.push({ id, hash: hash(canonical(row)) });
+      }
+    }
+    skillCatalog = { before: current.before, manifest: validateStrictManifest(next), owned };
+  }
+  return { plugin: { name: manifest.name, version: manifest.version, ...(manifest.description ? { description: manifest.description } : {}) }, actions, warnings, ...(unmapped?.length ? { unmapped } : {}), workspace: canonicalWorkspace, ...(skillCatalog ? { skillCatalog } : {}) };
 }
 
 /** Validate a file target and return its safe absolute path: fixed shapes
@@ -286,8 +309,12 @@ export interface ApplyResult { name: string; entry: PluginRegistryEntry; warning
  * last file write and the settings save can leave untracked files — the plan
  * lists their exact paths, so recovery is manual but fully visible. */
 export async function applyInstall(plan: PluginPlan, workspace: string, store: Store): Promise<ApplyResult> {
+  return withProfileWriteLock(plan.workspace, () => applyInstallLocked(plan, workspace, store));
+}
+async function applyInstallLocked(plan: PluginPlan, workspace: string, store: Store): Promise<ApplyResult> {
   const canonicalWorkspace = await fs.realpath(path.resolve(workspace));
   if (canonicalWorkspace !== plan.workspace) throw httpError(409, 'The plan was computed for a different workspace. Re-plan and retry.');
+  if (plan.skillCatalog && (await readStrictManifest(canonicalWorkspace)).before !== plan.skillCatalog.before) throw httpError(409, 'The project skill catalog changed. Review the installation again.');
   const apply = plan.actions.filter(action => action.conflict !== 'exists');
   const warnings = [...plan.warnings];
   const written: { absolute: string; prior: string | null }[] = [];
@@ -301,6 +328,7 @@ export async function applyInstall(plan: PluginPlan, workspace: string, store: S
       await fs.writeFile(absolute, action.content, 'utf8');
       written.push({ absolute, prior });
     }
+    if (plan.skillCatalog) await writeStrictManifest(canonicalWorkspace, plan.skillCatalog.manifest, plan.skillCatalog.before);
   } catch (error) {
     // Best-effort rollback: restore what was overwritten, unlink what was new.
     // Rollback failures are swallowed — the original error is the actionable one.
@@ -348,7 +376,7 @@ export async function applyInstall(plan: PluginPlan, workspace: string, store: S
     const kept = new Set(items.map(item => `${item.kind}:${item.target}`));
     for (const item of previousParsed.data.items) if (!kept.has(`${item.kind}:${item.target}`)) warnings.push(`Previously installed ${item.kind} ${item.target} is no longer provided by this version; it was left in place and is no longer tracked.`);
   }
-  const entry: PluginRegistryEntry = { version: plan.plugin.version, ...(plan.plugin.description ? { description: plan.plugin.description } : {}), installedAt: Date.now(), workspace: canonicalWorkspace, items };
+  const entry: PluginRegistryEntry = { version: plan.plugin.version, ...(plan.plugin.description ? { description: plan.plugin.description } : {}), installedAt: Date.now(), workspace: canonicalWorkspace, items, ...(plan.skillCatalog ? { skillCatalog: plan.skillCatalog.owned } : {}) };
   store.saveSettings({ ...patch, plugins: { ...settings.plugins, [plan.plugin.name]: entry } });
   return { name: plan.plugin.name, entry, warnings };
 }
@@ -359,6 +387,11 @@ export async function applyInstall(plan: PluginPlan, workspace: string, store: S
  * only when they still match the recorded hash (mcp compares without
  * `enabled`, so a server the user merely connected still uninstalls). */
 export async function uninstall(name: string, workspace: string, store: Store): Promise<UninstallResult> {
+  if (!slug.safeParse(name).success) throw httpError(400, 'Plugin name must be a lowercase slug.');
+  const entry = registryEntry(store.settings(), name);
+  return withProfileWriteLock(entry?.workspace || workspace, () => uninstallLocked(name, workspace, store));
+}
+async function uninstallLocked(name: string, workspace: string, store: Store): Promise<UninstallResult> {
   const parsedName = slug.safeParse(name);
   if (!parsedName.success) throw httpError(400, 'Plugin name must be a lowercase slug.');
   const settings = store.settings();
@@ -366,6 +399,21 @@ export async function uninstall(name: string, workspace: string, store: Store): 
   if (!entry) throw httpError(404, `Plugin "${parsedName.data}" is not installed.`);
   const removed: UninstallResult['removed'] = [];
   const warnings: string[] = [];
+  let catalog: Awaited<ReturnType<typeof readStrictManifest>> | undefined;
+  const preserveSkills = new Set<string>();
+  const missingSkills = new Set<string>();
+  if (entry.skillCatalog) {
+    try {
+      catalog = await readStrictManifest(entry.workspace);
+      for (const item of entry.items.filter(item => item.kind === 'skill')) {
+        const id = SKILL_TARGET.exec(item.target)?.[1]; if (!id) continue;
+        const row = catalog.manifest.skills.find(skill => skill.id === id), owned = entry.skillCatalog.find(skill => skill.id === id);
+        if (catalog.manifest.profiles.some(profile => profile.skills?.includes(id)) || row && (!owned || owned.hash !== hash(canonical(row)))) {
+          preserveSkills.add(id); warnings.push(`Skill "${id}" is used by a project profile or has edited catalog metadata; it was kept.`);
+        }
+      }
+    } catch { for (const item of entry.items) if (item.kind === 'skill') preserveSkills.add(SKILL_TARGET.exec(item.target)?.[1] || ''); warnings.push('The project skill catalog could not be read safely; its skills were kept.'); }
+  }
   let requested: string | undefined;
   try { requested = await fs.realpath(path.resolve(workspace)); } catch { /* informational only */ }
   // Files are removed from the workspace RECORDED at install time — that is
@@ -376,12 +424,13 @@ export async function uninstall(name: string, workspace: string, store: Store): 
   const hooks: HookConfig[] = parsedHooks.success ? [...parsedHooks.data] : [];
   for (const item of entry.items) {
     if (item.kind === 'skill' || item.kind === 'command') {
+      if (item.kind === 'skill' && preserveSkills.has(SKILL_TARGET.exec(item.target)?.[1] || '')) continue;
       let absolute: string;
       try { absolute = await safeFileTarget(entry.workspace, item.kind, item.target); }
       catch { warnings.push(`${item.target} is no longer a safe target; it was left in place.`); continue; }
       let content: string;
       try { content = await fs.readFile(absolute, 'utf8'); }
-      catch (error) { if (!hasCode(error, 'ENOENT')) warnings.push(`${item.target} could not be read; it was left in place.`); continue; }
+      catch (error) { if (!hasCode(error, 'ENOENT')) warnings.push(`${item.target} could not be read; it was left in place.`); else if (item.kind === 'skill') missingSkills.add(SKILL_TARGET.exec(item.target)?.[1] || ''); continue; }
       if (hash(content) !== item.hash) { warnings.push(`${item.target} was modified after installation; it was left in place.`); continue; }
       await fs.unlink(absolute);
       // A skill's directory is plugin-created; remove it when now empty.
@@ -402,6 +451,11 @@ export async function uninstall(name: string, workspace: string, store: Store): 
       hooks.splice(index, 1);
       removed.push({ kind: 'hook', target: item.target });
     }
+  }
+  if (catalog && entry.skillCatalog) {
+    const deleted = new Set([...missingSkills, ...removed.filter(item => item.kind === 'skill').map(item => SKILL_TARGET.exec(item.target)?.[1])]);
+    const skills = catalog.manifest.skills.filter(skill => !deleted.has(skill.id) || !entry.skillCatalog!.some(item => item.id === skill.id && item.hash === hash(canonical(skill))));
+    if (skills.length !== catalog.manifest.skills.length) await writeStrictManifest(entry.workspace, { ...catalog.manifest, skills }, catalog.before);
   }
   const plugins = { ...settings.plugins };
   delete plugins[parsedName.data];

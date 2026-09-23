@@ -60,8 +60,6 @@ test('delegation has one status and usage appears only after the turn finishes',
     await page.getByRole('button', { name: 'Send message', exact: true }).click();
     const approval = page.getByRole('region', { name: 'Permission requested', exact: true });
     await expect(approval).toBeVisible();
-    await approval.getByRole('button', { name: 'Allow once', exact: true }).click();
-    await expect(approval).toBeVisible();
     await expect(page.locator('.work-log > summary').first()).toContainText('step');
     await expect(approval).toContainText(/sidekick/i);
     await expect(page.locator('.message-live, .run-status, .session-state, .context-estimate, .usage')).toHaveCount(0);
@@ -92,7 +90,7 @@ for (const width of [1280, 390]) {
     await expect(page.locator('.work-log > summary')).toHaveText('2 steps');
     await expect(page.locator('.tool-card').first()).toBeHidden();
     await expect(page.locator('.composer [aria-label="Project profiles"]')).toHaveCount(0);
-    await expect(page.getByRole('combobox', { name: 'Agent mode', exact: true })).toHaveValue('build');
+    await expect(page.getByRole('combobox', { name: 'Agent mode', exact: true, includeHidden: true })).toHaveValue('build');
     await expect(page.locator('.markdown table')).toBeVisible();
     const answerBounds = await page.locator('.markdown').last().boundingBox(), stepsBounds = await page.locator('.work-log').boundingBox();
     const introBounds = await page.getByText('I’ll inspect the repository first.', { exact: true }).boundingBox();

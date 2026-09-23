@@ -55,8 +55,7 @@ async function approve(page: Page, text: string | RegExp) {
 
 test('the sidekick writes behind parent-surfaced approvals and one persistent child spans turns', async ({ page, request }) => {
   const session = await create(request); await open(page, session); await send(page, session);
-  // Launch approval, then the sidekick's own write surfaces in THIS parent session.
-  await approve(page, 'sidekick');
+  // The selected architecture authorizes launch; its write still needs approval.
   await approve(page, /sidekick/i); await expect(permission(page)).toHaveCount(0, { timeout: 10_000 });
   const first = await done(request, session), delegation = await latest(request, session);
   expect(delegation.role).toBe('sidekick'); expect(delegation.status).toBe('completed');
@@ -73,7 +72,7 @@ test('the sidekick writes behind parent-surfaced approvals and one persistent ch
 
   // Second turn: the SAME child session continues — persistent context, not a fresh helper.
   await send(page, session, 'second');
-  await approve(page, 'sidekick'); await approve(page, /sidekick/i); await done(request, session);
+  await approve(page, /sidekick/i); await done(request, session);
   const after = (await detail(request, session)).delegations!;
   expect(after).toHaveLength(2); expect(after[0]).toEqual(delegation); expect(after[1].id).not.toBe(delegation.id); expect(after[1].childSessionId).toBe(delegation.childSessionId);
   expect(await readFile(join(workspace, 'sidekick-note.txt'), 'utf8')).toBe('sidekick turn 2');

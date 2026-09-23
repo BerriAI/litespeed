@@ -1,0 +1,68 @@
+.permissions-settings { gap: 24px; }
+.settings-page-backdrop .permissions-settings > .section-heading { margin-bottom: 8px; }
+.permissions-section-heading { display: flex; align-items: flex-start; justify-content: space-between; gap: 16px; }
+.permissions-section-heading h4 { margin: 0; color: var(--text); font-size: 14px; font-weight: 550; }
+.permissions-section-heading p { margin: 5px 0 0; color: var(--muted); font-size: 12px; line-height: 1.6; }
+.project-permissions { min-width: 0; }
+.permissions-project-path { margin: 14px 0; color: var(--muted); font-size: 12px; }
+.permissions-project-path > summary { display: flex; align-items: center; gap: 7px; width: fit-content; max-width: 100%; cursor: pointer; list-style: none; }
+.permissions-project-path > summary span { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.permissions-project-path > summary svg { flex-shrink: 0; }
+.permissions-project-path > p { margin: 8px 0 0; overflow-wrap: anywhere; }
+.permissions-project-path[open] > summary > svg:last-child { transform: rotate(90deg); }
+.permission-access-list { overflow: hidden; border: 1px solid var(--border); border-radius: 12px; }
+.permission-access-item { min-width: 0; padding: 17px 18px; }
+.permission-access-item + .permission-access-item { border-top: 1px solid var(--border); }
+.permission-access-row { display: flex; align-items: flex-start; justify-content: space-between; gap: 20px; }
+.permission-access-row > div { min-width: 0; }
+.permission-access-item strong { color: var(--text); font-size: 13px; font-weight: 500; }
+.permission-access-item p { margin: 5px 0 0; color: var(--muted); font-size: 12px; line-height: 1.65; overflow-wrap: anywhere; }
+.permission-access-scope { display: block; margin-top: 8px; color: var(--muted); font-size: 11px; }
+.permission-access-row > .button { flex-shrink: 0; margin: 1px 0; }
+.permission-access-status { flex-shrink: 0; margin-top: 1px; padding: 2px 7px; border-radius: 5px; background: var(--subtle); color: var(--muted); font-size: 10px; line-height: 1.7; }
+.permission-access-status.enabled { color: var(--text); }
+.permission-access-item > .text-button { margin-top: 12px; padding: 3px 0; }
+.permission-source-review { margin-top: 12px; font-size: 12px; color: var(--muted); }
+.permission-source-review > summary { display: flex; align-items: center; gap: 8px; width: fit-content; max-width: 100%; list-style: none; cursor: pointer; }
+.permission-source-review[open] > summary > svg { transform: rotate(90deg); }
+.permission-source-review pre, .permission-app-hook pre { max-height: 230px; margin: 10px 0 0; padding: 12px; overflow: auto; border-radius: 7px; background: var(--subtle); color: var(--secondary); font-family: var(--mono); font-size: 11px; line-height: 1.7; white-space: pre-wrap; overflow-wrap: anywhere; }
+.permission-source-review ul { list-style: none; padding: 0; margin: 10px 0 0; }
+.permission-source-review li { display: flex; flex-direction: column; gap: 3px; padding: 7px 0; overflow-wrap: anywhere; }
+.permission-access-item .error-text { margin-top: 10px; color: var(--red); }
+.permission-access-notice { margin: 12px 0 0; color: var(--muted); font-size: 12px; line-height: 1.6; }
+.permission-app-commands > summary { display: flex; align-items: center; justify-content: space-between; list-style: none; cursor: pointer; }
+.permission-app-commands > summary > span { display: flex; flex-direction: column; gap: 5px; }
+.permission-app-commands small { color: var(--muted); font-size: 11px; }
+.permission-app-commands[open] > summary > svg { transform: rotate(90deg); }
+.permission-app-hook { margin-top: 16px; }
+.permission-app-hook > button { margin-top: 8px; }
+.permissions-help { margin-top: -10px; color: var(--muted); font-size: 12px; line-height: 1.7; }
+.permissions-help > summary { display: flex; align-items: center; gap: 7px; cursor: pointer; list-style: none; width: fit-content; }
+.permissions-help[open] > summary > svg { transform: rotate(90deg); }
+.permissions-help > div { border-left: 1px solid var(--border-strong); padding-left: 16px; margin-top: 14px; }
+.permissions-help p { margin: 10px 0; }
+.permissions-help dl { margin: 12px 0; }
+.permissions-help dt { color: var(--text); font-weight: 500; margin-top: 12px; }
+.permissions-help dd { margin: 4px 0 0; }
+.permissions-help code { font-family: var(--mono); color: var(--secondary); font-size: 11px; }
+.permissions-help > summary::-webkit-details-marker, .permissions-project-path > summary::-webkit-details-marker, .permission-source-review > summary::-webkit-details-marker, .permission-app-commands > summary::-webkit-details-marker { display: none; }
+.permission-rules-empty { display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 16px; padding: 18px; border: 1px dashed var(--border); border-radius: 12px; }
+.permission-rules-empty strong { color: var(--text); font-size: 13px; font-weight: 500; }
+.permission-rules-empty p { margin: 6px 0 0; color: var(--muted); font-size: 12px; line-height: 1.6; }
+.permission-rules-empty > .button { flex-shrink: 0; }
+.settings-content .permission-access-item[data-highlighted='true'] { outline: 1px solid var(--border-strong); outline-offset: -4px; }
+.settings-switch { position: relative; flex-shrink: 0; width: 34px; height: 20px; padding: 2px; border: 1px solid var(--border-strong); border-radius: 12px; background: var(--subtle); cursor: pointer; }
+.settings-switch > span { display: block; width: 14px; height: 14px; border-radius: 50%; background: var(--muted); transition: transform .15s ease; }
+.settings-switch[aria-checked='true'] { background: var(--text); border-color: var(--text); }
+.settings-switch[aria-checked='true'] > span { background: var(--surface); transform: translateX(14px); }
+.settings-switch:disabled { opacity: .45; cursor: not-allowed; }
+@media (prefers-reduced-motion: reduce) { .settings-switch > span { transition: none; } }
+@media (max-width: 600px) {
+  .permissions-settings { gap: 22px; }
+  .permission-access-item { padding: 15px; }
+  .permission-access-row { gap: 12px; flex-wrap: wrap; }
+  .permission-access-row > div { flex: 1 1 160px; }
+  .permission-access-row > .button { flex-basis: auto; }
+  .permission-access-row .settings-switch { margin-top: 2px; }
+  .permissions-settings .permission-access-item .text-button { font-size: 12px; }
+}

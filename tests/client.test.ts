@@ -121,6 +121,24 @@ afterEach(async () => {
 });
 
 describe('session draft persistence', () => {
+  it('seeds a review task while preserving the current and existing saved drafts', async () => {
+    const tab = await hook('a'); await act(async () => tab.current.setText('Keep my current work'));
+    const review = { text: 'Review this snapshot', attachments: [{ name: 'changes.txt', content: 'A captured diff' }] };
+    await act(async () => tab.current.seed('review', review));
+    expect(tab.current.draft.text).toBe('Keep my current work');
+    await tab.render('review'); expect(tab.current.draft).toEqual(review);
+    expect(() => tab.current.seed('review', review)).toThrow('already has');
+    localStorage.setItem(draftKey('other'), JSON.stringify({ text: 'From another tab', attachments: [] }));
+    expect(() => tab.current.seed('other', review)).toThrow('already has a saved draft');
+    expect(stored('other')?.text).toBe('From another tab');
+    const reload = await hook('review'); expect(reload.current.draft).toEqual(review);
+  });
+  it('keeps a newly seeded review in memory and warns if saving fails', async () => {
+    const tab = await hook('a');
+    vi.spyOn(Storage.prototype, 'setItem').mockImplementation(() => { throw new Error('unavailable'); });
+    await act(async () => tab.current.seed('review', { text: 'Review my work', attachments: [] }));
+    await tab.render('review'); expect(tab.current.draft.text).toBe('Review my work'); expect(tab.current.notice).toContain('not saved for reload');
+  });
   it('does not remove another tab’s newer saved draft when an older submission completes', async () => {
     const first = await hook('a');
     await act(async () => first.current.setText('original draft'));

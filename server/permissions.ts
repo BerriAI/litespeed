@@ -26,7 +26,8 @@ export function ruleSubject(tool: string, args: Record<string, unknown>): string
   if (tool === 'bash') return typeof args.command === 'string' ? args.command : undefined;
   if (['read_file', 'write_file', 'edit_file', 'view_image'].includes(tool)) return typeof args.path === 'string' ? args.path : undefined;
   if (tool === 'glob' || tool === 'grep') return typeof args.path === 'string' ? args.path : typeof args.pattern === 'string' ? String(args.pattern) : '';
-  if (tool === 'web_fetch') return typeof args.url === 'string' ? args.url : undefined;
+  if (tool === 'web_fetch' || tool === 'browser') return typeof args.url === 'string' ? args.url : undefined;
+  if (tool === 'computer') return typeof args.action === 'string' ? args.action : undefined;
   return undefined;
 }
 

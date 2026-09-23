@@ -1,0 +1,21 @@
+.browser-upload { display: flex; flex-direction: column; flex-shrink: 0; min-height: 0; max-height: min(310px, 55%); overflow: hidden; padding: 16px; border-bottom: 1px solid var(--border); background: var(--surface); }
+.browser-upload-content { min-height: 0; overflow-y: auto; overscroll-behavior: contain; }
+.browser-upload-heading { display: flex; align-items: flex-start; flex-shrink: 0; gap: 9px; }
+.browser-upload-heading > svg { flex-shrink: 0; margin-top: 2px; color: var(--muted); }
+.browser-upload-heading > div { flex: 1; min-width: 0; }
+.browser-upload-heading strong { display: block; font-size: 12px; font-weight: 500; line-height: 1.5; }
+.browser-upload-heading span { display: block; color: var(--muted); font-size: 11px; margin-top: 3px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.browser-upload-heading > .icon-button { flex-shrink: 0; width: 24px; height: 24px; margin: -4px -4px 0 4px; }
+.browser-upload-content > p { font-size: 11px; line-height: 1.65; color: var(--muted); margin: 12px 0 0; }
+.browser-upload-actions { display: flex; align-items: center; justify-content: space-between; flex-shrink: 0; gap: 10px; margin-top: 14px; }
+.browser-upload-actions .button { font-size: 11px; padding: 8px 10px; min-height: 32px; }
+.browser-upload-actions > span { color: var(--faint); font-size: 10px; }
+.browser-upload-files { list-style: none; padding: 0; margin: 12px 0 0; border: 1px solid var(--border); border-radius: 7px; }
+.browser-upload-files li { display: flex; gap: 8px; align-items: center; padding: 6px 8px; font-size: 11px; }
+.browser-upload-files li + li { border-top: 1px solid var(--border); }
+.browser-upload-files li > svg { flex-shrink: 0; color: var(--muted); }
+.browser-upload-files li > span { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.browser-upload-files small { flex-shrink: 0; color: var(--muted); font-size: 10px; }
+.browser-upload-files .icon-button { flex-shrink: 0; width: 23px; height: 23px; }
+.browser-upload-error { font-size: 11px; color: var(--red); line-height: 1.6; margin-top: 12px; }
+.browser-upload button[aria-disabled='true'] { opacity: .45; cursor: default; }

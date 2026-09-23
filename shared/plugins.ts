@@ -16,7 +16,7 @@ export interface PluginItem { kind: 'skill' | 'command' | 'mcp' | 'hook'; target
 /** Registry entry under Settings.plugins, keyed by plugin name. `workspace` is
  * the canonical workspace the file items were installed into: file ownership
  * is per-workspace, while mcp/hook items live in global settings. */
-export interface PluginRegistryEntry { version: string; description?: string; installedAt: number; workspace: string; items: PluginItem[] }
+export interface PluginRegistryEntry { version: string; description?: string; installedAt: number; workspace: string; items: PluginItem[]; skillCatalog?: { id: string; hash: string }[] }
 
 /** One planned install step. `preview` is bounded (500 chars) display text.
  * conflict 'exists' = the target is present and NOT owned by this plugin

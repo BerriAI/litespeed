@@ -50,7 +50,8 @@ describe('permission rules settings editor', () => {
     expect(el<HTMLTextAreaElement>('[aria-label="Rule 2 patterns"]').value).toBe('');
     const text = document.body.textContent!;
     expect(text).toContain('Deny always wins'); expect(text).toContain('.litespeed/permissions.json'); expect(text).toContain('word boundary');
-    expect(text).toContain('captured when the message is accepted'); expect(text).toContain('one path segment'); expect(text).toContain('not a sandbox');
+    expect(text).toContain('captured when a message is accepted'); expect(text).toContain('stays within one folder'); expect(text).toContain('do not confine commands');
+    expect(el<HTMLDetailsElement>('.permissions-help').open).toBe(false);
   });
   it('adds a rule from the empty state and saves the exact rule set shape', async () => {
     const api = server(); const view = await mount(); await press('Permissions');

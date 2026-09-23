@@ -6,7 +6,7 @@ export type PermissionDecision = 'allow' | 'ask' | 'deny';
 export type ApprovalDecision = 'allow' | 'always' | 'project' | 'deny';
 export const PERMISSION_MODES = ['ask', 'edit', 'auto'] as const;
 export const permissionModeLabels = { ask: 'Ask first', edit: 'Allow project edits', auto: 'Allow all tools' } as const;
-export const RULE_TOOLS = ['read_file', 'write_file', 'edit_file', 'glob', 'grep', 'bash', 'web_fetch', 'web_search', 'view_image', 'todo_read', 'todo_write', 'task', 'sidekick', 'delegate', 'takeover', 'kill_shell', 'bash_output', 'wait', 'history_search', 'tool_output_page', 'memory_remember', 'memory_forget', 'memory_recall'] as const;
+export const RULE_TOOLS = ['read_file', 'write_file', 'edit_file', 'glob', 'grep', 'bash', 'web_fetch', 'browser', 'computer', 'web_search', 'view_image', 'todo_read', 'todo_write', 'task', 'sidekick', 'delegate', 'takeover', 'kill_shell', 'bash_output', 'wait', 'history_search', 'tool_output_page', 'memory_remember', 'memory_forget', 'memory_recall'] as const;
 
 /** One explicit rule. `tool` is an exact built-in tool name (never a pattern).
  * `patterns` apply to that tool's sensitive argument — the command for bash,

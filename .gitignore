@@ -14,3 +14,4 @@ playwright-report/
 WORKLOG.md
 test-results-tui/
 release-artifacts/
+.ui-audit/

@@ -9,6 +9,7 @@ import { createServer, type Server } from 'node:http';
 // Opt in after building: LITESPEED_TEST_NODE=/absolute/path/to/node vitest run tests/runtime.test.ts
 // No credential-bearing environment is inherited by the built app or CLI.
 const runtime = process.env.LITESPEED_TEST_NODE;
+const expectedRuntime = process.env.LITESPEED_TEST_NODE_VERSION || '26.4.0';
 const project = resolve(dirname(fileURLToPath(import.meta.url)), '..');
 const instances: ChildProcess[] = [];
 const servers: Server[] = [];
@@ -50,7 +51,7 @@ describe.skipIf(!runtime)('built runtime compatibility (explicit opt-in)', () =>
     const env = { ...environment(temporary), LITESPEED_DATA_DIR: data, LITESPEED_WORKSPACE: workspace };
     const version = await processResult(runtime!, ['--version'], temporary, env).finished;
     expect(version.code).toBe(0);
-    expect(version.output.trim()).toMatch(/^v26\.4\.0$/);
+    expect(version.output.trim()).toBe(`v${expectedRuntime}`);
     const providerCalls: { messages: { role: string; content: any }[]; tools?: { function: { name: string } }[] }[] = [];
     let catalogCalls = 0;
     let advertisedMcpName = '';
@@ -131,7 +132,7 @@ describe.skipIf(!runtime)('built runtime compatibility (explicit opt-in)', () =>
       return result;
     };
     const packageVersion = JSON.parse(await readFile(join(project, 'package.json'), 'utf8')).version;
-    expect(await api('/health')).toEqual({ ok: true, name: 'litespeed', version: packageVersion });
+    expect(await api('/health')).toMatchObject({ ok: true, name: 'litespeed', version: packageVersion, storeId: expect.stringMatching(/^[a-f0-9]{64}$/) });
     expect(await (await fetch(app.base + '/')).text()).toContain('<div id="root">');
     const initial = await api('/settings');
     expect(initial.providers).toEqual([]);
@@ -688,10 +689,11 @@ process.stdin.on('end',()=>process.exit(0));
     expect(providerCalls).toHaveLength(22); expect(catalogCalls).toBe(1);
     expect(await readFile(join(workspace, 'runtime.txt'))).toEqual(fixtureBytes);
     expect((await api(`${profilePath}/profile`)).pinned).toEqual(profilePinned.pinned);
-    // Installed CLI uses ordinary approval semantics for the foreground task:
-    // noninteractive Ask denies without creating a child; explicit Plan+Auto
-    // launches one bounded researcher whose only action is reading exact bytes.
+    // Read-only research normally needs no prompt. An explicit ask rule must
+    // still be honored by the noninteractive CLI without creating a child.
     const mcpBeforeResearch = await mcpRecords();
+    const priorRules = (await api('/settings')).permissionRules ?? { version: 1, rules: [] };
+    await api('/settings', { permissionRules: { version: 1, rules: [{ tool: 'task', decision: 'ask' }] } }, 'PATCH');
     const deniedResearch = await processResult(runtime!, [join(installation, 'bin/litespeed.mjs'), 'run', '--url', app.base, '--plan', '--json', 'runtime delegation denied noninteractive'], workspace, env).finished;
     expect(deniedResearch.code, deniedResearch.output).toBe(0);
     expect(deniedResearch.output).toContain('Denied task: interactive approval required');
@@ -699,6 +701,7 @@ process.stdin.on('end',()=>process.exit(0));
     const afterDenied = (await api('/sessions')).sessions;
     const deniedSession = afterDenied.find((value: { title: string }) => value.title === 'runtime delegation denied noninteractive');
     expect(deniedSession).toBeTruthy(); expect((await api(`/sessions/${deniedSession.id}`)).delegations).toEqual([]);
+    await api('/settings', { permissionRules: priorRules }, 'PATCH');
     const research = await processResult(runtime!, [join(installation, 'bin/litespeed.mjs'), 'run', '--url', app.base, '--plan', '--auto', '--json', 'runtime delegation CLI read'], workspace, env).finished;
     expect(research.code, research.output).toBe(0); expect(research.output).toContain('Runtime delegation parent complete.');
     expect(providerCalls).toHaveLength(28);

@@ -3,7 +3,7 @@ import { Download, RefreshCw, X } from 'lucide-react';
 import type { UpdateStatus } from '../../shared/updates';
 import { api, post } from './api';
 
-export function Updates() {
+export function Updates({ compact = false }: { compact?: boolean }) {
   const [status, setStatus] = useState<UpdateStatus>(), [open, setOpen] = useState(false), [busy, setBusy] = useState(''), [error, setError] = useState('');
   useEffect(() => {
     let live = true;
@@ -30,7 +30,8 @@ export function Updates() {
   }
   if (!status) return null;
   const available = status.available || status.restartRequired;
-  return <div className="updates"><button className="sidebar-footer-button" onClick={() => setOpen(value => !value)}><Download size={15} /><span>{status.restartRequired ? 'Restart to update' : available ? `Update to ${status.latestVersion}` : 'Updates'}</span>{available && <span className="update-dot" />}</button>
+  const label = status.restartRequired ? 'Restart to update' : available ? `Update to ${status.latestVersion}` : 'Updates';
+  return <div className={`updates ${compact ? 'compact' : ''}`}><button aria-label={label} title={label} className={compact ? 'icon-button' : 'sidebar-footer-button'} onClick={() => setOpen(value => !value)}><Download size={15} />{!compact && <span>{label}</span>}{available && <span className="update-dot" />}</button>
     {open && <div className="update-details" role="region" aria-label="Litespeed updates"><div className="update-heading"><strong>Litespeed {status.currentVersion}</strong><button className="icon-button" aria-label="Close updates" onClick={() => setOpen(false)}><X size={14} /></button></div>
       <p>{status.restartRequired ? `${status.installedVersion} is installed. Restart when your tasks and workspace terminals are finished.` : status.available ? `${status.latestVersion} is available.` : status.error && !status.latestVersion ? 'Could not check for updates. Keep working and try again later.' : status.checkedAt ? 'You have the latest checked version.' : 'Check for a newer version of Litespeed.'}</p>
       {busy && <p role="status">{busy === 'install' ? 'Downloading and checking the update…' : busy === 'restart' ? 'Restarting Litespeed…' : 'Checking for updates…'}</p>}

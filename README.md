@@ -1,12 +1,20 @@
 # Litespeed
 
-A local coding agent for your terminal and browser, built around **multi-model workflows**. Use one model or combine a driver with sidekicks, workers, or experts. Follow their work, approve changes, and review the result in one conversation. Pairing models lets a faster, cheaper model handle routine work while a stronger model handles planning or difficult tasks, which can reduce cost and wait time.
+A local coding agent for your Mac, terminal, and browser, built around **multi-model workflows**. Use one model or combine a driver with sidekicks, workers, or experts. Follow their work, approve changes, and review the result in one conversation. Pairing models lets a faster, cheaper model handle routine work while a stronger model handles planning or difficult tasks, which can reduce cost and wait time.
 
 Connect through LiteLLM, OpenAI-compatible APIs, native Anthropic, or ChatGPT device sign-in. Your project stays on your machine; prompts and selected context go to your chosen provider.
 
 ## Quick start
 
-Download the **macOS package** with its runtimes included—no Node or npm setup:
+### Mac desktop app
+
+**[Download Litespeed for Apple silicon Macs](https://github.com/BerriAI/litespeed/releases/download/desktop-v0.1.23-preview.1/Litespeed-0.1.23-darwin-arm64.zip)** · macOS 14 or later
+
+Unzip the download, move **Litespeed.app** to Applications, and open it. The app includes its runtimes and task browser. This is a locally signed desktop preview, not an Apple-notarized release; see the [installation instructions](docs/desktop-macos.md#download-and-install) if macOS blocks the first launch.
+
+### Terminal
+
+Download the terminal package with its runtimes included—no Node or npm setup:
 
 ```sh
 curl -fsSL https://github.com/BerriAI/litespeed/releases/latest/download/install.sh | sh
@@ -32,6 +40,12 @@ Litespeed has its own command, separate from the [LiteLLM gateway CLI](https://d
 3. Type a task. **Build** can edit files and run commands; **Plan** uses read-only tools. Type `/` for command suggestions in either client; use **↑/↓**, **Tab** or **Enter** to complete, and **Esc** to dismiss. **Ctrl+P** opens terminal commands and navigation.
 
 See the [terminal guide](docs/tui.md) for shortcuts, resuming sessions, and configuration.
+
+## Mac desktop app
+
+The desktop build puts projects and tasks on the left, with persistent files, review, browser, and computer views beside the conversation. It can import your existing Litespeed settings and saved tasks into its own local data.
+
+See the [desktop app guide](docs/desktop-status.md) for opening the portable app, available workflows, shortcuts, and current limits. [Build and packaging details](docs/desktop-macos.md) cover the native Mac shell and bundled runtime. The [desktop preview](https://github.com/BerriAI/litespeed/releases/tag/desktop-v0.1.23-preview.1) is available for Apple silicon Macs.
 
 ## Prefer the browser?
 

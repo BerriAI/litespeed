@@ -1,0 +1,29 @@
+.settings-page-backdrop .general-settings .section-heading { margin-bottom: 8px; }
+.general-settings .general-settings-card { border: 1px solid var(--border); border-radius: 14px; background: var(--surface); padding: 0 16px; container-type: inline-size; }
+.general-settings .general-settings-section { margin-top: 8px; }
+.general-settings .general-settings-section > h4 { margin: 0 0 13px; color: var(--secondary); font-size: 13px; font-weight: 500; }
+.general-settings .general-settings-card > * + *, .general-settings .general-settings-fields > * + * { border-top: 1px solid var(--border); }
+.general-settings .general-setting-row { display: flex; align-items: center; gap: 24px; min-height: 72px; padding: 16px 0; }
+.general-settings .general-setting-label { flex: 1; min-width: 0; }
+.general-settings .general-setting-label > label { display: block; color: var(--text); font-size: 13px; font-weight: 400; line-height: 1.5; }
+.general-settings .general-setting-label > small { display: block; margin-top: 4px; color: var(--muted); font-size: 12px; line-height: 1.5; }
+.general-settings .general-setting-row > :is(input, select) { flex: 0 0 auto; width: 150px; height: 34px; min-height: 34px; min-width: 0; padding: 6px 10px; background-color: var(--subtle); font-size: 12px; line-height: 16px; }
+.general-settings .general-setting-row > select { padding-right: 28px; }
+.general-settings .general-setting-wide > :is(input, select) { width: 46%; }
+.general-settings .general-setting-row > .general-setting-switch { appearance: none; position: relative; width: 34px; height: 20px; min-height: 20px; margin: 0; padding: 0; border: 0; border-radius: 12px; background: var(--border-strong); cursor: pointer; }
+.general-settings .general-setting-switch::before { content: ''; position: absolute; width: 14px; height: 14px; top: 3px; left: 3px; border-radius: 50%; background: #fff; box-shadow: 0 1px 3px #0003; transition: transform .14s ease; }
+.general-settings .general-setting-row > .general-setting-switch:checked { background: #3c8df6; }
+.general-settings .general-setting-switch:checked::before { transform: translateX(14px); }
+.general-settings .general-setting-switch:disabled { cursor: default; opacity: .5; }
+.general-settings .memory-section { border-radius: 14px; padding: 16px; background: var(--surface); }
+@container (max-width: 460px) {
+  .general-settings .general-setting-row { gap: 16px; }
+  .general-settings .general-setting-wide { flex-direction: column; align-items: stretch; gap: 10px; }
+  .general-settings .general-setting-wide > :is(input, select) { width: 100%; }
+}
+@media (max-width: 600px) {
+  .general-settings .general-settings-card { padding-inline: 14px; border-radius: 12px; }
+  .general-settings .general-setting-row > :is(input, select):not([type='checkbox']) { font-size: 16px; }
+  .general-settings .general-setting-row > select { width: 125px; }
+  .general-settings .general-setting-wide > select { width: 100%; }
+}

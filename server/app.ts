@@ -8,6 +8,22 @@ import { shuntConfigured } from '../shared/shunt.js';
 import { gatewayBaseUrl } from '../shared/setup.js';
 import { clientSurface } from '../shared/client.js';
 import { REASONING_EFFORTS } from '../shared/types.js';
+import { browserActionSchema, browserStopSchema, browserSelectionSchema } from './browser.js';
+import { browserUploadSchema } from './browser-uploads.js';
+import type { BrowserFrame } from '../shared/browser.js';
+import { computerActionSchema, type ComputerDriver } from './computer.js';
+import { GitActions } from './git-actions.js';
+import { GitDiscards } from './git-discard.js';
+import { GitBranchesService, gitBranchRequestSchema } from './git-branches.js';
+import { PullRequests, type PullRequestTransport } from './pull-requests.js';
+import { PullRequestCheckouts, type PullRequestFetcher } from './pull-request-checkouts.js';
+import { worktreeName, worktreeStartingRef } from './worktrees.js';
+import { TaskWorktrees } from './task-worktree.js';
+import { TaskLocals } from './task-local.js';
+import { defaultDownloadDirectory, validateDownloadDirectory } from './download-destination.js';
+import { pullRequestCheckoutDraft, pullRequestDiscussion } from '../shared/pull-requests.js';
+import { filePreview, readPreviewAsset } from './file-preview.js';
+import { snapshotFileAttachment } from './attachment-files.js';
 import { WorkspacePreferences } from './workspace-preferences.js';
 import { architectureConfiguration, liteFusionPreset } from '../shared/architecture-config.js';
 import { architectureProviders } from '../shared/architectures.js';
@@ -15,8 +31,9 @@ import { liteFusionSchema, captureLiteFusion } from './litefusion-routing.js';
 import { LITEFUSION_ROLES, LITEFUSION_MODELS, LITEFUSION_VERSION, validateLiteFusion } from '../shared/litefusion.js';
 import express, { type Express, type Response } from 'express';
 import { z } from 'zod';
-import { realpath, stat, readdir } from 'node:fs/promises';
+import { realpath, stat, readdir, readFile as readStateFile } from 'node:fs/promises';
 import { resolve, join } from 'node:path';
+import { homedir } from 'node:os';
 import { createHash, randomUUID } from 'node:crypto';
 import { Store } from './store.js';
 import { EventBus } from './events.js';
@@ -33,17 +50,22 @@ import { sandboxBackend } from './command-sandbox.js';
 import { permissionReview, hookReview, sourceHash } from './workspace-trust.js';
 import { validateHooks } from './hooks.js';
 import { validateSidecars } from './sidecars.js';
-import { planInstall, applyInstall, uninstall, publicPlan } from './plugins.js';
+import { planInstall, applyInstall, uninstall, publicPlan, pluginPlanHash } from './plugins.js';
 import { PLUGIN_LIMITS } from '../shared/plugins.js';
 import { HOOK_LIMITS } from '../shared/hooks.js';
 import type { ProfileDetail } from '../shared/profiles.js';
 import { listFiles, listWorkspaceStyles, readFile, readCommand, restoreChanges, searchFiles, gitStatus, resolveWorkspacePath } from './tools.js';
 import { collectDiagnostics } from './doctor.js';
+import { Schedules } from './schedules.js';
+import { nextOccurrence, scheduleTimingSchema } from './schedule-time.js';
+import { gitReview, gitFileDiff } from './git-review.js';
+import type { ScheduleSelection } from '../shared/schedules.js';
 import type { Message, Provider, Session, Settings, UsageReport, UsageTotals } from '../shared/types.js';
 
 const providerSchema = z.object({id:z.string().regex(/^[a-zA-Z0-9_-]{1,64}$/),name:z.string().min(1).max(100),kind:z.enum(['openai','anthropic','codex']),baseUrl:z.url().refine(v=>['http:','https:'].includes(new URL(v).protocol)),apiKey:z.string().max(8192).optional(),models:z.array(z.string().max(200)).max(500).optional(),anthropicCacheModels:z.array(z.string().min(1).max(250)).max(500).optional(),contextWindows:z.record(z.string().min(1).max(250),z.number().int().min(1024).max(10000000)).refine(value=>Object.keys(value).length<=100,'At most 100 model context windows may be configured.').optional()});
+const browserPreferencesSchema = z.object({ searchEngine: z.enum(['google', 'duckduckgo', 'bing']), rememberHistory: z.boolean(), downloadDirectory: z.string().trim().max(4096).optional(), autoSaveDownloads: z.boolean().optional() }).strict();
 const mcpSchema = z.object({command:z.string().max(1000).optional(),args:z.array(z.string().max(4000)).max(100).optional(),env:z.record(z.string(),z.string().max(8192)).optional(),url:z.url().optional(),enabled:z.boolean().optional(),advertise:z.boolean().optional()}).refine(v=>Boolean(v.command)!==Boolean(v.url),'Specify either a command or URL');
-const settingsSchema = z.object({providers:z.array(providerSchema).max(30).refine(p=>new Set(p.map(x=>x.id)).size===p.length,'Provider IDs must be unique').optional(),defaultProvider:z.string().max(64).optional(),defaultModel:z.string().max(250).optional(),workspace:z.string().max(4096).optional(),permissionMode:z.enum(['ask','edit','auto']).optional(),maxSteps:z.number().int().min(1).max(200).optional(),theme:z.enum(['light','dark','system']).optional(),mcpServers:z.record(z.string().regex(/^[a-zA-Z0-9_-]{1,64}$/),mcpSchema).refine(value=>Object.keys(value).length<=30,'At most 30 MCP servers may be configured.').optional(),permissionRules:z.unknown().optional(),memoryEnabled:z.boolean().optional(),hooks:z.unknown().optional(),sidecars:z.unknown().optional(),trustedWorkspaces:z.array(z.string().min(1).max(4096)).max(HOOK_LIMITS.trustedWorkspaces).optional(),notifications:z.boolean().optional(),expectedMcpConfigRevision:z.string().min(1).max(128).optional()});
+const settingsSchema = z.object({browser:browserPreferencesSchema.optional(),providers:z.array(providerSchema).max(30).refine(p=>new Set(p.map(x=>x.id)).size===p.length,'Provider IDs must be unique').optional(),defaultProvider:z.string().max(64).optional(),defaultModel:z.string().max(250).optional(),workspace:z.string().max(4096).optional(),permissionMode:z.enum(['ask','edit','auto']).optional(),maxSteps:z.number().int().min(1).max(200).optional(),theme:z.enum(['light','dark','system']).optional(),mcpServers:z.record(z.string().regex(/^[a-zA-Z0-9_-]{1,64}$/),mcpSchema).refine(value=>Object.keys(value).length<=30,'At most 30 MCP servers may be configured.').optional(),permissionRules:z.unknown().optional(),memoryEnabled:z.boolean().optional(),hooks:z.unknown().optional(),sidecars:z.unknown().optional(),trustedWorkspaces:z.array(z.string().min(1).max(4096)).max(HOOK_LIMITS.trustedWorkspaces).optional(),notifications:z.boolean().optional(),expectedMcpConfigRevision:z.string().min(1).max(128).optional()});
 // planner: the optional planning half of a planner+executor pair; null clears it.
 // architecture: the optional multi-model arrangement (shared/architectures.ts); null clears it.
 const modelRouteSchema = z.object({providerId:z.string().min(1).max(64),model:z.string().min(1).max(250)}).strict();
@@ -69,13 +91,14 @@ export interface AuthService {
   connected(providerId:string):boolean;
   disconnect(providerId:string):any;
 }
-export interface AppOptions { store?:Store; external?:ExternalTools; auth?:AuthService; updates?: { installation?: string; status(force?:boolean):Promise<UpdateStatus>; install():Promise<UpdateStatus>; restart():Promise<{version:string}>; draining():boolean }; }
+export interface AppOptions { store?:Store; external?:ExternalTools; computerDriver?:ComputerDriver; pullRequestTransport?:PullRequestTransport; pullRequestFetcher?:PullRequestFetcher; workspaceHasTerminal?: (workspace: string) => boolean; auth?:AuthService; updates?: { installation?: string; status(force?:boolean):Promise<UpdateStatus>; install():Promise<UpdateStatus>; restart():Promise<{version:string}>; draining():boolean }; }
 
 export function createApp(options:AppOptions = {}) {
-  const store=options.store || new Store(),bus=new EventBus(store),runner=new Runner(store,bus,options.external);
+  const store=options.store || new Store(),bus=new EventBus(store),runner=new Runner(store,bus,options.external,options.computerDriver);
   const app:Express=express();
   app.disable('x-powered-by');
   app.use((req,res,next)=>{
+    for (const host of ['127.0.0.1', 'localhost', '[::1]']) runner.browsers.blockOrigin(`http://${host}:${req.socket.localPort}`);
     const hostname=req.hostname.replace(/^\[|\]$/g,'');
     if(!['localhost','127.0.0.1','::1'].includes(hostname)) return res.status(403).json({error:'Litespeed only accepts local connections.'});
     const origin=req.get('origin');
@@ -93,6 +116,11 @@ export function createApp(options:AppOptions = {}) {
   const publicSettings=()=>{const s=store.publicSettings();return{...s,mcpConfigRevision:mcpConfigRevision(),providers:s.providers.map(p=>p.kind==='codex'?{...p,configured:options.auth?.connected(p.id)||false}:p)}};
   const workspace=async(value:unknown)=>{const root=await realpath(resolve(queryString(value)||store.settings().workspace));if(!(await stat(root)).isDirectory())throw httpError(400,'Workspace must be a directory.');return root;};
   const checkProvider=(id:string|undefined)=>{if(id&&!store.settings().providers.some(p=>p.id===id))throw httpError(400,'Provider not found. Choose a connected provider.');};
+  app.get('/api/workspaces/resolve',async(req,res)=>{
+    const value=z.string().trim().min(1).max(4096).parse(req.query.path);
+    const path=value==='~'?homedir():value.startsWith('~/')?join(homedir(),value.slice(2)):value;
+    res.json({path:await workspace(path)});
+  });
   const requestSignal=(res:Response)=>{const controller=new AbortController();res.once('close',()=>{if(!res.writableEnded)controller.abort();});return controller.signal;};
   const profileDetail=(snapshot:ProfileSnapshot|null,source:ProfileDetail['source']={status:snapshot?'current':'inactive'},diagnostics:ProfileDetail['diagnostics']=[]):ProfileDetail=>({active:snapshot?.active??null,pinned:snapshot?{instructions:snapshot.instructions,skills:snapshot.skills,sources:snapshot.sources}:null,source,diagnostics});
   const publishConfiguration=(id:string)=>{for(const [type,data]of [['session',store.session(id)],['queue',store.queue(id)]] as const)try{bus.emit(id,type,data);}catch{console.error('Could not publish configuration update. Refresh to inspect saved state.');}};
@@ -131,7 +159,15 @@ export function createApp(options:AppOptions = {}) {
     }
     res.json(result);
   });
-  app.get('/api/health',(_req,res)=>res.json({ok:true,name:'litespeed',version:VERSION,...(options.updates?.installation?{installation:options.updates.installation,pid:process.pid}:{})}));
+  app.get('/api/health',async(_req,res)=>res.json({ok:true,name:'litespeed',version:VERSION,pid:process.pid,storeId:createHash('sha256').update(await realpath(store.directory)).digest('hex'),...(options.updates?.installation?{installation:options.updates.installation}:{})}));
+  app.get('/api/desktop/import', async(_req,res) => {
+    try {
+      const path = join(store.directory, 'desktop-import.json');
+      if ((await stat(path)).size > 4096) return res.json(null);
+      const marker = z.object({ imported: z.literal(true), importedAt: z.number(), sessions: z.number().int().nonnegative(), schedulesPaused: z.number().int().nonnegative() }).parse(JSON.parse(await readStateFile(path, 'utf8')));
+      res.json(marker);
+    } catch { res.json(null); }
+  });
   app.get('/api/updates',async(req,res)=>res.json(options.updates?await options.updates.status(req.query.check==='true'):{currentVersion:VERSION,available:false,packaged:false,restartRequired:false,releaseUrl:'https://github.com/BerriAI/litespeed/releases',command:'Update your source checkout and rebuild.'}));
   app.post('/api/updates/install',async(_req,res)=>{if(!options.updates)throw httpError(409,'Packaged updates are unavailable on this server.');res.json(await options.updates.install());});
   app.post('/api/updates/restart',async(_req,res)=>{if(!options.updates)throw httpError(409,'Packaged updates are unavailable on this server.');res.json(await options.updates.restart());});
@@ -174,6 +210,11 @@ export function createApp(options:AppOptions = {}) {
     // whole v1 surface — no dedicated routes.
     if(patch.sidecars!==undefined)patch.sidecars=validateSidecars(patch.sidecars);
     if(patch.workspace)patch.workspace=await workspace(patch.workspace);
+    if(patch.browser) {
+      if (patch.browser.downloadDirectory && (patch.browser.autoSaveDownloads || patch.browser.downloadDirectory !== store.settings().browser?.downloadDirectory)) patch.browser.downloadDirectory = await validateDownloadDirectory(patch.browser.downloadDirectory);
+      else if (!patch.browser.downloadDirectory && patch.browser.autoSaveDownloads) patch.browser.downloadDirectory = await validateDownloadDirectory();
+      else if (patch.browser.downloadDirectory === '') delete patch.browser.downloadDirectory;
+    }
     if(patch.mcpServers&&expectedMcpConfigRevision!==undefined&&expectedMcpConfigRevision!==mcpConfigRevision())throw httpError(409,'Saved MCP configuration changed. Review it before saving your changes.');
     const current=store.settings(),providers=patch.providers||current.providers;
     if(providers.length&&!providers.some(p=>p.id===(patch.defaultProvider||current.defaultProvider)))throw httpError(400,'Default provider must be in the provider list.');
@@ -295,6 +336,31 @@ export function createApp(options:AppOptions = {}) {
     res.json({schemaVersion:1,sessionId:session.id,policyVersion:LITEFUSION_VERSION,selection:session.architecture,tasks:runner.tasks.list(session.id),assignments,turns:turns.map(id=>{const evaluations=fusionEvaluations.list(session.id,id);return {id,scheduling:runner.tasks.metrics(session.id,id),usage:runner.usage.turn(session.id,id),checks:store.messages(session.id).filter(message=>message.turnId===id).flatMap(message=>(message.toolCalls??[]).filter(call=>['verify','bash'].includes(call.name)).map(call=>({id:call.id,command:call.args.command,status:call.status,execution:call.execution}))),evaluation:evaluations.at(-1)??{success:null,source:null},evaluations};}),limitations:['Unreported costs remain unknown.','Worker completion is not an external success label.']});
   });
   const preferences=new WorkspacePreferences(store);
+  const schedules=new Schedules(store,runner,bus);
+  const scheduleFields=z.object({name:z.string().trim().min(1).max(120),prompt:z.string().trim().min(1).max(200000),workspace:z.string().min(1).max(4096),timing:scheduleTimingSchema,selection:sessionSchema.omit({title:true,workspace:true}).strict().optional()}).strict();
+  const resolveSchedule=async(input:z.infer<typeof scheduleFields>)=>{
+    const root=await workspace(input.workspace),settings=store.settings(),preferred=preferences.get(root);
+    const selection={providerId:settings.defaultProvider,model:settings.defaultModel,mode:'build',permissionMode:settings.permissionMode,...preferred,...input.selection} as Record<string,unknown>;
+    for(const key of ['setupComplete','architectureConfigurations'])delete selection[key];
+    for(const key of ['architecture','planner','shunt','outputStyle'])if(selection[key]===null)delete selection[key];
+    const parsed=sessionSchema.omit({title:true,workspace:true}).required({providerId:true,model:true,mode:true,permissionMode:true}).parse(selection);
+    if(!parsed.providerId.trim()||!parsed.model.trim())throw httpError(400,'Choose a connected model before scheduling a task.');
+    checkProvider(parsed.providerId);if(parsed.architecture)checkArchitecture(parsed.architecture);if(parsed.planner)checkProvider(parsed.planner.providerId);
+    if(!shuntConfigured(parsed.shunt,settings.providers))throw httpError(400,'Choose an API-key Shunt model or turn Shunt off.');
+    return {...input,workspace:root,selection:parsed as ScheduleSelection};
+  };
+  app.get('/api/schedules',(_req,res)=>res.json(schedules.list()));
+  app.post('/api/schedules/preview',(req,res)=>{const{timing}=z.object({timing:scheduleTimingSchema}).strict().parse(req.body);res.json({nextRunAt:nextOccurrence(timing,Date.now())});});
+  app.post('/api/schedules',async(req,res)=>{res.status(201).json(schedules.create(await resolveSchedule(scheduleFields.parse(req.body))));});
+  app.patch('/api/schedules/:id',async(req,res)=>{
+    const{expectedRevision,...patch}=scheduleFields.partial().extend({status:z.enum(['active','paused']).optional(),expectedRevision:z.number().int().min(0)}).strict().parse(req.body);
+    const previous=schedules.get(req.params.id);
+    const changed=Object.keys(patch).some(key=>key!=='status');
+    const resolved=changed?await resolveSchedule({...previous,...patch}):undefined;
+    res.json(schedules.update(req.params.id,expectedRevision,{...patch,...(resolved?{workspace:resolved.workspace,selection:resolved.selection}:{})} as Parameters<Schedules['update']>[2]));
+  });
+  app.delete('/api/schedules/:id',(req,res)=>{const revision=z.coerce.number().int().min(0).parse(req.query.revision);schedules.remove(req.params.id,revision);res.json({ok:true});});
+  app.post('/api/schedules/:id/run',async(req,res)=>res.status(202).json(await schedules.runNow(req.params.id)));
   app.get('/api/workspace-preferences',async(req,res)=>res.json(preferences.get(await workspace(req.query.workspace))));
   app.post('/api/workspace-preferences',async(req,res)=>{
     const input=sessionSchema.required({providerId:true,model:true}).extend({setupComplete:z.boolean().optional(),architectureConfigurations:architectureConfigurationsSchema.optional()}).parse(req.body), root=await workspace(input.workspace);
@@ -302,6 +368,10 @@ export function createApp(options:AppOptions = {}) {
     if(input.setupComplete&&!input.model.trim())throw httpError(400,'Choose a model to finish setup.');
     preferences.save(root,{...input,shunt:input.shunt??undefined,architecture:input.architecture??undefined,planner:input.planner??undefined,outputStyle:input.outputStyle??undefined},true);
     res.json({ok:true});
+  });
+  app.get('/api/task-search',async(req,res)=>{
+    const input = z.object({ query: z.string().max(200).default(''), project: z.string().min(1).max(4096).optional(), includeArchived: z.enum(['true','false']).default('true').transform(value=>value==='true') }).strict().parse(req.query);
+    res.setHeader('Cache-Control','no-store'); res.json(await runner.searchTasks(input,requestSignal(res)));
   });
   app.get('/api/sessions',(req,res)=>res.json({sessions:store.sessions(queryString(req.query.q),req.query.archived==='true')}));
   app.post('/api/sessions',async(req,res)=>{
@@ -403,7 +473,7 @@ export function createApp(options:AppOptions = {}) {
     const session=store.updateSession(req.params.id,{...configuration,pendingArchitecture:undefined},expectedConfigRevision);
     preferences.save(session.workspace,session,true);publishConfiguration(session.id);res.json(session);
   });
-  app.delete('/api/sessions/:id',(req,res)=>{runner.assertIdle(req.params.id);runner.deleteSessionJobs(req.params.id);store.deleteSession(req.params.id);runner.removeFromSearchIndex(req.params.id);res.json({ok:true});});
+  app.delete('/api/sessions/:id',async(req,res)=>{runner.assertIdle(req.params.id);runner.deleteSessionJobs(req.params.id);await Promise.all([runner.browsers.closeSession(req.params.id),runner.computers.closeSession(req.params.id)]);store.deleteSession(req.params.id);runner.removeFromSearchIndex(req.params.id);res.json({ok:true});});
   const memory=new Memory(store);
   const memoryWorkspace=(value:unknown)=>{const workspace=queryString(value);if(!workspace.trim())throw httpError(400,'workspace is required.');return workspace;};
   app.get('/api/memory',(req,res)=>res.json({facts:memory.list(memoryWorkspace(req.query.workspace))}));
@@ -430,12 +500,13 @@ export function createApp(options:AppOptions = {}) {
   });
   const snapshotInput=async(id:string,body:unknown,surface:unknown)=>{
     const {skills,...input}=inputSchema.parse(body),session=store.session(id);
+    if (session.worktree?.removed) throw httpError(409, 'This working copy was removed. Open the original project or create another worktree to continue.');
     // Recalled skill attachments are display snapshots, never instructions to trust on a new send.
     input.attachments=(input.attachments??[]).filter(attachment=>!attachment.skillId);
     const invoked=await snapshotSkillInvocation(session.workspace,skills);
     if(!input.content.trim()&&!input.attachments.length&&!invoked.length)throw httpError(400,'A message or attachment is required.');
     if(input.attachments.length+invoked.length>10)throw httpError(400,'A message can have up to 10 files and skills combined.');
-    for(const attachment of input.attachments||[])if(attachment.path){const file=await readFile(session.workspace,attachment.path);attachment.content=file.content.slice(0,50000)+(file.truncated?'\n[Attachment truncated]':'');}
+    for (let index = 0; index < input.attachments.length; index++) input.attachments[index] = await snapshotFileAttachment(session.workspace, input.attachments[index]);
     return {...input,attachments:[...input.attachments,...invoked],clientSurface:clientSurface(surface)};
   };
   app.post('/api/sessions/:id/messages',async(req,res)=>{
@@ -488,10 +559,316 @@ export function createApp(options:AppOptions = {}) {
   app.post('/api/sessions/:id/fork',(req,res)=>{runner.assertIdle(req.params.id);const input=z.object({messageId:z.string().optional()}).parse(req.body||{});res.status(201).json(store.fork(req.params.id,input.messageId));});
   app.post('/api/sessions/:id/compact',async(req,res)=>{await runner.compact(req.params.id);res.json({ok:true});});
   app.get('/api/sessions/:id/export',(req,res)=>{const id=req.params.id;res.setHeader('Content-Disposition',`attachment; filename="litespeed-session-${id}.json"`);res.json({session:store.session(id),messages:store.messages(id),todos:store.todos(id)});});
+  const browserSession = (id: string) => { const session = store.session(id); if (store.isChild(id)) throw httpError(404, 'Session not found.'); return session; };
+  app.get('/api/browser/history', async(req,res) => { res.setHeader('Cache-Control', 'no-store'); res.json(await runner.browsers.history.list(queryString(req.query.q).slice(0, 500), req.query.limit ? z.coerce.number().int().min(1).max(100).parse(req.query.limit) : 100)); });
+  app.delete('/api/browser/history', async(req,res) => { z.object({ confirm: z.literal(true) }).strict().parse(req.body); await runner.browsers.history.clear(); res.json({ ok: true }); });
+  app.delete('/api/browser/history/:entryId', async(req,res) => { await runner.browsers.history.clear(z.uuid().parse(req.params.entryId)); res.json({ ok: true }); });
+  app.post('/api/browser/reset', async(req,res) => { z.object({ confirm: z.literal(true) }).strict().parse(req.body); await runner.resetBrowser(); res.json({ ok: true }); });
+  app.get('/api/sessions/:id/browser', async(req,res) => { browserSession(req.params.id); res.json(await runner.browsers.state(req.params.id)); });
+  app.get('/api/sessions/:id/browser/frame', async(req,res) => {
+    browserSession(req.params.id);
+    const frame = await runner.browsers.frame(req.params.id, queryString(req.query.tabId) || undefined);
+    res.setHeader('Cache-Control', 'no-store');
+    if (!frame) return res.status(204).end();
+    res.type('image/jpeg').send(frame);
+  });
+  app.get('/api/sessions/:id/browser/stream', async(req,res) => {
+    browserSession(req.params.id);
+    const tabId = z.string().min(1).max(64).parse(queryString(req.query.tabId));
+    let stopped = false, blocked = false, queued: BrowserFrame | undefined, unsubscribe: (() => void) | null = null;
+    const stop = () => { stopped = true; queued = undefined; unsubscribe?.(); clearInterval(heartbeat); };
+    const send = (frame: BrowserFrame) => {
+      if (stopped) return;
+      if (blocked) { queued = frame; return; }
+      blocked = !res.write(`data: ${JSON.stringify(frame)}\n\n`);
+    };
+    const heartbeat = setInterval(() => { if (!stopped && !blocked) blocked = !res.write(': live\n\n'); }, 15000); heartbeat.unref();
+    res.on('close', stop); res.on('drain', () => { blocked = false; if (queued) { const latest = queued; queued = undefined; send(latest); } });
+    res.setHeader('Content-Type', 'text/event-stream'); res.setHeader('Cache-Control', 'no-store, no-transform'); res.setHeader('X-Accel-Buffering', 'no');
+    try {
+      unsubscribe = await runner.browsers.stream(req.params.id, tabId, send, () => { if (!stopped) { res.write('event: suspended\ndata: {}\n\n'); res.end(); } });
+      if (stopped) unsubscribe?.();
+      else if (!unsubscribe) { stop(); res.status(204).end(); }
+      else res.flushHeaders();
+    } catch (error) { stop(); if (res.headersSent) res.end(); else throw error; }
+  });
+  app.get('/api/browser/download-directory', (_req,res) => res.json({ defaultDirectory: defaultDownloadDirectory() }));
+  app.post('/api/sessions/:id/browser/downloads/:downloadId/save', async(req,res) => {
+    browserSession(req.params.id); runner.assertIdle(req.params.id);
+    res.json(await runner.browsers.downloads.save(req.params.id, req.params.downloadId, runner.browsers.preferences().downloadDirectory, requestSignal(res)));
+  });
+  app.get('/api/sessions/:id/browser/downloads/:downloadId', async(req,res) => {
+    browserSession(req.params.id);
+    const { item, data } = await runner.browsers.downloads.read(req.params.id, req.params.downloadId);
+    res.setHeader('Cache-Control', 'no-store');
+    res.setHeader('Content-Security-Policy', "default-src 'none'; sandbox");
+    res.setHeader('Content-Disposition', `attachment; filename*=UTF-8''${encodeURIComponent(item.name).replace(/['()*]/g, value => '%' + value.charCodeAt(0).toString(16).toUpperCase())}`);
+    res.type('application/octet-stream').send(data);
+  });
+  app.delete('/api/sessions/:id/browser/downloads/:downloadId', async(req,res) => {
+    browserSession(req.params.id); runner.assertIdle(req.params.id);
+    await runner.browsers.downloads.remove(req.params.id, req.params.downloadId); res.json({ ok: true });
+  });
+  app.post('/api/sessions/:id/browser/inspect', async(req,res) => {
+    const session = browserSession(req.params.id); runner.assertIdle(req.params.id);
+    if (session.archived) throw httpError(409, 'Restore this task before adjusting its browser page.');
+    res.setHeader('Cache-Control', 'no-store');
+    res.json(await runner.browserInspection(req.params.id, req.body, requestSignal(res)));
+  });
+  app.post('/api/sessions/:id/browser/selection', async(req,res) => {
+    const session = browserSession(req.params.id); runner.assertIdle(req.params.id);
+    if (session.archived) throw httpError(409, 'Restore this task before reading its browser selection.');
+    res.setHeader('Cache-Control', 'no-store');
+    res.json(await runner.browserSelection(req.params.id, browserSelectionSchema.parse(req.body), requestSignal(res)));
+  });
+  app.post('/api/sessions/:id/browser/upload', async(req,res) => {
+    const session = browserSession(req.params.id); runner.assertIdle(req.params.id);
+    if (session.archived) throw httpError(409, 'Restore this task before sharing files with its browser.');
+    res.setHeader('Cache-Control', 'no-store');
+    res.json(await runner.browserUpload(req.params.id, browserUploadSchema.parse(req.body), requestSignal(res)));
+  });
+  app.post('/api/sessions/:id/browser', async(req,res) => {
+    const session = browserSession(req.params.id); runner.assertIdle(req.params.id);
+    if (session.archived) throw httpError(409, 'Restore this task before using its browser.');
+    const result = await runner.browserInteraction(req.params.id, browserActionSchema.parse(req.body), requestSignal(res));
+    res.json({ ...result.state, busy: false });
+  });
+  app.post('/api/sessions/:id/browser/stop', async(req,res) => {
+    const session = browserSession(req.params.id);
+    if (session.archived) throw httpError(409, 'Restore this task before using its browser.');
+    res.setHeader('Cache-Control', 'no-store');
+    res.json(await runner.stopBrowserLoading(req.params.id, browserStopSchema.parse(req.body)));
+  });
+  app.get('/api/sessions/:id/browser/diagnostics', async(req,res) => {
+    browserSession(req.params.id); const tabId = z.string().min(1).max(64).parse(req.query.tabId);
+    res.setHeader('Cache-Control', 'no-store'); res.json(await runner.browsers.diagnostics(req.params.id, tabId));
+  });
+  app.delete('/api/sessions/:id/browser/diagnostics', async(req,res) => {
+    const session = browserSession(req.params.id), input = z.object({ tabId: z.string().min(1).max(64), view: z.enum(['console', 'network', 'all']) }).strict().parse(req.body);
+    if (session.archived) throw httpError(409, 'Restore this task before clearing its browser activity.');
+    res.json(await runner.exclusive(req.params.id, () => runner.browsers.clearDiagnostics(req.params.id, input.tabId, input.view)));
+  });
+  app.get('/api/sessions/:id/computer', (req,res) => { browserSession(req.params.id); res.json(runner.computers.state(req.params.id)); });
+  app.get('/api/sessions/:id/computer/frame', (req,res) => {
+    browserSession(req.params.id);
+    const frame = runner.computers.frame(req.params.id, queryString(req.query.snapshotId));
+    res.setHeader('Cache-Control', 'no-store');
+    if (!frame) { res.status(204).end(); return; }
+    res.type('image/png').send(frame);
+  });
+  app.post('/api/sessions/:id/computer', async(req,res) => {
+    const session = browserSession(req.params.id); runner.assertIdle(req.params.id);
+    if (session.archived) throw httpError(409, 'Restore this task before using its computer view.');
+    const result = await runner.computerInteraction(req.params.id, computerActionSchema.parse(req.body), requestSignal(res));
+    res.json(result.state);
+  });
   app.get('/api/files',async(req,res)=>res.json({entries:await listFiles(await workspace(req.query.workspace),queryString(req.query.path))}));
   app.get('/api/file',async(req,res)=>res.json(await readFile(await workspace(req.query.workspace),queryString(req.query.path))));
+  app.get('/api/file-preview',async(req,res)=>res.json(await filePreview(await workspace(req.query.workspace),queryString(req.query.path))));
+  app.get('/api/file-content',async(req,res)=>{
+    const asset=await readPreviewAsset(await workspace(req.query.workspace),queryString(req.query.path));
+    res.setHeader('Content-Security-Policy', "default-src 'none'; sandbox");
+    res.setHeader('Cache-Control','no-store');
+    res.setHeader('Content-Disposition',`inline; filename*=UTF-8''${encodeURIComponent(asset.path.split('/').at(-1)!)}`);
+    res.type(asset.mimeType).send(asset.data);
+  });
   app.get('/api/search',async(req,res)=>res.json({files:await searchFiles(await workspace(req.query.workspace),queryString(req.query.q))}));
   app.get('/api/git',async(req,res)=>res.json(await gitStatus(await workspace(req.query.workspace))));
+  const gitReviewQuery=z.object({workspace:z.string().max(4096).optional(),scope:z.enum(['unstaged','staged','branch']).default('unstaged'),base:z.string().min(1).max(256).optional()});
+  const pullRequests = new PullRequests(options.pullRequestTransport);
+  const pullRequestCheckouts = new PullRequestCheckouts(store, pullRequests, options.pullRequestFetcher);
+  app.get('/api/pull-requests', async(req,res) => {
+    const input = z.object({ workspace: z.string().max(4096).optional(), state: z.enum(['open', 'closed', 'all']).default('open'), page: z.coerce.number().int().min(1).max(100).default(1) }).parse(req.query);
+    res.json(await pullRequests.list(await workspace(input.workspace), input.state, input.page, requestSignal(res)));
+  });
+  app.get('/api/pull-requests/:number', async(req,res) => {
+    const id = z.coerce.number().int().positive().max(2_147_483_647).parse(req.params.number);
+    res.json(await pullRequests.detail(await workspace(req.query.workspace), id, requestSignal(res)));
+  });
+  app.post('/api/pull-requests/:number/discussion', async(req,res) => {
+    const id = z.coerce.number().int().positive().max(2_147_483_647).parse(req.params.number);
+    const input = z.object({ workspace: z.string().max(4096), revision: z.string().regex(/^[a-f0-9]{64}$/), providerId: z.string().min(1).max(64), model: z.string().min(1).max(250) }).strict().parse(req.body);
+    checkProvider(input.providerId);
+    const result = await runner.prepareConfiguration(undefined, undefined, async signal => {
+      const root = await workspace(input.workspace), detail = await pullRequests.detail(root, id, signal);
+      if (detail.revision !== input.revision) throw httpError(409, 'The pull request changed since you opened it. Refresh its changes before starting a discussion.');
+      return { root, detail };
+    }, ({ root, detail }) => ({
+      session: store.createSession({ workspace: root, title: `Review #${id}: ${detail.title}`.slice(0, 200), providerId: input.providerId, model: input.model, mode: 'plan', permissionMode: 'ask' }),
+      draft: pullRequestDiscussion(detail),
+    }), requestSignal(res));
+    res.status(201).json(result);
+  });
+  app.post('/api/pull-requests/:number/worktree/prepare', async(req,res) => {
+    const id = z.coerce.number().int().positive().max(2_147_483_647).parse(req.params.number);
+    const input = z.object({ workspace: z.string().min(1).max(4096), revision: z.string().regex(/^[a-f0-9]{64}$/) }).strict().parse(req.body), root = await workspace(input.workspace);
+    res.json(await runner.workspaceOperation(root, signal => pullRequestCheckouts.prepare(root, id, input.revision, signal), requestSignal(res)));
+  });
+  app.post('/api/pull-requests/:number/worktree', async(req,res) => {
+    const id = z.coerce.number().int().positive().max(2_147_483_647).parse(req.params.number);
+    const input = z.object({ workspace: z.string().min(1).max(4096), planId: z.string().uuid(), providerId: z.string().min(1).max(64), model: z.string().min(1).max(250) }).strict().parse(req.body), root = await workspace(input.workspace);
+    checkProvider(input.providerId);
+    const result = await runner.workspaceOperation(root, async signal => {
+      const { worktree, request } = await pullRequestCheckouts.create(root, id, input.planId, signal);
+      const session = store.createSession({ workspace: worktree.path, title: `Review #${id}: ${request.title}`.slice(0, 200), providerId: input.providerId, model: input.model, mode: 'plan', permissionMode: 'ask' });
+      return { worktree, session, draft: pullRequestCheckoutDraft(request) };
+    }, requestSignal(res));
+    res.status(201).json(result);
+  });
+  const gitActions = new GitActions();
+  const gitBranches = new GitBranchesService();
+  const taskWorktrees = new TaskWorktrees(store, runner.history);
+  const taskLocals = new TaskLocals(store, runner.history);
+  async function localTaskOperation<T>(id: string, operation: (signal: AbortSignal) => Promise<T>, signal: AbortSignal) {
+    const session = store.session(id), project = session.worktree?.project;
+    if (!project || session.worktree?.removed) throw httpError(409, 'Choose an available worktree task to continue locally.');
+    if (options.workspaceHasTerminal?.(session.workspace) || options.workspaceHasTerminal?.(project)) throw httpError(409, 'Close terminals in the worktree and local project before moving this task.');
+    return runner.workspaceOperation(project, signal => runner.taskWorkspaceOperation(id, operation, signal), signal);
+  }
+  app.post('/api/sessions/:id/local/prepare', async(req,res) => {
+    const id = z.string().uuid().parse(req.params.id), input = z.object({ expectedConfigRevision: z.number().int().nonnegative() }).strict().parse(req.body);
+    res.json(await localTaskOperation(id, signal => taskLocals.prepare(id, input.expectedConfigRevision, signal), requestSignal(res)));
+  });
+  app.post('/api/sessions/:id/local', async(req,res) => {
+    const id = z.string().uuid().parse(req.params.id), input = z.object({ planId: z.string().uuid() }).strict().parse(req.body);
+    res.json(await localTaskOperation(id, async signal => {
+      const result = await taskLocals.apply(id, input.planId, signal);
+      publishConfiguration(id); try { bus.emit(id, 'history', runner.history.state(id)); bus.emit(id, 'message', store.messages(id).at(-1)!); } catch { console.error('Could not publish local continuation. Refresh to read the saved task.'); }
+      return result;
+    }, requestSignal(res)));
+  });
+  app.post('/api/sessions/:id/worktree/prepare', async(req,res) => {
+    const id = z.string().uuid().parse(req.params.id), input = z.object({ name: worktreeName, includeLocalSetup: z.boolean().default(false), expectedConfigRevision: z.number().int().nonnegative() }).strict().parse(req.body);
+    if (options.workspaceHasTerminal?.(store.session(id).workspace)) throw httpError(409, 'Close this project’s terminals before moving its task.');
+    res.json(await runner.taskWorkspaceOperation(id, signal => taskWorktrees.prepare(id, input.name, input.includeLocalSetup, input.expectedConfigRevision, signal), requestSignal(res)));
+  });
+  app.post('/api/sessions/:id/worktree', async(req,res) => {
+    const id = z.string().uuid().parse(req.params.id), input = z.object({ planId: z.string().uuid() }).strict().parse(req.body);
+    const result = await runner.taskWorkspaceOperation(id, async signal => {
+      if (options.workspaceHasTerminal?.(store.session(id).workspace)) throw httpError(409, 'Close this project’s terminals before moving its task.');
+      const moved = await taskWorktrees.apply(id, input.planId, signal);
+      publishConfiguration(id); try { bus.emit(id, 'history', runner.history.state(id)); bus.emit(id, 'message', store.messages(id).at(-1)!); } catch { console.error('Could not publish task move. Refresh to read the saved state.'); }
+      return moved;
+    }, requestSignal(res));
+    res.json(result);
+  });
+  app.get('/api/worktrees', async(req,res) => {
+    res.setHeader('Cache-Control', 'no-store');
+    res.json({ worktrees: store.worktrees.list(queryString(req.query.workspace) || undefined, req.query.includeRemoved === 'true') });
+  });
+  app.post('/api/worktrees/prepare', async(req,res) => {
+    const input = z.object({ workspace: z.string().min(1).max(4096), name: worktreeName, includeLocalEdits: z.boolean().optional(), includeLocalSetup: z.boolean().optional(), startingRef: worktreeStartingRef.optional() }).strict().parse(req.body), root = await workspace(input.workspace);
+    res.json(await runner.workspaceOperation(root, signal => store.worktrees.prepare(root, input.name, signal, undefined, input.includeLocalEdits, input.includeLocalSetup, input.startingRef), requestSignal(res)));
+  });
+  app.post('/api/worktrees/create', async(req,res) => {
+    const input = z.object({ workspace: z.string().min(1).max(4096), id: z.string().uuid(), providerId: z.string().min(1).max(64), model: z.string().min(1).max(250) }).strict().parse(req.body), root = await workspace(input.workspace);
+    checkProvider(input.providerId);
+    const result = await runner.workspaceOperation(root, async signal => {
+      const worktree = await store.worktrees.create(root, input.id, signal);
+      const session = store.createSession({ workspace: worktree.path, worktree: store.worktrees.metadata(worktree), title: worktree.name.replaceAll('-', ' '), providerId: input.providerId, model: input.model, mode: 'build', permissionMode: 'ask' });
+      return { worktree, session };
+    }, requestSignal(res));
+    res.status(201).json(result);
+  });
+  app.post('/api/worktrees/:id/tasks', async(req,res) => {
+    const id = z.string().uuid().parse(req.params.id), input = z.object({ providerId: z.string().min(1).max(64), model: z.string().min(1).max(250) }).strict().parse(req.body);
+    checkProvider(input.providerId);
+    const result = await runner.workspaceOperation(store.worktrees.get(id).path, async signal => {
+      const worktree = await store.worktrees.ready(id, signal);
+      return store.createSession({ workspace: worktree.path, worktree: store.worktrees.metadata(worktree), title: 'New task', providerId: input.providerId, model: input.model, mode: 'build', permissionMode: 'ask' });
+    }, requestSignal(res));
+    res.status(201).json(result);
+  });
+  app.post('/api/worktrees/:id/remove/prepare', async(req,res) => {
+    const id = z.string().uuid().parse(req.params.id), record = store.worktrees.get(id);
+    if (options.workspaceHasTerminal?.(record.path)) throw httpError(409, 'Close this worktree’s terminals before removing it.');
+    res.json(await runner.workspaceOperation(record.path, signal => store.worktrees.prepareRemove(id, signal), requestSignal(res)));
+  });
+  app.post('/api/worktrees/:id/recover', async(req,res) => {
+    const id = z.string().uuid().parse(req.params.id), record = store.worktrees.get(id);
+    res.json(await runner.workspaceOperation(record.path, async signal => { const recovered = await store.worktrees.recover(id, signal); for (const session of [...store.sessions(), ...store.sessions('', true)]) if (session.workspace === record.path) publishConfiguration(session.id); return recovered; }, requestSignal(res)));
+  });
+  app.post('/api/worktrees/:id/restore/prepare', async(req,res) => {
+    const id = z.string().uuid().parse(req.params.id), record = store.worktrees.get(id, true);
+    res.json(await runner.workspaceOperation(record.project, signal => store.worktrees.prepareRestore(id, signal), requestSignal(res)));
+  });
+  app.post('/api/worktrees/:id/restore', async(req,res) => {
+    const id = z.string().uuid().parse(req.params.id), input = z.object({ planId: z.string().uuid() }).strict().parse(req.body), record = store.worktrees.get(id, true);
+    const result = await runner.workspaceOperation(record.project, signal => runner.workspaceOperation(record.path, async () => {
+      if (options.workspaceHasTerminal?.(record.path)) throw httpError(409, 'Close this worktree’s terminals before restoring it.');
+      const worktree = await store.worktrees.restore(id, input.planId, signal);
+      const sessions = [...store.sessions(), ...store.sessions('', true)].filter(session => session.workspace === record.path);
+      for (const session of sessions) publishConfiguration(session.id);
+      return { worktree, sessions };
+    }, signal), requestSignal(res));
+    res.json(result);
+  });
+  app.post('/api/worktrees/:id/remove', async(req,res) => {
+    const id = z.string().uuid().parse(req.params.id), input = z.object({ planId: z.string().uuid() }).strict().parse(req.body), record = store.worktrees.get(id);
+    const result = await runner.workspaceOperation(record.project, signal => runner.workspaceOperation(record.path, async () => {
+      if (options.workspaceHasTerminal?.(record.path)) throw httpError(409, 'Close this worktree’s terminals before removing it.');
+      const removed = await store.worktrees.remove(id, input.planId, signal);
+      for (const session of [...store.sessions(), ...store.sessions('', true)]) if (session.workspace === record.path) publishConfiguration(session.id);
+      return removed;
+    }, signal), requestSignal(res));
+    res.json(result);
+  });
+  app.get('/api/git/branches', async(req,res) => {
+    res.setHeader('Cache-Control', 'no-store');
+    res.json(await gitBranches.list(await workspace(req.query.workspace), requestSignal(res)));
+  });
+  app.post('/api/git/branches/prepare', async(req,res) => {
+    const input = z.object({ workspace: z.string().max(4096).optional(), request: gitBranchRequestSchema }).strict().parse(req.body), root = await workspace(input.workspace);
+    res.json(await runner.workspaceOperation(root, signal => gitBranches.prepare(root, input.request, signal), requestSignal(res)));
+  });
+  app.post('/api/git/branches/apply', async(req,res) => {
+    const input = z.object({ workspace: z.string().max(4096).optional(), id: z.string().uuid() }).strict().parse(req.body), root = await workspace(input.workspace);
+    res.json(await runner.workspaceOperation(root, signal => gitBranches.apply(root, input.id, signal), requestSignal(res)));
+  });
+  app.post('/api/git/actions/prepare', async(req,res) => {
+    const input = z.object({ workspace: z.string().max(4096).optional(), action: z.enum(['stage','unstage','commit','push']), paths: z.array(z.string().min(1).max(4096)).min(1).max(500).optional() }).strict().parse(req.body);
+    const root = await workspace(input.workspace);
+    res.json(await runner.workspaceOperation(root, signal => gitActions.prepare(root, input.action, input.paths, signal), requestSignal(res)));
+  });
+  app.post('/api/git/actions/apply', async(req,res) => {
+    const input = z.object({ workspace: z.string().max(4096).optional(), id: z.string().uuid(), message: z.string().max(10_000).optional() }).strict().parse(req.body);
+    const root = await workspace(input.workspace);
+    res.json(await runner.workspaceOperation(root, signal => gitActions.apply(root, input.id, input.message, signal), requestSignal(res)));
+  });
+  const gitDiscards = new GitDiscards(store);
+  const discardWorkspace = z.object({ workspace: z.string().max(4096).optional() });
+  const discardPaths = z.array(z.string().min(1).max(4096)).min(1).max(100);
+  app.get('/api/git/discards', async(req,res) => {
+    const all = z.enum(['true', 'false']).optional().parse(req.query.all);
+    res.json({ backups: gitDiscards.list(all === 'true' ? undefined : await workspace(req.query.workspace)) });
+  });
+  app.post('/api/git/discards/prepare', async(req,res) => {
+    const input = discardWorkspace.extend({ paths: discardPaths }).strict().parse(req.body), root = await workspace(input.workspace);
+    res.json(await runner.workspaceOperation(root, signal => gitDiscards.prepare(root, input.paths, signal), requestSignal(res)));
+  });
+  app.post('/api/git/discards/apply', async(req,res) => {
+    const input = discardWorkspace.extend({ id: z.string().uuid() }).strict().parse(req.body), root = await workspace(input.workspace);
+    res.json(await runner.workspaceOperation(root, signal => gitDiscards.apply(root, input.id, signal), requestSignal(res)));
+  });
+  app.post('/api/git/discards/:id/restore', async(req,res) => {
+    const id = z.string().uuid().parse(req.params.id), input = discardWorkspace.extend({ paths: discardPaths.optional() }).strict().parse(req.body);
+    const root = await workspace(input.workspace).catch(error => { if (error.code === 'ENOENT') throw httpError(409, 'This project folder is unavailable. Save the original copies, or reopen the project at its saved location before restoring.'); throw error; });
+    res.json(await runner.workspaceOperation(root, signal => gitDiscards.prepareRestore(root, id, input.paths, signal), requestSignal(res)));
+  });
+  app.get('/api/git/discards/:id/original', async(req,res) => {
+    const id = z.string().uuid().parse(req.params.id), path = z.string().min(1).max(4096).parse(queryString(req.query.path));
+    const root = resolve(z.string().min(1).max(4096).parse(queryString(req.query.workspace)));
+    const data = gitDiscards.original(root, id, path), name = path.split('/').at(-1)!;
+    res.setHeader('Cache-Control', 'no-store'); res.setHeader('Content-Security-Policy', "default-src 'none'; sandbox");
+    res.setHeader('Content-Disposition', `attachment; filename*=UTF-8''${encodeURIComponent(name).replace(/['()*]/g, value => '%' + value.charCodeAt(0).toString(16).toUpperCase())}`);
+    res.type('application/octet-stream').send(data);
+  });
+  app.delete('/api/git/discards/:id', async(req,res) => {
+    const id = z.string().uuid().parse(req.params.id), input = discardWorkspace.extend({ workspace: z.string().min(1).max(4096), confirm: z.literal(true) }).strict().parse(req.body), root = resolve(input.workspace);
+    await runner.workspaceOperation(root, async () => gitDiscards.remove(root, id), requestSignal(res)); res.json({ ok: true });
+  });
+  app.get('/api/git/review',async(req,res)=>{const input=gitReviewQuery.parse(req.query);res.json(await gitReview(await workspace(input.workspace),input.scope,input.base,requestSignal(res)));});
+  app.get('/api/git/diff',async(req,res)=>{const input=gitReviewQuery.extend({path:z.string().min(1).max(4096)}).parse(req.query);res.json(await gitFileDiff(await workspace(input.workspace),input.scope,input.path,input.base,requestSignal(res)));});
   app.get('/api/sessions/:id/changes',(req,res)=>{store.session(req.params.id);res.json({changes:store.changes(req.params.id)});});
   app.get('/api/sessions/:id/history',(req,res)=>res.json(runner.history.state(req.params.id)));
   const publishHistory=(id:string)=>{
@@ -540,12 +917,14 @@ export function createApp(options:AppOptions = {}) {
   app.post('/api/plugins/plan',async(req,res)=>{
     const input=pluginInput.parse(req.body);
     const root=await workspace(input.workspace);
-    res.json({plan:publicPlan(await planInstall(input.source,root,store))});
+    const plan=await planInstall(input.source,root,store);
+    res.json({plan:publicPlan(plan),planHash:pluginPlanHash(plan)});
   });
   app.post('/api/plugins/install',async(req,res)=>{
-    const input=pluginInput.parse(req.body);
+    const input=pluginInput.extend({expectedPlanHash:z.string().regex(/^[a-f0-9]{64}$/).optional()}).parse(req.body);
     const root=await workspace(input.workspace);
     const plan=await planInstall(input.source,root,store);
+    if(input.expectedPlanHash&&input.expectedPlanHash!==pluginPlanHash(plan))throw httpError(409,'The plugin or destination changed. Review the installation again.');
     const result=await applyInstall(plan,root,store);
     res.json({plan:publicPlan({...plan,warnings:result.warnings}),applied:true,plugin:{name:result.name,...result.entry}});
   });
@@ -584,6 +963,6 @@ export function createApp(options:AppOptions = {}) {
     const status=error.status||((error.code==='ENOENT'||error.code==='ENOTDIR')?404:500);
     res.status(status).json({error:safeError(error,store)});
   });
-  return{app,store,bus,runner};
+  return{app,store,bus,runner,schedules};
 }
 function safeError(error:unknown,store:Store){let text=error instanceof Error?error.message:'An unexpected error occurred.';for(const p of store.settings().providers)if(p.apiKey)text=text.split(p.apiKey).join('[redacted]');return text.slice(0,2000);}

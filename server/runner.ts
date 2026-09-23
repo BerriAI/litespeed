@@ -1,3 +1,5 @@
+import { SessionBrowsers } from './browser.js';
+import { SessionComputers, type ComputerDriver } from './computer.js';
 import { sandboxCommand, sandboxBackend } from './command-sandbox.js';
 import { LiteFusionDiscovery } from './litefusion-discovery.js';
 import { liteFusionReadiness, type LiteFusionReadiness } from '../shared/litefusion-readiness.js';
@@ -31,7 +33,7 @@ import { createHash, randomUUID } from 'node:crypto';
 import type { Attachment, Message, PermissionRequest, Provider, Session, ToolCall, ToolDefinition } from '../shared/types.js';
 import { Store } from './store.js';
 import { EventBus } from './events.js';
-import { executeTool, executeToolOutputPage, isReadOnlyTool, toolDefinitions, historySearchTool, toolOutputPageTool, bashOutputTool, killShellTool, waitTool, viewImageTool, webSearchTool, sidekickTool, memoryToolDefinitions, updateGoalTool, capabilityTool, captureProjectGuidance, captureProjectPermissions, captureWorkspaceStyle, researchTaskInput, sidekickTaskInput, resolveWorkspacePath, inspectToolPath, validateToolPath, type ToolPathAccess } from './tools.js';
+import { executeTool, executeToolOutputPage, isReadOnlyTool, toolDefinitions, historySearchTool, toolOutputPageTool, bashOutputTool, killShellTool, waitTool, viewImageTool, webSearchTool, browserTool, computerTool, sidekickTool, memoryToolDefinitions, updateGoalTool, capabilityTool, captureProjectGuidance, captureProjectPermissions, captureWorkspaceStyle, researchTaskInput, sidekickTaskInput, resolveWorkspacePath, inspectToolPath, validateToolPath, type ToolPathAccess } from './tools.js';
 import { OUTPUT_STYLES } from '../shared/styles.js';
 import { GOAL_LIMITS, goalTurnLabel, type GoalReportStatus, type SessionGoal } from '../shared/goals.js';
 import { Jobs, executeBashOutput, executeKillShell, executeWait, finishedNotice } from './jobs.js';
@@ -104,6 +106,7 @@ export class Runner {
   private runs = new Map<string, ActiveRun>();
   private approvedPaths = new WeakMap<ToolCall, ToolPathAccess>();
   private workspaceOwners = new Map<string,string>();
+  workspaceOperationActive(workspace: string) { return this.workspaceOwners.get(workspace)?.startsWith('workspace:') ?? false; }
   private ownWorkspace(workspace:string,id:string) {
     const owner=this.workspaceOwners.get(workspace);
     if(owner&&owner!==id)throw conflict('Another task is changing this workspace. Wait for it to finish before modifying these files.');
@@ -121,7 +124,7 @@ export class Runner {
       signal.throwIfAborted();
       const owner = this.workspaceOwners.get(workspace);
       if (!owner || owner === id) { this.ownWorkspace(workspace, id); return; }
-      waiting(`Waiting for “${this.store.session(owner).title}” (${owner.slice(0, 8)}) to finish changing this workspace. You can stop this task while it waits.`);
+      waiting(owner.startsWith('workspace:') ? 'Waiting for the project operation to finish. You can stop this task while it waits.' : `Waiting for “${this.store.session(owner).title}” (${owner.slice(0, 8)}) to finish changing this workspace. You can stop this task while it waits.`);
       await new Promise<void>((resolve, reject) => {
         const cleanup = () => { this.workspaceWaiters.delete(wake); signal.removeEventListener('abort', abort); };
         const wake = () => { cleanup(); resolve(); };
@@ -144,6 +147,7 @@ export class Runner {
   private prefixHistoryReasons = new Map<string, Set<PrefixChangeReason>>();
   notePrefixHistoryChange(id: string, reason: PrefixChangeReason) { (this.prefixHistoryReasons.get(id) ?? this.prefixHistoryReasons.set(id, new Set()).get(id)!).add(reason); }
   private operations = new Set<string>();
+  private manualBrowserOperations = new Map<string, number>();
   private preparations = new Map<string, AbortController>();
   private queuePreparations = new Map<string, Set<AbortController>>();
   private configurationPreparations = new Map<string, AbortController>();
@@ -165,7 +169,11 @@ export class Runner {
   // Capture the configuration at acceptance. A later edit blocks remaining
   // intercepted calls instead of changing policy or respawning an old command.
   readonly sidecars = new Sidecars();
-  constructor(readonly store: Store, readonly bus: EventBus, private external?: ExternalTools) { this.usage=new UsageLedger(store);this.history=new History(store);this.delegations=new Delegations(store,this.history);this.tasks=new LiteFusionTasks(store);this.questions=new Questions(store,bus); }
+  private browserShutdown?: Promise<void>;
+  private browserResetting = false;
+  readonly browsers: SessionBrowsers;
+  readonly computers: SessionComputers;
+  constructor(readonly store: Store, readonly bus: EventBus, private external?: ExternalTools, computerDriver?: ComputerDriver) { this.browsers = new SessionBrowsers(store.directory, { preferences: () => store.settings().browser }); this.computers = new SessionComputers(store.directory, computerDriver); this.usage=new UsageLedger(store);this.history=new History(store);this.delegations=new Delegations(store,this.history);this.tasks=new LiteFusionTasks(store);this.questions=new Questions(store,bus); }
   readonly liteFusionDiscovery=new LiteFusionDiscovery();
   liteFusionStatus(id:string):LiteFusionReadiness|undefined {
     const run=this.runs.get(id),session=this.store.session(id);
@@ -187,19 +195,65 @@ export class Runner {
     return progress&&!messages.some(message=>message.id===progress.id)?[...messages,progress]:messages;
   }
   permissions(id: string) { return [...(this.runs.get(id)?.approvals.values() || [])].map(p => p.request); }
-  private assertOpen() { if(this.stopping)throw conflict('The server is stopping. Restart it before sending more work.'); }
+  private assertOpen() { if(this.stopping)throw conflict('The server is stopping. Restart it before sending more work.'); if (this.browserResetting) throw conflict('The browser profile is resetting. Try again in a moment.'); }
   assertIdle(id: string) { this.assertRoot(id);this.assertOpen();if (this.active(id) || this.operations.has(id) || this.preparations.has(id)) throw conflict('Wait for the current operation or stop the response before making this change.'); }
+  async browserInteraction(id: string, input: unknown, signal?: AbortSignal) {
+    this.assertIdle(id); this.store.session(id); this.operations.add(id); this.manualBrowserOperations.set(id, 1);
+    try { return await this.browsers.execute(id, input, signal); }
+    finally { this.releaseManualBrowser(id); }
+  }
+  private releaseManualBrowser(id: string) {
+    const remaining = (this.manualBrowserOperations.get(id) ?? 1) - 1;
+    if (remaining > 0) this.manualBrowserOperations.set(id, remaining);
+    else { this.manualBrowserOperations.delete(id); this.operations.delete(id); }
+    this.notifyIdle();
+  }
+  async stopBrowserLoading(id: string, input: import('../shared/browser.js').BrowserStopRequest) {
+    this.assertRoot(id); this.assertOpen(); this.store.session(id);
+    if (this.active(id) || this.preparations.has(id) || this.operations.has(id) && !this.manualBrowserOperations.has(id)) throw conflict('Wait for the current operation or stop the response before controlling its browser.');
+    this.operations.add(id); this.manualBrowserOperations.set(id, (this.manualBrowserOperations.get(id) ?? 0) + 1);
+    try { return await this.browsers.stopLoading(id, input); }
+    finally { this.releaseManualBrowser(id); }
+  }
+  async browserInspection(id: string, input: unknown, signal?: AbortSignal) {
+    this.assertIdle(id); this.store.session(id); this.operations.add(id);
+    try { return await this.browsers.inspect(id, input, signal); }
+    finally { this.operations.delete(id); this.notifyIdle(); }
+  }
+  async browserSelection(id: string, input: unknown, signal?: AbortSignal) {
+    this.assertIdle(id); this.store.session(id); this.operations.add(id);
+    try { return await this.browsers.selection(id, input, signal); }
+    finally { this.operations.delete(id); this.notifyIdle(); }
+  }
+  async browserUpload(id: string, input: unknown, signal?: AbortSignal) {
+    this.assertIdle(id); this.store.session(id); this.operations.add(id);
+    try { return await this.browsers.upload(id, input, signal); }
+    finally { this.operations.delete(id); this.notifyIdle(); }
+  }
+  async resetBrowser() {
+    this.assertOpen();
+    if (this.runs.size || this.operations.size || this.preparations.size || this.queuePreparations.size || this.configurationPreparations.size || this.externalOperations.size || this.jobs.active()) throw conflict('Finish active tasks and background jobs before resetting the browser.');
+    this.browserResetting = true;
+    try { await this.browsers.resetProfile(); }
+    finally { this.browserResetting = false; this.notifyIdle(); }
+  }
+  async computerInteraction(id: string, input: unknown, signal?: AbortSignal) {
+    this.assertIdle(id); this.store.session(id); this.operations.add(id);
+    try { return await this.computers.execute(id, input, signal); }
+    finally { this.operations.delete(id); this.notifyIdle(); }
+  }
   private notifyIdle() {
-    if(this.runs.size||this.operations.size||this.preparations.size||this.queuePreparations.size||this.configurationPreparations.size||this.externalOperations.size)return;
+    if(this.runs.size||this.operations.size||this.preparations.size||this.queuePreparations.size||this.configurationPreparations.size||this.externalOperations.size||this.browserResetting)return;
     for(const resolve of this.idleWaiters)resolve();
     this.idleWaiters.clear();
   }
   prepareRestart() {
+    if (this.browserResetting) throw conflict('Wait for the browser reset before restarting.');
     if (this.runs.size || this.operations.size || this.preparations.size || this.queuePreparations.size || this.configurationPreparations.size || this.externalOperations.size || this.jobs.active()) throw conflict('Finish active tasks and background jobs before restarting. The update is installed and your work is still running.');
     this.stopping = true;
   }
   whenIdle(): Promise<void> {
-    return new Promise(resolve=>{this.idleWaiters.add(resolve);this.notifyIdle();});
+    return new Promise<void>(resolve=>{this.idleWaiters.add(resolve);this.notifyIdle();}).then(() => this.browserShutdown);
   }
   async submit(id: string, snapshot: () => Promise<{ content: string; attachments?: Attachment[]; clientSurface?: ClientSurface }>): Promise<string> {
     this.assertIdle(id);this.store.session(id);
@@ -232,6 +286,27 @@ export class Runner {
     this.assertIdle(id);const workspace=this.store.session(id).workspace;this.ownWorkspace(workspace,id);this.operations.add(id);
     try { return await operation(); }
     finally { this.operations.delete(id);this.releaseWorkspace(workspace,id);this.notifyIdle(); }
+  }
+  async workspaceOperation<T>(workspace: string, operation: (signal: AbortSignal) => Promise<T>, requestSignal?: AbortSignal): Promise<T> {
+    this.assertOpen();
+    if (this.jobs.active(workspace)) throw conflict('Finish the active work in this project before changing Git state.');
+    for (const session of this.store.sessions()) {
+      if (session.workspace !== workspace) continue;
+      if (this.active(session.id) || this.operations.has(session.id) || this.preparations.has(session.id)) throw conflict('Finish the active work in this project before changing Git state.');
+      this.history.assertReady(session.id);
+    }
+    const owner = `workspace:${randomUUID()}`;
+    this.ownWorkspace(workspace, owner);
+    try { return await this.externalOperation(operation, requestSignal); }
+    finally { this.releaseWorkspace(workspace, owner); }
+  }
+  async taskWorkspaceOperation<T>(id: string, operation: (signal: AbortSignal) => Promise<T>, requestSignal?: AbortSignal): Promise<T> {
+    this.assertIdle(id);
+    return this.workspaceOperation(this.store.session(id).workspace, async signal => {
+      this.assertIdle(id); this.operations.add(id);
+      try { return await operation(signal); }
+      finally { this.operations.delete(id); this.notifyIdle(); }
+    }, requestSignal);
   }
   async prepareConfiguration<T,R>(id: string|undefined, expectedConfigRevision: number|undefined, prepare: (signal:AbortSignal)=>Promise<T>, commit:(prepared:T)=>R, requestSignal?:AbortSignal):Promise<R> {
     this.assertOpen();
@@ -292,6 +367,7 @@ export class Runner {
   }
   stopAll() {
     this.stopping=true;
+    this.browserShutdown = Promise.all([this.browsers.close(), this.computers.close()]).then(() => {}).catch(() => {});
     // Background jobs are process-local and must not outlive the server; SIGTERM
     // them all without waiting (graceful shutdown has its own overall timeout).
     try {this.jobs.killAll();} catch {console.error('Could not signal background jobs during shutdown.');}
@@ -480,6 +556,7 @@ export class Runner {
   }
   resumeQueue(id: string) {
     this.assertRoot(id);this.assertOpen();this.history.assertReady(id);
+    if (this.store.session(id).worktree?.removed) throw conflict('This working copy was removed. Recall the queued messages into another task.');
     if(this.operations.has(id)||this.preparations.has(id))throw conflict('Wait for the current operation before resuming the queue.');
     const run=this.runs.get(id);
     if(run?.controller.signal.aborted)throw conflict('Wait for cancellation to finish before resuming the queue.');
@@ -536,6 +613,9 @@ export class Runner {
     this.assertIdle(id);
     if(!queuedId&&this.store.queue(id).items.length)throw conflict('Resume or remove queued messages before sending a new message.');
     const session = this.store.session(id);
+    if (this.workspaceOperationActive(session.workspace)) throw conflict('Wait for the current project operation before starting a new turn.');
+    if (session.worktree?.removed) throw conflict('This working copy was removed. Open its original project or create another worktree to continue.');
+    this.store.worktrees.assertUsable(session.workspace);
     if(session.architecture?.kind==='litefusion'){const configured=liteFusionConfiguration(session.architecture,session);session.providerId=configured.providerId;session.model=configured.model;session.modelReasoning=configured.modelReasoning;session.architecture=configured.architecture!;delete session.planner;delete session.shunt;}
     // TURN MODEL: Plan-mode turns run on the session planner when one is set;
     // Build turns (and plan turns without a planner) run on the executor — the
@@ -711,6 +791,15 @@ export class Runner {
   }
   /** Best-effort removal of a deleted session's derived search rows. */
   removeFromSearchIndex(id: string) { try {this.searchIndex.remove(id);} catch {/* derived data; deletion already succeeded */} }
+  async searchTasks(input: import('../shared/task-search.js').TaskSearchQuery, signal?: AbortSignal): Promise<import('../shared/task-search.js').TaskSearchResult> {
+    signal?.throwIfAborted();
+    if (!input.query.trim()) return { ...this.searchIndex.tasks(input), indexing: false };
+    // Completed turns update this index already. Refresh live tasks explicitly;
+    // a bounded sweep brings older/imported history into the same search.
+    for (const id of this.runs.keys()) { signal?.throwIfAborted(); this.searchIndex.index(id); }
+    const progress = this.searchIndex.indexAll();
+    signal?.throwIfAborted(); return { ...this.searchIndex.tasks(input), indexing: !progress.done };
+  }
   /** 5.2 repair: rebuild the derived search index by walking EVERY session row
    * (root, archived, and researcher children alike) and force-reindexing each
    * (delete+reinsert, so even a corrupt-but-fresh-looking FTS row set is
@@ -800,7 +889,7 @@ export class Runner {
       // unsealed history, shutdown, or a later queue pause still prevents promotion.
       advanceQueue=Boolean(run.advanceQueue&&run.controller.signal.aborted&&!run.failure&&!history.pendingRecovery&&current.status!=='error'&&!this.stopping);
       if(!succeeded&&!advanceQueue)this.holdQueue(id,run.controller.signal.aborted?'Cancelled. Review and resume queued messages explicitly.':'Response stopped or encountered an error. Review before resuming queued messages.',false);
-      this.bus.emit(id,'done',{status:this.store.session(id).status});
+      this.bus.emit(id,'done',{status:this.store.session(id).status,outcome:succeeded?'completed':current.status==='error'?'failed':'interrupted'});
     } catch(error) {succeeded=false;advanceQueue=false;this.failRun(id,run,error);}
     finally {
       run.progressMessage=undefined;this.releaseExternal(run);
@@ -986,7 +1075,10 @@ export class Runner {
       } else if (message.role === 'user' || (message.role === 'system' && message.content.startsWith('[Steering] '))) {
         const parts: any[] = [{type:'text',text:message.content}];
         for (const attachment of message.attachments || []) {
-          if (attachment.dataUrl && attachment.mimeType?.startsWith('image/')) parts.push({type:'image_url',image_url:{url:attachment.dataUrl}});
+          if (attachment.dataUrl && attachment.mimeType?.startsWith('image/')) {
+            parts.push({type:'image_url',image_url:{url:attachment.dataUrl}});
+            if (attachment.content) parts.push({type:'text',text:`\n<image_context name=${JSON.stringify(attachment.name)}>\n${attachment.content.slice(0,50000)}\n</image_context>`});
+          }
           else {
             // Paths are display metadata, never a deferred read of a changing workspace.
             const content = attachment.content ?? '[Attachment content unavailable. Reattach this file to include it.]';
@@ -1334,17 +1426,19 @@ export class Runner {
     const readTool = connected && Boolean(run.external!.readOnlyTools?.().has(subject));
     const target = access?.external || subject === 'bash' ? access?.resolvedPath : undefined;
     const scopeDescription = subject === 'bash' ? `This exact command in ${target ?? session.workspace} (${confined?'workspace confinement, no network':'unrestricted shell access'})`
+      : subject === 'browser' ? 'This browser action with these exact arguments'
+      : subject === 'computer' ? 'This desktop action with these exact arguments'
       : connected ? readTool ? 'This read tool on the reviewed connection' : 'This connected tool with these exact arguments'
       : target ? `This tool at ${target}` : 'This tool in this workspace';
     const scope = createHash('sha256').update(canonical({version:2,workspace:ownerSession.workspace,
       path:target, command:subject === 'bash' ? subjectArgs.command : undefined, sandbox:subject==='bash' ? confined : undefined,
       mcp:connected ? run.external!.scope(subject) : undefined,
-      arguments:connected && !readTool ? subjectArgs : undefined})).digest('hex');
+      arguments:(connected && !readTool) || subject === 'browser' || subject === 'computer' ? subjectArgs : undefined})).digest('hex');
     if (match?.decision!=='ask') {
       if (['task','sidekick','delegate','takeover','kill_shell','todo_write'].includes(subject) || (session.permissionMode === 'edit' && !access?.external && ['write_file','edit_file'].includes(subject)) || (session.permissionMode==='edit' && session.commandSandbox==='workspace' && confined) || (run.policy?.memory && !run.child && ['memory_remember','memory_forget'].includes(subject)) || (localReadOnly && !access?.external) || session.permissionMode === 'auto' || [...this.store.toolGrants(ownerSession.id),...this.store.projectToolGrants(ownerSession.workspace)].some(g => g.tool === subject && g.scope === scope) || match?.decision==='allow') return true;
     }
     if (approvalSignal.aborted) return false;
-    const base = access?.external ? `${subject === 'bash' ? 'Run this command with an external working directory' : localReadOnly ? 'Read outside this session’s workspace' : 'Modify a file outside this session’s workspace'}: ${access.resolvedPath}${run.child ? ` (requested by the ${run.child.role ?? 'researcher'})` : ''}.${!localReadOnly ? ' External changes are not covered by workspace Undo.' : ''}` : subject === 'task' ? 'Launch one bounded read-only researcher. It cannot modify files or delegate.' : subject === 'sidekick' ? 'Hand this task to the persistent sidekick. It can modify files and run commands, each behind your normal approval.' : subject === 'delegate' ? 'Start a fresh worker for this assignment. Its file edits and commands use this session’s permissions.' : subject === 'bash' ? `Run this command in your workspace${run.child?.role ? ` (requested by the ${run.child.role})` : ''}` : subject.startsWith('mcp_') ? 'Call this connected tool' : run.child?.role ? `Allow this ${run.child.role} action in your workspace` : 'Allow this action in your workspace';
+    const base = access?.external ? `${subject === 'bash' ? 'Run this command with an external working directory' : localReadOnly ? 'Read outside this session’s workspace' : 'Modify a file outside this session’s workspace'}: ${access.resolvedPath}${run.child ? ` (requested by the ${run.child.role ?? 'researcher'})` : ''}.${!localReadOnly ? ' External changes are not covered by workspace Undo.' : ''}` : subject === 'task' ? 'Launch one bounded read-only researcher. It cannot modify files or delegate.' : subject === 'sidekick' ? 'Hand this task to the persistent sidekick. It can modify files and run commands, each behind your normal approval.' : subject === 'delegate' ? 'Start a fresh worker for this assignment. Its file edits and commands use this session’s permissions.' : subject === 'browser' ? `Use the task browser: ${String(subjectArgs.action)}${subjectArgs.url ? ` · ${String(subjectArgs.url)}` : ''}. Browser actions are not covered by file undo.` : subject === 'computer' ? `Use your desktop apps: ${String(subjectArgs.action)}${subjectArgs.bundleId ? ` · ${String(subjectArgs.bundleId)}` : ''}${subjectArgs.windowId ? ` · window ${String(subjectArgs.windowId)}` : ''}. Desktop actions are not covered by file undo.` : subject === 'bash' ? `Run this command in your workspace${run.child?.role ? ` (requested by the ${run.child.role})` : ''}` : subject.startsWith('mcp_') ? 'Call this connected tool' : run.child?.role ? `Allow this ${run.child.role} action in your workspace` : 'Allow this action in your workspace';
     const notes = `${match?.decision==='ask'?' An explicit permission rule requires confirmation for this call.':''}${captured?.advisory?` ${captured.advisory}`:''}`;
     // request.tool/args carry the SUBJECT: the user reviews the real connected
     // tool and its real arguments, and an "always" grant is stored under that
@@ -1524,9 +1618,9 @@ export class Runner {
       if(readOnly)return isReadOnlyTool(name)&&!jobTool(name)&&policy.tools.includes(name);
       return sidekickChild(name);
     };
-    const policyAllows=(name:string)=>['wait_tasks','resolve_task'].includes(name)?Boolean(!run.child&&policy.litefusion):run.child?(run.litefusionRole?liteWorkerAllows(name):run.child.role?sidekickChild(name):isReadOnlyTool(name)&&!jobTool(name)&&policy.tools.includes(name)):name==='update_goal'?Boolean(run.goalTurn)&&allowlist==null:jobTool(name)?allowlist==null&&(session.mode!=='plan'||isReadOnlyTool(name)):name==='history_search'||name==='tool_output_page'||name==='capability'?allowlist==null:name.startsWith('memory_')?policy.memory&&allowlist==null&&(session.mode!=='plan'||isReadOnlyTool(name)):name==='delegate'||name==='verify'||name==='takeover'?Boolean(policy.litefusion?name!=='takeover'&&!hidden.includes(name)&&(name==='delegate'||session.mode==='build'&&policy.tools.includes('bash')):session.architecture&&session.architecture.kind!=='sidekick-fusion'&&session.mode==='build'&&allowlist==null):name==='sidekick'?session.architecture?.kind==='sidekick-fusion'&&session.mode!=='plan'&&allowlist==null&&!hidden.includes(name):name==='task'?!policy.litefusion&&allowlist==null&&!hidden.includes(name):name==='ask_user'||((allowlist==null||allowlist.some(tool=>tool===name))&&(session.mode!=='plan'||isReadOnlyTool(name))&&!hidden.includes(name));
+    const policyAllows=(name:string)=>['browser','computer'].includes(name)? !run.child && session.mode==='build' && allowlist==null:['wait_tasks','resolve_task'].includes(name)?Boolean(!run.child&&policy.litefusion):run.child?(run.litefusionRole?liteWorkerAllows(name):run.child.role?sidekickChild(name):isReadOnlyTool(name)&&!jobTool(name)&&policy.tools.includes(name)):name==='update_goal'?Boolean(run.goalTurn)&&allowlist==null:jobTool(name)?allowlist==null&&(session.mode!=='plan'||isReadOnlyTool(name)):name==='history_search'||name==='tool_output_page'||name==='capability'?allowlist==null:name.startsWith('memory_')?policy.memory&&allowlist==null&&(session.mode!=='plan'||isReadOnlyTool(name)):name==='delegate'||name==='verify'||name==='takeover'?Boolean(policy.litefusion?name!=='takeover'&&!hidden.includes(name)&&(name==='delegate'||session.mode==='build'&&policy.tools.includes('bash')):session.architecture&&session.architecture.kind!=='sidekick-fusion'&&session.mode==='build'&&allowlist==null):name==='sidekick'?session.architecture?.kind==='sidekick-fusion'&&session.mode!=='plan'&&allowlist==null&&!hidden.includes(name):name==='task'?!policy.litefusion&&allowlist==null&&!hidden.includes(name):name==='ask_user'||((allowlist==null||allowlist.some(tool=>tool===name))&&(session.mode!=='plan'||isReadOnlyTool(name))&&!hidden.includes(name));
     const strictDriver=!run.child&&session.mode==='build'&&strictFusion(session.architecture);
-    const baseAllowed=(name:string)=>policyAllows(name)&&(!strictDriver||isReadOnlyTool(name)||['delegate','verify','takeover','todo_write','ask_user','update_goal'].includes(name)||((name==='write_file'||name==='edit_file')&&Boolean(run.takeover?.remaining)));
+    const baseAllowed=(name:string)=>policyAllows(name)&&(!strictDriver||isReadOnlyTool(name)||['delegate','verify','takeover','todo_write','ask_user','update_goal','browser','computer'].includes(name)||((name==='write_file'||name==='edit_file')&&Boolean(run.takeover?.remaining)));
     const allowed=(name:string):boolean => name==='bulk_read' ? Boolean(policy.shuntProvider)&&baseAllowed('read_file') : name==='code_write' ? Boolean(policy.shuntProvider)&&baseAllowed('read_file')&&baseAllowed('write_file') : baseAllowed(name);
     // GATEWAY PARTITION (docs/design-capability-proxy.md, Option 3): tools whose
     // server did NOT opt into advertise:true stay OUT of the advertised array —
@@ -1547,7 +1641,7 @@ export class Runner {
     // can only name PROFILE_TOOLS; visible in Plan; inside the child ceiling —
     // a deliberate ceiling expansion recorded in docs/delegation.md).
     const readTools = policy.shuntProvider ? toolDefinitions.map(tool => tool.function.name==='read_file' ? {...tool,function:{...tool.function,parameters:{...tool.function.parameters,properties:{...(tool.function.parameters.properties as object),direct_reason:{type:'string',minLength:1,maxLength:1000,description:'Why you need source directly for exact reasoning, debugging or recovery instead of a Shunt answer.'}}}}} : tool) : toolDefinitions;
-    const availableTools = [...readTools, ...(policy.shuntProvider?shuntTools:[]), ...(session.architecture&&!run.child?(policy.litefusion?[liteFusionDelegateTool,waitTasksTool,resolveTaskTool,verifyTool]:session.architecture.kind==='sidekick-fusion'?[sidekickTool]:[delegateTool,verifyTool,takeoverTool]):[]), historySearchTool, toolOutputPageTool, bashOutputTool, killShellTool, waitTool, viewImageTool, webSearchTool, updateGoalTool, ...(run.litefusionRole?[workerRequestTool,...(run.litefusionRole.execution==='review'?[verifyTool]:[])]:[]), ...(gateway.size?[capabilityTool]:[]), ...(policy.memory&&!run.child?memoryToolDefinitions:[]), questionTool, ...externalTools.filter(t => t.function.name !== 'ask_user')].filter(t=>allowed(t.function.name)||(strictDriver&&['write_file','edit_file','code_write'].includes(t.function.name)&&policyAllows(t.function.name==='code_write'?'write_file':t.function.name)&&(t.function.name!=='code_write'||baseAllowed('read_file'))));
+    const availableTools = [...readTools, ...(policy.shuntProvider?shuntTools:[]), ...(session.architecture&&!run.child?(policy.litefusion?[liteFusionDelegateTool,waitTasksTool,resolveTaskTool,verifyTool]:session.architecture.kind==='sidekick-fusion'?[sidekickTool]:[delegateTool,verifyTool,takeoverTool]):[]), historySearchTool, toolOutputPageTool, bashOutputTool, killShellTool, waitTool, viewImageTool, webSearchTool, browserTool, computerTool, updateGoalTool, ...(run.litefusionRole?[workerRequestTool,...(run.litefusionRole.execution==='review'?[verifyTool]:[])]:[]), ...(gateway.size?[capabilityTool]:[]), ...(policy.memory&&!run.child?memoryToolDefinitions:[]), questionTool, ...externalTools.filter(t => t.function.name !== 'ask_user')].filter(t=>allowed(t.function.name)||(strictDriver&&['write_file','edit_file','code_write'].includes(t.function.name)&&policyAllows(t.function.name==='code_write'?'write_file':t.function.name)&&(t.function.name!=='code_write'||baseAllowed('read_file'))));
     // An ignored invalid rules file must be visible in the session detail, not
     // only when a prompt happens to occur. The child transcript inherits the
     // parent's captured rules; the parent already carries the notice.
@@ -1949,6 +2043,8 @@ export class Runner {
             }
             output = call.name==='takeover' ? 'Bounded driver takeover recorded: up to three file edits on the listed paths. Run verification afterward.' : call.name==='update_goal' ? this.executeUpdateGoal(id,run,call.args) : call.name==='history_search' ? this.executeHistorySearch(id,call.args) : call.name==='tool_output_page' ? executeToolOutputPage(this.store,id,call.args) : call.name==='bash_output' ? await executeBashOutput(this.jobs,id,call.args) : call.name==='kill_shell' ? await executeKillShell(this.jobs,id,call.args) : call.name==='wait' ? await executeWait(this.jobs,id,call.args) : call.name.startsWith('memory_') ? this.executeMemory(session.workspace,call.name,call.args) : call.name==='capability' ? await this.executeCapability(id,run,message,call,content=>hookNotices.push(content)) : call.name.startsWith('mcp_') ? await run.external!.execute(call.name,call.args,signal) : await executeTool(call.name==='verify'?'bash':call.name,call.name==='verify'?verificationCommand(call.args):call.args,{
               workspace:session.workspace,sessionId:id,signal,fileAccess:this.approvedPaths.get(call),
+              browser: args => this.browsers.execute(id, args, signal),
+              computer: args => this.computers.execute(id, args, signal),
               executeShell: (command, cwd, waitMs) => this.executeCommand(id, run, message, call, command, cwd, waitMs),
               onExecution: execution => { call.execution = execution; },
               prepareChange:change => { const owner=run.child?.role&&!run.child.isolated?run.child.delegation.parentSessionId:id;if(this.approvedPaths.get(call)?.external){this.history.noteEffects(owner,`External file changes are not covered by workspace Undo: ${change.path}`);return;}this.history.prepareChange(owner,run.child?.role?{...change,actorSessionId:id,invocationId:run.child.delegation.id}:change); },

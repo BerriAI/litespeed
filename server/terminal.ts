@@ -43,9 +43,9 @@ export function terminalEnvironment(shell: string): Record<string, string> {
 /** One process-local shell per stored session. Detaching never destroys a running shell. */
 export class TerminalManager {
   private readonly terminals = new Map<string, TerminalEntry>();
-  private readonly stopping = new Set<Promise<void>>();
+  private readonly stopping = new Map<Promise<void>, string>();
   private closed = false;
-  constructor(private readonly store: Store, private readonly spawnPty: PtyFactory = spawn) {}
+  constructor(private readonly store: Store, private readonly spawnPty: PtyFactory = spawn, private readonly workspaceBusy: (workspace: string) => boolean = () => false) {}
 
   private terminalSession(sessionId: string) {
     // Private durable identity, not public parentId or caller-supplied metadata.
@@ -57,6 +57,8 @@ export class TerminalManager {
   validate(sessionId: string) {
     if (this.closed) throw fail(503, 'Terminal service is stopping.');
     const session = this.terminalSession(sessionId);
+    if (this.workspaceBusy(session.workspace)) throw fail(409, 'Wait for the current project operation before opening its terminal.');
+    if (this.store.worktrees.isRemoving(session.workspace) || session.worktree?.removed) throw fail(409, 'This working copy is being removed or is no longer available.');
     const entry = this.terminals.get(sessionId);
     if (!entry && this.terminals.size + this.stopping.size >= TERMINAL_LIMITS.terminals) throw fail(429, 'Terminal limit reached. End another shell first.');
     if (entry && entry.clients.size >= TERMINAL_LIMITS.clients) throw fail(429, 'Too many terminal viewers. Close another terminal tab.');
@@ -218,7 +220,7 @@ export class TerminalManager {
   private dispose(entry: TerminalEntry, reason: string) {
     if (entry.closing) return;
     this.end(entry, { type: 'exit', reason });
-    this.stopping.add(entry.stopped);
+    this.stopping.set(entry.stopped, entry.cwd);
     // Login shells normally forward SIGHUP to their jobs. Disowned/detached processes are not a sandbox.
     try { entry.pty.kill('SIGHUP'); } catch { /* Already exited. */ }
     entry.killTimer = setTimeout(() => {
@@ -236,12 +238,12 @@ export class TerminalManager {
     entry.resolveStopped();
   }
 
-  active() { return this.terminals.size > 0 || this.stopping.size > 0; }
+  active(workspace?: string) { return [...this.terminals.values()].some(entry => !workspace || entry.cwd === workspace) || [...this.stopping.values()].some(cwd => !workspace || cwd === workspace); }
 
   async close() {
     this.closed = true;
     for (const entry of this.terminals.values()) this.dispose(entry, 'Terminal service stopped.');
-    await Promise.all(this.stopping);
+    await Promise.all(this.stopping.keys());
   }
 }
 
@@ -264,8 +266,8 @@ function trustedUpgrade(req: IncomingMessage) {
 }
 
 /** Mount on the same HTTP server as the API. Call close() before closing Store during shutdown. */
-export function attachTerminals(server: Server, store: Store, stopping: () => boolean = () => false): { close(): Promise<void>; active(): boolean } {
-  const manager = new TerminalManager(store);
+export function attachTerminals(server: Server, store: Store, stopping: () => boolean = () => false, workspaceBusy: (workspace: string) => boolean = () => false): { close(): Promise<void>; active(workspace?: string): boolean } {
+  const manager = new TerminalManager(store, spawn, workspaceBusy);
   const wss = new WebSocketServer({ noServer: true, maxPayload: TERMINAL_LIMITS.messageBytes, perMessageDeflate: false, clientTracking: true });
   let closing: Promise<void> | undefined;
   const reject = (socket: Duplex, status: number) => {
@@ -306,5 +308,5 @@ export function attachTerminals(server: Server, store: Store, stopping: () => bo
   const onSignal = () => { void close(); };
   server.on('upgrade', upgrade); server.once('close', onClose);
   process.once('SIGTERM', onSignal); process.once('SIGINT', onSignal);
-  return { close, active: () => manager.active() };
+  return { close, active: workspace => manager.active(workspace) };
 }

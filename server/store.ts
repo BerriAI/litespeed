@@ -1,4 +1,6 @@
 import { LEGACY_NAMES } from '../bin/legacy.mjs';
+import { protectStateDirectory } from './state-paths.js';
+import { ProjectWorktrees } from './worktrees.js';
 import { architectureConfiguration, architectureKey, liteFusionConfiguration } from '../shared/architecture-config.js';
 import type { ClientSurface } from '../shared/client.js';
 import { DatabaseSync } from 'node:sqlite';
@@ -13,6 +15,8 @@ import type { Session, Message, Settings, Todo, FileChange, RunEvent, Provider, 
 
 export class Store {
   readonly db: DatabaseSync;
+  readonly worktrees: ProjectWorktrees;
+  private readonly releaseStateProtection: () => void;
   constructor(readonly directory = resolve(process.env.LITESPEED_DATA_DIR || '.litespeed')) {
     assertNoLegacyStore(directory);
     mkdirSync(directory, { recursive: true, mode: 0o700 });
@@ -56,6 +60,8 @@ export class Store {
       const queue=this.queue(session.id);
       if(queue.items.length)this.saveQueue(session.id,{...queue,paused:true,reason:'Server restarted. Review and resume queued messages explicitly.'});
     }
+    this.releaseStateProtection = protectStateDirectory(directory);
+    this.worktrees = new ProjectWorktrees(this);
   }
   /** A context can have many immutable handoffs, but only one active writer.
    * Migrate transactionally without guessing origins overwritten by old reuse. */
@@ -123,7 +129,7 @@ export class Store {
       DROP TABLE tool_grants;
       ALTER TABLE tool_grants_v2 RENAME TO tool_grants;`));
   }
-  close() { this.db.close(); }
+  close() { try { this.worktrees.close(); this.db.close(); } finally { this.releaseStateProtection(); } }
   settings(): Settings {
     const row = this.db.prepare('SELECT data FROM settings WHERE id=1').get() as { data: string } | undefined;
     const settings: Settings = row ? JSON.parse(row.data) : {
@@ -207,6 +213,9 @@ export class Store {
       const settings = this.settings(), now = Date.now();
       const session: Session = { id: randomUUID(), title: 'New session', workspace: settings.workspace, model: settings.defaultModel, providerId: settings.defaultProvider, mode: 'build', permissionMode: settings.permissionMode, createdAt: now, updatedAt: now, archived: false, ...input, status: 'idle', configRevision: 0 };
       delete session.pendingArchitecture;
+      delete session.worktree;
+      const workingCopy = this.worktrees?.list().find(record => record.status === 'ready' && record.path === session.workspace);
+      if (workingCopy) session.worktree = this.worktrees.metadata(workingCopy);
       this.projectArchitecture(session);
       session.architectureConfigurations={...session.architectureConfigurations,[architectureKey(session)]:architectureConfiguration(session)};
       // Imported/public summaries can never manufacture a private activation.
@@ -237,6 +246,7 @@ export class Store {
       const changed = (shunt !== undefined && JSON.stringify(shunt ?? undefined) !== JSON.stringify(previous.shunt)) || reasoningChanged || plannerChanged || styleChanged || architectureChanged || (['workspace', 'providerId', 'model', 'mode', 'permissionMode', 'commandSandbox'] as const).some(key => safe[key] !== undefined && safe[key] !== previous[key]);
       if (safe.workspace !== undefined && safe.workspace !== previous.workspace && (previous.profile || this.db.prepare('SELECT 1 FROM session_profiles WHERE session_id=?').get(id))) throw Object.assign(new Error('Clear the profile before changing the workspace.'), { status: 409 });
       const session = { ...previous, ...safe, id, updatedAt: Date.now(), configRevision: previous.configRevision! + (changed ? 1 : 0) };
+      if (session.workspace !== previous.workspace) delete session.worktree;
       if (shunt !== undefined) { if (shunt === null) delete session.shunt; else session.shunt = shunt; }
       if (planner !== undefined) { if (planner === null) delete session.planner; else session.planner = planner; }
       if (outputStyle !== undefined) { if (outputStyle === null) delete session.outputStyle; else session.outputStyle = outputStyle; }
@@ -250,6 +260,32 @@ export class Store {
       }
       this.db.prepare('UPDATE sessions SET data=? WHERE id=?').run(JSON.stringify(session), id);
       if (changed||modelChanged) this.pauseConfigurationQueue(id);
+      return session;
+    });
+  }
+  /** Only the reviewed task-worktree flow calls this. Pinned instructions remain
+   * the same immutable snapshot; ordinary workspace edits cannot bypass their guard. */
+  attachTaskWorktree(id: string, worktreeId: string, expectedConfigRevision: number): Session {
+    return this.atomic(() => {
+      this.assertChildMutable(id);
+      const previous = this.session(id); this.assertConfigRevision(previous, expectedConfigRevision); this.profileSnapshot(id);
+      const record = this.worktrees.get(worktreeId);
+      if (previous.archived || previous.worktree || previous.status === 'running' || previous.status === 'waiting' || previous.workspace !== record.project || record.status !== 'ready') throw Object.assign(new Error('The task or working copy changed. Review the move again.'), { status: 409 });
+      const session: Session = { ...previous, workspace: record.path, worktree: this.worktrees.metadata(record), configRevision: previous.configRevision! + 1, historyRevision: (previous.historyRevision ?? 0) + 1, updatedAt: Date.now() };
+      this.db.prepare('UPDATE sessions SET data=? WHERE id=?').run(JSON.stringify(session), id);
+      const queue = this.queue(id); this.saveQueue(id, { ...queue, paused: true, reason: 'This task moved to a worktree. Review queued messages before resuming.' });
+      return session;
+    });
+  }
+  detachTaskWorktree(id: string, worktreeId: string, expectedConfigRevision: number): Session {
+    return this.atomic(() => {
+      this.assertChildMutable(id);
+      const previous = this.session(id); this.assertConfigRevision(previous, expectedConfigRevision); this.profileSnapshot(id);
+      const record = this.worktrees.get(worktreeId);
+      if (previous.archived || previous.worktree?.id !== worktreeId || previous.status === 'running' || previous.status === 'waiting' || previous.workspace !== record.path || record.status !== 'ready') throw Object.assign(new Error('The task or working copy changed. Review the local continuation again.'), { status: 409 });
+      const session: Session = { ...previous, workspace: record.project, worktree: undefined, configRevision: previous.configRevision! + 1, historyRevision: (previous.historyRevision ?? 0) + 1, updatedAt: Date.now() };
+      this.db.prepare('UPDATE sessions SET data=? WHERE id=?').run(JSON.stringify(session), id);
+      const queue = this.queue(id); this.saveQueue(id, { ...queue, paused: true, reason: 'This task moved to the local project. Review queued messages before resuming.' });
       return session;
     });
   }

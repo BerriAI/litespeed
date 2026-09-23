@@ -1,0 +1,6 @@
+.browser-pending-link { display: flex; align-items: center; gap: 9px; flex-shrink: 0; padding: 10px 12px; border-bottom: 1px solid var(--border); background: var(--surface); color: var(--muted); }
+.browser-pending-link > span { flex: 1; min-width: 0; }
+.browser-pending-link strong { display: block; font-size: 11px; line-height: 1.6; font-weight: 500; color: var(--secondary); }
+.browser-pending-link small { display: block; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-size: 10px; margin-top: 2px; }
+.browser-pending-link .icon-button { flex-shrink: 0; }
+.browser-surface { position: relative; display: flex; flex-direction: column; flex: 1; min-height: 0; }

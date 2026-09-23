@@ -5,7 +5,7 @@ test('Advanced settings keeps onboarding simple and saves an independently chose
   const original=await(await request.get(`/api/workspace-preferences?workspace=${encodeURIComponent(settings.workspace)}`)).json();
   try {
     await request.post('/api/workspace-preferences',{data:{workspace:settings.workspace,providerId:'fixture',model:'test-model',architecture:null,shunt:null,setupComplete:false}});
-    await page.goto('/');await page.getByRole('button',{name:'Set up Litespeed',exact:true}).click();
+    await page.goto('/');await page.getByRole('button',{name:'Settings',exact:true}).click();await page.getByRole('button',{name:'Set up Litespeed',exact:true}).click();
     const dialog=page.getByRole('dialog',{name:'Set up Litespeed',exact:true});
     await expect(dialog.getByText('Review your setup',{exact:true})).toBeVisible();
     await dialog.getByRole('combobox',{name:'Setup architecture'}).selectOption('single');

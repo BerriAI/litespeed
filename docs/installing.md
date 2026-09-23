@@ -1,6 +1,10 @@
 # Install and update Litespeed
 
-## macOS package
+## Mac desktop app
+
+The [desktop preview](https://github.com/BerriAI/litespeed/releases/tag/desktop-v0.1.23-preview.1) is a self-contained app for Apple silicon Macs running macOS 14 or later. Download the ZIP, unzip it, and move Litespeed.app to Applications. It is locally signed and not Apple-notarized; follow the [desktop installation instructions](desktop-macos.md#download-and-install) for first launch.
+
+## Terminal package for macOS
 
 Litespeed releases include Node, Bun, the native terminal packages, and the built web app for Apple silicon and Intel Macs. You do not need to install Node or run npm. Git and project-specific tools remain separate.
 
@@ -19,7 +23,7 @@ litespeed
 
 To use the current terminal instead, run `export PATH="$HOME/.local/bin:$PATH"` once. An installer launched with `curl … | sh` cannot change its parent terminal’s environment. The first launch asks for your gateway base URL and API key. For the browser, open `http://localhost:3210`, or run `litespeed serve` for a web-only session.
 
-You can also download the archive for your Mac from [Releases](https://github.com/BerriAI/litespeed/releases), alongside its `manifest.json`. Extract it and run `litespeed/runtime/node litespeed/bin/install.mjs /absolute/path/to/archive.tar.gz /absolute/path/to/manifest.json`. These are terminal/server packages, not a signed/notarized `.app` or `.pkg` installer.
+You can also download the terminal archive for your Mac from [Releases](https://github.com/BerriAI/litespeed/releases), alongside its `manifest.json`. Extract it and run `litespeed/runtime/node litespeed/bin/install.mjs /absolute/path/to/archive.tar.gz /absolute/path/to/manifest.json`. These are terminal/server packages, not a signed/notarized `.app` or `.pkg` installer.
 
 ## Updates
 
@@ -59,6 +63,6 @@ Keep that checkout in place. Pull changes, run `npm ci && npm run build`, and re
 
 ## Publishing a release
 
-Bump `package.json` and the lockfile root version, update `docs/release-notes.md`, and push a matching `vX.Y.Z` tag. The release workflow independently builds and tests both macOS architectures. It verifies checksums, combines their manifests, and publishes assets only after both package smoke tests pass. A workflow dispatch builds verification artifacts without publishing a release.
+Bump `package.json` and the lockfile root version, update `docs/release-notes.md`, and push a matching `vX.Y.Z` tag. The release workflow independently builds and tests both macOS architectures. It verifies checksums, combines their manifests, and publishes the terminal archives and desktop ZIPs only after both architectures pass their terminal and desktop package smoke tests. Desktop SHA-256 manifests accompany each ZIP. A workflow dispatch builds verification artifacts without publishing a release.
 
 Locally, `npm run package:macos` builds for the current Mac and `npm run test:package` verifies the bundled install and a synthetic upgrade in a disposable directory. The smoke test removes system Node/Bun from PATH, boots the native TUI and web server, completes a synthetic provider call, refuses a busy restart, and checks session/settings preservation after restarting the updated server.

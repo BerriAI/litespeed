@@ -1,0 +1,7 @@
+.browser-selection-menu { position: fixed; z-index: 200; width: 242px; max-width: calc(100vw - 16px); padding: 5px; border: 1px solid var(--border); border-radius: 10px; background: var(--surface); color: var(--text); box-shadow: 0 10px 34px #0003; outline: none; }
+.browser-selection-menu > p { margin: 0 6px 5px; padding: 7px 3px 10px; border-bottom: 1px solid var(--border); font-size: 11px; line-height: 1.5; color: var(--muted); display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; overflow-wrap: anywhere; white-space: pre-wrap; }
+.browser-selection-menu > p.error { color: var(--red); }
+.browser-selection-menu > button { display: flex; align-items: center; gap: 9px; width: 100%; padding: 9px; border-radius: 6px; font-size: 12px; text-align: left; }
+.browser-selection-menu > button:hover:not(:disabled), .browser-selection-menu > button:focus-visible { background: var(--hover); outline: none; }
+.browser-selection-menu > button:disabled { opacity: .45; cursor: default; }
+.browser-selection-menu kbd { margin-left: auto; color: var(--faint); font-family: inherit; font-size: 10px; white-space: nowrap; }

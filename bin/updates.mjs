@@ -121,7 +121,7 @@ export function updateService({ root, version, directory, fetchLatest = latest }
     let release; try { if (cache.release) release = manifest(cache.release); } catch { /* Discard invalid cached metadata. */ }
     const available = Boolean(release && newer(release.version, version));
     let next; if (installation) { try { next = (await json(join(installation.home, 'current/release.json'))).version; } catch { /* The current running version remains usable. */ } }
-    return { currentVersion: version, latestVersion: release?.version, available, packaged: Boolean(installation), installedVersion: next, restartRequired: Boolean(next && newer(next, version)), checkedAt: cache.checkedAt, error: cache.error, releaseUrl: release ? `${RELEASES}/tag/v${release.version}` : RELEASES, command: installation ? 'litespeed update' : 'Update your source checkout and rebuild, or install the macOS package.' };
+    return { currentVersion: version, latestVersion: release?.version, available, packaged: Boolean(installation), installedVersion: next, restartRequired: Boolean(next && newer(next, version)), checkedAt: cache.checkedAt, error: cache.error, releaseUrl: release ? `${RELEASES}/tag/v${release.version}` : RELEASES, command: installation ? 'litespeed update' : process.env.LITESPEED_DESKTOP_BUNDLE === '1' ? 'Download the new Mac app and replace Litespeed.app. Your saved work stays in Application Support.' : 'Update your source checkout and rebuild, or install the macOS package.' };
   }
   async function install() {
     const installation = await installed(root);

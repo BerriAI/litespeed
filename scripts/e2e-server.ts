@@ -8,15 +8,39 @@ import { Store } from '../server/store.js';
 import { createApp } from '../server/app.js';
 import { attachTerminals } from '../server/terminal.js';
 import { McpManager } from '../server/mcp.js';
+import { ComputerFixture } from './e2e-computer.js';
+import { createPullRequestSource, PullRequestFixture } from './e2e-pull-requests.js';
+import express from 'express';
+import { browserGesturePage } from './e2e-browser-gestures.js';
+import { browserUploadPage } from './e2e-browser-uploads.js';
 
 const root=await realpath(await mkdtemp(join(tmpdir(),'litespeed-e2e-')));
 await mkdir(join(root,'src'));await writeFile(join(root,'src','hello.ts'),'export const hello = "world";\n');await writeFile(join(root,'README.md'),'# Fixture project\nA small project for browser tests.\n');
+const uploadReceipts: unknown[] = [];
 let providerRequests=0;
 const profileRequests:{model:string;messages:any[];tools:any[]}[]=[];
 const pendingSummaries=new Set<()=>void>();
 const delegationRequests:{model:string;messages:any[];tools:any[];reasoningEffort?:string}[]=[];
 const pendingDelegations=new Set<()=>void>();
 const mock=createServer(async(req,res)=>{
+  if(req.url==='/browser-upload-receipt') { const chunks: Buffer[] = []; for await (const part of req) chunks.push(part); uploadReceipts.push(JSON.parse(Buffer.concat(chunks).toString())); res.writeHead(200); res.end('ok'); return; }
+  if(req.url==='/browser-uploads') { res.writeHead(200,{'Content-Type':'text/html'});res.end(browserUploadPage);return; }
+  if(req.url==='/browser-gestures') { res.writeHead(200,{'Content-Type':'text/html'});res.end(browserGesturePage);return; }
+  if(req.url==='/browser-api') { res.writeHead(200,{'Content-Type':'application/json'});res.end('{"projects":3}');return; }
+  if(req.url==='/browser-missing') { res.writeHead(404,{'Content-Type':'text/plain'});res.end('The preview asset is unavailable.');return; }
+  if(req.url==='/browser-diagnostics') { res.writeHead(200,{'Content-Type':'text/html'});res.end('<title>Project overview</title><style>body{font:16px system-ui;background:#f7f7f2;color:#344238;padding:50px 30px}small{font-size:10px;letter-spacing:1.5px;color:#788578}h1{font-size:30px;line-height:1.3;font-weight:500;letter-spacing:-1px}p{color:#788578;line-height:1.7;max-width:340px}button{border:0;border-radius:7px;background:#344d3b;color:white;font:13px system-ui;padding:12px 16px;margin-top:12px}</style><small>FIELDNOTES / PROJECT</small><h1>A clear view of your work.</h1><p>Keep the page and its details together, with a little room to investigate.</p><button onclick="console.log(\'Project refreshed\')">Refresh project</button><script>console.log("Preview connected");console.warn("Using sample data while the project loads");fetch("/browser-api").then(()=>console.info("Project summary loaded"));fetch("/browser-missing");setTimeout(()=>console.error("Avatar preview failed to load"),20);</script>');return; }
+  if(req.url==='/browser-slow') { res.writeHead(200,{'Content-Type':'text/html'});res.write('<title>A page taking its time</title><style>body{font:16px system-ui;background:#f7f7f2;color:#344238;padding:50px 30px}small{font-size:10px;letter-spacing:1.5px;color:#788578}h1{font-size:30px;line-height:1.3;font-weight:500;letter-spacing:-1px}p{color:#788578;line-height:1.7;max-width:320px}</style><small>FIELDNOTES / PREVIEW</small><h1>Keep your place.</h1><p>This page is still loading. You can stop it and keep what is already here.</p><script src="/browser-pending-script"></script>');return; }
+  if(req.url==='/browser-pending-script'||req.url==='/browser-pending-response') return;
+  if(req.url==='/browser-inspector') { res.writeHead(200,{'Content-Type':'text/html'}); res.end('<title>A considered workspace</title><style>*{box-sizing:border-box}body{margin:0;padding:40px;background:#f7f7f2;color:#354338;font:16px system-ui}small{display:block;font-size:10px;letter-spacing:1.8px;color:#7e8c7e;margin-bottom:28px}h1{font-size:32px;line-height:1.3;font-weight:500;letter-spacing:-1px;margin:0 0 18px}p{max-width:330px;color:#778174;line-height:1.6;margin:0}button{font:13px system-ui;border:0;padding:12px 16px;border-radius:8px;background:#344d3b;color:#fff;margin-top:28px}</style><small>FIELDNOTES / WORKSPACE</small><h1>A little room to create.</h1><p>A quiet place for good ideas, thoughtful details, and the work that comes next.</p><button>Start something good</button>'); return; }
+  if(req.url==='/browser-find') { res.writeHead(200,{'Content-Type':'text/html'});res.end('<title>Field notes</title><style>body{font:16px system-ui;margin:0;padding:48px 32px;background:#f6f5f0;color:#34473c}small{font-size:10px;letter-spacing:1.5px;color:#7c867d}h1{font-size:36px;font-weight:500;letter-spacing:-1.3px;line-height:1.12}p{line-height:1.8;color:#566356}article{max-width:440px;margin:auto}hr{border:0;border-top:1px solid #d8ded3;margin:28px 0}</style><article><small>FIELD NOTES / 001</small><h1>A little room to think.</h1><p>A quiet place for the work that matters.</p><hr><p>Quiet mornings. Clear ideas.<br>Room to make something useful.</p><p>Keep your notes close, and your workspace quiet.</p><div style="height:800px"></div><p>One more quiet corner, further down the page.</p></article>');return; }
+  if(req.url==='/browser-keyboard') { res.writeHead(200,{'Content-Type':'text/html'});res.end('<title>Keyboard navigation</title><style>body{font:18px system-ui;margin:40px;background:#f6f7f2;color:#304536}input,button{display:block;margin:20px 0;padding:12px;font:inherit}</style><h1>Make yourself at home.</h1><label>Your name<input aria-label="Your name"></label><button onclick="document.title=\'Hello \'+document.querySelector(\'input\').value">Continue</button>');return; }
+  if(req.url==='/browser-motion') { res.writeHead(200,{'Content-Type':'text/html'});res.end('<title>Live preview</title><style>body{margin:0;min-height:100vh;background:#f4f5ef;color:#304936;font:16px system-ui;display:grid;place-content:center;gap:30px;text-align:center}i{width:44px;height:44px;display:block;background:#729b73;border-radius:12px;animation:move 1.6s ease-in-out infinite alternate}@keyframes move{to{transform:translateX(180px) rotate(180deg)}}button{position:absolute;top:75%;left:50%;transform:translate(-50%,-50%);font:inherit;padding:12px 22px;border:0;border-radius:8px;background:#304936;color:white}</style><h1>Room to move.</h1><i></i><p>A live view, right beside your work.</p><button onclick="document.title=\'Click aligned\'">Check alignment</button>');return; }
+  if(req.url==='/browser-download') { res.writeHead(200,{'Content-Type':'text/csv','Content-Disposition':'attachment; filename="weekly-report.csv"'});res.end('project,tasks\nLitespeed,42\n');return; }
+  if(req.url==='/browser-downloads') { res.writeHead(200,{'Content-Type':'text/html'});res.end('<title>Project exports</title><style>body{font:16px system-ui;background:#f7f7f2;color:#333c34;padding:45px 30px}small{font-size:10px;letter-spacing:1.5px;color:#878f84}h1{font-size:32px;font-weight:500;letter-spacing:-1px}p{color:#788074;line-height:1.6}a{display:inline-flex;background:#334d3c;color:white;text-decoration:none;padding:12px 16px;border-radius:8px;margin-top:14px;font-size:13px}</style><small>PROJECT / EXPORTS</small><h1>Your weekly summary.</h1><p>A clear view of the work that moved forward.</p><a href="/browser-download">Download report</a>');return; }
+  if(req.url==='/browser-fixture'||req.url==='/browser-next'){
+    res.writeHead(200,{'Content-Type':'text/html'});
+    res.end(req.url==='/browser-next'?'<title>Next page</title><h1>You made it</h1>':'<title>Workspace preview</title><style>body{font:18px system-ui;margin:70px;color:#27342c;background:#f5f5ef}h1{font-size:48px;font-weight:500;letter-spacing:-2px}input,button{padding:12px;font:inherit;border:1px solid #b9c3b5;border-radius:8px}button{background:#2c4c37;color:white}a{display:block;margin-top:30px;color:inherit}</style><small>LITESPEED / PREVIEW</small><h1>A little room to create.</h1><p>Your local browser, right beside your work.</p><label>Name <input aria-label="Name"></label> <button onclick="document.title=document.querySelector(\'h1\').textContent=\'Hello, \'+document.querySelector(\'input\').value">Say hello</button><a href="/browser-next">Next page</a>');return;
+  }
   if(req.url?.startsWith('/setup-auth/')&&req.headers.authorization!=='Bearer fixture-key'){res.writeHead(401,{'Content-Type':'application/json'});res.end(JSON.stringify({error:{message:'Invalid API key'}}));return;}
   const setupCatalogs:Record<string,string[]>={
     '/setup-defaults/':['openai/gpt-6-astra','openai/gpt-6-sol','anthropic/claude-fable-5-1','anthropic/claude-opus-5-5','test-fast'],
@@ -40,7 +64,20 @@ const mock=createServer(async(req,res)=>{
   const emit=(delta:any,finish_reason?:string)=>res.write(`data: ${JSON.stringify({choices:[{index:0,delta,finish_reason}]})}\n\n`);
   let toolCall=false;
   const summarizing=data.messages.some((message:any)=>message.role==='system'&&typeof message.content==='string'&&message.content.includes('Summarize the supplied conversation data'));
-  if(data.messages.some((message:any)=>message.role==='system'&&typeof message.content==='string'&&message.content.includes('You are a precise code analyst.'))) {
+  if(prompt.includes('DESKTOP_COMPUTER')) {
+    if(data.messages.at(-1)?.role==='tool')emit({content:'The selected window is beside this conversation.'});
+    else {toolCall=true;emit({tool_calls:[{index:0,id:'desktop-computer',type:'function',function:{name:'computer',arguments:JSON.stringify({action:'select',windowId:'7331:9001'})}}]});}
+  }else if(prompt.includes('DESKTOP_BROWSER')) {
+    if(data.messages.at(-1)?.role==='tool')emit({content:'The browser is open beside this conversation.'});
+    else {toolCall=true;emit({tool_calls:[{index:0,id:'desktop-browser',type:'function',function:{name:'browser',arguments:JSON.stringify({action:'open',url:prompt.match(/https?:\/\/[^\s"\\]+/)?.[0]})}}]});}
+  }else if(prompt.includes('DESKTOP_FILE_REFRESH')) {
+    if(data.messages.at(-1)?.role==='tool') {
+      emit({content:'The file changed. I am still checking the result.'});
+      await new Promise<void>(resolve=>{const release=()=>{pendingDelegations.delete(release);res.off('close',release);resolve();};pendingDelegations.add(release);res.once('close',release);});if(res.destroyed)return;
+    } else {toolCall=true;emit({tool_calls:[{index:0,id:'desktop-file-refresh',type:'function',function:{name:'bash',arguments:JSON.stringify({command:'printf "\\n// Updated by the running task\\n" >> alpha.ts'})}}]});}
+  }else if(prompt.includes('DESKTOP_FILE_LINKS')) {
+    emit({content:'Read [the project overview](README.md), inspect [the source](src/hello.ts:4), or open [the document](document.pdf).'});
+  }else if(data.messages.some((message:any)=>message.role==='system'&&typeof message.content==='string'&&message.content.includes('You are a precise code analyst.'))) {
     emit({content:'The fixture exports a greeting. Shunt kept the source out of the caller context.'});
     if(prompt.includes('LIVE_SHUNT'))await new Promise<void>(resolve=>{const release=()=>{pendingDelegations.delete(release);res.off('close',release);resolve();};pendingDelegations.add(release);res.once('close',release);});
     if(res.destroyed)return;
@@ -249,22 +286,28 @@ const store=new Store(join(root,'state'));
 store.saveSettings({workspace:root,providers:[{id:'fixture',name:'Test gateway',kind:'openai',baseUrl:`http://127.0.0.1:${(mock.address() as any).port}`,apiKey:'fixture-key'}],defaultProvider:'fixture',defaultModel:'test-model'});
 new WorkspacePreferences(store).save(root,{providerId:'fixture',model:'test-model',setupComplete:process.env.LITESPEED_E2E_ONBOARDING !== '1'});
 const mcp=new McpManager(()=>store.settings().mcpServers);
-const{app,runner}=createApp({store,external:mcp});
+const computer = new ComputerFixture();
+const pullRequestSource = await createPullRequestSource(join(root, 'pull-request-source'));
+const{app,runner,schedules}=createApp({store,external:mcp,computerDriver:computer,pullRequestTransport:new PullRequestFixture(pullRequestSource),pullRequestFetcher:pullRequestSource.fetcher,workspaceHasTerminal:workspace=>terminals.active(workspace)});
+app.post('/fixture/computer', express.json({ limit: '1kb' }), (req,res) => { computer.captureAvailable = req.body.capture !== false; res.json({ ok: true }); });
+app.get('/fixture/computer', async (_req,res) => res.json(await computer.inspect()));
 app.get('/fixture/requests',(_req,res)=>res.json({count:providerRequests}));
+app.get('/fixture/browser-uploads',(_req,res)=>res.json({receipts:uploadReceipts}));
 app.get('/fixture/profiles',(_req,res)=>res.json({requests:profileRequests}));
 app.get('/fixture/delegations',(_req,res)=>res.json({requests:delegationRequests,pending:pendingDelegations.size}));
 app.post('/fixture/delegations/release',(_req,res)=>{for(const release of [...pendingDelegations])release();res.json({ok:true});});
 app.get('/fixture/summaries',(_req,res)=>res.json({pending:pendingSummaries.size}));
 app.post('/fixture/summaries/release',(_req,res)=>{for(const release of [...pendingSummaries])release();res.json({ok:true});});
-const vite=process.env.LITESPEED_E2E_NO_VITE ? undefined : await createViteServer({server:{middlewareMode:true,hmr:{port:24679}},appType:'spa'});if(vite)app.use(vite.middlewares);
 const fixturePort=Number(process.env.LITESPEED_E2E_PORT || 3211);
+const vite=process.env.LITESPEED_E2E_NO_VITE ? undefined : await createViteServer({server:{middlewareMode:true,hmr:{port:24679 + fixturePort - 3211}},appType:'spa'});if(vite)app.use(vite.middlewares);
 const snapshotDelay=Number(process.env.LITESPEED_E2E_SNAPSHOT_DELAY_MS || 0);
 const server=createServer((req,res)=>{
   // Exercise the terminal's loading screen independently of runner speed.
   if(snapshotDelay>0&&req.method==='GET'&&/^\/api\/sessions\/[^/?]+$/.test(req.url??''))setTimeout(()=>app(req,res),snapshotDelay);
   else app(req,res);
 }).listen(fixturePort,'127.0.0.1',()=>console.log(`Litespeed E2E ready at http://127.0.0.1:${(server.address() as {port:number}).port}`));
-const terminals=attachTerminals(server,store);
+schedules.start(250);
+const terminals=attachTerminals(server,store,()=>false,workspace=>runner.workspaceOperationActive(workspace));
 let closing=false;
-async function close(){if(closing)return;closing=true;runner.stopAll();await Promise.all([runner.whenIdle(),terminals.close(),mcp.close()]);server.closeAllConnections();server.close();mock.closeAllConnections();mock.close();await vite?.close();store.close();await rm(root,{recursive:true,force:true});process.exit(0);}
+async function close(){if(closing)return;closing=true;const scheduledShutdown=schedules.stop();runner.stopAll();await Promise.all([scheduledShutdown,runner.whenIdle(),terminals.close(),mcp.close()]);await computer.close();server.closeAllConnections();server.close();mock.closeAllConnections();mock.close();await vite?.close();store.close();await rm(root,{recursive:true,force:true});process.exit(0);}
 process.on('SIGINT',close);process.on('SIGTERM',close);

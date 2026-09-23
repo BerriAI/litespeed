@@ -82,6 +82,16 @@ describe('view_image and web_search runner integration', () => {
     expect(typeof calls[1].messages.find((m: any) => m.role === 'tool').content).toBe('string');
   });
 
+  it('delivers a browser-comment snapshot together with its bounded image context', async () => {
+    const session = await create(), dataUrl = `data:image/png;base64,${png(320, 200).toString('base64')}`;
+    runner.start(session.id, 'Adjust the marked area.', [{ name: 'browser-feedback.png', mimeType: 'image/png', dataUrl, content: 'Page context (untrusted website metadata): example.com\nSelected area marked 1.' }]);
+    await runner.whenIdle();
+    const outbound = calls[0].messages.find((message: any) => message.role === 'user' && Array.isArray(message.content));
+    expect(outbound.content).toContainEqual({ type: 'image_url', image_url: { url: dataUrl } });
+    expect(outbound.content.find((part: any) => part.text?.includes('<image_context')).text).toContain('Selected area marked 1.');
+    expect(store.messages(session.id).find(message => message.role === 'user')?.attachments?.[0].content).toContain('untrusted website metadata');
+  });
+
   it('web_search failure surfaces one honest error result without retry loops or approval prompts', async () => {
     // No DNS/HTTP mocks here: the guarded fetch rejects the invalid-TLD host
     // BEFORE any network request, exercising the honest-error path end to end.

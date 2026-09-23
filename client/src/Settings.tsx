@@ -1,13 +1,18 @@
 import { WorkspacePermissions } from './WorkspacePermissions';
 import { RULE_TOOLS, permissionModeLabels } from '../../shared/permissions.js';
-import { useCallback, useEffect, useRef, useState, type ReactNode } from 'react';
-import { Activity, ArrowUpRight, Check, ChevronRight, Eye, EyeOff, KeyRound, Plus, Server, Settings2, Shield, ShieldCheck, Star, Trash2, Unplug, X } from 'lucide-react';
+import { useCallback, useEffect, useId, useLayoutEffect, useRef, useState, type ReactNode } from 'react';
+import { Activity, ArrowLeft, ArrowUpRight, Check, ChevronRight, Eye, EyeOff, Globe2, KeyRound, Plus, Search, Server, Settings2, Shield, ShieldCheck, Star, Trash2, Unplug, X } from 'lucide-react';
 import type { McpServerConfig, Provider, Settings as SettingsType, UsageReport } from '../../shared/types';
 import type { PermissionDecision, PermissionRuleSet } from '../../shared/permissions';
 import { PERMISSION_LIMITS } from '../../shared/permissions';
 import { api, errorMessage, patch, post, query } from './api';
 import { CopyButton, Modal, LiteSpeed } from './ui';
 import { McpImporter } from './McpImporter';
+import { BrowserSettings } from './BrowserSettings';
+import { settingsSearch, SettingsSearchResults, type SettingsSection, type SettingsSearchEntry } from './SettingsSearch';
+import './settings-search.css';
+import './general-settings.css';
+import { defaultBrowserPreferences } from '../../shared/browser';
 
 import { McpLogin } from './McpLogin';
 import type { McpServerStatus, McpLoginStart } from '../../shared/mcp';
@@ -53,13 +58,57 @@ function parseContextRows(rows: ContextLimitRow[]): Record<string, number> {
   }
   return Object.fromEntries(entries);
 }
-export function Settings({ initialTab = 'providers', session, settings, workspace, onClose, onSave, onProfiles, profilesDisabled, profiles }: { initialTab?: 'providers' | 'integrations'; session?: import('../../shared/types').Session; workspace?: string; profiles?: ReactNode; onProfiles?: () => void; profilesDisabled?: boolean; settings: SettingsType; onClose: () => void; onSave: (settings: SettingsType) => void }) {
+export function Settings({ fullScreen = false, initialTab = 'providers', session, settings, workspace, onClose, onSave, onProfiles, onSetup, profilesDisabled, profiles }: { fullScreen?: boolean; initialTab?: 'providers' | 'integrations' | 'general'; session?: import('../../shared/types').Session; workspace?: string; profiles?: ReactNode; onProfiles?: () => void; onSetup?: () => void; profilesDisabled?: boolean; settings: SettingsType; onClose: () => void; onSave: (settings: SettingsType) => void }) {
+  const fieldId = useId();
   const [draft, setDraft] = useState<SettingsType>(() => ({ ...settings, providers: settings.providers.map(({ apiKey: _key, ...p }) => p) }));
   const [contextRows, setContextRows] = useState(() => contextRowsFor(settings.providers));
   const [ruleRows, setRuleRows] = useState(() => ruleRowsFor(settings.permissionRules));
   const rulesTouched = useRef(false);
   const saving = useRef(false);
-  const [tab, setTab] = useState<'providers' | 'general' | 'permissions' | 'integrations' | 'usage' | 'profiles'>(initialTab);
+  const [tab, setTab] = useState<SettingsSection>(initialTab);
+  const [searchText, setSearchText] = useState(''), [focusSetting, setFocusSetting] = useState<{ target?: string } | null>(null);
+  const searchInput = useRef<HTMLInputElement>(null), content = useRef<HTMLDivElement>(null), categories = useRef<HTMLDivElement>(null);
+  const searchResults = settingsSearch(searchText, Boolean(onProfiles && !profilesDisabled)).filter(entry => (entry.target !== 'cache-aliases' || draft.providers.some(provider => provider.kind === 'openai')) && (entry.target !== 'command-confinement' || Boolean(session)));
+  useEffect(() => { if (searchText.trim()) content.current?.scrollTo({ top: 0 }); }, [searchText]);
+  useEffect(() => {
+    if (searchText.trim() || !window.matchMedia?.('(max-width: 600px)').matches) return;
+    const frame = requestAnimationFrame(() => categories.current?.querySelector<HTMLElement>('button.selected')?.scrollIntoView({ block: 'nearest', inline: 'center' }));
+    return () => cancelAnimationFrame(frame);
+  }, [tab, searchText]);
+  function navigateSection(next: SettingsSection) { setSearchText(''); setFocusSetting(null); setTab(next); }
+  function chooseSetting(entry: SettingsSearchEntry) {
+    if (entry.section === 'profiles') onProfiles?.();
+    if (entry.target === 'cache-aliases' && draft.providers.find(provider => provider.id === selected)?.kind !== 'openai') {
+      const compatible = draft.providers.find(provider => provider.kind === 'openai');
+      if (compatible) { setSelected(compatible.id); setShowKey(false); }
+    }
+    setSearchText(''); setTab(entry.section); setFocusSetting({ target: entry.target });
+  }
+  useLayoutEffect(() => {
+    if (!focusSetting) return;
+    let highlighted: HTMLElement | null = null, timer: ReturnType<typeof setTimeout>, fallback: ReturnType<typeof setTimeout>, observer: MutationObserver | undefined;
+    function focus(allowFallback = false) {
+      const target = focusSetting!.target ? content.current?.querySelector<HTMLElement>(`[data-setting="${focusSetting!.target}"]`) : content.current;
+      const section = target || (allowFallback ? content.current : null);
+      if (!section) return false;
+      observer?.disconnect(); clearTimeout(fallback);
+      const details = section.closest('details'); if (details) details.open = true;
+      const visible = (selector: string) => [...section.querySelectorAll<HTMLElement>(selector)].find(element => element.getClientRects().length > 0);
+      const field = visible('input:not(:disabled), select:not(:disabled), textarea:not(:disabled)') || visible('button:not(:disabled)') || visible('summary') || section;
+      if (section === content.current) section.scrollTo({ top: 0 }); else section.scrollIntoView({ block: 'center' });
+      if (!field.hasAttribute('tabindex') && !field.matches('input, select, textarea, button, summary')) field.tabIndex = -1;
+      field.focus({ preventScroll: true });
+      if (focusSetting!.target && section !== content.current) { highlighted = section; highlighted.dataset.highlighted = 'true'; timer = setTimeout(() => highlighted?.removeAttribute('data-highlighted'), 1800); }
+      return true;
+    }
+    if (!focus() && content.current) {
+      observer = new MutationObserver(() => { focus(); });
+      observer.observe(content.current, { childList: true, subtree: true });
+      fallback = setTimeout(() => focus(true), 2000);
+    }
+    return () => { clearTimeout(timer); clearTimeout(fallback); observer?.disconnect(); highlighted?.removeAttribute('data-highlighted'); };
+  }, [focusSetting, tab]);
+  const browserTouched = useRef(false);
   const [selected, setSelected] = useState(settings.defaultProvider || settings.providers[0]?.id || '');
   const [busy, setBusy] = useState(false);
   const [testing, setTesting] = useState(false);
@@ -288,18 +337,20 @@ export function Settings({ initialTab = 'providers', session, settings, workspac
       if (!draft.providers.some(p => p.id === draft.defaultProvider)) throw new Error('Choose a default provider.');
       const mcpChanged = mcp !== initialMcp.current;
       if (mcpChanged && !reviewedRevision.current) throw new Error('Review the saved MCP configuration before saving MCP changes.');
-      const { mcpServers: _mcp, mcpConfigRevision: _revision, permissionRules: _rules, memoryEnabled: _memory, notifications: _notifications, ...values } = draft;
+      // Project trust and installed commands have immediate, separately reviewed
+      // controls. Saving an unrelated form must never replay their older values.
+      const { mcpServers: _mcp, mcpConfigRevision: _revision, permissionRules: _rules, memoryEnabled: _memory, notifications: _notifications, browser: _browser, hooks: _hooks, sidecars: _sidecars, trustedWorkspaces: _trust, trustedPermissionRules: _projectRules, plugins: _plugins, ...values } = draft;
       let permissionRules: PermissionRuleSet | undefined;
       if (rulesTouched.current) {
-        try { permissionRules = parseRuleRows(ruleRows); } catch (error) { setTab('permissions'); throw error; }
+        try { permissionRules = parseRuleRows(ruleRows); } catch (error) { navigateSection('permissions'); throw error; }
       }
       const providers = values.providers.map(p => {
         let contextWindows: Record<string, number>;
         try { contextWindows = parseContextRows(contextRows[p.id] ?? []); }
-        catch (error) { setSelected(p.id); setTab('providers'); throw error; }
+        catch (error) { setSelected(p.id); navigateSection('providers'); throw error; }
         return { ...p, models: p.models?.filter(Boolean), ...(p.anthropicCacheModels !== undefined ? { anthropicCacheModels: p.anthropicCacheModels.filter(Boolean) } : {}), ...(contextRows[p.id] !== undefined || p.contextWindows !== undefined ? { contextWindows } : {}) };
       });
-      const saved = await patch<SettingsType>('/settings', { ...values, providers, ...(memoryTouched.current ? { memoryEnabled: Boolean(draft.memoryEnabled) } : {}), ...(notificationsTouched.current ? { notifications: Boolean(draft.notifications) } : {}), ...(permissionRules !== undefined ? { permissionRules } : {}), ...(mcpChanged ? { mcpServers, expectedMcpConfigRevision: reviewedRevision.current } : {}) });
+      const saved = await patch<SettingsType>('/settings', { ...values, providers, ...(browserTouched.current ? { browser: draft.browser } : {}), ...(memoryTouched.current ? { memoryEnabled: Boolean(draft.memoryEnabled) } : {}), ...(notificationsTouched.current ? { notifications: Boolean(draft.notifications) } : {}), ...(permissionRules !== undefined ? { permissionRules } : {}), ...(mcpChanged ? { mcpServers, expectedMcpConfigRevision: reviewedRevision.current } : {}) });
       if (!alive.current) return saved;
       onSave(saved);
       if (mcpChanged) {
@@ -309,7 +360,7 @@ export function Settings({ initialTab = 'providers', session, settings, workspac
       // An unrelated save is not consent to adopt unseen changes to saved executable configuration.
       setDraft({ ...saved, mcpServers: savedMcp.current, mcpConfigRevision: reviewedRevision.current, providers: saved.providers.map(({ apiKey: _key, ...p }) => p) });
       setContextRows(contextRowsFor(saved.providers));
-      setRuleRows(ruleRowsFor(saved.permissionRules)); rulesTouched.current = false; memoryTouched.current = false; notificationsTouched.current = false;
+      setRuleRows(ruleRowsFor(saved.permissionRules)); rulesTouched.current = false; memoryTouched.current = false; notificationsTouched.current = false; browserTouched.current = false;
       if (close) onClose(); else { setNotice('Settings saved.'); void refreshMcp(true); }
       return saved;
     } catch (e) { if (alive.current) { setError(errorMessage(e)); void refreshMcp(true); } return null; }
@@ -359,31 +410,44 @@ export function Settings({ initialTab = 'providers', session, settings, workspac
     })();
   };
   if (importingMcp) return <McpImporter workspace={workspace || draft.workspace} onClose={() => setImportingMcp(false)} onImported={importedMcp} />;
-  return <Modal title="Settings" onClose={onClose} wide>
-    <div className="settings-layout"><nav className="settings-nav" aria-label="Settings sections">
-      <button className={tab === 'providers' ? 'selected' : ''} onClick={() => setTab('providers')}><Server size={16} />Providers</button>
-      <button className={tab === 'general' ? 'selected' : ''} onClick={() => setTab('general')}><Settings2 size={16} />Workspace</button>
-      {onProfiles && <button className={tab === 'profiles' ? 'selected' : ''} aria-label="Project profiles" disabled={profilesDisabled} onClick={() => { onProfiles(); setTab('profiles'); }}><Star size={16} />Project profiles</button>}
-      <button className={tab === 'permissions' ? 'selected' : ''} onClick={() => setTab('permissions')}><Shield size={16} />Permissions</button>
-      <button className={tab === 'integrations' ? 'selected' : ''} onClick={() => setTab('integrations')}><Unplug size={16} />Integrations</button>
-      <button className={tab === 'usage' ? 'selected' : ''} onClick={() => setTab('usage')}><Activity size={16} />Usage</button>
-      <div className="settings-note"><ShieldCheck size={17} /><p>Your keys stay on this local server. They are never returned to the browser.</p></div>
-    </nav><div className="settings-content">
+  return <Modal title="Settings" onClose={onClose} wide fullScreen={fullScreen} onKeyDown={event => {
+    if ((event.metaKey || event.ctrlKey) && event.key.toLowerCase() === 'f') { event.preventDefault(); event.stopPropagation(); setFocusSetting(null); searchInput.current?.focus(); searchInput.current?.select(); }
+    if (event.key === 'Escape' && searchText) { event.preventDefault(); event.stopPropagation(); setSearchText(''); searchInput.current?.focus(); }
+  }}>
+    <div className="settings-layout"><nav className="settings-nav" data-searching={Boolean(searchText.trim()) || undefined} aria-label="Settings sections">
+      {fullScreen && <button className="settings-back" onClick={onClose} aria-label="Back to app"><ArrowLeft size={16} />Back to app</button>}
+      <div className="settings-search"><Search size={14} /><input ref={searchInput} type="search" aria-label="Search settings" placeholder="Search" value={searchText} maxLength={120} onFocus={() => setFocusSetting(null)} onChange={event => { setFocusSetting(null); setSearchText(event.target.value); }} onKeyDown={event => {
+        if (event.key === 'Escape' && searchText) { event.preventDefault(); event.stopPropagation(); setSearchText(''); }
+        else if (event.key === 'Enter' && searchResults[0]) { event.preventDefault(); chooseSetting(searchResults[0]); }
+        else if (event.key === 'ArrowDown' && searchText.trim()) { event.preventDefault(); content.current?.querySelector<HTMLButtonElement>('[data-setting-result]')?.focus(); }
+      }} />{searchText && <button className="icon-button" aria-label="Clear settings search" onClick={() => { setSearchText(''); searchInput.current?.focus(); }}><X size={13} /></button>}</div>
+      {fullScreen && <span className="settings-group-label">Settings</span>}
+      <div ref={categories} className="settings-categories"><button className={tab === 'general' ? 'selected' : ''} onClick={() => navigateSection('general')}><Settings2 size={16} />General</button>
+      <button className={tab === 'providers' ? 'selected' : ''} onClick={() => navigateSection('providers')}><Server size={16} />Providers</button>
+      {onProfiles && <button className={tab === 'profiles' ? 'selected' : ''} aria-label="Project profiles" disabled={profilesDisabled} onClick={() => { onProfiles(); navigateSection('profiles'); }}><Star size={16} />Project profiles</button>}
+      <button className={tab === 'permissions' ? 'selected' : ''} onClick={() => navigateSection('permissions')}><Shield size={16} />Permissions</button>
+      <button className={tab === 'integrations' ? 'selected' : ''} onClick={() => navigateSection('integrations')}><Unplug size={16} />Integrations</button>
+      <button className={tab === 'browser' ? 'selected' : ''} onClick={() => navigateSection('browser')}><Globe2 size={16} />Browser</button>
+      <button className={tab === 'usage' ? 'selected' : ''} onClick={() => navigateSection('usage')}><Activity size={16} />Usage</button>
+      {onSetup && <button className="settings-setup" disabled={busy || profilesDisabled} onClick={onSetup}><Settings2 size={16} />Set up Litespeed</button>}</div><div className="settings-note"><ShieldCheck size={17} /><p>Your keys stay on this local server. They are never returned to the browser.</p></div>
+    </nav><div ref={content} tabIndex={-1} className={`settings-content${searchText.trim() ? ' is-searching' : ''}`}>
+      {searchText.trim() && <SettingsSearchResults query={searchText} results={searchResults} onSelect={chooseSetting} onClear={() => { setSearchText(''); searchInput.current?.focus(); }} />}
       {profiles && <div hidden={tab !== 'profiles'}>{profiles}</div>}
+      {tab === 'browser' && <BrowserSettings preferences={draft.browser || defaultBrowserPreferences} onChange={browser => { browserTouched.current = true; setDraft(current => ({ ...current, browser })); }} disabled={busy} />}
       {tab === 'providers' && <>
-        <div className="section-heading"><div><h3>Bring your own intelligence.</h3><p>One gateway, or connect directly. Your choice.</p></div></div>
+        <div className="section-heading"><div><h3>Providers</h3><p>Connect the models you use.</p></div></div>
         <div className="provider-tabs">{draft.providers.map(p => <button key={p.id} className={p.id === selected ? 'selected' : ''} onClick={() => { setSelected(p.id); setShowKey(false); setError(''); setNotice(''); }}><span className={`provider-dot ${p.configured ? 'configured' : ''}`} />{p.name}</button>)}<button onClick={addProvider} aria-label="Add provider"><Plus size={15} />Add</button></div>
         {provider ? <div className="form-stack">
           <div className="provider-intro"><span className="provider-symbol"><Server size={21} /></span><div><h4>{provider.name}</h4><p>{provider.configured ? 'Credentials configured' : 'Add your connection details to get started'}</p></div></div>
-          <div className="form-columns"><label>Provider name<input value={provider.name} onChange={e => updateProvider({ name: e.target.value })} /></label><label>API format<select value={provider.kind} onChange={e => updateProvider({ kind: e.target.value as Provider['kind'], ...(e.target.value === 'codex' ? { baseUrl: 'https://chatgpt.com/backend-api/codex', name: provider.name === 'Custom provider' ? 'ChatGPT' : provider.name } : {}) })}><option value="openai">OpenAI-compatible</option><option value="anthropic">Anthropic</option><option value="codex">Codex</option></select></label></div>
+          <div data-setting="provider-connection" className="form-columns"><label>Provider name<input value={provider.name} onChange={e => updateProvider({ name: e.target.value })} /></label><label>API format<select value={provider.kind} onChange={e => updateProvider({ kind: e.target.value as Provider['kind'], ...(e.target.value === 'codex' ? { baseUrl: 'https://chatgpt.com/backend-api/codex', name: provider.name === 'Custom provider' ? 'ChatGPT' : provider.name } : {}) })}><option value="openai">OpenAI-compatible</option><option value="anthropic">Anthropic</option><option value="codex">Codex</option></select></label></div>
           <label>Base URL<input type="url" placeholder="https://your-gateway.example.com" value={provider.baseUrl} onChange={e => updateProvider({ baseUrl: e.target.value })} spellCheck={false} /><span className="field-hint">For LiteLLM, use your proxy URL. Local servers may not need a key.</span></label>
-          {provider.kind === 'codex' && <div className="auth-card"><strong>Connect your ChatGPT account</strong><p>Uses Codex sign-in. Availability depends on your plan, account eligibility, and provider rules. This is separate from an API key; it does not grant access to every model.</p>{login?.providerId === selected ? <><div className="auth-code">{login.userCode && <><code>{login.userCode}</code><CopyButton text={login.userCode} /></>}<a href={login.url} target="_blank" rel="noopener noreferrer">Continue sign-in ↗</a></div><div className="success-note"><LiteSpeed active compact />Waiting for sign-in…</div><button className="text-button" onClick={() => setLogin(null)}>Stop waiting</button></> : <div className="auth-actions"><button className="button primary" disabled={busy || authBusy} onClick={() => void connect('device')}>{authBusy ? 'Connecting…' : provider.configured ? 'Reconnect ChatGPT' : 'Connect ChatGPT'}<ArrowUpRight size={14} /></button><button className="text-button" disabled={busy || authBusy} onClick={() => void connect('browser')}>Use browser sign-in</button>{provider.configured && <button className="text-button danger" disabled={authBusy} onClick={() => void disconnect()}>Disconnect</button>}</div>}</div>}
-          {provider.kind !== 'codex' && <label>API key<div className="secret-input"><KeyRound size={15} /><input type={showKey ? 'text' : 'password'} autoComplete="off" value={provider.apiKey ?? ''} placeholder={provider.configured ? 'Saved key · leave blank to keep' : 'Enter API key (optional for local servers)'} onChange={e => updateProvider({ apiKey: e.target.value || undefined })} /><button type="button" aria-label={showKey ? 'Hide API key' : 'Show API key'} onClick={() => setShowKey(v => !v)}>{showKey ? <EyeOff size={16} /> : <Eye size={16} />}</button></div>{provider.configured && <button className="text-button danger" onClick={() => updateProvider({ apiKey: '', configured: false })}>Remove saved key on save</button>}</label>}
-          <label>Model IDs<input placeholder="e.g. my-coding-model, local-model" value={(provider.models ?? []).join(', ')} onChange={e => updateProvider({ models: e.target.value.split(',').map(s => s.trim()) })} /><span className="field-hint">Comma-separated. Useful if your endpoint does not support model discovery.</span></label>
-          {provider.kind === 'openai' && <details className="context-overrides" key={`cache-${selected}`}><summary>Claude caching aliases<span>{provider.anthropicCacheModels?.filter(Boolean).length || 'Optional'}</span><ChevronRight size={13} /></summary><div className="context-overrides-body">
+          {provider.kind === 'codex' && <div data-setting="provider-credentials" className="auth-card"><strong>Connect your ChatGPT account</strong><p>Uses Codex sign-in. Availability depends on your plan, account eligibility, and provider rules. This is separate from an API key; it does not grant access to every model.</p>{login?.providerId === selected ? <><div className="auth-code">{login.userCode && <><code>{login.userCode}</code><CopyButton text={login.userCode} /></>}<a href={login.url} target="_blank" rel="noopener noreferrer">Continue sign-in ↗</a></div><div className="success-note"><LiteSpeed active compact />Waiting for sign-in…</div><button className="text-button" onClick={() => setLogin(null)}>Stop waiting</button></> : <div className="auth-actions"><button className="button primary" disabled={busy || authBusy} onClick={() => void connect('device')}>{authBusy ? 'Connecting…' : provider.configured ? 'Reconnect ChatGPT' : 'Connect ChatGPT'}<ArrowUpRight size={14} /></button><button className="text-button" disabled={busy || authBusy} onClick={() => void connect('browser')}>Use browser sign-in</button>{provider.configured && <button className="text-button danger" disabled={authBusy} onClick={() => void disconnect()}>Disconnect</button>}</div>}</div>}
+          {provider.kind !== 'codex' && <label data-setting="provider-credentials">API key<div className="secret-input"><KeyRound size={15} /><input type={showKey ? 'text' : 'password'} autoComplete="off" value={provider.apiKey ?? ''} placeholder={provider.configured ? 'Saved key · leave blank to keep' : 'Enter API key (optional for local servers)'} onChange={e => updateProvider({ apiKey: e.target.value || undefined })} /><button type="button" aria-label={showKey ? 'Hide API key' : 'Show API key'} onClick={() => setShowKey(v => !v)}>{showKey ? <EyeOff size={16} /> : <Eye size={16} />}</button></div>{provider.configured && <button className="text-button danger" onClick={() => updateProvider({ apiKey: '', configured: false })}>Remove saved key on save</button>}</label>}
+          <label data-setting="provider-models">Model IDs<input placeholder="e.g. my-coding-model, local-model" value={(provider.models ?? []).join(', ')} onChange={e => updateProvider({ models: e.target.value.split(',').map(s => s.trim()) })} /><span className="field-hint">Comma-separated. Useful if your endpoint does not support model discovery.</span></label>
+          {provider.kind === 'openai' && <details data-setting="cache-aliases" className="context-overrides" key={`cache-${selected}`}><summary>Claude caching aliases<span>{provider.anthropicCacheModels?.filter(Boolean).length || 'Optional'}</span><ChevronRight size={13} /></summary><div className="context-overrides-body">
             <label>Claude model aliases<input aria-label="Claude model aliases" placeholder="e.g. my-coding-model" value={(provider.anthropicCacheModels ?? []).join(', ')} onChange={e => updateProvider({ anthropicCacheModels: e.target.value.split(',').map(value => value.trim()) })} spellCheck={false} /><span className="field-hint">Exact gateway model IDs that route to Claude. Names containing Claude or Anthropic already cache automatically. Leave empty for other models.</span></label>
           </div></details>}
-          <details className="context-overrides" aria-label="Context window overrides" key={`context-${selected}`}><summary>Context window overrides<span>{rows.length || 'Optional'}</span><ChevronRight size={13} /></summary><div className="context-overrides-body">
+          <details data-setting="context-limits" className="context-overrides" aria-label="Context window overrides" key={`context-${selected}`}><summary>Context window overrides<span>{rows.length || 'Optional'}</span><ChevronRight size={13} /></summary><div className="context-overrides-body">
             <p className="field-hint">Set a verified context window in tokens for an exact model ID on this provider. Overrides take priority over model discovery; they do not add models to the list above. Removing an override restores discovery, or an unknown limit when none is available.</p>
             {rows.length === 0 && <p className="context-overrides-empty">No overrides. Limits come from model discovery when available.</p>}
             {rows.map((row, index) => <div className="context-override-row" key={row.id}>
@@ -397,14 +461,41 @@ export function Settings({ initialTab = 'providers', session, settings, workspac
           <div className="provider-actions"><button className="button secondary" disabled={busy || testing || !provider.baseUrl} onClick={test}>{testing ? 'Connecting…' : 'Save & test connection'}<ArrowUpRight size={14} /></button><button className="icon-button danger" aria-label={`Remove ${provider.name}`} disabled={draft.providers.length < 2 || busy} onClick={() => { const next = draft.providers.filter(p => p.id !== selected); setDraft(s => ({ ...s, providers: next, defaultProvider: s.defaultProvider === selected ? next[0].id : s.defaultProvider })); setSelected(next[0].id); }}><Trash2 size={15} /></button></div>
         </div> : <div className="empty-state"><Server size={25} /><strong>No providers yet</strong><button className="button secondary" onClick={addProvider}><Plus size={15} />Add a provider</button></div>}
       </>}
-      {tab === 'general' && <div className="form-stack"><div className="section-heading"><div><h3>A workspace that feels like yours.</h3><p>Defaults apply to new sessions.</p></div></div>
-        <label>Workspace path<input value={draft.workspace} placeholder="/absolute/path/to/your/project" onChange={e => setDraft(s => ({ ...s, workspace: e.target.value }))} spellCheck={false} /><span className="field-hint">File tools are scoped here. Shell commands start here but are not sandboxed.</span></label>
-        <div className="form-columns"><label>Default provider<select value={draft.defaultProvider} onChange={e => setDraft(s => ({ ...s, defaultProvider: e.target.value }))}>{draft.providers.map(p => <option key={p.id} value={p.id}>{p.name}</option>)}</select></label><label>Default model<input value={draft.defaultModel} onChange={e => setDraft(s => ({ ...s, defaultModel: e.target.value }))} /></label></div>
-        <label>Permissions<select value={draft.permissionMode} onChange={e => setDraft(s => ({ ...s, permissionMode: e.target.value as SettingsType['permissionMode'] }))}><option value="ask">Ask before changes and commands</option><option value="edit">Allow project edits</option><option value="auto">Allow all tools</option></select><span className="field-hint">Automatic mode lets the agent modify files and execute shell commands without asking.</span></label>
-        <div className="form-columns"><label>Appearance<select value={draft.theme} onChange={e => setDraft(s => ({ ...s, theme: e.target.value as SettingsType['theme'] }))}><option value="system">System</option><option value="light">Light</option><option value="dark">Dark</option></select></label></div>
-        <label className="notifications-toggle"><input type="checkbox" checked={Boolean(draft.notifications)} disabled={busy} onChange={e => { notificationsTouched.current = true; setNotice(''); const notifications = e.target.checked; setDraft(s => ({ ...s, notifications })); }} />Notify when a response finishes or needs approval</label>
-        <p className="field-hint">Off by default. Uses your operating system’s notifications (macOS and Linux); only responses longer than 10 seconds notify on finish. Changes apply immediately, even to a running response.</p>
-        <section className="memory-section" aria-label="Agent memory">
+      {tab === 'general' && <div className="form-stack general-settings"><div className="section-heading"><div><h3>General</h3><p>Preferences and defaults for new tasks.</p></div></div>
+        <div className="general-settings-card">
+          <div data-setting="appearance" className="general-setting-row">
+            <div className="general-setting-label"><label htmlFor={`${fieldId}-appearance`}>Appearance</label><small id={`${fieldId}-appearance-hint`}>Choose a light, dark or system theme.</small></div>
+            <select id={`${fieldId}-appearance`} aria-describedby={`${fieldId}-appearance-hint`} value={draft.theme} onChange={e => setDraft(s => ({ ...s, theme: e.target.value as SettingsType['theme'] }))}><option value="system">System</option><option value="light">Light</option><option value="dark">Dark</option></select>
+          </div>
+          <div data-setting="notifications" className="general-setting-row">
+            <div className="general-setting-label"><label htmlFor={`${fieldId}-notifications`}>Notifications</label><small id={`${fieldId}-notifications-hint`}>Notify when longer responses finish or work needs approval.</small></div>
+            <input id={`${fieldId}-notifications`} aria-label="Notify when a response finishes or needs approval" aria-describedby={`${fieldId}-notifications-hint`} className="general-setting-switch" type="checkbox" checked={Boolean(draft.notifications)} disabled={busy} onChange={e => { notificationsTouched.current = true; setNotice(''); const notifications = e.target.checked; setDraft(s => ({ ...s, notifications })); }} />
+          </div>
+        </div>
+        <section className="general-settings-section" aria-labelledby={`${fieldId}-new-tasks`}>
+          <h4 id={`${fieldId}-new-tasks`}>New tasks</h4>
+          <div className="general-settings-card">
+            <div data-setting="workspace" className="general-setting-row general-setting-wide">
+              <div className="general-setting-label"><label htmlFor={`${fieldId}-workspace`}>Workspace path</label><small id={`${fieldId}-workspace-hint`}>The default folder for new tasks.</small></div>
+              <input id={`${fieldId}-workspace`} aria-describedby={`${fieldId}-workspace-hint`} value={draft.workspace} title={draft.workspace} placeholder="/absolute/path/to/your/project" onChange={e => setDraft(s => ({ ...s, workspace: e.target.value }))} spellCheck={false} />
+            </div>
+            <div data-setting="defaults" className="general-settings-fields">
+              <div className="general-setting-row general-setting-wide">
+                <div className="general-setting-label"><label htmlFor={`${fieldId}-provider`}>Default provider</label></div>
+                <select id={`${fieldId}-provider`} value={draft.defaultProvider} onChange={e => setDraft(s => ({ ...s, defaultProvider: e.target.value }))}>{draft.providers.map(p => <option key={p.id} value={p.id}>{p.name}</option>)}</select>
+              </div>
+              <div className="general-setting-row general-setting-wide">
+                <div className="general-setting-label"><label htmlFor={`${fieldId}-model`}>Default model</label></div>
+                <input id={`${fieldId}-model`} value={draft.defaultModel} onChange={e => setDraft(s => ({ ...s, defaultModel: e.target.value }))} />
+              </div>
+            </div>
+            <div data-setting="default-permissions" className="general-setting-row general-setting-wide">
+              <div className="general-setting-label"><label htmlFor={`${fieldId}-permissions`}>Permissions</label><small id={`${fieldId}-permissions-hint`}>Choose when Litespeed asks before acting.</small></div>
+              <select id={`${fieldId}-permissions`} aria-describedby={`${fieldId}-permissions-hint`} value={draft.permissionMode} onChange={e => setDraft(s => ({ ...s, permissionMode: e.target.value as SettingsType['permissionMode'] }))}><option value="ask">Ask before changes and commands</option><option value="edit">Allow project edits</option><option value="auto">Allow all tools</option></select>
+            </div>
+          </div>
+        </section>
+        <section data-setting="memory" className="memory-section" aria-label="Agent memory">
           <div className="mcp-cache-heading"><div><strong>Memory</strong><p>Recorded facts for the workspace above.</p></div><button className="button secondary" disabled={memoryLoading || busy || !memoryWorkspace} onClick={() => void refreshMemory(memoryWorkspace)}>Refresh facts</button></div>
           <label className="memory-toggle"><input type="checkbox" checked={draft.memoryEnabled !== false} disabled={busy} onChange={e => { memoryTouched.current = true; setNotice(''); const memoryEnabled = e.target.checked; setDraft(s => ({ ...s, memoryEnabled })); }} />Enable agent memory</label>
           <p className="field-hint">On by default. The agent can save and update local workspace notes automatically. Notes are background context, not instructions. Review or delete them here; explicit Ask and Deny rules still apply.</p>
@@ -422,11 +513,19 @@ export function Settings({ initialTab = 'providers', session, settings, workspac
         </section>
         <div className="quiet-callout"><ShieldCheck size={18} /><p>Plan mode is read-only. Switch to Build when you are ready to make changes.</p></div>
       </div>}
-      {tab === 'permissions' && <div className="form-stack"><WorkspacePermissions workspace={workspace || settings.workspace} session={session}/><datalist id="permission-rule-tools">{RULE_TOOLS.map(tool=><option key={tool} value={tool}/>)}</datalist><div className="section-heading"><div><h3>Decide once, ahead of time.</h3><p>Explicit rules run before the session’s permission mode.</p></div></div>
-        <p className="field-hint">An explicit Deny always wins. Ask beats Allow. Per-project rules in <code>.litespeed/permissions.json</code> in your workspace (same shape: <code>{'{"version":1,"rules":[…]}'}</code>) override these app rules at equal severity. When no rule matches, the session’s permission mode decides as usual. Rules never widen tool availability — Plan mode and profile limits still apply, and exact connected (mcp_*) tool names are supported. Rules for a turn are captured when the message is accepted, so edits here apply to future turns.</p>
-        <p className="field-hint">Patterns, one per line, match the tool’s sensitive argument: the command for bash, the workspace-relative path for file tools. A rule with no patterns matches every call of the tool. For bash, a pattern without wildcards matches as a command prefix at a word boundary (“git status” covers “git status --short”, not “git statusx”); <code>*</code> spans words and flags but never crosses shell operators like <code>;</code> <code>&&</code> <code>|</code>; <code>**</code> matches anything. For file tools, <code>*</code> stays within one path segment and <code>**</code> crosses segments.</p>
-        {ruleRows.length === 0 ? <div className="empty-state"><Shield size={25} /><strong>No permission rules</strong><p>Every tool call falls back to the session’s permission mode. Add a rule to always allow, always ask, or always deny specific tools or patterns.</p><button className="button secondary" disabled={busy} onClick={() => updateRuleRows([{ id: crypto.randomUUID(), tool: 'bash', decision: 'ask', patterns: '' }])}><Plus size={15} />Add rule</button></div> : <>
-          {ruleRows.map((row, index) => <div className="permission-rule" key={row.id}>
+      {tab === 'permissions' && <div className="form-stack permissions-settings"><div className="section-heading"><div><h3>Permissions</h3><p>Choose when Litespeed asks before acting.</p></div></div>
+        <WorkspacePermissions key={workspace || settings.workspace} workspace={workspace || settings.workspace} session={session}/>
+        <datalist id="permission-rule-tools">{RULE_TOOLS.map(tool => <option key={tool} value={tool}/>)}</datalist>
+        <div className="permissions-section-heading"><div><h4>App rules</h4><p>Rules for specific tools, commands or files. Changes apply after saving.</p></div></div>
+        <details className="permissions-help"><summary>How rules work<ChevronRight size={14} /></summary><div>
+          <p>Deny always wins. Ask takes priority over Allow. When no rule matches, the task’s permission mode decides. Plan mode and profile limits still apply.</p>
+          <p>Project rules in <code>.litespeed/permissions.json</code> take priority at equal severity. Rules are captured when a message is accepted, so changes apply to future turns.</p>
+          <p>Use one pattern per line, or leave patterns empty to match every call. Connected tools use their exact <code>mcp_</code> name.</p>
+          <dl><dt>Commands</dt><dd>A pattern without wildcards matches at a word boundary: <code>git status</code> also matches <code>git status --short</code>. <code>*</code> spans words and flags; <code>**</code> matches anything. Shell operators such as <code>;</code>, <code>&amp;&amp;</code> and <code>|</code> require the full command to match before it can run automatically.</dd><dt>Files</dt><dd>Patterns match workspace-relative paths. <code>*</code> stays within one folder; <code>**</code> crosses folders.</dd></dl>
+          <p>Pattern rules control approvals; they do not confine commands to the workspace.</p>
+        </div></details>
+        {ruleRows.length === 0 ? <div data-setting="permission-rules" className="permission-rules-empty"><div><strong>No permission rules</strong><p>Tools use the task’s permission mode.</p></div><button className="button secondary" disabled={busy} onClick={() => updateRuleRows([{ id: crypto.randomUUID(), tool: 'bash', decision: 'ask', patterns: '' }])}><Plus size={15} />Add rule</button></div> : <>
+          {ruleRows.map((row, index) => <div data-setting={index === 0 ? 'permission-rules' : undefined} className="permission-rule" key={row.id}>
             <div className="permission-rule-row">
               <label>Tool<select aria-label={`Rule ${index + 1} tool`} value={row.tool.startsWith('mcp_')?'mcp_':row.tool} disabled={busy} onChange={e => updateRuleRows(ruleRows.map(item => item.id === row.id ? { ...item, tool: e.target.value } : item))}>{RULE_TOOLS.map(tool => <option key={tool} value={tool}>{tool}</option>)}<option value="mcp_">Connected tool…</option></select>{row.tool.startsWith('mcp_')&&<input aria-label={`Rule ${index + 1} connected tool`} placeholder="Exact mcp_ tool name" value={row.tool} onChange={e=>updateRuleRows(ruleRows.map(item=>item.id===row.id?{...item,tool:e.target.value}:item))}/>}</label>
               <label>Decision<select aria-label={`Rule ${index + 1} decision`} value={row.decision} disabled={busy} onChange={e => updateRuleRows(ruleRows.map(item => item.id === row.id ? { ...item, decision: e.target.value as PermissionDecision } : item))}>{decisionLabels.map(([value, label]) => <option key={value} value={value}>{label}</option>)}</select></label>
@@ -438,13 +537,12 @@ export function Settings({ initialTab = 'providers', session, settings, workspac
           <div className="permission-rules-footer"><button className="text-button" type="button" disabled={busy || ruleRows.length >= PERMISSION_LIMITS.rules} onClick={() => updateRuleRows([...ruleRows, { id: crypto.randomUUID(), tool: 'bash', decision: 'ask', patterns: '' }])}><Plus size={14} />Add rule</button><span className="field-hint">{ruleRows.length} / {PERMISSION_LIMITS.rules} rules · {PERMISSION_LIMITS.patternsPerRule} patterns per rule · {PERMISSION_LIMITS.patternLength} characters per pattern</span></div>
           {ruleRows.length > PERMISSION_LIMITS.rules && <p className="error-text" role="alert">Use at most {PERMISSION_LIMITS.rules} permission rules.</p>}
         </>}
-        <div className="quiet-callout"><ShieldCheck size={18} /><p>Pattern matching is a documented convenience, not a sandbox. A bash command containing shell control operators never auto-allows through a pattern rule unless the full command text matches.</p></div>
       </div>}
-      {tab === 'integrations' && <div className="form-stack"><div className="section-heading"><div><h3>Extend your workspace.</h3><p>Connect tools through Model Context Protocol.</p></div></div>
+      {tab === 'integrations' && <div className="form-stack"><div className="section-heading"><div><h3>Connections</h3><p>Connect tools through Model Context Protocol.</p></div></div>
         <button className="button secondary" type="button" disabled={busy || anyMcpAction || mcpDirty || !reviewedRevision.current} onClick={() => setImportingMcp(true)}>Import Claude/Codex MCP servers…</button>
         <p className="field-hint">Choose multiple compatible configurations from fixed Claude Code/Codex files. They import into global settings disabled; no server is connected automatically.</p>
         <p className="field-hint">Tool search and TypeScript execution are enabled by default for connected servers. The agent discovers relevant tools and can process their results in a script before returning a summary. Each tool call keeps your normal approval settings. Set <code>advertise: true</code> on a server to expose its tools directly instead.</p>
-        <label>MCP servers<textarea className="code-input" rows={12} value={mcp} disabled={busy} onChange={e => { currentMcp.current = e.target.value; setMcp(e.target.value); }} spellCheck={false} aria-label="MCP servers" aria-describedby="mcp-hint" /><span className="field-hint" id="mcp-hint">A JSON object keyed by server name. Each entry supports command, args, env, or url, and enabled. Masked environment values are kept when saved unchanged.</span></label>
+        <label data-setting="connected-tools">MCP servers<textarea className="code-input" rows={12} value={mcp} disabled={busy} onChange={e => { currentMcp.current = e.target.value; setMcp(e.target.value); }} spellCheck={false} aria-label="MCP servers" aria-describedby="mcp-hint" /><span className="field-hint" id="mcp-hint">A JSON object keyed by server name. Each entry supports command, args, env, or url, and enabled. Masked environment values are kept when saved unchanged.</span></label>
         <div className="mcp-cache-heading"><div><strong>Saved server connections</strong><p>Cache-only status · checked every 3 seconds while this tab is open. Viewing status never starts a server.</p></div><button className="button secondary" disabled={mcpLoading || busy} onClick={() => void refreshMcp(true)}>Refresh status</button></div>
         {mcpLoading && <p className="field-hint" role="status">Loading cached MCP status…</p>}
         {mcpDirty && <p className="mcp-warning" role="status">Unsaved MCP changes. Save settings before connecting, refreshing tools, or reconnecting. Actions only use saved configuration.</p>}
@@ -474,8 +572,8 @@ export function Settings({ initialTab = 'providers', session, settings, workspac
         // provider that did not say, never a fabricated zero.
         const anyCached = Boolean(usage?.days.some(day => day.entries.some(entry => entry.cachedTokens !== undefined)));
         const format = (value?: number) => value === undefined ? '—' : value.toLocaleString('en-US');
-        return <div className="form-stack"><div className="section-heading"><div><h3>Where the tokens went.</h3><p>Provider-reported usage, grouped by day and model.</p></div></div>
-          <label>Window<select value={usageDays} disabled={usageLoading} onChange={e => setUsageDays(Number(e.target.value))}>{[7, 30, 90].map(value => <option key={value} value={value}>Last {value} days</option>)}</select></label>
+        return <div className="form-stack"><div className="section-heading"><div><h3>Usage</h3><p>Provider-reported usage, grouped by day and model.</p></div></div>
+          <label>Window<select value={usageDays} onChange={e => setUsageDays(Number(e.target.value))}>{[7, 30, 90].map(value => <option key={value} value={value}>Last {value} days</option>)}</select></label>
           {usageLoading && <p className="field-hint" role="status">Loading recorded usage…</p>}
           {usageError && <div className="inline-alert" role="alert">{usageError}</div>}
           {!usageLoading && !usageError && usage && usage.days.length === 0 && <div className="empty-state"><Activity size={25} /><strong>No recorded usage</strong><p>Usage is recorded from provider-reported token counts as responses stream. Send a message and check back.</p></div>}
@@ -499,6 +597,6 @@ export function Settings({ initialTab = 'providers', session, settings, workspac
       {error && <div className="inline-alert" role="alert">{error}<button className="icon-button" aria-label="Dismiss error" onClick={() => setError('')}><X size={14} /></button></div>}
       {notice && <p className="success-note" role="status"><Check size={15} />{notice}</p>}
     </div></div>
-    <footer className="modal-footer">{tab === 'profiles' ? <button className="button secondary" onClick={onClose}>Done</button> : <><span>Local by default. Open by design.</span><button className="button secondary" onClick={onClose}>Cancel</button><button className="button primary" disabled={busy || testing || anyMcpAction || reviewLoading || rulesInvalid} onClick={() => save(true)}>Save settings<ChevronRight size={15} /></button></>}</footer>
+    <footer className="modal-footer">{tab === 'profiles' ? <button className="button secondary" onClick={onClose}>Done</button> : <><span className="settings-save-space" aria-hidden="true" /><button className="button secondary" onClick={onClose}>Cancel</button><button className="button primary" disabled={busy || testing || anyMcpAction || reviewLoading || rulesInvalid} onClick={() => save(true)}>Save settings<ChevronRight size={15} /></button></>}</footer>
   </Modal>;
 }

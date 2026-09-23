@@ -1,11 +1,13 @@
 import { permissionModeLabels } from '../../shared/permissions.js';
-import { useCallback, useEffect, useRef, useState, type KeyboardEvent } from 'react';
-import { ArrowUp, AtSign, Check, ChevronDown, File, Hammer, Image, ListPlus, ListTree, Navigation, Paperclip, Pause, Play, Search, Shield, ShieldCheck, Square, X, Zap } from 'lucide-react';
+import { useCallback, useEffect, useLayoutEffect, useRef, useState, type KeyboardEvent } from 'react';
+import { ArrowUp, AtSign, Check, ChevronDown, File, Folder, Monitor, Plus, Unplug, Hammer, ListPlus, ListTree, Navigation, Paperclip, Pause, Play, Search, Shield, ShieldCheck, Square, X, Zap } from 'lucide-react';
 import type { ArchitectureSelection, Attachment, Mode, ModelReasoning, PermissionMode, QueueState, Settings } from '../../shared/types';
 import { architectureInfo, architectureWorker } from '../../shared/architectures';
 import { api, errorMessage, query } from './api';
 import { LiteSpeed } from './ui';
 import { ModelPicker } from './ModelPicker';
+import { Attachments } from './Attachments';
+import { BranchControl } from './BranchControl';
 
 /** planner: the optional planning half of a planner+executor pair (undefined =
  * untouched, null = explicitly cleared in the next PATCH). outputStyle and
@@ -23,12 +25,13 @@ interface Props {
   running: boolean; disabled?: boolean; welcome?: boolean; workspace: string;
   text: string; setText: (value: string) => void;
   attachments: Attachment[]; setAttachments: (value: Attachment[]) => void;
-  draftNotice?: string; onSettings: () => void;
+  draftNotice?: string; onSettings: () => void; onWorkspace?: () => void; onPlugins?: () => void;
   selectionDisabled?: boolean;
   architectureDisabled?:boolean; pendingSelection?:Selection;
   onPermissionMode?: (mode: PermissionMode) => void;
+  onOpenFile?: (path: string) => void; previousWorkspaces?: readonly string[];
 }
-export function Composer({ settings, selection, onSelection, onSend, onCommand, onQueue, onSteer, queue, queueBusy, onQueueAction, onCancel, running, disabled, welcome, workspace, text, setText, attachments, setAttachments, draftNotice, onSettings, selectionDisabled, architectureDisabled, pendingSelection, onPermissionMode }: Props) {
+export function Composer({ settings, selection, onSelection, onSend, onCommand, onQueue, onSteer, queue, queueBusy, onQueueAction, onCancel, running, disabled, welcome, workspace, text, setText, attachments, setAttachments, draftNotice, onSettings, onWorkspace, onPlugins, selectionDisabled, architectureDisabled, pendingSelection, onPermissionMode, onOpenFile, previousWorkspaces }: Props) {
   const [modelOpen, setModelOpen] = useState(false);
   const [contextOpen, setContextOpen] = useState(false);
   const [contextQuery, setContextQuery] = useState('');
@@ -51,11 +54,19 @@ export function Composer({ settings, selection, onSelection, onSend, onCommand, 
   const configDisabled = Boolean(selectionDisabled || disabled || running || sending);
   useEffect(() => { if (running || sending) setModelOpen(false); }, [running, sending]);
   useEffect(() => { alive.current = true; return () => { alive.current = false; }; }, []);
+  const fitInput = useCallback((editing = false) => {
+    const element = input.current; if (!element) return;
+    const scrollTop = element.scrollTop, atEnd = editing && document.activeElement === element && element.selectionStart === element.value.length;
+    element.style.height = 'auto'; element.style.height = `${Math.min(element.scrollHeight, 220)}px`;
+    element.scrollTop = atEnd ? element.scrollHeight : scrollTop;
+  }, []);
+  useLayoutEffect(() => fitInput(true), [text, fitInput]);
   useEffect(() => {
-    if (!input.current) return;
-    input.current.style.height = 'auto';
-    input.current.style.height = `${Math.min(input.current.scrollHeight, 220)}px`;
-  }, [text]);
+    const element = input.current; if (!element || typeof ResizeObserver === 'undefined') return;
+    let width = element.clientWidth;
+    const observer = new ResizeObserver(() => { if (element.clientWidth !== width) { width = element.clientWidth; fitInput(); } });
+    observer.observe(element); return () => observer.disconnect();
+  }, [fitInput]);
   useEffect(() => {
     if (!contextOpen) return;
     let live = true;
@@ -135,8 +146,8 @@ export function Composer({ settings, selection, onSelection, onSend, onCommand, 
     </section>}
     <div className={`composer ${welcome ? 'welcome-composer' : ''} ${dragging ? 'dragging' : ''}`} onDragOver={e => { e.preventDefault(); setDragging(true); }} onDragLeave={e => { if (!e.currentTarget.contains(e.relatedTarget as Node)) setDragging(false); }} onDrop={e => { e.preventDefault(); setDragging(false); void addFiles(e.dataTransfer.files).catch(e => setError(errorMessage(e))); }}>
       {dragging && <div className="drop-overlay"><Paperclip size={22} />Drop files to add context</div>}
-      {attachments.length > 0 && <div className="attachments">{attachments.map((a, i) => <div className="attachment-chip" key={`${a.name}-${i}`} title={a.path || a.name}>{a.dataUrl ? <Image size={13} /> : <File size={13} />}<span>{a.path || a.name}</span><button aria-label={`Remove ${a.name}`} disabled={sending} onClick={() => setAttachments(attachments.filter((_, n) => n !== i))}><X size={12} /></button></div>)}</div>}
-      <label className="sr-only" htmlFor="message-input">Message Litespeed</label><textarea ref={input} id="message-input" placeholder={welcome ? 'What do you want to build?' : queueMode ? 'Add the next message to your queue…' : 'Ask a follow-up, or start something new…'} value={text} maxLength={200000} rows={welcome ? 3 : 2} onKeyDown={onKey} onPaste={e => { const files = e.clipboardData.files; if (files.length) void addFiles(files).catch(e => setError(errorMessage(e))); }} disabled={disabled || sending} onChange={e => { setText(e.target.value); const mention = e.target.value.match(/(?:^|\s)@([^\s]*)$/); if (mention) { setContextOpen(true); setContextQuery(mention[1]); } else setContextOpen(false); }} />
+      {attachments.length > 0 && <Attachments attachments={attachments} disabled={sending} workspace={workspace} previousWorkspaces={previousWorkspaces} onOpenFile={onOpenFile} onRemove={index => setAttachments(attachments.filter((_, n) => n !== index))} />}
+      <label className="sr-only" htmlFor="message-input">Message Litespeed</label><textarea ref={input} id="message-input" placeholder={queueMode ? 'Add a follow-up…' : welcome ? 'Work with Litespeed' : 'Do anything'} value={text} maxLength={200000} rows={2} onKeyDown={onKey} onPaste={e => { const files = e.clipboardData.files; if (files.length) void addFiles(files).catch(e => setError(errorMessage(e))); }} disabled={disabled || sending} onChange={e => { setText(e.target.value); const mention = e.target.value.match(/(?:^|\s)@([^\s]*)$/); if (mention) { setContextOpen(true); setContextQuery(mention[1]); } else setContextOpen(false); }} />
       {contextOpen && <div className="context-picker"><div className="context-search"><Search size={15} /><input autoFocus aria-label="Search workspace files" placeholder="Find a file in your workspace…" value={contextQuery} onChange={e => setContextQuery(e.target.value)} onKeyDown={e => { if (e.key === 'Escape') { setContextOpen(false); input.current?.focus(); } if (e.key === 'Enter' && files.length) { e.preventDefault(); addContext(files[0]); } }} /><button className="icon-button" aria-label="Close file picker" onClick={() => setContextOpen(false)}><X size={14} /></button></div>{fileLoading ? <div className="picker-empty"><LiteSpeed compact active />Finding files…</div> : files.length ? <div className="context-results">{files.slice(0, 30).map(f => <button key={f} onClick={() => addContext(f)}><File size={14} /><span>{f}</span>{attachments.some(a => a.path === f) && <Check size={14} />}</button>)}</div> : <div className="picker-empty">No files found. Try a different name.</div>}</div>}
       <div className="composer-toolbar"><div className="composer-tools">
         <div className="mode-switch"><select aria-label="Agent mode" value={selection.mode} disabled={configDisabled} onChange={event => { if (!configDisabled) onSelection({ ...selection, mode: event.target.value as Mode }); }}><option value="build">Build</option><option value="plan">Plan</option></select></div>
@@ -145,13 +156,14 @@ export function Composer({ settings, selection, onSelection, onSend, onCommand, 
         <button className="model-trigger" onClick={() => setModelOpen(true)} disabled={architectureDisabled??configDisabled} title={selection.mode === 'build' && selection.architecture ? `${architectureInfo(selection.architecture.kind).name} · ${selection.model || 'none'} + ${architectureWorker(selection.architecture)?.model ?? 'task specialists'}` : selection.mode === 'plan' && selection.planner ? `Planner · ${selection.planner.model} (executor: ${selection.model || 'none'})` : `${provider?.name || 'Choose provider'} · ${selection.model || 'Choose model'}${selection.planner ? ` (+planner: ${selection.planner.model})` : ''}`}><span>{selection.architecture?.kind === 'litefusion' ? 'LiteFusion' : (selection.mode === 'plan' && selection.planner ? selection.planner.model : selection.model)?.split('/').at(-1) || 'Select model'}</span>{selection.architecture?.kind === 'litefusion' ? <span className="model-companion">{selection.model.split('/').at(-1)}</span> : selection.mode === 'build' && selection.architecture && <span className="model-companion" title={architectureInfo(selection.architecture.kind).name}>+ {architectureInfo(selection.architecture.kind).roles[0]?.id ?? 'specialists'}</span>}{selection.mode === 'plan' && selection.planner && <span className="planner-tag">planner</span>}<ChevronDown size={12} /></button>
 
         <details className="permission-select"><summary><Shield size={12} />{selection.mode === 'plan' ? 'Read only' : permissionModeLabels[selection.permissionMode]}<ChevronDown size={10} /></summary><div className="permission-menu"><strong>Permissions</strong><button disabled={onPermissionMode ? disabled || sending : configDisabled} onClick={e => { if (onPermissionMode) onPermissionMode('ask'); else onSelection({ ...selection, permissionMode: 'ask' }); e.currentTarget.closest('details')?.removeAttribute('open'); }}><Shield size={16} /><span>Ask before changes<small>Review edits and commands first</small></span>{selection.permissionMode === 'ask' && <Check size={14} />}</button><button disabled={onPermissionMode ? disabled || sending : configDisabled} onClick={e => { if (onPermissionMode) onPermissionMode('edit'); else onSelection({ ...selection, permissionMode: 'edit' }); e.currentTarget.closest('details')?.removeAttribute('open'); }}><ShieldCheck size={16} /><span>Allow project edits<small>Ask for commands and new external access</small></span>{selection.permissionMode === 'edit' && <Check size={14} />}</button><button disabled={onPermissionMode ? disabled || sending : configDisabled} onClick={e => { if (onPermissionMode) onPermissionMode('auto'); else onSelection({ ...selection, permissionMode: 'auto' }); e.currentTarget.closest('details')?.removeAttribute('open'); }}><ShieldCheck size={16} /><span>Allow all tools<small>All tools and pending actions; explicit rules still apply</small></span>{selection.permissionMode === 'auto' && <Check size={14} />}</button></div></details>
-      </div><div className="composer-actions"><input ref={fileInput} type="file" multiple hidden tabIndex={-1} aria-label="Attach files" onChange={e => { if (e.target.files) void addFiles(e.target.files).catch(e => setError(errorMessage(e))); e.target.value = ''; }} /><button className="icon-button attach-button" title="Attach files" aria-label="Attach files" onClick={() => fileInput.current?.click()}><Paperclip size={17} /></button><button className="icon-button context-button" title="Add workspace file" aria-label="Add workspace file context" onClick={() => { setContextOpen(v => !v); setContextQuery(''); }}><AtSign size={17} /></button>
+      </div><div className="composer-actions"><input ref={fileInput} type="file" multiple hidden tabIndex={-1} aria-label="Attach files" onChange={e => { if (e.target.files) void addFiles(e.target.files).catch(e => setError(errorMessage(e))); e.target.value = ''; }} /><button className="icon-button attach-button" title="Attach files" aria-label="Attach files" onClick={() => fileInput.current?.click()}><Plus size={18} /></button><button className="icon-button context-button" title="Add workspace file" aria-label="Add workspace file context" onClick={() => { setContextOpen(v => !v); setContextQuery(''); }}><AtSign size={17} /></button>
         {onSteer && running && <button className="text-button steer-button" aria-label="Steer the running response" title="Send this note to the lead now" disabled={disabled || sending || queueBusy || !text.trim()} onClick={() => void steer()}><Navigation size={13} />Steer</button>}
         {queueMode ? <button className="send-button queue-send" aria-label="Add to queue" title="Add to queue (Enter)" disabled={disabled || sending || readingFiles || queueBusy || queueFull || (!text.trim() && !attachments.length)} onClick={() => void send()}>{sending ? <span className="send-loading" /> : <ListPlus size={16} />}<span>Queue</span></button> : !running && <button className="send-button" aria-label="Send message" title="Send (Enter) · New line (Shift + Enter)" disabled={disabled || sending || readingFiles || (!text.trim() && !attachments.length)} onClick={() => void send()}>{sending ? <span className="send-loading" /> : <ArrowUp size={20} />}</button>}
         {running && <button className="send-button stop" aria-label="Stop generation" title="Stop generation and pause queued messages" disabled={disabled} onClick={onCancel}><Square size={14} fill="currentColor" /></button>}
       </div></div>
     </div>
 
+    {welcome && <div className="composer-project-strip"><button onClick={onWorkspace ?? onSettings} title={workspace}><Folder size={14} /><span>{workspace.split('/').filter(Boolean).at(-1) || 'Choose project'}</span></button><BranchControl key={workspace} workspace={workspace} disabled={configDisabled} compact /><button onClick={onPlugins ?? onSettings}><Unplug size={14} />Plugins</button><span className="local-environment" title="Running locally on your computer"><Monitor size={14} /></span></div>}
     {draftNotice && <div className="draft-notice" role="status">{draftNotice}</div>}
     {error && <div className="inline-alert" role="alert">{error}<button className="icon-button" aria-label="Dismiss attachment error" onClick={() => setError('')}><X size={13} /></button></div>}
     {modelOpen && <ModelPicker disabled={architectureDisabled??configDisabled} settings={settings} selection={pendingSelection??selection} onChange={onSelection} onClose={closeModel} onSettings={onSettings} workspace={workspace} />}

@@ -5,18 +5,19 @@ import { mkdir, rm, stat } from 'node:fs/promises';
 import { join, resolve } from 'node:path';
 
 const delay = milliseconds => new Promise(done => setTimeout(done, milliseconds));
-async function healthy(base) {
+async function healthy(base, storeId) {
   const response = await fetch(`${base}/api/health`, { signal: AbortSignal.timeout(1500) });
   if (!response.ok) throw new Error(`Litespeed returned HTTP ${response.status}.`);
   const value = await response.json();
   if (value.ok !== true || typeof value.version !== 'string') throw new Error('This address is not a Litespeed server.');
   if (value.name !== 'litespeed') throw new Error('An older agent server is already running at this address. Stop it, migrate saved data if needed, and run litespeed again.');
+  if (storeId && value.storeId !== storeId) throw new Error('Another Litespeed server is using this address with different saved data. Close that server or choose another desktop port.');
 }
 
 /** An explicit --url is always an attachment. HTTP errors never mean “start a
  * second server”. A local startup lock serializes simultaneous TUI launches. */
-export async function ensureTuiServer({ base, root, workspace, explicit, env = process.env }) {
-  try { await healthy(base); return; }
+export async function ensureTuiServer({ base, root, workspace, explicit, storeId, env = process.env }) {
+  try { await healthy(base, storeId); return; }
   catch (error) {
     if (explicit || !['ECONNREFUSED', 'ConnectionRefused'].includes(error?.cause?.code)) throw error;
   }
@@ -32,14 +33,14 @@ export async function ensureTuiServer({ base, root, workspace, explicit, env = p
     try { await mkdir(lock); acquired = true; break; }
     catch (error) {
       if (error.code !== 'EEXIST') throw error;
-      try { await healthy(base); return; } catch { /* The owner is still starting. */ }
+      try { await healthy(base, storeId); return; } catch { /* The owner is still starting. */ }
       try { if (Date.now() - (await stat(lock)).mtimeMs > 30000) await rm(lock, { recursive: true, force: true }); } catch { /* Another launcher released it. */ }
       await delay(100);
     }
   }
   if (!acquired) throw new Error('Another Litespeed server startup is in progress. Try again shortly.');
   try {
-    try { await healthy(base); return; } catch (error) { if (!['ECONNREFUSED', 'ConnectionRefused'].includes(error?.cause?.code)) throw error; }
+    try { await healthy(base, storeId); return; } catch (error) { if (!['ECONNREFUSED', 'ConnectionRefused'].includes(error?.cause?.code)) throw error; }
     const log = join(directory, 'tui-server.log'), fd = openSync(log, 'a', 0o600);
     const entry = existsSync(join(root, 'dist/server/index.js')) ? [join(root, 'dist/server/index.js')] : ['--import', 'tsx', join(root, 'server/index.ts')];
     const server = spawn(process.execPath, entry, { cwd: root, detached: true, stdio: ['ignore', fd, fd], env: { ...env, LITESPEED_PORT: address.port || '80', LITESPEED_WORKSPACE: workspace } });
@@ -50,7 +51,7 @@ export async function ensureTuiServer({ base, root, workspace, explicit, env = p
     const deadline = Date.now() + 15000;
     while (Date.now() < deadline) {
       if (failed || server.exitCode !== null) { server.kill('SIGTERM'); throw new Error(`Could not start Litespeed. Check ${log}.`); }
-      try { await healthy(base); return { pid: server.pid, log }; } catch { /* Wait for the owned process to listen. */ }
+      try { await healthy(base, storeId); return { pid: server.pid, log }; } catch { /* Wait for the owned process to listen. */ }
       await delay(100);
     }
     server.kill('SIGTERM');

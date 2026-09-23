@@ -1,7 +1,8 @@
-import { useEffect, useId, useLayoutEffect, useRef, type ReactNode } from 'react';
+import { useEffect, useId, useLayoutEffect, useRef, type ReactNode, type KeyboardEventHandler } from 'react';
 import { Check, Copy, X } from 'lucide-react';
 import { useState } from 'react';
 import { copyText } from './clipboard';
+import { enterOverlay } from './overlays';
 
 export function Logo({ small = false }: { small?: boolean }) {
   return <span className={`litespeed-logo ${small ? 'small' : ''}`} aria-hidden="true"><svg viewBox="0 0 40 32" fill="none"><path d="M5 7h15c6 0 11 5 15 12 1.4 2.5-.2 5-3 5H5" stroke="currentColor" strokeWidth="2.6" strokeLinecap="round" strokeLinejoin="round" /><path d="M19 11h2c3 0 6 3 8 6H18l1-6Z" fill="currentColor" /><path d="M2 12h9M1 18h11M9 29h23" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" /></svg></span>;
@@ -9,20 +10,24 @@ export function Logo({ small = false }: { small?: boolean }) {
 export function LiteSpeed({ active = false, compact = false }: { active?: boolean; compact?: boolean }) {
   return <div className={`lite-speed ${active ? 'active' : ''} ${compact ? 'compact' : ''}`} aria-hidden="true"><span><i /></span></div>;
 }
-export function Modal({ title, children, onClose, wide = false }: { title: string; children: ReactNode; onClose: () => void; wide?: boolean }) {
+export function Modal({ title, children, onClose, wide = false, fullScreen = false, onKeyDown }: { title: string; children: ReactNode; onClose: () => void; wide?: boolean; fullScreen?: boolean; onKeyDown?: KeyboardEventHandler<HTMLDivElement> }) {
   const id = useId();
   const ref = useRef<HTMLDivElement>(null), close = useRef(onClose);
+  // React's autoFocus runs before layout effects. Capture the opener while
+  // rendering so a focused child input cannot replace the return target.
+  const returnFocus = useRef(typeof document === 'undefined' ? null : document.activeElement as HTMLElement | null);
   close.current = onClose;
   useLayoutEffect(() => {
-    const previous = document.activeElement as HTMLElement;
+    const leaveOverlay = enterOverlay();
+    const previous = returnFocus.current;
     const bodyOverflow = document.body.style.overflow;
     document.body.style.overflow = 'hidden';
-    const target = ref.current?.querySelector<HTMLElement>('[autofocus]') ?? ref.current?.querySelector<HTMLElement>('input, textarea, select') ?? ref.current?.querySelector<HTMLElement>('button');
+    const target = ref.current?.querySelector<HTMLElement>('[autofocus], [data-autofocus]') ?? ref.current?.querySelector<HTMLElement>('input, textarea, select') ?? ref.current?.querySelector<HTMLElement>('button');
     target?.focus();
     function onKey(e: KeyboardEvent) {
       if (e.key === 'Escape') { e.preventDefault(); close.current(); }
       if (e.key === 'Tab') {
-        const elements = Array.from(ref.current?.querySelectorAll<HTMLElement>('button:not([disabled]), summary, [href], input:not([disabled]), select:not([disabled]), textarea:not([disabled]), [tabindex="0"]') ?? []).filter(el => el.getClientRects().length);
+        const elements = Array.from(ref.current?.querySelectorAll<HTMLElement>('button:not([disabled]), summary, [href], input:not([disabled]), select:not([disabled]), textarea:not([disabled]), [tabindex="0"]') ?? []).filter(el => el.getClientRects().length && el.tabIndex >= 0);
         const first = elements[0], last = elements.at(-1);
         if (!first) { e.preventDefault(); return; }
         if (e.shiftKey && (document.activeElement === first || !ref.current?.contains(document.activeElement))) { e.preventDefault(); last?.focus(); }
@@ -30,9 +35,9 @@ export function Modal({ title, children, onClose, wide = false }: { title: strin
       }
     }
     document.addEventListener('keydown', onKey);
-    return () => { document.removeEventListener('keydown', onKey); document.body.style.overflow = bodyOverflow; previous?.focus(); };
+    return () => { document.removeEventListener('keydown', onKey); document.body.style.overflow = bodyOverflow; previous?.focus(); leaveOverlay(); };
   }, []);
-  return <div className="modal-backdrop" onMouseDown={e => { if (e.target === e.currentTarget) onClose(); }}><div ref={ref} className={`modal ${wide ? 'wide' : ''}`} role="dialog" aria-modal="true" aria-labelledby={id} tabIndex={-1}><div className="modal-header"><h2 id={id}>{title}</h2><button className="icon-button" onClick={onClose} aria-label="Close dialog"><X size={18} /></button></div>{children}</div></div>;
+  return <div className={`modal-backdrop ${fullScreen ? 'settings-page-backdrop' : ''}`} onMouseDown={e => { if (e.target === e.currentTarget) onClose(); }}><div ref={ref} className={`modal ${wide ? 'wide' : ''}`} role="dialog" aria-modal="true" aria-labelledby={id} tabIndex={-1} onKeyDown={onKeyDown}><div className="modal-header"><h2 id={id}>{title}</h2><button className="icon-button" onClick={onClose} aria-label="Close dialog"><X size={18} /></button></div>{children}</div></div>;
 }
 export function CopyButton({ text, label = 'Copy' }: { text: string; label?: string }) {
   const [state, setState] = useState<'idle' | 'copied' | 'error'>('idle');

@@ -59,6 +59,16 @@ describe('persistent terminal manager', () => {
   afterEach(async () => { await manager.close(); store.close(); await rm(dir, { recursive: true, force: true }); vi.unstubAllEnvs(); });
   const output = (socket: FakeSocket) => socket.sent.filter(m => m.type === 'output').map(m => m.data).join('');
 
+  it('rechecks workspace operations before a terminal can attach or spawn', () => {
+    let busy = false;
+    manager = new TerminalManager(store, factory as typeof spawn, () => busy);
+    const session = store.createSession(); manager.validate(session.id);
+    busy = true;
+    expect(() => manager.attach(session.id, new FakeSocket().ws)).toThrow('current project operation');
+    expect(factory).not.toHaveBeenCalled();
+    busy = false; manager.attach(session.id, new FakeSocket().ws); expect(factory).toHaveBeenCalledTimes(1);
+  });
+
   it('spawns lazily in the stored workspace with a minimal credential-free environment', () => {
     vi.stubEnv('LITELLM_API_KEY', 'hidden-provider-key'); vi.stubEnv('LITESPEED_DATA_DIR', '/secret/app-state');
     vi.stubEnv('OPENAI_API_KEY', 'hidden-other-key'); vi.stubEnv('NODE_OPTIONS', '--inspect');

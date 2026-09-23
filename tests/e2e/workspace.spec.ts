@@ -5,7 +5,7 @@ async function send(page:any,text:string){await page.getByRole('textbox',{name:'
 
 test('welcome is usable, keyboard palette works, and layout fits desktop',async({page})=>{
   const errors:string[]=[];page.on('pageerror',e=>errors.push(e.message));await fresh(page);
-  await expect(page.getByRole('heading',{name:'Litespeed.'})).toBeVisible();
+  await expect(page.getByRole('heading',{name:'What should we work on?'})).toBeVisible();
   await expect(page.getByRole('button',{name:'Send message',exact:true})).toBeDisabled();
   await page.keyboard.press('Control+k');await expect(page.getByRole('dialog')).toBeVisible();await page.keyboard.press('Escape');await expect(page.getByRole('dialog')).toHaveCount(0);
   expect(await page.evaluate(()=>document.documentElement.scrollWidth<=window.innerWidth)).toBe(true);expect(errors).toEqual([]);
@@ -42,13 +42,13 @@ test('stops a live stream and sends a follow-up',async({page})=>{
 
 test('surfaces provider errors and remains navigable',async({page})=>{
   await fresh(page);await send(page,'provider failure');await expect(page.getByRole('alert').first()).toContainText('HTTP 401');await expect(page.getByRole('button',{name:'Stop generation'})).toHaveCount(0);
-  await page.getByRole('button',{name:/New session/}).first().click();await expect(page.getByRole('heading',{name:'Litespeed.'})).toBeVisible();
+  await page.getByRole('button',{name:'New chat'}).first().click();await expect(page.getByRole('heading',{name:'What should we work on?'})).toBeVisible();
 });
 
 test('discovers models and attaches workspace context',async({page})=>{
   await fresh(page);await page.getByRole('button',{name:'test-model'}).click();await expect(page.getByRole('dialog',{name:'Choose a model'})).toBeVisible();await page.getByRole('button',{name:'Architecture',exact:true}).click();await page.getByRole('option',{name:/^Single model/}).click();await page.getByRole('button',{name:'Model',exact:true}).click();await page.getByRole('option',{name:'test-fast',exact:true}).click();await page.getByRole('button',{name:'Done',exact:true}).click();
   await page.getByRole('button',{name:'Add workspace file context'}).click();await page.getByRole('textbox',{name:'Search workspace files'}).fill('hello.ts');await page.getByRole('button',{name:'src/hello.ts',exact:true}).click();
-  await expect(page.getByRole('button',{name:'Remove hello.ts'})).toBeVisible();await send(page,'Read this attached source');await expect(page.getByRole('article',{name:'Your message'})).toContainText('src/hello.ts');await expect(page.getByRole('button',{name:'Stop generation'})).toHaveCount(0);
+  await expect(page.getByRole('button',{name:'Remove hello.ts'})).toBeVisible();await send(page,'Read this attached source');await expect(page.getByRole('article',{name:'Your message'}).getByRole('button',{name:'Preview hello.ts'})).toBeVisible();await expect(page.getByRole('button',{name:'Stop generation'})).toHaveCount(0);
 });
 
 test('terminal executes real commands, persists on hide and reload, and ends explicitly',async({page,request})=>{
@@ -77,10 +77,11 @@ test('terminal executes real commands, persists on hide and reload, and ends exp
 
 test('settings save, test connection, validation and dark appearance',async({page})=>{
   await fresh(page);await page.getByRole('button',{name:'Settings',exact:true}).click();await expect(page.getByRole('dialog',{name:'Settings'})).toBeVisible();
+  await page.getByRole('navigation',{name:'Settings sections'}).getByRole('button',{name:'Providers',exact:true}).click();
   const key=page.locator('input[type=password]');await expect(key).toHaveValue('');
   await page.getByRole('button',{name:'Save & test connection'}).click();await expect(page.getByRole('status')).toContainText('Connected');
-  await page.getByRole('button',{name:'Workspace',exact:true}).click();await page.getByLabel('Appearance').selectOption('dark');await page.getByRole('button',{name:'Save settings'}).click();await expect(page.locator('html')).toHaveAttribute('data-theme','dark');await page.screenshot({path:'test-results/welcome-dark.png',fullPage:true,animations:'disabled'});
-  await page.getByRole('button',{name:'Settings',exact:true}).click();await page.getByRole('button',{name:'Workspace',exact:true}).click();await page.getByLabel('Appearance').selectOption('light');await page.getByRole('button',{name:'Save settings'}).click();
+  await page.getByRole('button',{name:'General',exact:true}).click();await page.getByLabel('Appearance').selectOption('dark');await page.getByRole('button',{name:'Save settings'}).click();await expect(page.locator('html')).toHaveAttribute('data-theme','dark');await page.screenshot({path:'test-results/welcome-dark.png',fullPage:true,animations:'disabled'});
+  await page.getByRole('button',{name:'Settings',exact:true}).click();await page.getByRole('button',{name:'General',exact:true}).click();await page.getByLabel('Appearance').selectOption('light');await page.getByRole('button',{name:'Save settings'}).click();
 });
 
 test('mobile welcome, sidebar and composer stay within viewport',async({page})=>{
@@ -94,7 +95,7 @@ test('workspace visibility follows the saved choice across sessions while mobile
   const first = await (await request.post('/api/sessions', { data: { title: 'Panel first', providerId: 'fixture', model: 'test-model' } })).json();
   const second = await (await request.post('/api/sessions', { data: { title: 'Panel second', providerId: 'fixture', model: 'test-model' } })).json();
   await fresh(page);
-  await expect(page.locator('.welcome h1 .litespeed-logo')).toBeVisible();
+  await expect(page.getByRole('heading',{name:'What should we work on?'})).toBeVisible();
   await page.getByRole('button', { name: 'Panel first', exact: true }).click();
   await expect(page.locator('.workspace-panel')).toHaveCount(0);
   await page.getByRole('button', { name: 'Show workspace panel', exact: true }).click();

@@ -28,4 +28,12 @@ describe('terminal server startup', () => {
     cleanups.push(() => new Promise(resolve => server.close(() => resolve())));
     await expect(ensureTuiServer({ base: `http://127.0.0.1:${(server.address() as { port: number }).port}`, root: '/does-not-exist', workspace: '/tmp', explicit: false })).rejects.toThrow('503');
   });
+  it('only attaches the desktop to the expected saved-data identity', async () => {
+    const server = createServer((_, response) => { response.setHeader('Content-Type', 'application/json'); response.end(JSON.stringify({ ok: true, name: 'litespeed', version: 'test', storeId: 'matching-state' })); });
+    await new Promise<void>(resolve => server.listen(0, '127.0.0.1', resolve));
+    cleanups.push(() => new Promise(resolve => server.close(() => resolve())));
+    const options = { base: `http://127.0.0.1:${(server.address() as { port: number }).port}`, root: '/does-not-exist', workspace: '/tmp', explicit: false };
+    await expect(ensureTuiServer({ ...options, storeId: 'other-state' })).rejects.toThrow('different saved data');
+    expect(await ensureTuiServer({ ...options, storeId: 'matching-state' })).toBeUndefined();
+  });
 });

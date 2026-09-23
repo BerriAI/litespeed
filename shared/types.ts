@@ -34,6 +34,7 @@ export type ProviderKind = 'openai' | 'anthropic' | 'codex';
 export interface Provider { id: string; name: string; kind: ProviderKind; baseUrl: string; apiKey?: string; configured?: boolean; models?: string[]; anthropicCacheModels?: string[]; contextWindows?: Record<string, number>; }
 export interface Model { canonicalId?: string; reasoningEfforts?: ReasoningEffort[]; id: string; name: string; providerId: string; contextWindow?: number; maxInputTokens?: number; }
 export interface Settings { mcpConfigRevision?: string; providers: Provider[]; defaultProvider: string; defaultModel: string; workspace: string; permissionMode: PermissionMode; maxSteps?: number; theme: 'system' | 'light' | 'dark'; mcpServers: Record<string, McpServerConfig>; permissionRules?: PermissionRuleSet; memoryEnabled?: boolean;
+  browser?: import('./browser.js').BrowserPreferences;
   /** Lifecycle hooks configured at the app level (design note 4.3). */
   hooks?: HookConfig[];
   /** Canonical (realpath) workspace paths the user marked trusted. Project
@@ -59,6 +60,7 @@ export interface Settings { mcpConfigRevision?: string; providers: Provider[]; d
  * (docs/design-capability-proxy.md, Option 3). */
 export interface McpServerConfig { command?: string; args?: string[]; env?: Record<string,string>; url?: string; enabled?: boolean; advertise?: boolean; }
 export interface Session { modelReasoning?: ModelReasoning; profile?: ActiveProfile; configRevision?: number; historyRevision?: number; id: string; title: string; workspace: string; model: string; providerId: string; mode: Mode; permissionMode: PermissionMode; commandSandbox?: 'off' | 'workspace'; createdAt: number; updatedAt: number; status: RunStatus; archived: boolean; parentId?: string;
+  worktree?: import('./worktrees.js').TaskWorktree;
   architectureConfigurations?: import('./architecture-config.js').ArchitectureConfigurations;
   pendingArchitecture?: import('./architecture-config.js').PendingArchitectureConfiguration;
   shunt?: import('./shunt.js').ShuntSelection;
@@ -91,7 +93,7 @@ export interface ToolCall { taskId?:string; waitingForWorkspace?: string; change
    * in the transcript and visibly attributed on the activity card. */
   intercepted?: { by: string; originalArgs: Record<string,unknown>; reason: string }; }
 export interface Attachment { name: string; path?: string; content?: string; mimeType?: string; dataUrl?: string; /** Skill instructions captured at acceptance; re-resolved on resubmission. */ skillId?: string; }
-export interface Message { internal?:'worker_result'; clientSurface?: ClientSurface; turnId?: string; turnUsage?: import('./usage.js').TurnUsage; context?: ContextSnapshot; activity?: string; providerMetadata?: Record<string,unknown>; id: string; sessionId: string; role: 'user' | 'assistant' | 'tool' | 'system'; content: string; reasoning?: string; toolCalls?: ToolCall[]; toolCallId?: string; createdAt: number; attachments?: Attachment[]; usage?: Usage; error?: string;
+export interface Message { workspaceMove?: { from: string; to: string; destination?: 'worktree' | 'local' }; internal?:'worker_result'; clientSurface?: ClientSurface; turnId?: string; turnUsage?: import('./usage.js').TurnUsage; context?: ContextSnapshot; activity?: string; providerMetadata?: Record<string,unknown>; id: string; sessionId: string; role: 'user' | 'assistant' | 'tool' | 'system'; content: string; reasoning?: string; toolCalls?: ToolCall[]; toolCallId?: string; createdAt: number; attachments?: Attachment[]; usage?: Usage; error?: string;
   /** Host-computed end-of-turn evidence account. Only on the FINAL assistant message of a completed root turn; observation only, never persisted for children. */
   receipts?: TurnReceipts; }
 export interface Usage { inputTokens: number; outputTokens: number; cachedTokens?: number; cost?: number; durationMs?: number; }

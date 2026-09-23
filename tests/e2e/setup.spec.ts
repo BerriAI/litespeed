@@ -6,7 +6,7 @@ test('setup explains roles, saves a workspace default, and keeps advanced contro
   try {
     await request.post('/api/workspace-preferences', { data: { ...original, workspace:settings.workspace, providerId:'fixture', model:'test-model', setupComplete:false } });
     await page.goto('/');
-    await page.getByRole('button',{name:'Set up Litespeed',exact:true}).click();
+    await page.getByRole('button',{name:'Settings',exact:true}).click();await page.getByRole('button',{name:'Set up Litespeed',exact:true}).click();
     const dialog = page.getByRole('dialog', { name:'Set up Litespeed', exact:true });
     await expect(dialog).toBeVisible();
     await expect(dialog.getByText('Review your setup', {exact:true})).toBeVisible();
@@ -151,7 +151,7 @@ for (const scenario of [
       expect(preferences).toMatchObject({model:scenario.driver,architecture:{kind:'sidekick-fusion',sidekick:{model:'test-fast'}},shunt:{enabled:false}});
       await page.reload();
       await page.setViewportSize({width:1440,height:1000});
-      await page.getByRole('button',{name:'Set up Litespeed',exact:true}).click();
+      await page.getByRole('button',{name:'Settings',exact:true}).click();await page.getByRole('button',{name:'Set up Litespeed',exact:true}).click();
       await expect(dialog.getByRole('button',{name:'Sidekick model',exact:true})).toContainText('test-fast');
     }
   }finally{

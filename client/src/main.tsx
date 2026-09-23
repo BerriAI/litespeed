@@ -6,6 +6,9 @@ import '@fontsource-variable/geist';
 import '@fontsource-variable/geist/wght-italic.css';
 import '@fontsource-variable/geist-mono';
 import './styles.css';
+import './desktop.css';
+import './pull-requests.css';
+import './worktrees.css';
 
 class ErrorBoundary extends Component<{ children: ReactNode }, { failed: boolean }> {
   state = { failed: false };

@@ -1,6 +1,7 @@
 import { randomUUID } from 'node:crypto';
 import type { DatabaseSync } from 'node:sqlite';
 import type { Message } from '../shared/types.js';
+import type { TaskSearchItem, TaskSearchQuery } from '../shared/task-search.js';
 
 export type SearchKind = 'user_text' | 'assistant_text' | 'tool_input' | 'tool_error' | 'tool_output';
 export interface SearchQuery { query: string; kinds?: SearchKind[]; toolName?: string; sessionId?: string; excludeSessionId?: string; limit?: number }
@@ -137,6 +138,38 @@ export class SearchIndex {
       snippet: capped(row.snip, SEARCH_LIMITS.snippetBytes, '…'), score: Number(row.score),
     }));
     return { hits, indexed };
+  }
+  /** Task navigation searches prose only. It deduplicates matches by task before
+   * limiting, so one long conversation cannot crowd every other result out. */
+  tasks(input: TaskSearchQuery): { items: TaskSearchItem[]; projects: string[]; more: boolean } {
+    const text = input.query.replaceAll('\0', ' ').trim().slice(0, 200), limit = 50;
+    const projects = (this.db.prepare("SELECT DISTINCT COALESCE(json_extract(s.data,'$.worktree.project'),json_extract(s.data,'$.workspace')) project FROM sessions s WHERE NOT EXISTS (SELECT 1 FROM delegations d WHERE d.child_session_id=s.id) ORDER BY project").all() as { project: string }[]).map(row => row.project);
+    const conditions = ["NOT EXISTS (SELECT 1 FROM delegations d WHERE d.child_session_id=s.id)"], parameters: (string | number)[] = [];
+    if (!input.includeArchived) conditions.push("COALESCE(json_extract(s.data,'$.archived'),0)=0");
+    if (input.project) { conditions.push("COALESCE(json_extract(s.data,'$.worktree.project'),json_extract(s.data,'$.workspace'))=?"); parameters.push(input.project); }
+    const sessions = this.db.prepare(`SELECT s.id, json_extract(s.data,'$.title') title, COALESCE(json_extract(s.data,'$.worktree.project'),json_extract(s.data,'$.workspace')) project, json_extract(s.data,'$.updatedAt') updatedAt, COALESCE(json_extract(s.data,'$.archived'),0) archived FROM sessions s WHERE ${conditions.join(' AND ')} ORDER BY updatedAt DESC, s.id`).all(...parameters) as unknown as TaskSearchItem[];
+    const titleMatches = sessions.filter(session => !text || session.title.toLocaleLowerCase().includes(text.toLocaleLowerCase()));
+    const items: TaskSearchItem[] = titleMatches.slice(0, limit + 1).map(session => ({ ...session, archived: Boolean(session.archived) }));
+    if (!text || items.length > limit) return { items: items.slice(0, limit), projects, more: items.length > limit };
+    const terms = text.split(/\s+/).filter(term => /[\p{L}\p{N}]/u.test(term)).map(term => `"${term.replaceAll('"', '""')}"`);
+    if (!terms.length) return { items, projects, more: false };
+    const sql = `WITH matched AS MATERIALIZED (
+      SELECT history_fts.session_id, history_fts.message_id, kind,
+        snippet(history_fts,5,'','','…',24) AS snippet, bm25(history_fts) AS score,
+        history_fts.content indexed_content, json_extract(m.data,'$.content') current_content
+      FROM history_fts JOIN messages m ON m.id=history_fts.message_id AND m.session_id=history_fts.session_id
+      JOIN sessions s ON s.id=history_fts.session_id
+      WHERE history_fts MATCH ? AND kind IN ('user_text','assistant_text') AND ${conditions.join(' AND ')}
+    ), ranked AS (SELECT *, ROW_NUMBER() OVER (PARTITION BY session_id ORDER BY score, message_id) position FROM matched)
+    SELECT * FROM ranked WHERE position=1 ORDER BY score, session_id LIMIT ?`;
+    const rows = this.db.prepare(sql).all(`content:(${terms.join(' ')})`, ...parameters, limit + 1) as { session_id: string; message_id: string; kind: 'user_text' | 'assistant_text'; snippet: string; indexed_content: string; current_content: string }[];
+    const known = new Map(sessions.map(session => [session.id, session])), included = new Set(items.map(item => item.id));
+    for (const row of rows) {
+      if (included.has(row.session_id)) continue;
+      const session = known.get(row.session_id); if (!session || row.indexed_content !== capped((row.current_content || '').trim(), SEARCH_LIMITS.partBytes, '\n[Indexed content truncated at 16 KiB.]')) continue;
+      included.add(session.id); items.push({ ...session, archived: Boolean(session.archived), messageId: row.message_id, role: row.kind === 'user_text' ? 'user' : 'assistant', snippet: capped(row.snippet, SEARCH_LIMITS.snippetBytes, '…') });
+    }
+    return { items: items.slice(0, limit), projects, more: items.length > limit };
   }
   /** FTS5 syntax must never escape to the caller: try the raw query first (power
    * users keep operators), then retry with every whitespace-separated term quoted
