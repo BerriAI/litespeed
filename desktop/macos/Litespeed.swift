@@ -44,7 +44,7 @@ final class DesktopApp: NSObject, NSApplicationDelegate, NSWindowDelegate, WKNav
         let bridge = """
         (() => {
           const request = action => window.webkit.messageHandlers.desktop.postMessage({action});
-          Object.defineProperty(window, 'litespeedDesktop', {value: Object.freeze({platform:'darwin', chooseFolder:()=>request('chooseFolder')})});
+          Object.defineProperty(window, 'litespeedDesktop', {value: Object.freeze({platform:'darwin', chooseFolder:()=>request('chooseFolder'), restartUpdate:()=>request('restartUpdate')})});
           document.addEventListener('DOMContentLoaded', () => document.documentElement.dataset.desktop = 'macos', {once:true});
           window.addEventListener('contextmenu', event => { if (!event.target.closest('input,textarea,[contenteditable],pre,code,.pdf-text-layer')) event.preventDefault(); });
         })();
@@ -81,6 +81,7 @@ final class DesktopApp: NSObject, NSApplicationDelegate, NSWindowDelegate, WKNav
         func command(_ menu: NSMenu, _ title: String, _ action: Selector, _ key: String = "", _ modifiers: NSEvent.ModifierFlags = [.command]) { let item = NSMenuItem(title: title, action: action, keyEquivalent: key); item.keyEquivalentModifierMask = modifiers; item.target = self; menu.addItem(item) }
         let app = group("Litespeed")
         command(app, "About Litespeed", #selector(about))
+        command(app, "Check for Updates…", #selector(checkForUpdates))
         app.addItem(.separator()); command(app, "Settings…", #selector(settings), ",")
         app.addItem(.separator()); app.addItem(withTitle: "Hide Litespeed", action: #selector(NSApplication.hide(_:)), keyEquivalent: "h")
         app.addItem(withTitle: "Hide Others", action: #selector(NSApplication.hideOtherApplications(_:)), keyEquivalent: "h").keyEquivalentModifierMask = [.command, .option]
@@ -122,6 +123,7 @@ final class DesktopApp: NSObject, NSApplicationDelegate, NSWindowDelegate, WKNav
     @objc func toggleWorkspace() { command("workspace") }
     @objc func openProject() { command("open-project") }
     @objc func helpPage() { command("help") }
+    @objc func checkForUpdates() { command("updates") }
     func workspaceCommand(_ name: String, fallback: @escaping () -> Void) {
         guard let current = webView?.url, isAppURL(current), let data = try? JSONSerialization.data(withJSONObject: name, options: .fragmentsAllowed), let value = String(data: data, encoding: .utf8) else { fallback(); return }
         webView.evaluateJavaScript("!window.dispatchEvent(new CustomEvent('litespeed:workspace-command',{detail:\(value),cancelable:true}))") { result, _ in
@@ -192,7 +194,26 @@ final class DesktopApp: NSObject, NSApplicationDelegate, NSWindowDelegate, WKNav
     }
 
     func userContentController(_ userContentController: WKUserContentController, didReceive message: WKScriptMessage, replyHandler: @escaping (Any?, String?) -> Void) {
-        guard message.frameInfo.isMainFrame, let url = message.frameInfo.request.url, isAppURL(url), let body = message.body as? [String: String], body["action"] == "chooseFolder" else { replyHandler(nil, "This desktop action is unavailable."); return }
+        guard message.frameInfo.isMainFrame, let url = message.frameInfo.request.url, isAppURL(url), let body = message.body as? [String: String] else { replyHandler(nil, "This desktop action is unavailable."); return }
+        if body["action"] == "restartUpdate" {
+            guard config.bundledRuntime == true, config.attachOnly != true else { replyHandler(nil, "Install the Mac app before restarting an update."); return }
+            Task {
+                do {
+                    var request = URLRequest(url: serverURL.appendingPathComponent("api/updates/restart")); request.httpMethod = "POST"; request.timeoutInterval = 120
+                    request.setValue("application/json", forHTTPHeaderField: "Content-Type")
+                    request.httpBody = try JSONSerialization.data(withJSONObject: ["appPid": ProcessInfo.processInfo.processIdentifier])
+                    let (data, response) = try await URLSession.shared.data(for: request)
+                    guard (response as? HTTPURLResponse)?.statusCode == 200 else {
+                        let result = try? JSONSerialization.jsonObject(with: data) as? [String: Any]
+                        replyHandler(nil, result?["error"] as? String ?? "The update could not restart. Your app is still open."); return
+                    }
+                    replyHandler(nil, nil)
+                    DispatchQueue.main.asyncAfter(deadline: .now() + 0.15) { NSApp.terminate(nil) }
+                } catch { replyHandler(nil, error.localizedDescription) }
+            }
+            return
+        }
+        guard body["action"] == "chooseFolder" else { replyHandler(nil, "This desktop action is unavailable."); return }
         let panel = NSOpenPanel(); panel.canChooseDirectories = true; panel.canChooseFiles = false; panel.allowsMultipleSelection = false; panel.canCreateDirectories = true; panel.prompt = "Open Project"; panel.message = "Choose a folder for your project."
         panel.beginSheetModal(for: window) { response in replyHandler(response == .OK ? panel.url?.path : nil, nil) }
     }
@@ -238,6 +259,9 @@ final class DesktopApp: NSObject, NSApplicationDelegate, NSWindowDelegate, WKNav
                 if let result = result as? String { try result.write(to: directory.appendingPathComponent("native-state.json"), atomically: true, encoding: .utf8) }
                 let image = try await webView.takeSnapshot(configuration: nil)
                 if let data = image.tiffRepresentation, let bitmap = NSBitmapImageRep(data: data), let png = bitmap.representation(using: .png, properties: [:]) { try png.write(to: directory.appendingPathComponent("native-webview.png")) }
+                if arguments.contains("--audit-restart-update") {
+                    _ = try await webView.callAsyncJavaScript("await window.litespeedDesktop.restartUpdate();", arguments: [:], in: nil, contentWorld: .page)
+                }
             } catch { try? error.localizedDescription.write(to: directory.appendingPathComponent("native-error.txt"), atomically: true, encoding: .utf8) }
         }
     }

@@ -8,9 +8,9 @@ Connect through LiteLLM, OpenAI-compatible APIs, native Anthropic, or ChatGPT de
 
 ### Mac desktop app
 
-**[Download Litespeed for Apple silicon Macs](https://github.com/BerriAI/litespeed/releases/download/desktop-v0.1.23-preview.1/Litespeed-0.1.23-darwin-arm64.zip)** · macOS 14 or later
+**[Download Litespeed for Apple silicon Macs](https://github.com/BerriAI/litespeed/releases/download/desktop-v0.1.23-preview.2/Litespeed-0.1.23-darwin-arm64.dmg)** · macOS 14 or later
 
-Unzip the download, move **Litespeed.app** to Applications, and open it. The app includes its runtimes and task browser. This is a locally signed desktop preview, not an Apple-notarized release; see the [installation instructions](docs/desktop-macos.md#download-and-install) if macOS blocks the first launch.
+Open the downloaded disk image, drag **Litespeed** onto **Applications**, then open Litespeed from Applications. The app includes its runtimes and task browser. This is a locally signed desktop preview, not an Apple-notarized release; see the [installation instructions](docs/desktop-macos.md#download-and-install) if macOS blocks the first launch.
 
 ### Terminal
 
@@ -45,7 +45,7 @@ See the [terminal guide](docs/tui.md) for shortcuts, resuming sessions, and conf
 
 The desktop build puts projects and tasks on the left, with persistent files, review, browser, and computer views beside the conversation. It can import your existing Litespeed settings and saved tasks into its own local data.
 
-See the [desktop app guide](docs/desktop-status.md) for opening the portable app, available workflows, shortcuts, and current limits. [Build and packaging details](docs/desktop-macos.md) cover the native Mac shell and bundled runtime. The [desktop preview](https://github.com/BerriAI/litespeed/releases/tag/desktop-v0.1.23-preview.1) is available for Apple silicon Macs.
+See the [desktop app guide](docs/desktop-status.md) for opening the portable app, available workflows, shortcuts, and current limits. [Build and packaging details](docs/desktop-macos.md) cover the native Mac shell and bundled runtime. The [desktop preview](https://github.com/BerriAI/litespeed/releases/tag/desktop-v0.1.23-preview.2) is available for Apple silicon Macs.
 
 ## Prefer the browser?
 

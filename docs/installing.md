@@ -2,7 +2,7 @@
 
 ## Mac desktop app
 
-The [desktop preview](https://github.com/BerriAI/litespeed/releases/tag/desktop-v0.1.23-preview.1) is a self-contained app for Apple silicon Macs running macOS 14 or later. Download the ZIP, unzip it, and move Litespeed.app to Applications. It is locally signed and not Apple-notarized; follow the [desktop installation instructions](desktop-macos.md#download-and-install) for first launch.
+The [desktop preview](https://github.com/BerriAI/litespeed/releases/tag/desktop-v0.1.23-preview.2) is a self-contained app for Apple silicon Macs running macOS 14 or later. Open the downloaded DMG, drag Litespeed onto Applications, and open it from there. It is locally signed and not Apple-notarized; follow the [desktop installation instructions](desktop-macos.md#download-and-install) for first launch.
 
 ## Terminal package for macOS
 

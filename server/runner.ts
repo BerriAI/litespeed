@@ -247,9 +247,17 @@ export class Runner {
     for(const resolve of this.idleWaiters)resolve();
     this.idleWaiters.clear();
   }
+  restartBlockers(): string[] {
+    const reasons: string[] = [];
+    if (this.runs.size) reasons.push(`${this.runs.size} ${this.runs.size === 1 ? 'task is' : 'tasks are'} still running or waiting for a response.`);
+    if (this.jobs.active()) reasons.push('Background commands are still running.');
+    if (this.browserResetting || this.operations.size || this.preparations.size || this.queuePreparations.size || this.configurationPreparations.size || this.externalOperations.size) reasons.push('A workspace operation is still finishing.');
+    if ([...this.store.sessions(), ...this.store.sessions('', true)].some(session => this.store.queue(session.id).items.length)) reasons.push('Finish or remove queued messages before restarting.');
+    return reasons;
+  }
   prepareRestart() {
-    if (this.browserResetting) throw conflict('Wait for the browser reset before restarting.');
-    if (this.runs.size || this.operations.size || this.preparations.size || this.queuePreparations.size || this.configurationPreparations.size || this.externalOperations.size || this.jobs.active()) throw conflict('Finish active tasks and background jobs before restarting. The update is installed and your work is still running.');
+    const reasons = this.restartBlockers();
+    if (reasons.length) throw conflict(`Finish active tasks and background jobs before restarting. ${reasons.join(' ')}`);
     this.stopping = true;
   }
   whenIdle(): Promise<void> {

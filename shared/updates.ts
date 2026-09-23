@@ -1,4 +1,10 @@
 export interface UpdateStatus {
+  kind?: 'desktop';
+  currentBuild?: number;
+  latestBuild?: number;
+  installedBuild?: number;
+  progress?: { received: number; total: number };
+  blockers?: string[];
   currentVersion: string;
   latestVersion?: string;
   available: boolean;

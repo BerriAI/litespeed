@@ -4,7 +4,7 @@ import { promisify } from 'node:util';
 import { createServer } from 'node:http';
 import { createHash } from 'node:crypto';
 import { createReadStream } from 'node:fs';
-import { mkdir, mkdtemp, readFile, realpath, rm } from 'node:fs/promises';
+import { mkdir, mkdtemp, readFile, readlink, realpath, rm } from 'node:fs/promises';
 import { tmpdir } from 'node:os';
 import { join, resolve } from 'node:path';
 
@@ -50,7 +50,7 @@ try {
   await waitFor(async () => (await api(`/sessions/${session.id}/browser`)).downloads[0]?.status === 'ready', 'Bundled browser download did not finish');
   const download = (await api(`/sessions/${session.id}/browser`)).downloads[0];
   assert.equal(await (await fetch(`${base}/api/sessions/${session.id}/browser/downloads/${download.id}`)).text(), 'runtime,bundled\nnode,true\n');
-  assert.equal((await api('/updates')).packaged, false); assert.match((await api('/updates')).command, /replace Litespeed.app/);
+  const updates = await api('/updates'); assert.equal(updates.kind, 'desktop'); assert.equal(updates.currentBuild, manifest.build); assert.equal(updates.packaged, true);
   const repeated = JSON.parse((await exec(node, [join(root, 'bin/desktop-server.mjs')], { cwd: workspace, env })).stdout); assert.equal(repeated.started, false);
   await assert.rejects(exec(node, [join(root, 'bin/desktop-server.mjs')], { cwd: workspace, env: { ...env, LITESPEED_DATA_DIR: join(temporary, 'other-state') } }), /different saved data/);
   if (process.env.LITESPEED_NATIVE_PACKAGE_SMOKE === '1') {
@@ -69,6 +69,19 @@ try {
     console.log('Native packaged app also passed: relocated executable starts its own bundled server, loads WebKit with the folder bridge, and produces an app-owned home snapshot. Native OS dialogs are not covered.');
   }
   console.log('Portable Mac package passed: relocated signed app, bundled Node and Chromium, isolated startup, served UI, live browser interaction, retained download, safe reuse and mismatched-store refusal.');
+  if (manifest.installer) {
+    const disk = join(artifacts, manifest.installer.file), digest = createHash('sha256');
+    for await (const chunk of createReadStream(disk)) digest.update(chunk);
+    assert.equal(digest.digest('hex'), manifest.installer.sha256);
+    const mount = join(temporary, 'Installer'); await mkdir(mount);
+    execFileSync('/usr/bin/hdiutil', ['attach', '-nobrowse', '-readonly', '-mountpoint', mount, disk], { stdio: 'pipe' });
+    try {
+      assert.equal(await readlink(join(mount, 'Applications')), '/Applications');
+      assert.ok((await readFile(join(mount, '.DS_Store'))).length > 100);
+      execFileSync('/usr/bin/codesign', ['--verify', '--deep', '--strict', join(mount, 'Litespeed.app')], { stdio: 'pipe' });
+      console.log('DMG passed: read-only mount, signed Litespeed.app, Applications shortcut and Finder layout metadata.');
+    } finally { execFileSync('/usr/bin/hdiutil', ['detach', mount], { stdio: 'pipe' }); }
+  }
 } finally {
   if (native?.exitCode === null) native.kill('SIGTERM');
   if (pid) { try { process.kill(pid, 'SIGTERM'); } catch {} await waitFor(async () => { try { process.kill(pid, 0); return false; } catch { return true; } }, 'Owned server did not stop').catch(() => {}); }

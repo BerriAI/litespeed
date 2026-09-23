@@ -91,7 +91,7 @@ export interface AuthService {
   connected(providerId:string):boolean;
   disconnect(providerId:string):any;
 }
-export interface AppOptions { store?:Store; external?:ExternalTools; computerDriver?:ComputerDriver; pullRequestTransport?:PullRequestTransport; pullRequestFetcher?:PullRequestFetcher; workspaceHasTerminal?: (workspace: string) => boolean; auth?:AuthService; updates?: { installation?: string; status(force?:boolean):Promise<UpdateStatus>; install():Promise<UpdateStatus>; restart():Promise<{version:string}>; draining():boolean }; }
+export interface AppOptions { store?:Store; external?:ExternalTools; computerDriver?:ComputerDriver; pullRequestTransport?:PullRequestTransport; pullRequestFetcher?:PullRequestFetcher; workspaceHasTerminal?: (workspace: string) => boolean; auth?:AuthService; updates?: { installation?: string; desktopBuild?: number; status(force?:boolean):Promise<UpdateStatus>; install():Promise<UpdateStatus>; restart(input?: {appPid?: number}):Promise<{version:string}>; draining():boolean }; }
 
 export function createApp(options:AppOptions = {}) {
   const store=options.store || new Store(),bus=new EventBus(store),runner=new Runner(store,bus,options.external,options.computerDriver);
@@ -159,7 +159,7 @@ export function createApp(options:AppOptions = {}) {
     }
     res.json(result);
   });
-  app.get('/api/health',async(_req,res)=>res.json({ok:true,name:'litespeed',version:VERSION,pid:process.pid,storeId:createHash('sha256').update(await realpath(store.directory)).digest('hex'),...(options.updates?.installation?{installation:options.updates.installation}:{})}));
+  app.get('/api/health',async(_req,res)=>res.json({ok:true,name:'litespeed',version:VERSION,pid:process.pid,storeId:createHash('sha256').update(await realpath(store.directory)).digest('hex'),...(options.updates?.installation?{installation:options.updates.installation}:{}),...(options.updates?.desktopBuild?{desktopBuild:options.updates.desktopBuild}:{}),...(process.env.LITESPEED_DESKTOP_UPDATE_HANDOFF?{desktopUpdateId:process.env.LITESPEED_DESKTOP_UPDATE_HANDOFF}:{})}));
   app.get('/api/desktop/import', async(_req,res) => {
     try {
       const path = join(store.directory, 'desktop-import.json');
@@ -170,7 +170,7 @@ export function createApp(options:AppOptions = {}) {
   });
   app.get('/api/updates',async(req,res)=>res.json(options.updates?await options.updates.status(req.query.check==='true'):{currentVersion:VERSION,available:false,packaged:false,restartRequired:false,releaseUrl:'https://github.com/BerriAI/litespeed/releases',command:'Update your source checkout and rebuild.'}));
   app.post('/api/updates/install',async(_req,res)=>{if(!options.updates)throw httpError(409,'Packaged updates are unavailable on this server.');res.json(await options.updates.install());});
-  app.post('/api/updates/restart',async(_req,res)=>{if(!options.updates)throw httpError(409,'Packaged updates are unavailable on this server.');res.json(await options.updates.restart());});
+  app.post('/api/updates/restart',async(req,res)=>{if(!options.updates)throw httpError(409,'Packaged updates are unavailable on this server.');const input=z.object({appPid:z.number().int().min(2).optional()}).strict().parse(req.body??{});res.json(await options.updates.restart(input));});
   // 5.1 usage report. days is zod-clamped 1..90 (coerced from the query
   // string); the store clamps again so no other caller can widen the scan.
   // Token counts are provider-reported; no cost is computed (no rate card in v1).

@@ -1,10 +1,19 @@
-# Litespeed for Mac — desktop preview
+# Litespeed for Mac — desktop preview 2
 
-[Download for Apple silicon Macs](https://github.com/BerriAI/litespeed/releases/download/desktop-v0.1.23-preview.1/Litespeed-0.1.23-darwin-arm64.zip) · **macOS 14 or later**
+[Download for Apple silicon Macs](https://github.com/BerriAI/litespeed/releases/download/desktop-v0.1.23-preview.2/Litespeed-0.1.23-darwin-arm64.dmg) · **macOS 14 or later**
 
-Unzip the download, move **Litespeed.app** to Applications, and open it. Node and the task browser are included.
+Open the downloaded disk image, drag **Litespeed** onto **Applications**, then open Litespeed from Applications. Node and the task browser are included.
 
-This preview is locally signed and **not notarized by Apple**. If macOS blocks the first launch, use **System Settings → Privacy & Security → Open Anyway** for Litespeed. See the [installation guide](https://github.com/BerriAI/litespeed/blob/desktop-v0.1.23-preview.1/docs/desktop-macos.md#download-and-install).
+This preview is locally signed and **not notarized by Apple**. If macOS blocks the first launch, use **System Settings → Privacy & Security → Open Anyway** for Litespeed. See the [installation guide](https://github.com/BerriAI/litespeed/blob/desktop-v0.1.23-preview.2/docs/desktop-macos.md#download-and-install).
+
+## New in this preview
+
+- **A familiar Mac installer.** Open the disk image and drag Litespeed onto Applications.
+- **Updates in the sidebar.** A new update icon replaces the question mark when a desktop update is available. Click to download and restart.
+- **Wait for your work.** Active tasks, background commands, queued messages and open terminals keep running. The updater can wait until you finish, and you can cancel the pending restart.
+- **A complete app restart.** The app and its server update together; settings and task history are retained. A failed launch restores the previous app.
+
+Preview 1 users install this DMG once to gain the updater. New installations are ready for subsequent in-app updates.
 
 ## Included
 
@@ -18,6 +27,6 @@ On first launch, an existing Litespeed setup can be copied into the desktop app'
 
 ## Preview limits
 
-The initial download supports Apple silicon. Computer control requires the separately installed Cua Driver and working macOS permissions; actual desktop capture remains experimental. The task browser has its own profile and uses a live preview surface. Schedules require the local server to be running. When updating the preview, wait for tasks to finish, replace the app, and restart your Mac to restart its background server too. See the [workflow guide and limits](https://github.com/BerriAI/litespeed/blob/desktop-v0.1.23-preview.1/docs/desktop-status.md).
+The initial download supports Apple silicon. Computer control requires the separately installed Cua Driver and working macOS permissions; actual desktop capture remains experimental. The task browser has its own profile and uses a live preview surface. Schedules require the local server to be running. If you already ran preview 1, finish work and restart your Mac once after installing this DMG. Future updates come through the sidebar and restart only Litespeed. See the [workflow guide and limits](https://github.com/BerriAI/litespeed/blob/desktop-v0.1.23-preview.2/docs/desktop-status.md).
 
-The release includes `desktop-manifest-darwin-arm64.json` with the ZIP's SHA-256 checksum and byte size. No user tasks, provider keys, or browser sign-ins are included in the download.
+The release includes the DMG installer, an update ZIP, and `desktop-manifest-darwin-arm64.json` with both SHA-256 checksums and byte sizes. No user tasks, provider keys, or browser sign-ins are included in the download.

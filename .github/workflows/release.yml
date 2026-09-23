@@ -58,6 +58,7 @@ jobs:
             release-artifacts/*.tar.gz
             release-artifacts/manifest-*.json
             release-artifacts/Litespeed-*.zip
+            release-artifacts/Litespeed-*.dmg
             release-artifacts/desktop-manifest-*.json
           if-no-files-found: error
           retention-days: 7
@@ -83,7 +84,7 @@ jobs:
         run: |
           RELEASE_TAG="v$(node -p 'require("./package.json").version')"
           if [ "$GITHUB_REF_TYPE" = tag ]; then
-            gh release create "$RELEASE_TAG" release-artifacts/*.tar.gz release-artifacts/manifest.json release-artifacts/Litespeed-*.zip release-artifacts/desktop-manifest-*.json scripts/install.sh --verify-tag --title "Litespeed $RELEASE_TAG" --notes-file docs/release-notes.md
+            gh release create "$RELEASE_TAG" release-artifacts/*.tar.gz release-artifacts/manifest.json release-artifacts/Litespeed-*.zip release-artifacts/Litespeed-*.dmg release-artifacts/desktop-manifest-*.json scripts/install.sh --verify-tag --title "Litespeed $RELEASE_TAG" --notes-file docs/release-notes.md
           else
-            gh release create "$RELEASE_TAG" release-artifacts/*.tar.gz release-artifacts/manifest.json release-artifacts/Litespeed-*.zip release-artifacts/desktop-manifest-*.json scripts/install.sh --target "$GITHUB_SHA" --title "Litespeed $RELEASE_TAG" --notes-file docs/release-notes.md
+            gh release create "$RELEASE_TAG" release-artifacts/*.tar.gz release-artifacts/manifest.json release-artifacts/Litespeed-*.zip release-artifacts/Litespeed-*.dmg release-artifacts/desktop-manifest-*.json scripts/install.sh --target "$GITHUB_SHA" --title "Litespeed $RELEASE_TAG" --notes-file docs/release-notes.md
           fi
