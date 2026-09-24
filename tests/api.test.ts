@@ -52,6 +52,16 @@ describe('local API and agent loop',()=>{
   });
   afterEach(async()=>{runner.stopAll();await until(()=>!store.sessions().some(s=>runner.active(s.id))).catch(()=>{});await close(server);await close(provider);store.close();await rm(dir,{recursive:true,force:true});});
   it('serves health and never exposes configured keys',async()=>{expect((await request('/health')).data.ok).toBe(true);const result=await request('/settings');expect(JSON.stringify(result.data)).not.toContain('test-private-secret');expect(result.data.providers[0].configured).toBe(true);});
+  it('preserves text/thinking chronology when a conversation is exported and imported', async () => {
+    const saved = await session();
+    const responseParts = [{ type: 'text' as const, end: 6 }, { type: 'reasoning' as const, end: 6 }, { type: 'text' as const, end: 13 }];
+    store.saveMessage({ id: 'ordered-answer', sessionId: saved.id, role: 'assistant', content: 'First.Second.', reasoning: 'Check.', responseParts, createdAt: 1 });
+    const exported = (await request(`/sessions/${saved.id}/export`)).data;
+    const imported = await request('/sessions/import', exported);
+    expect(imported.status).toBe(201);
+    expect(store.messages(imported.data.id)[0]).toMatchObject({ content: 'First.Second.', reasoning: 'Check.', responseParts });
+    expect(calls).toHaveLength(0);
+  });
   it('blocks cross-origin and DNS-rebinding requests',async()=>{
     const foreign=await fetch(base+'/api/settings',{headers:{Origin:'https://evil.example'}});expect(foreign.status).toBe(403);
     const rebound=await new Promise<number>(resolve=>{httpRequest(base+'/api/settings',{headers:{Host:'evil.example'}},res=>{res.resume();resolve(res.statusCode!);}).end();});expect(rebound).toBe(403);

@@ -19,6 +19,7 @@ import { steeringContent } from '../shared/steering-presentation.js';
 import { Button } from './ui.js';
 import { terminalText } from './protocol.js';
 import { toolRow, reasoningSummary, stableStreamingMarkdown } from './transcriptModel.js';
+import { messageParts } from '../shared/message-parts.js';
 import { useConfig, useTheme } from './context.js';
 import type { TerminalController } from './controller.js';
 import { Brand } from './brand.js';
@@ -406,10 +407,11 @@ export const Transcript = memo(function Transcript({ detail, width, height, acti
       previousActor = activitySections(steps, actors).at(-1)?.kind ?? precedingActor;
       return <box key={message.id} marginTop={index === 0 && embedded ? 0 : 1} flexDirection="column" flexShrink={0}>
         {showDriver && detail.session.architecture && controller && <text paddingLeft={ACTIVITY_TEXT} fg={toHex(theme.textMuted)}>{detail.session.architecture?.kind==='litefusion'?'Lead':'Driver'}</text>}
-        {message.reasoning && <ReasoningRow subtle={syntax.subtle} row={{ running: live && !message.content && !message.toolCalls?.length, ...reasoningSummary(message.reasoning) }} />}
         {/* Text is still arriving only while the run is live and no tool call has
             followed it in this message; a settled response renders its real source. */}
-        {content.trim() && <TextRow compact streaming={live && !message.toolCalls?.length} text={terminalText(content, true)} syntax={syntax.normal} />}
+        {messageParts(message).map((part, index, parts) => part.type === 'reasoning'
+          ? <ReasoningRow key={`reasoning:${part.start}`} subtle={syntax.subtle} row={{ running: live && index === parts.length - 1 && !message.toolCalls?.length, ...reasoningSummary(part.text) }} />
+          : content.slice(part.start, part.end).trim() && <TextRow key={`text:${part.start}`} compact streaming={live && index === parts.length - 1 && !message.toolCalls?.length} text={terminalText(content.slice(part.start, part.end), true)} syntax={syntax.normal} />)}
         <WorkLog steps={steps} detail={detail} actors={actors} live={live} syntax={syntax} width={width} controller={controller} embedded={embedded} precedingActor={precedingActor} hasText={hasText} />
         {message.error && <ErrorRow error={terminalText(message.error, true)} />}
         {footer && (runUsage || message.context) && <box marginTop={1} paddingLeft={2} flexShrink={0}><Button tone="muted" onPress={() => onUsage?.(usageMessage, runUsage)}>{usageLabel(usageMessage, runUsage)}</Button></box>}

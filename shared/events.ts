@@ -1,5 +1,6 @@
 import type { RunEvent, Session, SessionDetail } from './types.js';
 import type { DelegationSummary } from './delegation.js';
+import { appendMessageDelta } from './message-parts.js';
 
 /** Only private summaries bound to an exact current task/sidekick call expose child transcripts. */
 export function visibleDelegations(detail: SessionDetail): DelegationSummary[] {
@@ -44,9 +45,8 @@ function reduceEvent(detail: SessionDetail, event: RunEvent): SessionDetail {
     case 'delta':
     case 'reasoning': {
       const messageId = data.messageId ?? data.id;
-      const field = event.type === 'reasoning' ? 'reasoning' : 'content';
       const text = data.delta ?? data.text ?? data.content ?? '';
-      return { ...detail, messages: detail.messages.map(m => m.id === messageId ? { ...m, [field]: (m[field] ?? '') + text } : m) };
+      return { ...detail, messages: detail.messages.map(m => m.id === messageId ? appendMessageDelta(m, event.type === 'reasoning' ? 'reasoning' : 'text', text) : m) };
     }
     case 'tool': {
       const tool = data.tool ?? data.toolCall ?? data;

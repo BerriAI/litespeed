@@ -20,6 +20,7 @@ const uploadReceipts: unknown[] = [];
 let providerRequests=0;
 const profileRequests:{model:string;messages:any[];tools:any[]}[]=[];
 const pendingSummaries=new Set<()=>void>();
+const pendingResponseChunks=new Set<()=>void>();
 const delegationRequests:{model:string;messages:any[];tools:any[];reasoningEffort?:string}[]=[];
 const pendingDelegations=new Set<()=>void>();
 const mock=createServer(async(req,res)=>{
@@ -257,6 +258,15 @@ const mock=createServer(async(req,res)=>{
     toolCall=true;emit({tool_calls:[{index:0,id:'fixture-question',type:'function',function:{name:'ask_user',arguments:JSON.stringify({question:'Which storage should this project use?',options:[{id:'sqlite',label:'SQLite',description:'A local database with no extra service.'},{id:'postgres',label:'PostgreSQL',description:'A separate database server.'}]})}}]});
   }else if(prompt.includes('ask fixture question')&&prompt.includes('then write')&&data.messages.at(-1)?.tool_call_id==='fixture-question'){
     toolCall=true;emit({tool_calls:[{index:0,id:'fixture-after-answer',type:'function',function:{name:'write_file',arguments:JSON.stringify({path:'answered.txt',content:'The answer did not grant tool permission.\n'})}}]});
+  }else if(prompt.includes('WEB_RESPONSE_ORDER')){
+    const deltas = prompt.includes('THINKING_FIRST')
+      ? [{ reasoning_content: 'Checking the request.' }, { content: 'Here is the answer.' }]
+      : [{ content: 'First, an observation.' }, { reasoning_content: 'Checking the observation.' }, { content: ' Now a conclusion.' }, { reasoning_content: 'One more check.' }, { content: ' The final result.' }];
+    for (const delta of deltas) {
+      emit(delta);
+      await new Promise<void>(resolve => { const release = () => { pendingResponseChunks.delete(release); res.off('close', release); resolve(); }; pendingResponseChunks.add(release); res.once('close', release); });
+      if (res.destroyed) return;
+    }
   }else if(prompt.includes('TUI_MARKDOWN_STREAM')){
     // Streams prose with inline markdown two characters at a time so a test can
     // observe every intermediate frame, then calls one tool so the same run has
@@ -290,6 +300,7 @@ const computer = new ComputerFixture();
 const pullRequestSource = await createPullRequestSource(join(root, 'pull-request-source'));
 const{app,runner,schedules}=createApp({store,external:mcp,computerDriver:computer,pullRequestTransport:new PullRequestFixture(pullRequestSource),pullRequestFetcher:pullRequestSource.fetcher,workspaceHasTerminal:workspace=>terminals.active(workspace)});
 app.post('/fixture/computer', express.json({ limit: '1kb' }), (req,res) => { computer.captureAvailable = req.body.capture !== false; res.json({ ok: true }); });
+app.post('/fixture/response-order/advance', (_req,res) => { for (const release of [...pendingResponseChunks]) release(); res.json({ ok: true }); });
 app.get('/fixture/computer', async (_req,res) => res.json(await computer.inspect()));
 app.get('/fixture/requests',(_req,res)=>res.json({count:providerRequests}));
 app.get('/fixture/browser-uploads',(_req,res)=>res.json({receipts:uploadReceipts}));

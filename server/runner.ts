@@ -1,4 +1,5 @@
 import { SessionBrowsers } from './browser.js';
+import { appendMessageDelta } from '../shared/message-parts.js';
 import { SessionComputers, type ComputerDriver } from './computer.js';
 import { sandboxCommand, sandboxBackend } from './command-sandbox.js';
 import { LiteFusionDiscovery } from './litefusion-discovery.js';
@@ -1783,8 +1784,10 @@ export class Runner {
           if (signal.aborted) break;
           if(run.child) { const usage=this.store.messageBytes(id)+Buffer.byteLength(JSON.stringify([...fragments.values()]))+Buffer.byteLength(JSON.stringify(chunk));if(usage>childLimits.transcriptBytes-65536)throw conflict(run.child.role?'The sidekick transcript reached its 16 MiB limit.':'The research transcript reached its 4 MiB limit.'); }
           if (message.activity) { message.activity='';this.save(message); }
-          if (chunk.type === 'text') { message.content += chunk.text || ''; this.persist(message); this.bus.emit(id,'delta',{messageId:message.id,delta:chunk.text || ''}); }
-          else if (chunk.type === 'reasoning') { message.reasoning = (message.reasoning || '') + (chunk.text || ''); this.persist(message); this.bus.emit(id,'reasoning',{messageId:message.id,delta:chunk.text || ''}); }
+          if (chunk.type === 'text' || chunk.type === 'reasoning') {
+            Object.assign(message, appendMessageDelta(message, chunk.type, chunk.text || ''));
+            this.persist(message); this.bus.emit(id, chunk.type === 'text' ? 'delta' : 'reasoning', { messageId: message.id, delta: chunk.text || '' });
+          }
           else if (chunk.type === 'usage' && chunk.usage) {
             message.usage = {...chunk.usage,durationMs:Date.now()-startedAt};
             if(message.context?.cache)message.context.cache={...message.context.cache,inputTokens:chunk.usage.inputTokens,...(chunk.usage.cachedTokens!==undefined?{cachedTokens:chunk.usage.cachedTokens}:{})};

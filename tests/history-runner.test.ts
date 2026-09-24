@@ -11,6 +11,9 @@ import { Store } from '../server/store.js';
 import { Runner } from '../server/runner.js';
 import { EventBus } from '../server/events.js';
 import type { FileChange, Message } from '../shared/types.js';
+import { messageParts } from '../shared/message-parts.js';
+import { applyEvent } from '../shared/events.js';
+import type { SessionDetail } from '../shared/types.js';
 
 type RequestBody = { messages: { role: string; content: unknown }[] };
 type Reply = (body: RequestBody, response: ServerResponse, index: number) => void;
@@ -68,6 +71,32 @@ describe('runner and turn history integration', () => {
   const recover = (id: string) => runner.exclusive(id, () => runner.history.recover(id));
   const undo = (id: string) => runner.exclusive(id, () => runner.history.undo(id, runner.history.state(id).undoId!));
   const redo = (id: string) => runner.exclusive(id, () => runner.history.redo(id, runner.history.state(id).redoId!));
+
+  it('preserves provider text/thinking order in live events and durable history without changing provider input', async () => {
+    const session = store.createSession();
+    let live: SessionDetail = { session, messages: [], permissions: [], todos: [] };
+    const off = bus.subscribe(session.id, event => { live = applyEvent(live, JSON.parse(JSON.stringify(event))); });
+    reply = (_body, res) => {
+      res.writeHead(200, { 'Content-Type': 'text/event-stream' });
+      delta(res, { content: 'First observation.' });
+      delta(res, { reasoning_content: 'Check the observation.' });
+      delta(res, { content: ' Second observation.' });
+      delta(res, { reasoning_content: 'Check the conclusion.' });
+      delta(res, { content: ' Final answer.' }); finish(res);
+    };
+    try {
+      await turn(session.id, 'Inspect the response order');
+      const persisted = store.messages(session.id).find(message => message.role === 'assistant')!;
+      const expected = ['First observation.', 'Check the observation.', ' Second observation.', 'Check the conclusion.', ' Final answer.'];
+      expect(messageParts(persisted).map(part => part.text)).toEqual(expected);
+      expect(messageParts(live.messages.find(message => message.id === persisted.id)!).map(part => part.text)).toEqual(expected);
+      await undo(session.id); await redo(session.id);
+      expect(messageParts(store.messages(session.id).find(message => message.id === persisted.id)!).map(part => part.text)).toEqual(expected);
+      await turn(session.id, 'Continue');
+      expect(calls[1].messages.find(message => message.role === 'assistant')?.content).toBe('First observation. Second observation. Final answer.');
+      expect(JSON.stringify(calls)).not.toContain('responseParts');
+    } finally { off(); }
+  });
 
   it('runs compound inspection during another writer without taking snapshots, then waits and resumes a write', async () => {
     const writer = store.createSession({ permissionMode: 'auto', title: 'First writer' });
