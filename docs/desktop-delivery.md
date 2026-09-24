@@ -33,6 +33,14 @@ The updater has focused checks for build ordering, concurrent staging, corrupt a
 
 A native update smoke check uses a disposable installation and the real WebKit-to-native restart bridge. It verifies that queued work blocks restart, closes the old app/server, installs the new build, restarts both, keeps the same saved-data identity and settings/task, and produces an app-owned WebKit snapshot after relaunch. No model generation or existing user data is needed for the check.
 
+## Thinking-order release verification
+
+Desktop preview 3 (0.1.23, Build 3) preserves the actual order of text and thinking in new responses. Validation for the fix included type checking, a production build, 342 focused unit/API checks, eight Chrome conversation checks, and a terminal streaming check covering 106 frames. Seven additional WebKit cases passed for thinking placement, reloads, and updater interactions.
+
+The Build 3 ZIP and DMG passed package verification, including a relocated native launch, the bundled browser, code signature and archive checksums, and an app-owned WebKit snapshot. The native update smoke also passed with a disposable Build 2 installation: queued work blocked restart, the app and server were replaced and relaunched, and settings and task history survived. This smoke uses a disposable copy with the previous build number; it does not update the user's installation or claim a test against every older release binary. The packaged frontend, server, shared code, and TUI matched the tested checkout.
+
+These are targeted release checks; the earlier full-suite counts above describe their respective previews.
+
 ## Reproduce the checks
 
 ```sh

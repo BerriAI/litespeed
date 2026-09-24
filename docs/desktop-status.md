@@ -4,7 +4,7 @@ A Mac app with a quiet conversation, projects and tasks on the left, Settings at
 
 ## Open it
 
-[Download the desktop preview](https://github.com/BerriAI/litespeed/releases/download/desktop-v0.1.23-preview.2/Litespeed-0.1.23-darwin-arm64.dmg), open the disk image, and drag **Litespeed** onto **Applications**. See [first-launch instructions](desktop-macos.md#download-and-install). It includes Node and its task browser, so those do not need separate installation. This build requires Apple silicon and macOS 14 or newer. It is signed locally and is not notarized.
+[Download the desktop preview](https://github.com/BerriAI/litespeed/releases/download/desktop-v0.1.23-preview.3/Litespeed-0.1.23-darwin-arm64.dmg), open the disk image, and drag **Litespeed** onto **Applications**. See [first-launch instructions](desktop-macos.md#download-and-install). It includes Node and its task browser, so those do not need separate installation. This build requires Apple silicon and macOS 14 or newer. It is signed locally and is not notarized.
 
 On first launch, the app copies existing Litespeed settings and tasks into its own saved data. The original installation stays independent. If no connection is configured, setup guides you through a provider and model. See [Mac app details](desktop-macos.md) for migration and packaging details.
 

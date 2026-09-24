@@ -4,14 +4,14 @@ The desktop shell uses AppKit and WebKit and shares the same local application a
 
 ## Download and install
 
-1. [Download Litespeed for Apple silicon Macs](https://github.com/BerriAI/litespeed/releases/download/desktop-v0.1.23-preview.2/Litespeed-0.1.23-darwin-arm64.dmg). The preview requires macOS 14 or later.
+1. [Download Litespeed for Apple silicon Macs](https://github.com/BerriAI/litespeed/releases/download/desktop-v0.1.23-preview.3/Litespeed-0.1.23-darwin-arm64.dmg). The preview requires macOS 14 or later.
 2. Open the `.dmg` and drag **Litespeed** onto the **Applications** shortcut.
 3. Open Litespeed from Applications, then eject the disk image.
 4. Connect your provider, or let it import an existing Litespeed setup.
 
 The preview is locally signed and is **not notarized by Apple**. If macOS prevents the first launch, open **System Settings → Privacy & Security**, find the notice for Litespeed, and choose **Open Anyway**, then confirm opening the app. This applies to this app; no system-wide security change is needed. On managed Macs, your organization's installation policy may apply.
 
-The [release page](https://github.com/BerriAI/litespeed/releases/tag/desktop-v0.1.23-preview.2) includes the DMG installer, the update ZIP, and their SHA-256 manifest. The current downloadable desktop preview is for Apple silicon; the terminal packages also support Intel. Desktop builds for both architectures are part of the release workflow, but an Intel desktop preview is not included in this initial download.
+The [release page](https://github.com/BerriAI/litespeed/releases/tag/desktop-v0.1.23-preview.3) includes the DMG installer, the update ZIP, and their SHA-256 manifest. The current downloadable desktop preview is for Apple silicon; the terminal packages also support Intel. Desktop builds for both architectures are part of the release workflow, but an Intel desktop preview is not included in this initial download.
 
 If you already ran desktop preview 1, finish your work and restart your Mac once after installing this version. Preview 1 did not include the desktop updater, and its background server can outlive the old app. Later updates use the in-app flow below.
 
