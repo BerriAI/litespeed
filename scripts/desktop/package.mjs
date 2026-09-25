@@ -3,10 +3,12 @@ import { createHash } from 'node:crypto';
 import { mkdir, mkdtemp, readFile, rename, rm, stat, writeFile } from 'node:fs/promises';
 import { tmpdir } from 'node:os';
 import { join, resolve } from 'node:path';
+import { notarize, signDesktopApp, signDiskImage, signingConfiguration } from './signing.mjs';
 
 if (process.platform !== 'darwin') throw new Error('Build the desktop app on its target Mac architecture.');
 const source = resolve(import.meta.dirname, '../..'), platform = `${process.platform}-${process.arch}`;
 const metadata = JSON.parse(await readFile(join(source, 'package.json'), 'utf8')), version = metadata.version, build = metadata.desktopBuild || 1;
+const signing = signingConfiguration();
 const output = resolve(process.argv[2] || join(source, 'release-artifacts'));
 const temporary = await mkdtemp(join(tmpdir(), 'litespeed-desktop-package-'));
 const run = (executable, args, cwd = source, env = process.env) => execFileSync(executable, args, { cwd, env, stdio: 'inherit' });
@@ -22,6 +24,13 @@ try {
   await writeFile(join(bundle, 'runtime/BROWSER-NOTICES.md'), '# Browser runtime\n\nThis app includes the Chromium headless shell and FFmpeg distributed by Playwright. Their bundled licenses and notices are retained under runtime/browsers. Playwright is Apache-2.0 licensed; its license is retained in node_modules/playwright.\n');
   const app = join(temporary, 'Litespeed.app');
   run(process.execPath, [join(source, 'scripts/desktop/build.mjs'), '--output', app, '--bundle', bundle]);
+  if (signing) {
+    await signDesktopApp(app, signing);
+    const submission = join(temporary, 'notarization.zip');
+    run('/usr/bin/ditto', ['-c', '-k', '--sequesterRsrc', '--keepParent', app, submission]);
+    notarize(submission, app, signing);
+    run('/usr/sbin/spctl', ['--assess', '--type', 'execute', '--verbose=2', app]);
+  }
   run('/usr/bin/codesign', ['--verify', '--deep', '--strict', app]);
   await mkdir(output, { recursive: true });
   const file = `Litespeed-${version}-${platform}.zip`, archive = join(output, file), staging = archive + '.partial';
@@ -39,8 +48,13 @@ try {
   }
   const diskFile = `Litespeed-${version}-${platform}.dmg`, disk = join(output, diskFile);
   run(python, [join(source, 'scripts/desktop/dmg.py'), app, background, disk]);
+  if (signing) {
+    signDiskImage(disk, signing);
+    notarize(disk, disk, signing);
+    run('/usr/sbin/spctl', ['--assess', '--type', 'open', '--context', 'context:primary-signature', '--verbose=2', disk]);
+  }
   run('/usr/bin/hdiutil', ['verify', disk]);
-  await writeFile(join(output, `desktop-manifest-${platform}.json`), JSON.stringify({ schema: 1, version, build, platform, minimumMacOS: '14.0', notarized: false, asset: { file, sha256: createHash('sha256').update(data).digest('hex'), size: (await stat(archive)).size }, installer: { file: diskFile, sha256: createHash('sha256').update(await readFile(disk)).digest('hex'), size: (await stat(disk)).size } }, null, 2) + '\n');
+  await writeFile(join(output, `desktop-manifest-${platform}.json`), JSON.stringify({ schema: 1, version, build, platform, minimumMacOS: '14.0', notarized: Boolean(signing), ...(signing ? { signingTeam: signing.team } : {}), asset: { file, sha256: createHash('sha256').update(data).digest('hex'), size: (await stat(archive)).size }, installer: { file: diskFile, sha256: createHash('sha256').update(await readFile(disk)).digest('hex'), size: (await stat(disk)).size } }, null, 2) + '\n');
   // Keep the existing development wrapper intact. The portable copy has its
   // own output directory and can be moved or installed independently.
   const portable = join(output, 'portable'); await mkdir(portable, { recursive: true });

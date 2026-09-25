@@ -33,6 +33,33 @@ Open the app directly, or copy it to Applications. Saved work lives outside the 
 
 The installer and update ZIP contain no user configuration, sign-ins or task data. Node is pinned and checked against its published checksum; package dependencies use the lockfile, and browser versions follow the pinned Playwright package. Bundled licenses are retained alongside the runtime and dependencies.
 
+## Apple-verified downloads
+
+The existing preview 2 download is not notarized. The warning “Apple could not verify Litespeed is free of malware” means Gatekeeper cannot verify this release through Apple. A local signature does not identify a verified publisher. Follow the first-launch instructions above only for a download you trust from this repository.
+
+Warning-free distribution requires an Apple Developer Program membership, a **Developer ID Application** certificate with its private key, and access to Apple's notarization service. A development certificate or Mac App Store distribution certificate does not work for this download.
+
+The packaging script supports Developer ID signing and notarization. It signs all bundled native code, including Node, Bun, Chromium and native modules, with a secure timestamp and hardened runtime, then signs the outer app. Generated-code entitlements apply only to bundled executable runtimes. It submits the app to Apple, attaches and validates its ticket, creates the update ZIP and DMG from that app, then signs and notarizes the DMG. The final hashes include the tickets. Gatekeeper assessment must pass before a notarized manifest is produced.
+
+For a local release, import the certificate into Keychain Access and store notarization credentials in a `notarytool` Keychain profile. Set `LITESPEED_SIGNING_IDENTITY` to the certificate identity or fingerprint, `LITESPEED_NOTARY_PROFILE` to that profile name, and `APPLE_TEAM_ID` to the ten-character team ID. Set `LITESPEED_SIGNING_KEYCHAIN` if using a separate keychain, then run `npm run desktop:package`. Incomplete signing configuration fails instead of producing a local-signature fallback. Without signing configuration, development builds remain explicitly unnotarized.
+
+For GitHub Actions, a repository administrator must add these **Actions secrets** under the repository's Settings → Secrets and variables → Actions. Do not put private keys or passwords in source control or chat.
+
+| Secret | Value |
+| --- | --- |
+| `APPLE_DEVELOPER_ID_P12_BASE64` | Base64-encoded `.p12` export of the Developer ID Application certificate and private key |
+| `APPLE_DEVELOPER_ID_PASSWORD` | Password protecting that `.p12` export |
+| `APPLE_TEAM_ID` | Apple Developer team ID |
+| `APPLE_NOTARY_KEY_ID` | App Store Connect team API key ID with access to notarization |
+| `APPLE_NOTARY_ISSUER_ID` | Issuer ID for that API key |
+| `APPLE_NOTARY_KEY_P8_BASE64` | Base64-encoded `.p8` private key |
+
+Run the **macOS release** workflow manually with **notarize** enabled to produce verified artifacts for both architectures. This manual run does not publish a release. Credentials are imported into a temporary keychain and removed after packaging, including on failure. Pull request builds do not receive signing credentials. Tag-triggered public releases and `[release]` main commits require notarization and refuse to publish unnotarized desktop manifests.
+
+Before publishing the first verified desktop download, increment `desktopBuild`, use a new release tag, and verify both the native app and its bundled browser from the signed package. Never replace the existing preview assets: the updater needs a newer build and matching final checksums. Update the README download link and release notes only once the new release is available. This setup alone does not remove the warning from the already published preview.
+
+See Apple's [notarization requirements](https://developer.apple.com/documentation/security/notarizing-macos-software-before-distribution).
+
 ## Build and open
 
 Run `npm run desktop:build` once, then open `release-artifacts/Litespeed.app`. `npm run desktop` rebuilds the development wrapper and opens it. Building requires Apple's Command Line Tools. The development app points at this checkout and its Node runtime; keep the checkout in place.
