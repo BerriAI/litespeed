@@ -79,7 +79,7 @@
     "toml": "3.0.0",
     "typescript": "5.9.3",
     "ws": "^8.21.3",
-    "zod": "^4.3.6"
+    "zod": "^4.6.6"
   },
   "devDependencies": {
     "@playwright/test": "^1.63.0",
